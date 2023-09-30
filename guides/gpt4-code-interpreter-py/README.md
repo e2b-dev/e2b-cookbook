@@ -3,13 +3,13 @@
 
 ## How to start
 1. Clone this repository
-1. Open the `e2b-cookbook/guides/gpt4-code-interpreter-py` directory
-1. Install dependencies
+2. Open the `e2b-cookbook/guides/gpt4-code-interpreter-py` directory
+3. Install dependencies:
 ```sh
 poetry install
 ```
-1. Rename `.env.example` to `.env` and set up the keys
-1. Start the app
+4. Rename `.env.example` to `.env` and set up the keys
+5. Start the app:
 ```sh
 poetry run python3 gpt4_code_interpreter/main.py
 ```

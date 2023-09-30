@@ -1,0 +1,17 @@
+{
+  "name": "gpt4-code-interpreter",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@e2b/sdk": "^0.4.1",
+    "openai": "^4.10.0"
+  }
+}

@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "ai-ffmpeg"
+version = "0.1.0"
+description = ""
+authors = ["Vasek Mlejnsky <vasek.mlejnsky@gmail.com>"]
+readme = "README.md"
+packages = [{include = "ai_ffmpeg"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+e2b = "^0.7.2"
+python-dotenv = "^1.0.0"
+openai = "^0.28.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

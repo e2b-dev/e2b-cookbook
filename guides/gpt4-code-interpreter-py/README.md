@@ -8,7 +8,7 @@
 ```sh
 poetry install
 ```
-4. Rename `.env.example` to `.env` and set up the keys
+4. Rename `.env.example` to `.env` and set up the API keys
 5. Start the app:
 ```sh
 poetry run python3 gpt4_code_interpreter/main.py

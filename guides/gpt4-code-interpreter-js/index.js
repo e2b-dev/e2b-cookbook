@@ -6,7 +6,7 @@ const functions = [
   {
     name: "exec_code",
     description:
-      "Executes the passed JavaScript code using Nodejs and returns the stdout and stderr.",
+      "Executes the passed JavaScript code using Nodejs and returns the stdout and stderr. Always produce valid JSON.",
     parameters: {
       type: "object",
       properties: {

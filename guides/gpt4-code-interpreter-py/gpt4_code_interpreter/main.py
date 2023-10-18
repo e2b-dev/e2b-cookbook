@@ -81,7 +81,7 @@ async def parse_gpt_response(response):
 
 async def main():
   global session
-  session = await e2b.Session.create(id="Node")
+  session = await e2b.Session.create(id="Nodejs")
 
   response = openai.ChatCompletion.create(
     model="gpt-4", # Or use "gpt-3.5-turbo"

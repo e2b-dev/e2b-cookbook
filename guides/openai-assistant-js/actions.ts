@@ -3,13 +3,13 @@ import path from 'path'
 
 export async function saveCodeToFile(
   sandbox: Sandbox,
-  { code, absolutePath }: { code: string; absolutePath: string },
+  { code, filename }: { code: string; filename: string },
 ): Promise<string> {
   try {
-    const dir = path.dirname(absolutePath)
+    const dir = path.dirname(filename)
 
     await sandbox.filesystem.makeDir(dir)
-    await sandbox.filesystem.write(absolutePath, code)
+    await sandbox.filesystem.write(filename, code)
 
     return 'success'
   } catch (e) {

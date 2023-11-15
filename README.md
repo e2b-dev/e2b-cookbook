@@ -5,3 +5,6 @@ Example code and guides for building with [E2B](https://e2b.dev). Get your E2B A
 - **Build Custom Code Interpreter with GPT-4**
   - [Python](guides/gpt4-code-interpreter-py)
   - [Nodejs](guides/gpt4-code-interpreter-js)
+- **Use OpenAI assistant E2B integration-4**
+  - [Python](guides/openai-assistant-py)
+  - [Nodejs](guides/openai-assistant-js)

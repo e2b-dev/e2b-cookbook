@@ -19,5 +19,5 @@ build-backend = "poetry.core.masonry.api"
 
 
 [tool.poetry.scripts]
-start = "openai_assistant.main:__main__"
-create-ai-assistant = "openai_assistant.assistant:__main__"
+start = "openai_assistant.main:main"
+create-ai-assistant = "openai_assistant.assistant:create_aassistent"

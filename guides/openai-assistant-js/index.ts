@@ -13,7 +13,6 @@ function sleep(time: number) {
 }
 
 const sandbox = await Sandbox.create({
-  id: 'ai-developer-sandbox',
   onStdout: console.log,
   onStderr: console.error,
 })

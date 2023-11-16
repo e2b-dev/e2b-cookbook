@@ -5,7 +5,7 @@ from e2b import Sandbox
 from .actions import read_file, save_code_to_file, list_files
 
 
-sandbox = Sandbox("ai-developer-sandbox")
+sandbox = Sandbox()
 
 sandbox.add_action(read_file).add_action(save_code_to_file).add_action(list_files)
 

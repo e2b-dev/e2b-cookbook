@@ -16,3 +16,8 @@ openai = "^1.2.4"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+
+[tool.poetry.scripts]
+start = "openai_assistant.main:__main__"
+create-ai-assistant = "openai_assistant.assistant:__main__"

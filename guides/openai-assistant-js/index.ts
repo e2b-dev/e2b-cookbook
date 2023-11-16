@@ -1,3 +1,5 @@
+import 'dotenv/config'
+
 import OpenAI from 'openai'
 import { MessageContentText } from 'openai/resources/beta/threads'
 import { Sandbox } from '@e2b/sdk'

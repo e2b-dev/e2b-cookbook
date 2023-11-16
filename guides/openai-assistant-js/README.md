@@ -7,7 +7,7 @@
 ```sh
 npm install
 ```
-4. Rename `.env.example` to `.env` and set up the `OPENAI_API_KEY` key and the `E2B_API_KEY` key
+4. Rename `.env.example` to `.env` and set up the `OPENAI_API_KEY` key and the `E2B_API_KEY` key (Get your E2B_API_KEY here: https://e2b.dev/docs/getting-started/api-key)
 5. Run `npm run create-ai-assistant` if you don't have an assistant yet
 6. Get the assistant ID from the console output and set it in the `.env` file as `AI_ASSISTANT_ID`
 7. Start the app:

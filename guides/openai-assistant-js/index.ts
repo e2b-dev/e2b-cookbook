@@ -19,9 +19,9 @@ const sandbox = await Sandbox.create({
 })
 
 sandbox
-  .addAction('readFile', readFile)
-  .addAction('saveCodeToFile', saveCodeToFile)
-  .addAction('listFiles', listFiles)
+  .addAction(readFile)
+  .addAction(saveCodeToFile)
+  .addAction(listFiles)
 
 const task = "Write a function that takes a list of strings and returns the longest string in the list."
 

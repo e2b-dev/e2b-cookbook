@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "openai-assistant-py"
+version = "0.1.0"
+description = ""
+authors = []
+readme = "README.md"
+packages = [{include = "openai_assistant"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+e2b = "0.11.0rc1"
+python-dotenv = "^1.0.0"
+openai = "^1.2.4"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.poetry.scripts]
+start = "openai_assistant.main:main"
+create-ai-assistant = "openai_assistant.assistant:create_aassistent"

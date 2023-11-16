@@ -19,9 +19,9 @@ const sandbox = await Sandbox.create({
 })
 
 sandbox
-  .registerAction('readFile', readFile)
-  .registerAction('saveCodeToFile', saveCodeToFile)
-  .registerAction('listFiles', listFiles)
+  .addAction('readFile', readFile)
+  .addAction('saveCodeToFile', saveCodeToFile)
+  .addAction('listFiles', listFiles)
 
 const task = "Write a function that takes a list of strings and returns the longest string in the list."
 
@@ -41,7 +41,7 @@ assistantLoop: while (true) {
 
   switch (run.status) {
     case 'requires_action': {
-      const outputs = await sandbox.openai.assistant.run(run)
+      const outputs = await sandbox.openai.actions.run(run)
 
       if (outputs.length > 0) {
         await openai.beta.threads.runs.submitToolOutputs(thread.id, run.id, {

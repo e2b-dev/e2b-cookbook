@@ -8,7 +8,7 @@ from openai.types.beta.assistant_create_params import Tool
 load_dotenv()
 
 
-def create_aassistent():
+def create_assistant():
     client = openai.Client()
 
     functions: List[Tool] = [

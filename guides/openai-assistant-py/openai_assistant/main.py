@@ -7,9 +7,16 @@ from .actions import read_file, save_code_to_file, list_files
 
 sandbox = Sandbox("ai-developer-sandbox")
 
-sandbox.register_action("readFile", read_file).register_action(
-    "saveCodeToFile", save_code_to_file
-).register_action("listFiles", list_files)
+sandbox.add_action(
+    read_file,
+    "readFile",
+).add_action(
+    save_code_to_file,
+    "saveCodeToFile",
+).add_action(
+    list_files,
+    "listFiles",
+)
 
 task = "Write a function that takes a list of strings and returns the longest string in the list."
 
@@ -30,7 +37,7 @@ run = client.beta.threads.runs.create(thread_id=thread.id, assistant_id=assistan
 
 while True:
     if run.status == "requires_action":
-        outputs = sandbox.openai.assistant.run(run)
+        outputs = sandbox.openai.actions.run(run)
         if len(outputs) > 0:
             client.beta.threads.runs.submit_tool_outputs(
                 thread_id=thread.id, run_id=run.id, tool_outputs=outputs

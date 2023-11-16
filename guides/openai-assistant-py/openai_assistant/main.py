@@ -7,16 +7,7 @@ from .actions import read_file, save_code_to_file, list_files
 
 sandbox = Sandbox("ai-developer-sandbox")
 
-sandbox.add_action(
-    read_file,
-    "readFile",
-).add_action(
-    save_code_to_file,
-    "saveCodeToFile",
-).add_action(
-    list_files,
-    "listFiles",
-)
+sandbox.add_action(read_file).add_action(save_code_to_file).add_action(list_files)
 
 task = "Write a function that takes a list of strings and returns the longest string in the list."
 

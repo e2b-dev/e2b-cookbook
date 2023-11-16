@@ -10,7 +10,7 @@ functions: List[Tool] = [
     {
         "type": "function",
         "function": {
-            "name": "saveCodeToFile",
+            "name": "save_code_to_file",
             "description": "Save code to file",
             "parameters": {
                 "type": "object",
@@ -30,7 +30,7 @@ functions: List[Tool] = [
     {
         "type": "function",
         "function": {
-            "name": "listFiles",
+            "name": "list_files",
             "description": "List files in a directory",
             "parameters": {
                 "type": "object",
@@ -46,7 +46,7 @@ functions: List[Tool] = [
     {
         "type": "function",
         "function": {
-            "name": "readFile",
+            "name": "read_file",
             "description": "Read a file",
             "parameters": {
                 "type": "object",

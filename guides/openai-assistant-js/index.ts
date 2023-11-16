@@ -40,6 +40,7 @@ let run = await openai.beta.threads.runs.create(thread.id, { assistant_id: assis
 assistantLoop: while (true) {
   await sleep(1000)
 
+  console.log("Assistant is currently in status:", run.status)
   switch (run.status) {
     case 'requires_action': {
       const outputs = await sandbox.openai.actions.run(run)
@@ -56,7 +57,7 @@ assistantLoop: while (true) {
       const messages = await openai.beta.threads.messages.list(thread.id)
       const textMessages = messages.data[0].content.filter(message => message.type === 'text') as MessageContentText[]
       console.log('Thread finished:', textMessages[0].text.value)
-      break
+      break assistantLoop
     }
     case 'queued':
     case 'in_progress':

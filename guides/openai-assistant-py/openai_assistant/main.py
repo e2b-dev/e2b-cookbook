@@ -33,11 +33,9 @@ def main():
     run = client.beta.threads.runs.create(thread_id=thread.id, assistant_id=assistant.id)
 
     while True:
+        print("Assistant is currently in status:", run.status)
         if run.status == "requires_action":
-            print("Run requires action")
-            print("Inputs:", run.required_action.submit_tool_outputs.tool_calls)
             outputs = sandbox.openai.actions.run(run)
-            print("Outputs:", outputs)
             if len(outputs) > 0:
                 client.beta.threads.runs.submit_tool_outputs(
                     thread_id=thread.id, run_id=run.id, tool_outputs=outputs
@@ -53,11 +51,9 @@ def main():
             break
 
         elif run.status in ["queued", "in_progress"]:
-            print(f"Waiting for the run to finish: {run.status}")
             pass
 
         elif run.status in ["cancelled", "cancelling", "expired", "failed"]:
-            print(f"Run failed: {run.status}")
             break
 
         else:

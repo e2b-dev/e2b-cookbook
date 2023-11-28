@@ -55,7 +55,7 @@ def create_assistant():
     When given a coding task, write and save code to files and install any packages if needed.
     Start by listing all files inside the repo. You work inside the '/home/user/repo' directory.
 
-    Please print any code that you have written to the code also to the terminal.
+    Please print any code that you have written there also to the terminal.
 
     Thank you, you're the best!
     """,

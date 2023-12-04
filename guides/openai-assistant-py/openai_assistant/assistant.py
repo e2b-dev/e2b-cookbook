@@ -4,9 +4,7 @@ from dotenv import load_dotenv
 import openai
 from openai.types.beta.assistant_create_params import Tool
 
-
 load_dotenv()
-
 
 def create_assistant():
     client = openai.Client()
@@ -64,13 +62,31 @@ def create_assistant():
                 },
             },
         },
+        {
+            "type": "function",
+            "function": {
+                "name": "commit_and_push",
+                "description": "Commit and push changes to the repository",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "commit_message": {
+                            "type": "string",
+                            "description": "The commit message",
+                        },
+                    },
+                },
+            },
+        },
     ]
 
     ai_developer = client.beta.assistants.create(
         instructions="""You are an AI developer.
-    When given a coding task, write and save code to files and install any packages if needed.
-    Start by listing all files inside the repo. You work inside the '/home/user/repo' directory.
-    Don't argue with me and just complete the task.
+    The provided codebase is in the /home/user/repo.
+    When given a coding task, you will work on it until it is completed. You will summarize your steps.
+    If you encounter some problem, just communicate it please. 
+    You can save code to file (or create a new file), list files in a given directory, read files, and commit and push changes.
+    You are professional, don't argue, and just complete the task.
     """,
         name="AI Developer",
         tools=functions,
@@ -79,7 +95,6 @@ def create_assistant():
 
     print("AI Developer Assistant created, copy its id to .env file:")
     print(ai_developer.id)
-
 
 if __name__ == "__main__":
     create_assistant()

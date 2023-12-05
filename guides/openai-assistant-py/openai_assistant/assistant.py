@@ -6,6 +6,7 @@ from openai.types.beta.assistant_create_params import Tool
 
 load_dotenv()
 
+
 def create_assistant():
     client = openai.Client()
 
@@ -21,6 +22,26 @@ def create_assistant():
                         "code": {
                             "type": "string",
                             "description": "The code to save",
+                        },
+                        "filename": {
+                            "type": "string",
+                            "description": "The filename including the path and extension",
+                        },
+                    },
+                },
+            },
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "write_to_file",
+                "description": "Write text or other content to a file",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "content": {
+                            "type": "string",
+                            "description": "The content to save",
                         },
                         "filename": {
                             "type": "string",
@@ -95,6 +116,7 @@ def create_assistant():
 
     print("AI Developer Assistant created, copy its id to .env file:")
     print(ai_developer.id)
+
 
 if __name__ == "__main__":
     create_assistant()

@@ -18,6 +18,7 @@ def save_code_to_file(sandbox: Sandbox, args: Dict[str, Any]) -> str:
     except Exception as e:
         return f"Error: {e}"
 
+
 def write_to_file(sandbox: Sandbox, args: Dict[str, Any]) -> str:
     filename = args["filename"]
     content = args["content"]
@@ -47,8 +48,8 @@ def list_files(sandbox: Sandbox, args: Dict[str, Any]) -> str:
 
 
 def read_file(sandbox: Sandbox, args: Dict[str, Any]) -> str:
-    path = args["path"]   # accessing a dictionary key named "path" inside the args dictionary
-    
+    path = args["path"]
+
     try:
         return sandbox.filesystem.read(path)
     except Exception as e:
@@ -56,25 +57,25 @@ def read_file(sandbox: Sandbox, args: Dict[str, Any]) -> str:
 
 
 def commit_and_push(sandbox: Sandbox, args: Dict[str, Any]) -> str:
-    repo_directory = "/home/user/repo"  # Assuming the repository is cloned to this directory
+    repo_directory = (
+        "/home/user/repo"  # Assuming the repository is cloned to this directory
+    )
     commit_message = args["commit_message"]
 
     git_add_proc = sandbox.process.start_and_wait(f"git -C {repo_directory} add .")
     if git_add_proc.stderr != "":
         return git_add_proc.stderr
-    else:
-        git_commit_proc = sandbox.process.start_and_wait(f"git -C {repo_directory} commit -m '{commit_message}'")
-        if git_commit_proc.stderr != "":
-            return git_commit_proc.stderr
-        else:
-            git_push_proc = sandbox.process.start_and_wait(f"git -C {repo_directory} push -u origin")  # Adjust 'main' to your branch name if different            
-            if git_push_proc.stderr != "":
-                return git_push_proc.stderr
-            else:
-                return "success"
-    
 
+    git_commit_proc = sandbox.process.start_and_wait(
+        f"git -C {repo_directory} commit -m '{commit_message}'"
+    )
+    if git_commit_proc.stderr != "":
+        return git_commit_proc.stderr
 
-# Functions with type hints
+    git_push_proc = sandbox.process.start_and_wait(
+        f"git -C {repo_directory} push -u origin"
+    )  # Adjust 'main' to your branch name if different
+    if git_push_proc.stderr != "":
+        return git_push_proc.stderr
 
-# print(read_file(Sandbox,[1, Any]))
+    return "success"

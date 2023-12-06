@@ -14,7 +14,11 @@ We are E2B. We provide sandboxed cloud environments made for AI agents and AI ap
 
 ## What we will do
 
-In this guide, we will build a custom AI agent that will clone our GitHub repository to its remote cloud environment, work on the repo there, and then commit the changes to GitHub. We will use the E2B Sandboxes for the remote execution of tasks, together with the Assistants API by OpenAI. The crucial concept from OpenAI we will use is Function Calling. You can find the final code [here](link-to-code). All links to particular parts of code in this post refer to the corresponding code on GitHub.
+In this guide, we will build a custom AI agent that will clone our GitHub repository to its remote cloud environment, work on the repo there, and then commit the changes to GitHub.
+
+We will use the E2B Sandboxes for the remote execution of tasks, together with the Assistants API by OpenAI. The crucial concept from OpenAI we will use is Function Calling.
+
+> You can find the final code [here](link-to-code). All links to particular parts of code in this post refer to the corresponding code on GitHub.
 
 ### Prerequisites
 
@@ -300,6 +304,7 @@ client = openai.Client()
 AI_ASSISTANT_ID = os.getenv("AI_ASSISTANT_ID")
 assistant = client.beta.assistants.retrieve(AI_ASSISTANT_ID)
 ```
+
 ### Prompt user for GitHub repo and task
 We define three functions that ask the user for
 - GitHub repository URL

@@ -488,5 +488,5 @@ Here are some examples of my assistant working on simple tasks - writing me 
 
 ![Gif 2](/guides/openai-assistant-py/openai_assistant/V0000002.gif "This is how the assistant starts working when I give him my GitHub token and assign a task. When he needs to call one of the actions, the process prints to the terminal and also reports success/error.")
 
-![Gif 3](/guides/openai-assistant-py/openai_assistant/V000003.gif "This is how my agent dealt with a simple coding ask. You can see he created a new file with code in my repo under his name "AI Developer".")
+![Gif 3](/guides/openai-assistant-py/openai_assistant/V000003.gif "This is how my agent dealt with a simple coding ask. You can see he created a new file with code in my repo under his name 'AI Developer'.")
 

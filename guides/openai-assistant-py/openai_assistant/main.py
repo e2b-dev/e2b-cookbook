@@ -11,6 +11,9 @@ from actions import (
     write_to_file,
 )
 
+from rich import print #NEW NEW NEW
+from rich.console import Console #NEW NEW NEW
+
 load_dotenv()
 client = openai.Client()
 
@@ -43,7 +46,7 @@ repo_directory = "/home/user/repo"
 def main():
     sandbox = Sandbox(
         on_stderr=lambda message: print("[Sandbox stderr]", message),
-        on_stdout=lambda message: print("[Sandbox stdout]", message),
+        on_stdout=lambda message: console.print("[Sandbox stdout]", message),
     )
     sandbox.add_action(read_file).add_action(save_code_to_file).add_action(
         list_files

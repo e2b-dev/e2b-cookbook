@@ -17,14 +17,10 @@ client = openai.Client()
 AI_ASSISTANT_ID = os.getenv("AI_ASSISTANT_ID")
 assistant = client.beta.assistants.retrieve(AI_ASSISTANT_ID)
 
-
-# defining the prompt for repo URL
 def prompt_user_for_github_repo():
     repo_url = input("Please provide the URL of your public GitHub repository: ")
     return repo_url
 
-
-# defining the prompt for specifying user task with github repo
 def prompt_user_for_task(repo_url):
     user_task_specification = input(
         "Please provide what you want to achieve with that repository: "
@@ -35,14 +31,12 @@ def prompt_user_for_task(repo_url):
     )
     return user_task
 
-
-# letting user provide authentication for the sandbox
 def prompt_user_for_auth():
     user_auth = input("Please provide your github authentication token: ")
     return user_auth
 
 
-# determining the directory where we clone the repository in the sandbox
+# Determe the directory where we clone the repository in the sandbox
 repo_directory = "/home/user/repo"
 
 
@@ -97,10 +91,6 @@ def main():
         print("Error: Unable to clone the repository")
         exit(1)
 
-    # user_auth = prompt_user_for__auth()
-    # git_auth = sandbox.process.start_and_wait(f"TBD{user_auth}")
-
-    # task = user_task
     thread = client.beta.threads.create(
         messages=[
             {

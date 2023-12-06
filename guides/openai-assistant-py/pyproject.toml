@@ -8,7 +8,7 @@ packages = [{include = "openai_assistant"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-e2b = "0.12.0"
+e2b = "^0.13.7"
 python-dotenv = "^1.0.0"
 openai = "^1.2.4"
 

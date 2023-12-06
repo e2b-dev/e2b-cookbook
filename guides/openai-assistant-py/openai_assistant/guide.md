@@ -2,11 +2,13 @@
 
 ## Python guide with complete code
 
+![Cover image](Assistants_API_v0.3.png)
+
 We are E2B. We provide sandboxed cloud environments made for AI agents and AI apps. Try our Custom Sandboxes and support us on GitHub with a star if you like it. E2B sandboxes work with any LLM - we also support the new Assistants API.
 
 ---
 
-🏁 **Final code:** [E2B Cookbook - OpenAI Assistant](link-to-code)
+> 🏁 **Final code:** [E2B Cookbook - OpenAI Assistant](link-to-code)
 
 ---
 
@@ -471,3 +473,11 @@ if __name__ == "__main__":
 > 🏁 Final code: E2B Cookbook - OpenAI Assistant
 
 Here are some examples of my assistant working on simple tasks - writing me a README, and creating a new file with a simple JavaScript code.
+
+
+![Gif 1](/guides/openai-assistant-py/openai_assistant/V00001.gif)
+
+![Gif 2](/guides/openai-assistant-py/openai_assistant/V0000002.gif)
+
+![Gif 3](/guides/openai-assistant-py/openai_assistant/V000003.gif)
+

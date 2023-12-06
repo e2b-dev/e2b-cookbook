@@ -2,7 +2,7 @@
 
 ## Python guide with complete code
 
-![Cover image](Assistants_API_v0.3.png)
+![Cover image](001.png)
 
 We are E2B. We provide sandboxed cloud environments made for AI agents and AI apps. Try our Custom Sandboxes and support us on GitHub with a star if you like it. E2B sandboxes work with any LLM - we also support the new Assistants API.
 
@@ -26,7 +26,7 @@ Sign up via E2B docs to get your free API key for using sandboxes.
 
 ---
 
-![E2B API Key screenshot](../../openai-assistant-js/e2b_api_key.png "Sign up via E2B docs to get your free API key for using sandboxes")
+![E2B API Key screenshot](002.png "Sign up via E2B docs to get your free API key for using sandboxes")
 
 ## 1. Create files
 
@@ -307,7 +307,7 @@ We define three functions that ask the user for
 - Providing the GitHub authentication token (use the classic Personal access token).
 
 
-![HTTPS code](github%20https%20code.png "Tip: Provide the GitHub URL in the HTTPS format")
+![HTTPS code](003.png "Tip: Provide the GitHub URL in the HTTPS format")
 
 Then we set up the repo_directoryto be "/home/user/repo". This is the path in the sandbox where the repository will be cloned and where the assistant will work on the given task.
 
@@ -336,7 +336,7 @@ repo_directory = "/home/user/repo"
 ### Spawning the sandbox
 Now we can define the mainfunction to spawn the E2B sandbox.
 
-![Assistants API OpenAI](0_axDrINJOn1X1HA39.png "We utilize the OpenAI's Assistants API concept of Threads and Runs")
+![Assistants API OpenAI](004.png "We utilize the OpenAI's Assistants API concept of Threads and Runs")
 
 Inside the function, we choose the preferred sandbox. 
 
@@ -416,7 +416,7 @@ def main():
 
 Still  inside the main function, we print the assistant's process to the terminal. Each time it chooses to use one of the actions, we see in the terminal how it uses the action and whether it ends with success or error.
 
-![Assistants status](OpenAI%20Assistants%20Status.png "A schema of assistant's run steps")
+![Assistants status](005.png "A schema of assistant's run steps")
 
 > Note: If the assistant is "queued", we are waiting for OpenAI's processes.
 
@@ -484,9 +484,9 @@ if __name__ == "__main__":
 Here are some examples of my assistant working on simple tasks - writing me a README, and creating a new file with a simple JavaScript code.
 
 
-![Gif 1](/guides/openai-assistant-py/openai_assistant/V00001.gif "Before and after the AI agent worked on my repository readme")
+![Gif 1](006.gif "Before and after the AI agent worked on my repository readme")
 
-![Gif 2](/guides/openai-assistant-py/openai_assistant/V0000002.gif "This is how the assistant starts working when I give him my GitHub token and assign a task. When he needs to call one of the actions, the process prints to the terminal and also reports success/error.")
+![Gif 2](007.gif "This is how the assistant starts working when I give him my GitHub token and assign a task. When he needs to call one of the actions, the process prints to the terminal and also reports success/error.")
 
-![Gif 3](/guides/openai-assistant-py/openai_assistant/V000003.gif "This is how my agent dealt with a simple coding ask. You can see he created a new file with code in my repo under his name 'AI Developer'.")
+![Gif 3](008.gif "This is how my agent dealt with a simple coding ask. You can see he created a new file with code in my repo under his name 'AI Developer'.")
 

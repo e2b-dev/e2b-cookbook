@@ -11,8 +11,8 @@ from actions import (
     write_to_file,
 )
 
-from rich import print #NEW NEW NEW
-from rich.console import Console #NEW NEW NEW
+from rich import print
+from rich.console import Console
 
 load_dotenv()
 client = openai.Client()
@@ -113,14 +113,8 @@ def main():
             print("Assistant run:")
             print()
             print(f"ID: {run.id}")
-            # print(f"Assistant ID: {run.assistant_id}")
             print(f"Status: {run.status}")
-            # print(f"Instructions: {run.instructions}")
-            # print(f"Metadata: {run.metadata}")
-            # print(f"Model: {run.model}")
             print(f"Required Action: {run.required_action}")
-            # print(f"Started At: {run.started_at}")
-            # print("Assistant run", run)
             print()
             outputs = sandbox.openai.actions.run(run)
             print(outputs)

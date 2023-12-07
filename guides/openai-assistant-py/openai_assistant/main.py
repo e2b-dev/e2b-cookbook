@@ -59,15 +59,16 @@ repo_directory = "/home/user/repo"
 # Create a Rich Console instance with the custom theme
 console = Console()
 
+def handle_sandbox_stdout(message):
+    console.print("[sandbox_stdout]", message.line)
 
 def main():
     sandbox = Sandbox(
         on_stderr=lambda message: print("[Sandbox stderr]", message),
-        on_stdout=lambda message: console.print("[Sandbox stdout]", message),
+        on_stdout=handle_sandbox_stdout,
     )
     sandbox.add_action(read_file).add_action(save_code_to_file).add_action(
-        list_files
-    ).add_action(commit_and_push).add_action(write_to_file)
+        list_files).add_action(commit_and_push).add_action(write_to_file) #TBD FORMAT
 
     # Identify AI developer in git
     sandbox.process.start_and_wait(
@@ -132,15 +133,15 @@ def main():
                 print("Assistant is currently in status:", run.status)
                 previous_status = run.status #NEW NEW NEW
             if run.status == "requires_action":
-                print("Assistant run:")
-                print()
-                print(f"ID: {run.id}")
-                print(f"Status: {run.status}")
-                print(f"Required Action: {run.required_action}")
-                print()
+                print("Assistant is using action:") #NEW NEW NEW
+                # print()
+                # print(f"ID: {run.id}")
+                #print(f"Status: {run.status}")
+                # print(f"Required Action: {run.required_action}\n")
+                # print()
                 outputs = sandbox.openai.actions.run(run)
-                print(outputs)
-                print()
+                # print(outputs)
+                # print()
                 if len(outputs) > 0:
                     client.beta.threads.runs.submit_tool_outputs(
                         thread_id=thread.id, run_id=run.id, tool_outputs=outputs

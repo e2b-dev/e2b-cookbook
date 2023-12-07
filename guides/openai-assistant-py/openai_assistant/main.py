@@ -12,13 +12,24 @@ from actions import (
 )
 
 from rich import print
-from rich.console import Console
+from rich.console import Console #NEW NEW NEW
+from rich.spinner import Spinner #NEW NEW NEW
+from rich.theme import Theme #NEW NEW NEW
 
 load_dotenv()
 client = openai.Client()
 
 AI_ASSISTANT_ID = os.getenv("AI_ASSISTANT_ID")
 assistant = client.beta.assistants.retrieve(AI_ASSISTANT_ID)
+
+
+# Create a custom theme with your desired colors            # NEW NEW NEW
+# custom_theme = Theme({
+#     "[sandbox_stderr]": "#FF0000",  # Red for sandbox stderr
+#     "[sandbox_stdout]": "#FF8800",  # Green for sandbox stdout
+# })
+
+
 
 def prompt_user_for_github_repo():
     repo_url = input("Please provide the URL of your public GitHub repository: ")
@@ -41,6 +52,12 @@ def prompt_user_for_auth():
 
 # Determe the directory where we clone the repository in the sandbox
 repo_directory = "/home/user/repo"
+
+
+
+# NEW NEW NEW
+# Create a Rich Console instance with the custom theme
+console = Console()
 
 
 def main():
@@ -107,44 +124,49 @@ def main():
         thread_id=thread.id, assistant_id=assistant.id
     )
 
-    while True:
-        print("Assistant is currently in status:", run.status)
-        if run.status == "requires_action":
-            print("Assistant run:")
-            print()
-            print(f"ID: {run.id}")
-            print(f"Status: {run.status}")
-            print(f"Required Action: {run.required_action}")
-            print()
-            outputs = sandbox.openai.actions.run(run)
-            print(outputs)
-            print()
-            if len(outputs) > 0:
-                client.beta.threads.runs.submit_tool_outputs(
-                    thread_id=thread.id, run_id=run.id, tool_outputs=outputs
+    spinner = Spinner("bouncingBall") #NEW NEW NEW
+    with console.status(spinner): #NEW NEW NEW
+        previous_status=None
+        while True:
+            if run.status != previous_status: #NEW NEW NEW
+                print("Assistant is currently in status:", run.status)
+                previous_status = run.status #NEW NEW NEW
+            if run.status == "requires_action":
+                print("Assistant run:")
+                print()
+                print(f"ID: {run.id}")
+                print(f"Status: {run.status}")
+                print(f"Required Action: {run.required_action}")
+                print()
+                outputs = sandbox.openai.actions.run(run)
+                print(outputs)
+                print()
+                if len(outputs) > 0:
+                    client.beta.threads.runs.submit_tool_outputs(
+                        thread_id=thread.id, run_id=run.id, tool_outputs=outputs
+                    )
+
+            elif run.status == "completed":
+                print("Run completed")
+                messages = (
+                    client.beta.threads.messages.list(thread_id=thread.id).data[0].content
                 )
+                text_messages = [message for message in messages if message.type == "text"]
+                print("Thread finished:", text_messages[0].text.value)
+                break
 
-        elif run.status == "completed":
-            print("Run completed")
-            messages = (
-                client.beta.threads.messages.list(thread_id=thread.id).data[0].content
-            )
-            text_messages = [message for message in messages if message.type == "text"]
-            print("Thread finished:", text_messages[0].text.value)
-            break
+            elif run.status in ["queued", "in_progress"]:
+                pass
 
-        elif run.status in ["queued", "in_progress"]:
-            pass
+            elif run.status in ["cancelled", "cancelling", "expired", "failed"]:
+                break
 
-        elif run.status in ["cancelled", "cancelling", "expired", "failed"]:
-            break
+            else:
+                print(f"Unknown status: {run.status}")
+                break
 
-        else:
-            print(f"Unknown status: {run.status}")
-            break
-
-        run = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
-        time.sleep(0.2)
+            run = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
+            time.sleep(0.5)
 
     sandbox.close()
 

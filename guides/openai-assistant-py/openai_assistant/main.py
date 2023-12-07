@@ -72,11 +72,17 @@ def main():
         on_stderr=handle_sandbox_stderr,
         on_stdout=handle_sandbox_stdout,
     )
-    sandbox.add_action(read_file).add_action(save_code_to_file).add_action(
+    sandbox.add_action(
+        read_file
+    ).add_action(
+        save_code_to_file
+    ).add_action(
         list_files
-    ).add_action(commit_and_push).add_action(
+    ).add_action(
+        commit_and_push
+    ).add_action(
         write_to_file
-    )  # TBD FORMAT
+    )
 
     # Identify AI developer in git
     sandbox.process.start_and_wait(

@@ -80,7 +80,7 @@ def commit_and_push(sandbox: Sandbox, args: Dict[str, Any]) -> str:
     )
     commit_message = args["commit_message"]
     console.print(
-        f"[sandbox_action]<Sandbox Action>[/sandbox_action] Committing with the message {commit_message}"
+        f"[sandbox_action]<Sandbox Action>[/sandbox_action] Committing with the message '{commit_message}'"
     )
 
     git_add_proc = sandbox.process.start_and_wait(f"git -C {repo_directory} add .")

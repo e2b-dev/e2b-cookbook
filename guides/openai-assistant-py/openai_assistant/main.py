@@ -15,6 +15,7 @@ from rich import print
 from rich.console import Console
 from rich.spinner import Spinner
 from rich.theme import Theme
+from rich.prompt import Prompt
 
 load_dotenv()
 client = openai.Client()
@@ -31,13 +32,13 @@ custom_theme = Theme(
 
 
 def prompt_user_for_github_repo():
-    repo_url = input("Please provide the URL of your public GitHub repository: ")
+    repo_url = Prompt.ask("[bold #995100]Provide URL of your public GitHub repository (Go to your repo, click on [bold #FF8800]<> Code[/bold #FF8800] and select [bold #FF8800]HTTPS[/bold #FF8800] format): [/bold #995100]")
     return repo_url
 
 
 def prompt_user_for_task(repo_url):
-    user_task_specification = input(
-        "Please provide what you want to achieve with that repository: "
+    user_task_specification = Prompt.ask(
+        "What do you want the AI developer to do?"
     )
     user_task = (
         f"Please work with the codebase repository called {repo_url} "
@@ -47,7 +48,7 @@ def prompt_user_for_task(repo_url):
 
 
 def prompt_user_for_auth():
-    user_auth = input("Please provide your github authentication token: ")
+    user_auth = Prompt.ask("\nHello! :wave:\nPlease provide your [bold #995100]GitHub token[/bold #995100] to securely interact with your repositories.\nIf you don't have a token, you can set it up [bold #FF8800][link=https://github.com/settings/tokens]here[/link][/bold #FF8800].\nPlease give it [bold #995100]admin:org[/ bold #995100], [bold #995100]read:project[/ bold #995100], and [bold #995100]repo[/ bold #995100] permissions. ", password=True)
     return user_auth
 
 
@@ -144,10 +145,10 @@ def main():
         previous_status = None
         while True:
             if run.status != previous_status:
-                print("Assistant is currently in status:", run.status)
+                print(" Assistant is currently in status:", run.status)
                 previous_status = run.status
             if run.status == "requires_action":
-                print("Assistant is using action:")
+                print(" Assistant is using action:")
                 outputs = sandbox.openai.actions.run(run)
                 if len(outputs) > 0:
                     client.beta.threads.runs.submit_tool_outputs(
@@ -155,7 +156,7 @@ def main():
                     )
 
             elif run.status == "completed":
-                print("Run completed")
+                print(" Run completed")
                 messages = (
                     client.beta.threads.messages.list(thread_id=thread.id)
                     .data[0]

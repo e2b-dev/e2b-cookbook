@@ -5,9 +5,11 @@ from rich.console import Console
 from rich.theme import Theme
 
 # Create a Rich Console instance with your desired colors
-custom_theme = Theme({
-    "sandbox_action": "bold #FF8800",  # Adjust color as needed
-})
+custom_theme = Theme(
+    {
+        "sandbox_action": "bold #FF8800",  # Adjust color as needed
+    }
+)
 
 console = Console(theme=custom_theme)
 
@@ -15,7 +17,9 @@ console = Console(theme=custom_theme)
 def save_code_to_file(sandbox: Sandbox, args: Dict[str, Any]) -> str:
     filename = args["filename"]
     code = args["code"]
-    console.print(f"[sandbox_action]<Sandbox Action>[/sandbox_action] Saving code to {filename}")
+    console.print(
+        f"[sandbox_action]<Sandbox Action>[/sandbox_action] Saving code to {filename}"
+    )
 
     try:
         dir = os.path.dirname(filename)
@@ -29,7 +33,9 @@ def save_code_to_file(sandbox: Sandbox, args: Dict[str, Any]) -> str:
 def write_to_file(sandbox: Sandbox, args: Dict[str, Any]) -> str:
     filename = args["filename"]
     content = args["content"]
-    console.print(f"[sandbox_action]<Sandbox Action>[/sandbox_action] Writing content to file {filename}")
+    console.print(
+        f"[sandbox_action]<Sandbox Action>[/sandbox_action] Writing content to file {filename}"
+    )
 
     try:
         dir = os.path.dirname(filename)
@@ -42,7 +48,9 @@ def write_to_file(sandbox: Sandbox, args: Dict[str, Any]) -> str:
 
 def list_files(sandbox: Sandbox, args: Dict[str, Any]) -> str:
     path = args["path"]
-    console.print(f"[sandbox_action]<Sandbox Action>[/sandbox_action] Listing files on path {path}")
+    console.print(
+        f"[sandbox_action]<Sandbox Action>[/sandbox_action] Listing files on path {path}"
+    )
 
     try:
         files = sandbox.filesystem.list(path)
@@ -56,7 +64,9 @@ def list_files(sandbox: Sandbox, args: Dict[str, Any]) -> str:
 
 def read_file(sandbox: Sandbox, args: Dict[str, Any]) -> str:
     path = args["path"]
-    console.print(f"[sandbox_action]<Sandbox Action>[/sandbox_action] Reading file on path {path}")
+    console.print(
+        f"[sandbox_action]<Sandbox Action>[/sandbox_action] Reading file on path {path}"
+    )
 
     try:
         return sandbox.filesystem.read(path)
@@ -65,9 +75,13 @@ def read_file(sandbox: Sandbox, args: Dict[str, Any]) -> str:
 
 
 def commit_and_push(sandbox: Sandbox, args: Dict[str, Any]) -> str:
-    repo_directory = "/home/user/repo"  # Assuming the repository is cloned to this directory
+    repo_directory = (
+        "/home/user/repo"  # Assuming the repository is cloned to this directory
+    )
     commit_message = args["commit_message"]
-    console.print(f"[sandbox_action]<Sandbox Action>[/sandbox_action] Committing with the message {commit_message}")
+    console.print(
+        f"[sandbox_action]<Sandbox Action>[/sandbox_action] Committing with the message {commit_message}"
+    )
 
     git_add_proc = sandbox.process.start_and_wait(f"git -C {repo_directory} add .")
     if git_add_proc.stderr != "":

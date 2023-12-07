@@ -12,9 +12,9 @@ from actions import (
 )
 
 from rich import print
-from rich.console import Console #NEW NEW NEW
-from rich.spinner import Spinner #NEW NEW NEW
-from rich.theme import Theme #NEW NEW NEW
+from rich.console import Console
+from rich.spinner import Spinner
+from rich.theme import Theme
 
 load_dotenv()
 client = openai.Client()
@@ -23,17 +23,17 @@ AI_ASSISTANT_ID = os.getenv("AI_ASSISTANT_ID")
 assistant = client.beta.assistants.retrieve(AI_ASSISTANT_ID)
 
 
-# Create a custom theme with your desired colors            # NEW NEW NEW
-# custom_theme = Theme({
-#     "[sandbox_stderr]": "#FF0000",  # Red for sandbox stderr
-#     "[sandbox_stdout]": "#FF8800",  # Green for sandbox stdout
-# })
-
+custom_theme = Theme(
+    {
+        "theme": "bold #FFB766",  # Adjust color as needed
+    }
+)
 
 
 def prompt_user_for_github_repo():
     repo_url = input("Please provide the URL of your public GitHub repository: ")
     return repo_url
+
 
 def prompt_user_for_task(repo_url):
     user_task_specification = input(
@@ -45,6 +45,7 @@ def prompt_user_for_task(repo_url):
     )
     return user_task
 
+
 def prompt_user_for_auth():
     user_auth = input("Please provide your github authentication token: ")
     return user_auth
@@ -54,21 +55,28 @@ def prompt_user_for_auth():
 repo_directory = "/home/user/repo"
 
 
-
-# NEW NEW NEW
 # Create a Rich Console instance with the custom theme
-console = Console()
+console = Console(theme=custom_theme)
+
 
 def handle_sandbox_stdout(message):
-    console.print("[sandbox_stdout]", message.line)
+    console.print(f"[theme]<Sandbox>[/theme] {message.line}")
+
+
+def handle_sandbox_stderr(message):
+    console.print(f"[theme]<Sandbox>[/theme] {message.line}")
+
 
 def main():
     sandbox = Sandbox(
-        on_stderr=lambda message: print("[Sandbox stderr]", message),
+        on_stderr=handle_sandbox_stderr,
         on_stdout=handle_sandbox_stdout,
     )
     sandbox.add_action(read_file).add_action(save_code_to_file).add_action(
-        list_files).add_action(commit_and_push).add_action(write_to_file) #TBD FORMAT
+        list_files
+    ).add_action(commit_and_push).add_action(
+        write_to_file
+    )  # TBD FORMAT
 
     # Identify AI developer in git
     sandbox.process.start_and_wait(
@@ -125,23 +133,16 @@ def main():
         thread_id=thread.id, assistant_id=assistant.id
     )
 
-    spinner = Spinner("bouncingBall") #NEW NEW NEW
-    with console.status(spinner): #NEW NEW NEW
-        previous_status=None
+    spinner = Spinner("bouncingBall")
+    with console.status(spinner):
+        previous_status = None
         while True:
-            if run.status != previous_status: #NEW NEW NEW
+            if run.status != previous_status:
                 print("Assistant is currently in status:", run.status)
-                previous_status = run.status #NEW NEW NEW
+                previous_status = run.status
             if run.status == "requires_action":
-                print("Assistant is using action:") #NEW NEW NEW
-                # print()
-                # print(f"ID: {run.id}")
-                #print(f"Status: {run.status}")
-                # print(f"Required Action: {run.required_action}\n")
-                # print()
+                print("Assistant is using action:")
                 outputs = sandbox.openai.actions.run(run)
-                # print(outputs)
-                # print()
                 if len(outputs) > 0:
                     client.beta.threads.runs.submit_tool_outputs(
                         thread_id=thread.id, run_id=run.id, tool_outputs=outputs
@@ -150,9 +151,13 @@ def main():
             elif run.status == "completed":
                 print("Run completed")
                 messages = (
-                    client.beta.threads.messages.list(thread_id=thread.id).data[0].content
+                    client.beta.threads.messages.list(thread_id=thread.id)
+                    .data[0]
+                    .content
                 )
-                text_messages = [message for message in messages if message.type == "text"]
+                text_messages = [
+                    message for message in messages if message.type == "text"
+                ]
                 print("Thread finished:", text_messages[0].text.value)
                 break
 

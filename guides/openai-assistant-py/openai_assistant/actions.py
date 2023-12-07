@@ -76,7 +76,7 @@ def read_file(sandbox: Sandbox, args: Dict[str, Any]) -> str:
 
 def commit_and_push(sandbox: Sandbox, args: Dict[str, Any]) -> str:
     repo_directory = (
-        "/home/user/repo"  # Assuming the repository is cloned to this directory
+        "/home/user/repo"  # The repository is cloned to this directory
     )
     commit_message = args["commit_message"]
     console.print(

@@ -4,7 +4,7 @@ version = "0.1.0"
 description = ""
 authors = []
 readme = "README.md"
-packages = [{include = "openai_assistant"}]
+packages = [{ include = "openai_assistant" }]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -21,4 +21,4 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 start = "openai_assistant.main:main"
-create-ai-assistant = "openai_assistant.assistant:create_aassistent"
+create-ai-assistant = "openai_assistant.assistant:create_assistant"

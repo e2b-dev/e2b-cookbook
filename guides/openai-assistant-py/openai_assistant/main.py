@@ -109,7 +109,7 @@ def main():
         print(proc.stderr)
         print(proc.stdout)
         exit(1)
-    # Check that user is authenticated
+    # Setup user's credentials
     proc = sandbox.process.start_and_wait("gh auth setup-git")
     if proc.exit_code != 0:
         print("Error: Unable to se up Git auth with GitHub")

@@ -5,10 +5,9 @@ import openai
 import time
 from actions import (
     read_file,
-    save_code_to_file,
+    save_content_to_file,
     list_files,
     commit_and_push,
-    write_to_file,
 )
 
 from rich import print
@@ -76,13 +75,11 @@ def main():
     sandbox.add_action(
         read_file
     ).add_action(
-        save_code_to_file
+        save_content_to_file
     ).add_action(
         list_files
     ).add_action(
         commit_and_push
-    ).add_action(
-        write_to_file
     )
 
     # Identify AI developer in git

@@ -14,27 +14,11 @@ custom_theme = Theme(
 console = Console(theme=custom_theme)
 
 
-def save_code_to_file(sandbox: Sandbox, args: Dict[str, Any]) -> str:
-    filename = args["filename"]
-    code = args["code"]
-    console.print(
-        f"[sandbox_action]<Sandbox Action>[/sandbox_action] Saving code to {filename}"
-    )
-
-    try:
-        dir = os.path.dirname(filename)
-        sandbox.filesystem.make_dir(dir)
-        sandbox.filesystem.write(filename, code)
-        return "success"
-    except Exception as e:
-        return f"Error: {e}"
-
-
-def write_to_file(sandbox: Sandbox, args: Dict[str, Any]) -> str:
+def save_content_to_file(sandbox: Sandbox, args: Dict[str, Any]) -> str:
     filename = args["filename"]
     content = args["content"]
     console.print(
-        f"[sandbox_action]<Sandbox Action>[/sandbox_action] Writing content to file {filename}"
+        f"[sandbox_action]<Sandbox Action>\t[/sandbox_action] Saving content to {filename}"
     )
 
     try:
@@ -46,10 +30,26 @@ def write_to_file(sandbox: Sandbox, args: Dict[str, Any]) -> str:
         return f"Error: {e}"
 
 
+# def write_to_file(sandbox: Sandbox, args: Dict[str, Any]) -> str:
+#     filename = args["filename"]
+#     content = args["content"]
+#     console.print(
+#         f"[sandbox_action]<Sandbox Action>\t[/sandbox_action] Writing content to file {filename}"
+#     )
+
+#     try:
+#         dir = os.path.dirname(filename)
+#         sandbox.filesystem.make_dir(dir)
+#         sandbox.filesystem.write(filename, content)
+#         return "success"
+#     except Exception as e:
+#         return f"Error: {e}"
+
+
 def list_files(sandbox: Sandbox, args: Dict[str, Any]) -> str:
     path = args["path"]
     console.print(
-        f"[sandbox_action]<Sandbox Action>[/sandbox_action] Listing files on path {path}"
+        f"[sandbox_action]<Sandbox Action>\t[/sandbox_action] Listing files on path {path}"
     )
 
     try:
@@ -65,7 +65,7 @@ def list_files(sandbox: Sandbox, args: Dict[str, Any]) -> str:
 def read_file(sandbox: Sandbox, args: Dict[str, Any]) -> str:
     path = args["path"]
     console.print(
-        f"[sandbox_action]<Sandbox Action>[/sandbox_action] Reading file on path {path}"
+        f"[sandbox_action]<Sandbox Action>\t[/sandbox_action] Reading file on path {path}"
     )
 
     try:
@@ -80,7 +80,7 @@ def commit_and_push(sandbox: Sandbox, args: Dict[str, Any]) -> str:
     )
     commit_message = args["commit_message"]
     console.print(
-        f"[sandbox_action]<Sandbox Action>[/sandbox_action] Committing with the message '{commit_message}'"
+        f"[sandbox_action]<Sandbox Action>\t[/sandbox_action] Committing with the message '{commit_message}'"
     )
 
     git_add_proc = sandbox.process.start_and_wait(f"git -C {repo_directory} add .")

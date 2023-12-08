@@ -14,14 +14,14 @@ def create_assistant():
         {
             "type": "function",
             "function": {
-                "name": "save_code_to_file",
-                "description": "Save code to file",
+                "name": "save_content_to_file",
+                "description": "Save content (code or text) to file",
                 "parameters": {
                     "type": "object",
                     "properties": {
-                        "code": {
+                        "content": {
                             "type": "string",
-                            "description": "The code to save",
+                            "description": "The content to save",
                         },
                         "filename": {
                             "type": "string",

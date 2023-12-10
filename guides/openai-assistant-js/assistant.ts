@@ -12,7 +12,7 @@ export const functions: Array<
   {
     type: 'function',
     function: {
-      name: 'save_content_to_file',
+      name: 'saveContentToFile', // Updated action name
       description: 'Save content (code or text) to file',
       parameters: {
         type: 'object',
@@ -32,7 +32,7 @@ export const functions: Array<
   {
     type: 'function',
     function: {
-      name: 'write_to_file',
+      name: 'writeToFile', // Updated action name
       description: 'Write text or other content to a file',
       parameters: {
         type: 'object',
@@ -52,7 +52,7 @@ export const functions: Array<
   {
     type: 'function',
     function: {
-      name: 'list_files',
+      name: 'listFiles',
       description: 'List files in a directory',
       parameters: {
         type: 'object',
@@ -68,7 +68,7 @@ export const functions: Array<
   {
     type: 'function',
     function: {
-      name: 'read_file',
+      name: 'readFile',
       description: 'Read a file',
       parameters: {
         type: 'object',
@@ -84,12 +84,12 @@ export const functions: Array<
   {
     type: 'function',
     function: {
-      name: 'commit_and_push',
+      name: 'commitAndPush',
       description: 'Commit and push changes to the repository',
       parameters: {
         type: 'object',
         properties: {
-          commit_message: {
+          commitMessage: { // Updated parameter name
             type: 'string',
             description: 'The commit message',
           },
@@ -117,6 +117,6 @@ export async function createAIDeveloper() {
   console.log(aiDeveloper.id);
 }
 
-if (require.main === module) {
+if (import.meta.main) {
   createAIDeveloper();
 }

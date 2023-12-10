@@ -31,7 +31,8 @@ custom_theme = Theme(
 
 
 def prompt_user_for_github_repo():
-    repo_url = Prompt.ask("[bold #995100]Provide URL of your public GitHub repository (Go to your repo, click on [bold #FF8800]<> Code[/bold #FF8800] and select [bold #FF8800]HTTPS[/bold #FF8800] format): [/bold #995100]")
+    repo_url = Prompt.ask("[bold #F5F5F5]Provide URL of your public GitHub repository (Go to your repo, click on [bold #FF8800]<> Code[/bold #FF8800] and select [bold #FF8800]HTTPS[/bold #FF8800] format): [/bold #F5F5F5]")
+    print("", end='\n')
     return repo_url
 
 
@@ -43,11 +44,13 @@ def prompt_user_for_task(repo_url):
         f"Please work with the codebase repository called {repo_url} "
         f"that is cloned in the /home/user/repo directory. Your task is: {user_task_specification}"
     )
+    print("", end='\n')
     return user_task
 
 
 def prompt_user_for_auth():
-    user_auth = Prompt.ask("\nHello! :wave:\nPlease provide your [bold #995100]GitHub token[/bold #995100] to securely interact with your repositories.\nIf you don't have a token, you can set it up [bold #FF8800][link=https://github.com/settings/tokens]here[/link][/bold #FF8800].\nPlease give it [bold #995100]admin:org[/ bold #995100], [bold #995100]read:project[/ bold #995100], and [bold #995100]repo[/ bold #995100] permissions. ", password=True)
+    user_auth = Prompt.ask("\nHello! :wave:\nPlease provide your [bold #F5F5F5]GitHub token[/bold #F5F5F5] to securely interact with your repositories.\n\nIf you don't have a token, you can set it up [bold #FF8800][link=https://github.com/settings/tokens]here[/link][/bold #FF8800].\nPlease give it [bold #F5F5F5]admin:org[/ bold #F5F5F5], [bold #F5F5F5]read:project[/ bold #F5F5F5], and [bold #F5F5F5]repo[/ bold #F5F5F5] permissions. ", password=True)
+    print("", end='\n')
     return user_auth
 
 
@@ -60,11 +63,11 @@ console = Console(theme=custom_theme)
 
 
 def handle_sandbox_stdout(message):
-    console.print(f"[theme]<Sandbox>[/theme] {message.line}")
+    console.print(f"[theme]<Sandbox>[/theme] {message.line}", end="\r")
 
 
 def handle_sandbox_stderr(message):
-    console.print(f"[theme]<Sandbox>[/theme] {message.line}")
+    console.print(f"[theme]<Sandbox>[/theme] {message.line}", end="\r")
 
 
 def main():
@@ -95,7 +98,7 @@ def main():
         f"echo {user_gh_token} | gh auth login --with-token"
     )
     if proc.exit_code != 0:
-        print("Error: Unable to log into github")
+        print("Error: Unable to log into github", end='\n')
         print(proc.stderr)
         print(proc.stdout)
         exit(1)
@@ -126,6 +129,8 @@ def main():
 
     thread = client.beta.threads.create(
         messages=[
+            #{"role": "user", "content": "Write hello world"},
+            #{"role": "assistant", "content": '{"code": "console.log(\\"hello world\\")"}', "name": "exec_code"},
             {
                 "role": "user",
                 "content": f"Carefully plan this task and start working on it: {user_task} in the {repo_url} repository",
@@ -142,18 +147,21 @@ def main():
         previous_status = None
         while True:
             if run.status != previous_status:
-                print(" Assistant is currently in status:", run.status)
+                #Spinner("bouncingBall", text=f" Assistant is currently in status: {run.status}")
+                #console.print(spinner)
+                console.print(" Assistant is currently in status:", run.status)
                 previous_status = run.status
             if run.status == "requires_action":
-                print(" Assistant is using action:")
+                #Spinner("bouncingBall", text=f" Assistant is using action:")
+                #console.print(spinner)
+                console.print(" Assistant is using action:")
                 outputs = sandbox.openai.actions.run(run)
                 if len(outputs) > 0:
                     client.beta.threads.runs.submit_tool_outputs(
                         thread_id=thread.id, run_id=run.id, tool_outputs=outputs
                     )
-
             elif run.status == "completed":
-                print(" Run completed")
+                console.print(" Run completed")
                 messages = (
                     client.beta.threads.messages.list(thread_id=thread.id)
                     .data[0]
@@ -178,7 +186,7 @@ def main():
             run = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
             time.sleep(0.5)
 
-    sandbox.close()
+        sandbox.close()
 
 
 if __name__ == "__main__":

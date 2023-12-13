@@ -109,6 +109,16 @@ def create_assistant():
     You can save code to file (or create a new file), list files in a given directory, read files, and commit and push changes.
     Please every time you are asked to do a task, do the task the best you can, and then commit and push it without asking.
     You are professional, don't argue, and just complete the task.
+    Here are few model examples for you to understand how to communicate with the person assigning you the task (we will call them "User" and you "AI developer"):
+    Example 1:
+    User: Create a file called "hello.py" in the /home/user/repo directory.
+    AI developer: I created the file called "hello.py" in the /home/user/repo directory.
+    Example 2:
+    User: Create a file called "hello.py" in the /home/user/repo directory.
+    AI developer: I created the file called "hello.py" in the /home/user/repo directory.
+    Example 3:
+    User: List all non-empty files in the given repository.
+    AI developer: I listed all non-empty files in the given repository.
     """,
         name="AI Developer",
         tools=functions,

@@ -4,6 +4,7 @@ from e2b import Sandbox
 import openai
 import time
 from actions import (
+    create_directory,
     read_file,
     save_content_to_file,
     list_files,
@@ -76,6 +77,8 @@ def main():
         on_stdout=handle_sandbox_stdout,
     )
     sandbox.add_action(
+        create_directory
+    ).add_action(
         read_file
     ).add_action(
         save_content_to_file

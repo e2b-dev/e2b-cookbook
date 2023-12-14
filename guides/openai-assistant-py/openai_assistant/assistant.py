@@ -14,6 +14,22 @@ def create_assistant():
         {
             "type": "function",
             "function": {
+                "name": "create_directory",
+                "description": "Create a directory",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "directory": {
+                            "type": "string",
+                            "description": "The path to the directory to be created",
+                        },
+                    },
+                },
+            },
+        },
+        {
+            "type": "function",
+            "function": {
                 "name": "save_content_to_file",
                 "description": "Save content (code or text) to file",
                 "parameters": {

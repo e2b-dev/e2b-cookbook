@@ -14,6 +14,19 @@ custom_theme = Theme(
 console = Console(theme=custom_theme)
 
 
+def create_directory(sandbox: Sandbox, args: Dict[str, Any]) -> str:
+    directory = args["directory"]
+    console.print(
+        f"[sandbox_action]<Sandbox Action>\t[/sandbox_action] Creating directory: {directory}"
+    )
+
+    try:
+        sandbox.filesystem.make_dir(directory)
+        return "success"
+    except Exception as e:
+        return f"Error: {e}"
+
+
 def save_content_to_file(sandbox: Sandbox, args: Dict[str, Any]) -> str:
     filename = args["filename"]
     content = args["content"]
@@ -28,23 +41,7 @@ def save_content_to_file(sandbox: Sandbox, args: Dict[str, Any]) -> str:
         return "success"
     except Exception as e:
         return f"Error: {e}"
-
-
-# def write_to_file(sandbox: Sandbox, args: Dict[str, Any]) -> str:
-#     filename = args["filename"]
-#     content = args["content"]
-#     console.print(
-#         f"[sandbox_action]<Sandbox Action>\t[/sandbox_action] Writing content to file {filename}"
-#     )
-
-#     try:
-#         dir = os.path.dirname(filename)
-#         sandbox.filesystem.make_dir(dir)
-#         sandbox.filesystem.write(filename, content)
-#         return "success"
-#     except Exception as e:
-#         return f"Error: {e}"
-
+    
 
 def list_files(sandbox: Sandbox, args: Dict[str, Any]) -> str:
     path = args["path"]

@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from e2b import Sandbox
 import openai
 import time
-from actions import (
+from openai_assistant.actions import (
     create_directory,
     read_file,
     save_content_to_file,
@@ -32,8 +32,12 @@ custom_theme = Theme(
 
 
 def prompt_user_for_github_repo():
-    repo_url = Prompt.ask("[bold #F5F5F5]Provide URL of your public GitHub repository (Go to your repo, click on [bold #FF8800]<> Code[/bold #FF8800] and select [bold #FF8800]HTTPS[/bold #FF8800] format): [/bold #F5F5F5]")
+    user_repo = Prompt.ask("\n\nWhat GitHub repository do you want to work in?\nPlease provide it in format [bold #E0E0E0]your_username/your_repository_name[/bold #E0E0E0]\n\nRepository:")
     print("", end='\n')
+
+    # Prepend "https://github.com/" to the user input and append ".git"
+    repo_url = f"https://github.com/{user_repo.strip()}.git"
+
     return repo_url
 
 
@@ -50,10 +54,9 @@ def prompt_user_for_task(repo_url):
 
 
 def prompt_user_for_auth():
-    user_auth = Prompt.ask("\nHello! :wave:\nPlease provide your [bold #F5F5F5]GitHub token[/bold #F5F5F5] to securely interact with your repositories.\n\nIf you don't have a token, you can set it up [bold #FF8800][link=https://github.com/settings/tokens]here[/link][/bold #FF8800].\nPlease give it [bold #F5F5F5]admin:org[/ bold #F5F5F5], [bold #F5F5F5]read:project[/ bold #F5F5F5], and [bold #F5F5F5]repo[/ bold #F5F5F5] permissions. ", password=True)
+    user_auth = Prompt.ask("\nProvide  GitHub token with following permissions:\n\n\u2022 admin:org\n\u2022 read:project\n\u2022 repo\n\nFind your token at\n[bold #0096FF]https://github.com/settings/tokens[/bold #0096FF]\n\nToken:", password=True)
     print("", end='\n')
     return user_auth
-
 
 # Determe the directory where we clone the repository in the sandbox
 repo_directory = "/home/user/repo"
@@ -96,7 +99,7 @@ def main():
 
     user_gh_token = prompt_user_for_auth()
     # Log in to github
-    print("Logging you into your GitHub...")
+    print("Logging into your GitHub...")
     proc = sandbox.process.start_and_wait(
         f"echo {user_gh_token} | gh auth login --with-token"
     )
@@ -119,6 +122,8 @@ def main():
         print(proc.stderr)
         print(proc.stdout)
         exit(1)
+    else:
+        print("✅ Logged in\n")
 
     repo_url = prompt_user_for_github_repo()
     user_task = prompt_user_for_task(repo_url)
@@ -132,8 +137,6 @@ def main():
 
     thread = client.beta.threads.create(
         messages=[
-            #{"role": "user", "content": "Write hello world"},
-            #{"role": "assistant", "content": '{"code": "console.log(\\"hello world\\")"}', "name": "exec_code"},
             {
                 "role": "user",
                 "content": f"Carefully plan this task and start working on it: {user_task} in the {repo_url} repository",
@@ -152,12 +155,12 @@ def main():
             if run.status != previous_status:
                 #Spinner("bouncingBall", text=f" Assistant is currently in status: {run.status}")
                 #console.print(spinner)
-                console.print(" Assistant is currently in status:", run.status)
+                console.print("[#E57B00]>[/#E57B00] Assistant is currently in status:", run.status)
                 previous_status = run.status
             if run.status == "requires_action":
                 #Spinner("bouncingBall", text=f" Assistant is using action:")
                 #console.print(spinner)
-                console.print(" Assistant is using action:")
+                console.print("[#E57B00]>[/#E57B00] Assistant is using action:")
                 outputs = sandbox.openai.actions.run(run)
                 if len(outputs) > 0:
                     client.beta.threads.runs.submit_tool_outputs(

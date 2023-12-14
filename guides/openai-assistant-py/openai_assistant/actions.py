@@ -7,7 +7,7 @@ from rich.theme import Theme
 # Create a Rich Console instance with your desired colors
 custom_theme = Theme(
     {
-        "sandbox_action": "bold #FF8800",  # Adjust color as needed
+        "sandbox_action": "bold #E57B00",  # Adjust color as needed
     }
 )
 
@@ -17,7 +17,7 @@ console = Console(theme=custom_theme)
 def create_directory(sandbox: Sandbox, args: Dict[str, Any]) -> str:
     directory = args["directory"]
     console.print(
-        f"[sandbox_action]<Sandbox Action>\t[/sandbox_action] Creating directory: {directory}"
+        f"[sandbox_action][Sandbox Action]\t[/sandbox_action] Creating directory: {directory}"
     )
 
     try:
@@ -31,7 +31,7 @@ def save_content_to_file(sandbox: Sandbox, args: Dict[str, Any]) -> str:
     filename = args["filename"]
     content = args["content"]
     console.print(
-        f"[sandbox_action]<Sandbox Action>\t[/sandbox_action] Saving content to {filename}"
+        f"[sandbox_action][Sandbox Action]\t[/sandbox_action] Saving content to {filename}"
     )
 
     try:
@@ -46,7 +46,7 @@ def save_content_to_file(sandbox: Sandbox, args: Dict[str, Any]) -> str:
 def list_files(sandbox: Sandbox, args: Dict[str, Any]) -> str:
     path = args["path"]
     console.print(
-        f"[sandbox_action]<Sandbox Action>\t[/sandbox_action] Listing files on path {path}"
+        f"[sandbox_action][Sandbox Action]\t[/sandbox_action] Listing files on path {path}"
     )
 
     try:
@@ -62,7 +62,7 @@ def list_files(sandbox: Sandbox, args: Dict[str, Any]) -> str:
 def read_file(sandbox: Sandbox, args: Dict[str, Any]) -> str:
     path = args["path"]
     console.print(
-        f"[sandbox_action]<Sandbox Action>\t[/sandbox_action] Reading file on path {path}"
+        f"[sandbox_action][Sandbox Action]\t[/sandbox_action] Reading file on path {path}"
     )
 
     try:
@@ -77,7 +77,7 @@ def commit_and_push(sandbox: Sandbox, args: Dict[str, Any]) -> str:
     )
     commit_message = args["commit_message"]
     console.print(
-        f"[sandbox_action]<Sandbox Action>\t[/sandbox_action] Committing with the message '{commit_message}'"
+        f"[sandbox_action][Sandbox Action]\t[/sandbox_action] Committing with the message '{commit_message}'"
     )
 
     git_add_proc = sandbox.process.start_and_wait(f"git -C {repo_directory} add .")

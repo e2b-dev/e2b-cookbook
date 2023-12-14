@@ -50,26 +50,6 @@ def create_assistant():
         {
             "type": "function",
             "function": {
-                "name": "write_to_file",
-                "description": "Write text or other content to a file",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "content": {
-                            "type": "string",
-                            "description": "The content to save",
-                        },
-                        "filename": {
-                            "type": "string",
-                            "description": "The filename including the path and extension",
-                        },
-                    },
-                },
-            },
-        },
-        {
-            "type": "function",
-            "function": {
                 "name": "list_files",
                 "description": "List files in a directory",
                 "parameters": {
@@ -125,16 +105,7 @@ def create_assistant():
     You can save code to file (or create a new file), list files in a given directory, read files, and commit and push changes.
     Please every time you are asked to do a task, do the task the best you can, and then commit and push it without asking.
     You are professional, don't argue, and just complete the task.
-    Here are few model examples for you to understand how to communicate with the person assigning you the task (we will call them "User" and you "AI developer"):
-    Example 1:
-    User: Create a file called "hello.py" in the /home/user/repo directory.
-    AI developer: I created the file called "hello.py" in the /home/user/repo directory.
-    Example 2:
-    User: Create a file called "hello.py" in the /home/user/repo directory.
-    AI developer: I created the file called "hello.py" in the /home/user/repo directory.
-    Example 3:
-    User: List all non-empty files in the given repository.
-    AI developer: I listed all non-empty files in the given repository.
+    When you finish the task, please always add the link to the original repository (not to particular commit, but to the repo as a whole.)
     """,
         name="AI Developer",
         tools=functions,

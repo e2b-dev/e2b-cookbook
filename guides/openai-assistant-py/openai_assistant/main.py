@@ -43,7 +43,7 @@ def prompt_user_for_github_repo():
 
 def prompt_user_for_task(repo_url):
     user_task_specification = Prompt.ask(
-        "What do you want the AI developer to do?"
+        "\nWhat do you want AI developer to do?"
     )
     user_task = (
         f"Please work with the codebase repository called {repo_url} "
@@ -67,133 +67,137 @@ console = Console(theme=custom_theme)
 
 
 def handle_sandbox_stdout(message):
-    console.print(f"[theme]<Sandbox>[/theme] {message.line}", end="\r")
+    console.print(f"[theme][Sandbox][/theme] {message.line}", end="\r")
 
 
 def handle_sandbox_stderr(message):
-    console.print(f"[theme]<Sandbox>[/theme] {message.line}", end="\r")
+    console.print(f"[theme][Sandbox][/theme] {message.line}", end="\r")
 
 
 def main():
-    sandbox = Sandbox(
-        on_stderr=handle_sandbox_stderr,
-        on_stdout=handle_sandbox_stdout,
-    )
-    sandbox.add_action(
-        create_directory
-    ).add_action(
-        read_file
-    ).add_action(
-        save_content_to_file
-    ).add_action(
-        list_files
-    ).add_action(
-        commit_and_push
-    )
-
-    # Identify AI developer in git
-    sandbox.process.start_and_wait(
-        "git config --global user.email 'ai-developer@email.com'"
-    )
-    sandbox.process.start_and_wait("git config --global user.name 'AI Developer'")
-
+    # Ask for GitHub token and repository only once
     user_gh_token = prompt_user_for_auth()
-    # Log in to github
-    print("Logging into your GitHub...")
-    proc = sandbox.process.start_and_wait(
-        f"echo {user_gh_token} | gh auth login --with-token"
-    )
-    if proc.exit_code != 0:
-        print("Error: Unable to log into github", end='\n')
-        print(proc.stderr)
-        print(proc.stdout)
-        exit(1)
-    # Check that user is logged into github
-    proc = sandbox.process.start_and_wait("gh auth status")
-    if proc.exit_code != 0:
-        print("Error: Unable to log into github")
-        print(proc.stderr)
-        print(proc.stdout)
-        exit(1)
-    # Setup user's credentials
-    proc = sandbox.process.start_and_wait("gh auth setup-git")
-    if proc.exit_code != 0:
-        print("Error: Unable to se up Git auth with GitHub")
-        print(proc.stderr)
-        print(proc.stdout)
-        exit(1)
-    else:
-        print("✅ Logged in\n")
-
     repo_url = prompt_user_for_github_repo()
-    user_task = prompt_user_for_task(repo_url)
 
-    git_clone_proc = sandbox.process.start_and_wait(
-        f"git clone {repo_url} {repo_directory}"
-    )
-    if git_clone_proc.exit_code != 0:
-        print("Error: Unable to clone the repository")
-        exit(1)
+    while True:
+        sandbox = Sandbox(
+            on_stderr=handle_sandbox_stderr,
+            on_stdout=handle_sandbox_stdout,
+        )
+        sandbox.add_action(
+            create_directory
+        ).add_action(
+            read_file
+        ).add_action(
+            save_content_to_file
+        ).add_action(
+            list_files
+        ).add_action(
+            commit_and_push
+        )
 
-    thread = client.beta.threads.create(
-        messages=[
-            {
-                "role": "user",
-                "content": f"Carefully plan this task and start working on it: {user_task} in the {repo_url} repository",
-            },
-        ],
-    )
+        # Identify AI developer in git
+        sandbox.process.start_and_wait(
+            "git config --global user.email 'ai-developer@email.com'"
+        )
+        sandbox.process.start_and_wait("git config --global user.name 'AI Developer'")
 
-    run = client.beta.threads.runs.create(
-        thread_id=thread.id, assistant_id=assistant.id
-    )
+        # Use the GitHub token
+        proc = sandbox.process.start_and_wait(
+            f"echo {user_gh_token} | gh auth login --with-token"
+        )
+        if proc.exit_code != 0:
+            print("Error: Unable to log into GitHub", end='\n')
+            print(proc.stderr)
+            print(proc.stdout)
+            exit(1)
 
-    spinner = Spinner("bouncingBall")
-    with console.status(spinner):
-        previous_status = None
-        while True:
-            if run.status != previous_status:
-                #Spinner("bouncingBall", text=f" Assistant is currently in status: {run.status}")
-                #console.print(spinner)
-                console.print("[#E57B00]>[/#E57B00] Assistant is currently in status:", run.status)
-                previous_status = run.status
-            if run.status == "requires_action":
-                #Spinner("bouncingBall", text=f" Assistant is using action:")
-                #console.print(spinner)
-                console.print("[#E57B00]>[/#E57B00] Assistant is using action:")
-                outputs = sandbox.openai.actions.run(run)
-                if len(outputs) > 0:
-                    client.beta.threads.runs.submit_tool_outputs(
-                        thread_id=thread.id, run_id=run.id, tool_outputs=outputs
+        # Check that the user is logged into GitHub
+        proc = sandbox.process.start_and_wait("gh auth status")
+        if proc.exit_code != 0:
+            print("Error: Unable to log into GitHub")
+            print(proc.stderr)
+            print(proc.stdout)
+            exit(1)
+
+        # Setup user's credentials
+        proc = sandbox.process.start_and_wait("gh auth setup-git")
+        if proc.exit_code != 0:
+            print("Error: Unable to set up Git auth with GitHub")
+            print(proc.stderr)
+            print(proc.stdout)
+            exit(1)
+        else:
+            print("✅ Logged in")
+
+        user_task = prompt_user_for_task(repo_url)
+
+        git_clone_proc = sandbox.process.start_and_wait(
+            f"git clone {repo_url} {repo_directory}"
+        )
+        if git_clone_proc.exit_code != 0:
+            print("Error: Unable to clone the repository")
+            exit(1)
+
+        thread = client.beta.threads.create(
+            messages=[
+                {
+                    "role": "user",
+                    "content": f"Carefully plan this task and start working on it: {user_task} in the {repo_url} repository",
+                },
+            ],
+        )
+
+        run = client.beta.threads.runs.create(
+            thread_id=thread.id, assistant_id=assistant.id
+        )
+
+        spinner = Spinner("bouncingBall")
+        with console.status(spinner):
+            previous_status = None
+            while True:
+                if run.status != previous_status:
+                    console.print("[#E57B00]>[/#E57B00] Assistant is currently in status:", run.status)
+                    previous_status = run.status
+                if run.status == "requires_action":
+                    console.print("[#E57B00]>[/#E57B00] Assistant is using action:")
+                    outputs = sandbox.openai.actions.run(run)
+                    if len(outputs) > 0:
+                        client.beta.threads.runs.submit_tool_outputs(
+                            thread_id=thread.id, run_id=run.id, tool_outputs=outputs
+                        )
+                elif run.status == "completed":
+                    console.print(" Run completed")
+                    messages = (
+                        client.beta.threads.messages.list(thread_id=thread.id)
+                        .data[0]
+                        .content
                     )
-            elif run.status == "completed":
-                console.print(" Run completed")
-                messages = (
-                    client.beta.threads.messages.list(thread_id=thread.id)
-                    .data[0]
-                    .content
-                )
-                text_messages = [
-                    message for message in messages if message.type == "text"
-                ]
-                print("Thread finished:", text_messages[0].text.value)
-                break
+                    text_messages = [
+                        message for message in messages if message.type == "text"
+                    ]
+                    console.print("Thread finished:", text_messages[0].text.value)
+                    break
 
-            elif run.status in ["queued", "in_progress"]:
-                pass
+                elif run.status in ["queued", "in_progress"]:
+                    pass
 
-            elif run.status in ["cancelled", "cancelling", "expired", "failed"]:
-                break
+                elif run.status in ["cancelled", "cancelling", "expired", "failed"]:
+                    break
 
-            else:
-                print(f"Unknown status: {run.status}")
-                break
+                else:
+                    print(f"Unknown status: {run.status}")
+                    break
 
-            run = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
-            time.sleep(0.5)
+                run = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
+                time.sleep(0.5)
 
-        sandbox.close()
+            sandbox.close()
 
+        # Ask the user if they want to continue or stop
+        #another_task = Prompt.ask("\nWrite another task or 'bye' to stop: ")
+        #if another_task.lower() == 'bye':
+        #break
 
 if __name__ == "__main__":
     main()

@@ -309,7 +309,9 @@ assistant = client.beta.assistants.retrieve(AI_ASSISTANT_ID)
 We define three functions that ask the user for
 - GitHub repository URL
 - Specifying the task for the AI agent (e.g., "Please write a code for printing first 100 number of a Fibonacci sequence into a "code.py" file)
-- Providing the GitHub authentication token (use the classic Personal access token).
+- Providing the GitHub authentication token.
+
+> We ask user to provide their GitHub [personal access token (classic)](https://github.com/settings/tokens) to securely interact with the GitHub API.
 
 
 ![HTTPS code](003.png "Tip: Provide the GitHub URL in the HTTPS format")

@@ -17,6 +17,10 @@ from rich.spinner import Spinner
 from rich.theme import Theme
 from rich.prompt import Prompt
 
+class MyPrompt(Prompt):
+    prompt_suffix = ""
+
+
 load_dotenv()
 client = openai.Client()
 
@@ -32,7 +36,7 @@ custom_theme = Theme(
 
 
 def prompt_user_for_github_repo():
-    user_repo = Prompt.ask("\n\nWhat GitHub repository do you want to work in?\nPlease provide it in format [bold #E0E0E0]your_username/your_repository_name[/bold #E0E0E0]\n\nRepository:")
+    user_repo = MyPrompt.ask("\nWhat GitHub repository do you want to work in?\nPlease provide it in format [bold #E0E0E0]your_username/your_repository_name[/bold #E0E0E0]\n\nRepository: ")
     print("", end='\n')
 
     # Prepend "https://github.com/" to the user input and append ".git"
@@ -42,8 +46,8 @@ def prompt_user_for_github_repo():
 
 
 def prompt_user_for_task(repo_url):
-    user_task_specification = Prompt.ask(
-        "\nWhat do you want AI developer to do?"
+    user_task_specification = MyPrompt.ask(
+        "\nWhat do you want AI developer to do? "
     )
     user_task = (
         f"Please work with the codebase repository called {repo_url} "
@@ -54,11 +58,11 @@ def prompt_user_for_task(repo_url):
 
 
 def prompt_user_for_auth():
-    user_auth = Prompt.ask("\nProvide  GitHub token with following permissions:\n\n\u2022 admin:org\n\u2022 read:project\n\u2022 repo\n\nFind your token at\n[bold #0096FF]https://github.com/settings/tokens[/bold #0096FF]\n\nToken:", password=True)
+    user_auth = MyPrompt.ask("\nProvide GitHub token with following permissions:\n\n\u2022 admin:org\n\u2022 read:project\n\u2022 repo\n\nFind or create your token at [bold #0096FF]https://github.com/settings/tokens[/bold #0096FF]\n\nToken:", password=True)
     print("", end='\n')
     return user_auth
 
-# Determe the directory where we clone the repository in the sandbox
+# Determinee the directory where we clone the repository in the sandbox
 repo_directory = "/home/user/repo"
 
 
@@ -75,69 +79,71 @@ def handle_sandbox_stderr(message):
 
 
 def main():
-    # Ask for GitHub token and repository only once
+    # Ask for GitHub token and repository
     user_gh_token = prompt_user_for_auth()
     repo_url = prompt_user_for_github_repo()
 
+    # Create the sandbox outside the loop
+    sandbox = Sandbox(
+        on_stderr=handle_sandbox_stderr,
+        on_stdout=handle_sandbox_stdout,
+    )
+    sandbox.add_action(
+        create_directory
+    ).add_action(
+        read_file
+    ).add_action(
+        save_content_to_file
+    ).add_action(
+        list_files
+    ).add_action(
+        commit_and_push
+    )
+
+    # Identify AI developer in git
+    sandbox.process.start_and_wait(
+        "git config --global user.email 'ai-developer@email.com'"
+    )
+    sandbox.process.start_and_wait("git config --global user.name 'AI Developer'")
+
+    # Use the GitHub token
+    proc = sandbox.process.start_and_wait(
+        f"echo {user_gh_token} | gh auth login --with-token"
+    )
+    if proc.exit_code != 0:
+        print("Error: Unable to log into GitHub", end='\n')
+        print(proc.stderr)
+        print(proc.stdout)
+        exit(1)
+
+    # Check that the user is logged into GitHub
+    proc = sandbox.process.start_and_wait("gh auth status")
+    if proc.exit_code != 0:
+        print("Error: Unable to log into GitHub")
+        print(proc.stderr)
+        print(proc.stdout)
+        exit(1)
+
+    # Setup user's credentials
+    proc = sandbox.process.start_and_wait("gh auth setup-git")
+    if proc.exit_code != 0:
+        print("Error: Unable to set up Git auth with GitHub")
+        print(proc.stderr)
+        print(proc.stdout)
+        exit(1)
+    else:
+        print("✅ Logged in")
+
+    # Clone the repository only once
+    git_clone_proc = sandbox.process.start_and_wait(
+        f"git clone {repo_url} {repo_directory}"
+    )
+    if git_clone_proc.exit_code != 0:
+        print("Error: Unable to clone the repository")
+        exit(1)
+
     while True:
-        sandbox = Sandbox(
-            on_stderr=handle_sandbox_stderr,
-            on_stdout=handle_sandbox_stdout,
-        )
-        sandbox.add_action(
-            create_directory
-        ).add_action(
-            read_file
-        ).add_action(
-            save_content_to_file
-        ).add_action(
-            list_files
-        ).add_action(
-            commit_and_push
-        )
-
-        # Identify AI developer in git
-        sandbox.process.start_and_wait(
-            "git config --global user.email 'ai-developer@email.com'"
-        )
-        sandbox.process.start_and_wait("git config --global user.name 'AI Developer'")
-
-        # Use the GitHub token
-        proc = sandbox.process.start_and_wait(
-            f"echo {user_gh_token} | gh auth login --with-token"
-        )
-        if proc.exit_code != 0:
-            print("Error: Unable to log into GitHub", end='\n')
-            print(proc.stderr)
-            print(proc.stdout)
-            exit(1)
-
-        # Check that the user is logged into GitHub
-        proc = sandbox.process.start_and_wait("gh auth status")
-        if proc.exit_code != 0:
-            print("Error: Unable to log into GitHub")
-            print(proc.stderr)
-            print(proc.stdout)
-            exit(1)
-
-        # Setup user's credentials
-        proc = sandbox.process.start_and_wait("gh auth setup-git")
-        if proc.exit_code != 0:
-            print("Error: Unable to set up Git auth with GitHub")
-            print(proc.stderr)
-            print(proc.stdout)
-            exit(1)
-        else:
-            print("✅ Logged in")
-
         user_task = prompt_user_for_task(repo_url)
-
-        git_clone_proc = sandbox.process.start_and_wait(
-            f"git clone {repo_url} {repo_directory}"
-        )
-        if git_clone_proc.exit_code != 0:
-            print("Error: Unable to clone the repository")
-            exit(1)
 
         thread = client.beta.threads.create(
             messages=[
@@ -192,12 +198,8 @@ def main():
                 run = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
                 time.sleep(0.5)
 
-            sandbox.close()
-
-        # Ask the user if they want to continue or stop
-        #another_task = Prompt.ask("\nWrite another task or 'bye' to stop: ")
-        #if another_task.lower() == 'bye':
-        #break
+    # Close the sandbox after the loop
+    sandbox.close()
 
 if __name__ == "__main__":
     main()

@@ -46,7 +46,7 @@ def prompt_user_for_github_repo():
 
 def prompt_user_for_task(repo_url):
     user_task_specification = MyPrompt.ask(
-        "\nWhat do you want AI developer to do? "
+        "\n\n[#E57B00]>[italic] The AI developer is working in the cloned repository[/italic][/#E57B00]\n\nWhat do you want to do? "
     )
     user_task = (
         f"Please work with the codebase repository called {repo_url} "
@@ -64,7 +64,7 @@ def prompt_user_for_auth():
 # Determinee the directory where we clone the repository in the sandbox
 repo_directory = "/home/user/repo"
 
-# Create a Rich Console instance with the custom theme
+# Create a Rich Console instance with our custom theme
 console = Console(theme=custom_theme)
 
 
@@ -77,7 +77,6 @@ def handle_sandbox_stderr(message):
 
 
 def main():
-    # Ask for GitHub token and repository
     user_gh_token = prompt_user_for_auth()
     repo_url = prompt_user_for_github_repo()
 
@@ -106,7 +105,6 @@ def main():
 
     # Use the GitHub token
     proc = sandbox.process.start_and_wait(
-        #f"echo {user_gh_token} | gh auth login --with-token"
         f"echo {user_gh_token} | gh auth login --with-token"
     )
     if proc.exit_code != 0:
@@ -133,7 +131,7 @@ def main():
     else:
         print("\n✅ Logged in")
 
-    # Clone the repository only once
+    # Clone the repository
     git_clone_proc = sandbox.process.start_and_wait(
         f"git clone {repo_url} {repo_directory}"
     )
@@ -196,9 +194,6 @@ def main():
 
                 run = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
                 time.sleep(0.5)
-
-    # Close the sandbox after the loop
-    sandbox.close()
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "mixtral-code-interpreter"
+version = "0.1.0"
+description = ""
+authors = ["Vasek Mlejnsky <vasek.mlejnsky@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+requests = "^2.31.0"
+e2b = "^0.13.12"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+start = "mixtral_code_interpreter.main:main"

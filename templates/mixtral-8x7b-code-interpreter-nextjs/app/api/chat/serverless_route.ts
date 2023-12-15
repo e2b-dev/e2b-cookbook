@@ -1,3 +1,6 @@
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
 import * as markedpkg from 'marked'
 import * as htmlparser from 'htmlparser2'
 import { kv } from '@vercel/kv'
@@ -120,11 +123,11 @@ async function askMistral(messages: Message[]) {
 }
 
 
-export async function POST(req: Request) {
+// export async function POST(req: Request) {
+export async function POST(req: NextRequest, res: NextResponse) {
   const json = await req.json()
   const { messages } = json
-  console.log('message:', messages)
-
+  console.log('messages', messages)
 
   const sandboxID = await kv.hget<string | undefined>('sandbox', 'id')
   const lastUsed = await kv.hget<number | undefined>('sandbox', 'lastUsed')
@@ -148,12 +151,13 @@ export async function POST(req: Request) {
   console.log(response)
   if (!response.message?.content) {
     console.error(response)
-    response.status(500).json({ error: 'Mistral did not return a message' })
-    // return new Response(JSON.stringify({
-    //   response: 'Mistral did not return a message',
-    // }), {
-    //   status: 500,
-    // })
+    return NextResponse.json(
+      {
+        response: 'Mistral did not return a message',
+      },
+      {
+        status: 500,
+      })
   }
   const mistralMessage = response.message.content
   console.log('Mistral response:', mistralMessage)
@@ -191,10 +195,13 @@ export async function POST(req: Request) {
   await sbx.keepAlive(TTL)
   await sbx.close()
 
-  return new Response(JSON.stringify({
-    response: mistralMessage,
-    codeBlocks,
-  }), {
-    status: 200,
-  })
+  return NextResponse.json(
+    {
+      response: mistralMessage,
+      codeBlocks,
+    },
+    {
+      status: 200,
+    },
+  )
 }

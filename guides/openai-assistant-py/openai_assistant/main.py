@@ -61,7 +61,7 @@ def prompt_user_for_auth():
     print("", end='\n')
     return user_auth
 
-# Determinee the directory where we clone the repository in the sandbox
+# Determine the directory where we clone the repository in the sandbox
 repo_directory = "/home/user/repo"
 
 # Create a Rich Console instance with our custom theme

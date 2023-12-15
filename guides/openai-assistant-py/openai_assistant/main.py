@@ -39,7 +39,6 @@ def prompt_user_for_github_repo():
     user_repo = MyPrompt.ask("\nWhat GitHub repository do you want to work in?\nPlease provide it in format [bold #E0E0E0]your_username/your_repository_name[/bold #E0E0E0]\n\nRepository: ")
     print("", end='\n')
 
-    # Prepend "https://github.com/" to the user input and append ".git"
     repo_url = f"https://github.com/{user_repo.strip()}.git"
 
     return repo_url
@@ -58,13 +57,12 @@ def prompt_user_for_task(repo_url):
 
 
 def prompt_user_for_auth():
-    user_auth = MyPrompt.ask("\nProvide GitHub token with following permissions:\n\n\u2022 admin:org\n\u2022 read:project\n\u2022 repo\n\nFind or create your token at [bold #0096FF]https://github.com/settings/tokens[/bold #0096FF]\n\nToken:", password=True)
+    user_auth = MyPrompt.ask("\nProvide [bold]GitHub token[/bold] with following permissions:\n\n\u2022 read:org\n\u2022 read:project\n\u2022 repo\n\nFind or create your token at [bold #0096FF]https://github.com/settings/tokens[/bold #0096FF]\n\nToken:", password=True)
     print("", end='\n')
     return user_auth
 
 # Determinee the directory where we clone the repository in the sandbox
 repo_directory = "/home/user/repo"
-
 
 # Create a Rich Console instance with the custom theme
 console = Console(theme=custom_theme)
@@ -83,7 +81,7 @@ def main():
     user_gh_token = prompt_user_for_auth()
     repo_url = prompt_user_for_github_repo()
 
-    # Create the sandbox outside the loop
+    # Create the sandbox
     sandbox = Sandbox(
         on_stderr=handle_sandbox_stderr,
         on_stdout=handle_sandbox_stdout,
@@ -108,6 +106,7 @@ def main():
 
     # Use the GitHub token
     proc = sandbox.process.start_and_wait(
+        #f"echo {user_gh_token} | gh auth login --with-token"
         f"echo {user_gh_token} | gh auth login --with-token"
     )
     if proc.exit_code != 0:
@@ -132,7 +131,7 @@ def main():
         print(proc.stdout)
         exit(1)
     else:
-        print("✅ Logged in")
+        print("\n✅ Logged in")
 
     # Clone the repository only once
     git_clone_proc = sandbox.process.start_and_wait(

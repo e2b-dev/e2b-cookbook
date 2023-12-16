@@ -30,13 +30,14 @@ assistant = client.beta.assistants.retrieve(AI_ASSISTANT_ID)
 
 custom_theme = Theme(
     {
-        "theme": "bold #FFB766",  # Adjust color as needed
+        "theme": "bold #666666",  # Adjust color as needed
     }
 )
 
 
 def prompt_user_for_github_repo():
     user_repo = MyPrompt.ask("\nWhat GitHub repository do you want to work in?\nPlease provide it in format [bold #E0E0E0]your_username/your_repository_name[/bold #E0E0E0]\n\nRepository: ")
+    print("\n🔄[#E57B00][italic] Cloning the repo[/#E57B00][/italic]",end='\n')
     print("", end='\n')
 
     repo_url = f"https://github.com/{user_repo.strip()}.git"
@@ -46,7 +47,7 @@ def prompt_user_for_github_repo():
 
 def prompt_user_for_task(repo_url):
     user_task_specification = MyPrompt.ask(
-        "\n\n[#E57B00]>[italic] The AI developer is working in the cloned repository[/italic][/#E57B00]\n\nWhat do you want to do? "
+        "\n\n🤖[#E57B00][bold italic] The AI developer is working in the cloned repository[/bold italic][/#E57B00]\n\nWhat do you want to do? "
     )
     user_task = (
         f"Please work with the codebase repository called {repo_url} "
@@ -58,6 +59,7 @@ def prompt_user_for_task(repo_url):
 
 def prompt_user_for_auth():
     user_auth = MyPrompt.ask("\nProvide [bold]GitHub token[/bold] with following permissions:\n\n\u2022 read:org\n\u2022 read:project\n\u2022 repo\n\nFind or create your token at [bold #0096FF]https://github.com/settings/tokens[/bold #0096FF]\n\nToken:", password=True)
+    #print("\n✅ [#E57B00][italic]Logged in[/#E57B00][/italic]")
     print("", end='\n')
     return user_auth
 
@@ -77,6 +79,7 @@ def handle_sandbox_stderr(message):
 
 
 def main():
+    print("\n🤖[#E57B00][bold italic] AI developer[/#E57B00][/bold italic]")
     user_gh_token = prompt_user_for_auth()
     repo_url = prompt_user_for_github_repo()
 
@@ -129,7 +132,7 @@ def main():
         print(proc.stdout)
         exit(1)
     else:
-        print("\n✅ Logged in")
+        print("\n✅ [#E57B00][italic]Logged in[/#E57B00][/italic]")
 
     # Clone the repository
     git_clone_proc = sandbox.process.start_and_wait(

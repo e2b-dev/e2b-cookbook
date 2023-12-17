@@ -8,8 +8,8 @@ from openai_assistant.actions import (
     read_file,
     save_content_to_file,
     list_files,
-    #commit_and_push,
-    make_pull_request
+    # commit_and_push,
+    make_pull_request,
 )
 
 from rich import print
@@ -17,6 +17,7 @@ from rich.console import Console
 from rich.spinner import Spinner
 from rich.theme import Theme
 from rich.prompt import Prompt
+
 
 class MyPrompt(Prompt):
     prompt_suffix = ""
@@ -37,9 +38,11 @@ custom_theme = Theme(
 
 
 def prompt_user_for_github_repo():
-    user_repo = MyPrompt.ask("\nWhat GitHub repository do you want to work in?\nPlease provide it in format [bold #E0E0E0]your_username/your_repository_name[/bold #E0E0E0]\n\nRepository: ")
-    print("\n🔄[#E57B00][italic] Cloning the repo[/#E57B00][/italic]",end='\n')
-    print("", end='\n')
+    user_repo = MyPrompt.ask(
+        "\nWhat GitHub repository do you want to work in?\nPlease provide it in format [bold #E0E0E0]your_username/your_repository_name[/bold #E0E0E0]\n\nRepository: "
+    )
+    print("\n🔄[#E57B00][italic] Cloning the repo[/#E57B00][/italic]", end="\n")
+    print("", end="\n")
 
     repo_url = f"https://github.com/{user_repo.strip()}.git"
 
@@ -54,15 +57,18 @@ def prompt_user_for_task(repo_url):
         f"Please work with the codebase repository called {repo_url} "
         f"that is cloned in the /home/user/repo directory. Your task is: {user_task_specification}"
     )
-    print("", end='\n')
+    print("", end="\n")
     return user_task
 
 
 def prompt_user_for_auth():
-    user_auth = MyPrompt.ask("\nProvide [bold]GitHub token[/bold] with following permissions:\n\n\u2022 read:org\n\u2022 read:project\n\u2022 repo\n\nFind or create your token at [bold #0096FF]https://github.com/settings/tokens[/bold #0096FF]\n\nToken:", password=True)
-    #print("\n✅ [#E57B00][italic]Logged in[/#E57B00][/italic]")
-    print("", end='\n')
+    user_auth = MyPrompt.ask(
+        "\nProvide [bold]GitHub token[/bold] with following permissions:\n\n\u2022 read:org\n\u2022 read:project\n\u2022 repo\n\nFind or create your token at [bold #0096FF]https://github.com/settings/tokens[/bold #0096FF]\n\nToken:",
+        password=True,
+    )
+    print("", end="\n")
     return user_auth
+
 
 # Determine the directory where we clone the repository in the sandbox
 repo_directory = "/home/user/repo"
@@ -89,16 +95,12 @@ def main():
         on_stderr=handle_sandbox_stderr,
         on_stdout=handle_sandbox_stdout,
     )
-    sandbox.add_action(
-        create_directory
-    ).add_action(
-        read_file
-    ).add_action(
+    sandbox.add_action(create_directory).add_action(read_file).add_action(
         save_content_to_file
     ).add_action(
         list_files
-    #).add_action(
-        #commit_and_push
+        # ).add_action(
+        # commit_and_push
     ).add_action(
         make_pull_request
     )
@@ -114,7 +116,7 @@ def main():
         f"echo {user_gh_token} | gh auth login --with-token"
     )
     if proc.exit_code != 0:
-        print("Error: Unable to log into GitHub", end='\n')
+        print("Error: Unable to log into GitHub", end="\n")
         print(proc.stderr)
         print(proc.stdout)
         exit(1)
@@ -161,18 +163,25 @@ def main():
             thread_id=thread.id, assistant_id=assistant.id
         )
 
-        spinner = Spinner("dots")
+        spinner = ""
         with console.status(spinner):
             previous_status = None
             while True:
                 if run.status != previous_status:
                     if run.status == "queued":
-                        console.print("[bold #FF8800]>[/bold #FF8800] Waiting for OpenAI")
+                        console.print(
+                            "[bold #FF8800]>[/bold #FF8800] Waiting for OpenAI"
+                        )
                     else:
-                        console.print("[bold #FF8800]>[/bold #FF8800] Assistant is currently in status:", run.status)
+                        console.print(
+                            "[bold #FF8800]>[/bold #FF8800] Assistant is currently in status:",
+                            run.status,
+                        )
                     previous_status = run.status
                 if run.status == "requires_action":
-                    console.print("[bold #FF8800]>[/bold #FF8800] Assistant is using action:")
+                    console.print(
+                        "[bold #FF8800]>[/bold #FF8800] Assistant is using action:"
+                    )
                     outputs = sandbox.openai.actions.run(run)
                     if len(outputs) > 0:
                         client.beta.threads.runs.submit_tool_outputs(
@@ -201,8 +210,11 @@ def main():
                     print(f"Unknown status: {run.status}")
                     break
 
-                run = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
+                run = client.beta.threads.runs.retrieve(
+                    thread_id=thread.id, run_id=run.id
+                )
                 time.sleep(0.5)
+
 
 if __name__ == "__main__":
     main()

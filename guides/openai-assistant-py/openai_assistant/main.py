@@ -8,7 +8,8 @@ from openai_assistant.actions import (
     read_file,
     save_content_to_file,
     list_files,
-    commit_and_push,
+    #commit_and_push,
+    make_pull_request
 )
 
 from rich import print
@@ -96,8 +97,10 @@ def main():
         save_content_to_file
     ).add_action(
         list_files
+    #).add_action(
+        #commit_and_push
     ).add_action(
-        commit_and_push
+        make_pull_request
     )
 
     # Identify AI developer in git
@@ -158,15 +161,18 @@ def main():
             thread_id=thread.id, assistant_id=assistant.id
         )
 
-        spinner = Spinner("bouncingBall")
+        spinner = Spinner("dots")
         with console.status(spinner):
             previous_status = None
             while True:
                 if run.status != previous_status:
-                    console.print("[#E57B00]>[/#E57B00] Assistant is currently in status:", run.status)
+                    if run.status == "queued":
+                        console.print("[bold #FF8800]>[/bold #FF8800] Waiting for OpenAI")
+                    else:
+                        console.print("[bold #FF8800]>[/bold #FF8800] Assistant is currently in status:", run.status)
                     previous_status = run.status
                 if run.status == "requires_action":
-                    console.print("[#E57B00]>[/#E57B00] Assistant is using action:")
+                    console.print("[bold #FF8800]>[/bold #FF8800] Assistant is using action:")
                     outputs = sandbox.openai.actions.run(run)
                     if len(outputs) > 0:
                         client.beta.threads.runs.submit_tool_outputs(

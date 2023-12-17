@@ -97,3 +97,47 @@ def commit_and_push(sandbox: Sandbox, args: Dict[str, Any]) -> str:
         return git_push_proc.stderr
 
     return "success"
+
+def make_pull_request(sandbox: Sandbox, args: Dict[str, Any]) -> str:
+    repo_directory = "/home/user/repo"  # The repository is cloned to this directory
+    base_branch = "main"  # The base branch is always the existing main branch
+    new_branch = "ai-developer"  # The new branch has a constant path (e.g., AI_developer)
+    title = "Pull request from AI Developer"  # The title of the pull request
+    body = ""  # The description or body of the pull request is empty
+
+    console.print(
+        f"[sandbox_action][Sandbox Action]\t[/sandbox_action] Making a pull request from '{new_branch}' to '{base_branch}'"
+    )
+
+    # Step 1: Create a new branch
+    git_checkout_proc = sandbox.process.start_and_wait(
+        f"git -C {repo_directory} checkout -b {new_branch}"
+    )
+    if git_checkout_proc.stderr != "":
+        return git_checkout_proc.stderr
+
+    # Step 2: Add, commit, and push the changes to the new branch
+    git_add_proc = sandbox.process.start_and_wait(f"git -C {repo_directory} add .")
+    if git_add_proc.stderr != "":
+        return git_add_proc.stderr
+
+    git_commit_proc = sandbox.process.start_and_wait(
+        f"git -C {repo_directory} commit -m 'Commit message for pull request'"
+    )
+    if git_commit_proc.stderr != "":
+        return git_commit_proc.stderr
+
+    git_push_proc = sandbox.process.start_and_wait(
+        f"git -C {repo_directory} push -u origin {new_branch}"
+    )
+    if git_push_proc.stderr != "":
+        return git_push_proc.stderr
+
+    # Step 3: Create the pull request
+    gh_pull_request_proc = sandbox.process.start_and_wait(
+        f"gh pr create --base {base_branch} --head {new_branch} --title '{title}' --body '{body}'"
+    )
+    if gh_pull_request_proc.stderr != "":
+        return gh_pull_request_proc.stderr
+
+    return "success"

@@ -8,8 +8,9 @@ from openai_assistant.actions import (
     read_file,
     save_content_to_file,
     list_files,
-    # commit_and_push,
+    commit,
     make_pull_request,
+    REPO_DIRECTORY,
 )
 
 from rich import print
@@ -55,7 +56,7 @@ def prompt_user_for_task(repo_url):
     )
     user_task = (
         f"Please work with the codebase repository called {repo_url} "
-        f"that is cloned in the /home/user/repo directory. Your task is: {user_task_specification}"
+        f"that is cloned in the /home/user/repo directory. React on the following user's comment: {user_task_specification}"
     )
     print("", end="\n")
     return user_task
@@ -70,19 +71,16 @@ def prompt_user_for_auth():
     return user_auth
 
 
-# Determine the directory where we clone the repository in the sandbox
-repo_directory = "/home/user/repo"
-
 # Create a Rich Console instance with our custom theme
 console = Console(theme=custom_theme)
 
 
 def handle_sandbox_stdout(message):
-    console.print(f"[theme][Sandbox][/theme] {message.line}", end="\r")
+    console.print(f"[theme][Sandbox][/theme] {message.line}")
 
 
 def handle_sandbox_stderr(message):
-    console.print(f"[theme][Sandbox][/theme] {message.line}", end="\r")
+    console.print(f"[theme][Sandbox][/theme] {message.line}")
 
 
 def main():
@@ -97,13 +95,7 @@ def main():
     )
     sandbox.add_action(create_directory).add_action(read_file).add_action(
         save_content_to_file
-    ).add_action(
-        list_files
-        # ).add_action(
-        # commit_and_push
-    ).add_action(
-        make_pull_request
-    )
+    ).add_action(list_files).add_action(commit).add_action(make_pull_request)
 
     # Identify AI developer in git
     sandbox.process.start_and_wait(
@@ -141,7 +133,7 @@ def main():
 
     # Clone the repository
     git_clone_proc = sandbox.process.start_and_wait(
-        f"git clone {repo_url} {repo_directory}"
+        f"git clone {repo_url} {REPO_DIRECTORY}"
     )
     if git_clone_proc.exit_code != 0:
         print("Error: Unable to clone the repository")
@@ -168,27 +160,20 @@ def main():
             previous_status = None
             while True:
                 if run.status != previous_status:
-                    if run.status == "queued":
-                        console.print(
-                            "[bold #FF8800]>[/bold #FF8800] Waiting for OpenAI"
-                        )
-                    else:
-                        console.print(
-                            "[bold #FF8800]>[/bold #FF8800] Assistant is currently in status:",
-                            run.status,
-                        )
+                    console.print(
+                        f"[bold #FF8800]>[/bold #FF8800] Assistant is currently in status: {run.status} [#666666](waiting for OpenAI)[/#666666]"
+                    )
                     previous_status = run.status
                 if run.status == "requires_action":
-                    console.print(
-                        "[bold #FF8800]>[/bold #FF8800] Assistant is using action:"
-                    )
                     outputs = sandbox.openai.actions.run(run)
                     if len(outputs) > 0:
                         client.beta.threads.runs.submit_tool_outputs(
                             thread_id=thread.id, run_id=run.id, tool_outputs=outputs
                         )
                 elif run.status == "completed":
-                    console.print(" Run completed")
+                    console.print(
+                        "\n✅[#E57B00][italic] Run completed[/#E57B00][/italic]"
+                    )
                     messages = (
                         client.beta.threads.messages.list(thread_id=thread.id)
                         .data[0]

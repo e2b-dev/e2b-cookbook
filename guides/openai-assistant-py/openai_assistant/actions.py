@@ -1,10 +1,14 @@
 import os
+import random
+import string
 from typing import Any, Dict
 from e2b import Sandbox
 from rich.console import Console
 from rich.theme import Theme
 
-# Create a Rich Console instance with your desired colors
+# Determine the directory where we clone the repository in the sandbox
+REPO_DIRECTORY = "/home/user/repo"
+
 custom_theme = Theme(
     {
         "sandbox_action": "bold #E57B00",  # Adjust color as needed
@@ -14,11 +18,15 @@ custom_theme = Theme(
 console = Console(theme=custom_theme)
 
 
+def print_sandbox_action(action_type: str, action_message: str):
+    console.print(
+        f"[sandbox_action] [Sandbox Action][/sandbox_action] {action_type}: {action_message}"
+    )
+
+
 def create_directory(sandbox: Sandbox, args: Dict[str, Any]) -> str:
     directory = args["directory"]
-    console.print(
-        f"[sandbox_action] [Sandbox Action]\t[/sandbox_action] Creating directory: {directory}"
-    )
+    print_sandbox_action("Creating directory", directory)
 
     try:
         sandbox.filesystem.make_dir(directory)
@@ -28,16 +36,14 @@ def create_directory(sandbox: Sandbox, args: Dict[str, Any]) -> str:
 
 
 def save_content_to_file(sandbox: Sandbox, args: Dict[str, Any]) -> str:
-    filename = args["filename"]
+    path = args["path"]
     content = args["content"]
-    console.print(
-        f"[sandbox_action] [Sandbox Action]\t[/sandbox_action] Saving content to {filename}"
-    )
+    print_sandbox_action("Saving content to", path)
 
     try:
-        dir = os.path.dirname(filename)
+        dir = os.path.dirname(path)
         sandbox.filesystem.make_dir(dir)
-        sandbox.filesystem.write(filename, content)
+        sandbox.filesystem.write(path, content)
         return "success"
     except Exception as e:
         return f"Error: {e}"
@@ -45,9 +51,7 @@ def save_content_to_file(sandbox: Sandbox, args: Dict[str, Any]) -> str:
 
 def list_files(sandbox: Sandbox, args: Dict[str, Any]) -> str:
     path = args["path"]
-    console.print(
-        f"[sandbox_action] [Sandbox Action]\t[/sandbox_action] Listing files on path {path}"
-    )
+    print_sandbox_action("Listing files on path", path)
 
     try:
         files = sandbox.filesystem.list(path)
@@ -61,9 +65,7 @@ def list_files(sandbox: Sandbox, args: Dict[str, Any]) -> str:
 
 def read_file(sandbox: Sandbox, args: Dict[str, Any]) -> str:
     path = args["path"]
-    console.print(
-        f"[sandbox_action] [Sandbox Action]\t[/sandbox_action] Reading file on path {path}"
-    )
+    print_sandbox_action("Reading file on path", path)
 
     try:
         return sandbox.filesystem.read(path)
@@ -71,74 +73,66 @@ def read_file(sandbox: Sandbox, args: Dict[str, Any]) -> str:
         return f"Error: {e}"
 
 
-def commit_and_push(sandbox: Sandbox, args: Dict[str, Any]) -> str:
-    repo_directory = "/home/user/repo"  # The repository is cloned to this directory
+def commit(sandbox: Sandbox, args: Dict[str, Any]) -> str:
+    repo_directory = "/home/user/repo"
     commit_message = args["commit_message"]
-    console.print(
-        f"[sandbox_action] [Sandbox Action]\t[/sandbox_action] Committing with the message '{commit_message}'"
-    )
+    print_sandbox_action("Committing with the message", commit_message)
 
     git_add_proc = sandbox.process.start_and_wait(f"git -C {repo_directory} add .")
-    if git_add_proc.stderr != "":
-        return git_add_proc.stderr
+    if git_add_proc.exit_code != 0:
+        error = f"Error adding files to staging: {git_add_proc.stdout}\n\t{git_add_proc.stderr}"
+        console.print("\t[bold red]Error:[/bold red]", error)
+        return error
 
     git_commit_proc = sandbox.process.start_and_wait(
         f"git -C {repo_directory} commit -m '{commit_message}'"
     )
-    if git_commit_proc.stderr != "":
-        return git_commit_proc.stderr
-
-    git_push_proc = sandbox.process.start_and_wait(
-        f"git -C {repo_directory} push -u origin"
-    )  # Adjust 'main' to your branch name if different
-    if git_push_proc.stderr != "":
-        return git_push_proc.stderr
+    if git_commit_proc.exit_code != 0:
+        error = f"Error committing changes: {git_commit_proc.stdout}\n\t{git_commit_proc.stderr}"
+        console.print("\t[bold red]Error:[/bold red]", error)
+        return error
 
     return "success"
 
 
 def make_pull_request(sandbox: Sandbox, args: Dict[str, Any]) -> str:
-    repo_directory = "/home/user/repo"  # The repository is cloned to this directory
-    base_branch = "main"  # The base branch is always the existing main branch
-    new_branch = (
-        "ai-developer"  # The new branch has a constant path (e.g., AI_developer)
-    )
-    title = "Pull request from AI Developer"  # The title of the pull request
-    body = ""  # The description or body of the pull request is empty
+    base_branch = "main"
 
-    console.print(
-        f"[sandbox_action] [Sandbox Action]\t[/sandbox_action] Making a pull request from '{new_branch}' to '{base_branch}'"
+    random_letters = "".join(random.choice(string.ascii_letters) for _ in range(5))
+    new_branch = f"ai-developer-{random_letters}"
+
+    title = "Pull request from AI Developer"
+    body = ""
+
+    print_sandbox_action(
+        "Making a pull request", f"from '{new_branch}' to '{base_branch}'"
     )
 
-    # Step 1: Create a new branch
     git_checkout_proc = sandbox.process.start_and_wait(
-        f"git -C {repo_directory} checkout -b {new_branch}"
+        f"git -C {REPO_DIRECTORY} checkout -b {new_branch}"
     )
-    if git_checkout_proc.stderr != "":
-        return git_checkout_proc.stderr
-
-    # Step 2: Add, commit, and push the changes to the new branch
-    git_add_proc = sandbox.process.start_and_wait(f"git -C {repo_directory} add .")
-    if git_add_proc.stderr != "":
-        return git_add_proc.stderr
-
-    git_commit_proc = sandbox.process.start_and_wait(
-        f"git -C {repo_directory} commit -m 'Commit message for pull request'"
-    )
-    if git_commit_proc.stderr != "":
-        return git_commit_proc.stderr
+    if git_checkout_proc.exit_code != 0:
+        error = f"Error creating a new git branch {new_branch}: {git_checkout_proc.stdout}\n\t{git_checkout_proc.stderr}"
+        console.print("\t[bold red]Error:[/bold red]", error)
+        return error
 
     git_push_proc = sandbox.process.start_and_wait(
-        f"git -C {repo_directory} push -u origin {new_branch}"
+        f"git -C {REPO_DIRECTORY} push -u origin {new_branch}"
     )
-    if git_push_proc.stderr != "":
-        return git_push_proc.stderr
+    if git_push_proc.exit_code != 0:
+        error = (
+            f"Error pushing changes: {git_push_proc.stdout}\n\t{git_push_proc.stderr}"
+        )
+        console.print("\t[bold red]Error:[/bold red]", error)
+        return error
 
-    # Step 3: Create the pull request
     gh_pull_request_proc = sandbox.process.start_and_wait(
-        f"gh pr create --base {base_branch} --head {new_branch} --title '{title}' --body '{body}'"
+        cmd=f"gh pr create --base {base_branch} --head {new_branch} --title '{title}' --body '{body}'",
+        cwd=REPO_DIRECTORY,
     )
-    if gh_pull_request_proc.stderr != "":
-        return gh_pull_request_proc.stderr
+    if gh_pull_request_proc.exit_code != 0:
+        error = f"Error creating pull request: {gh_pull_request_proc.stdout}\n\t{gh_pull_request_proc.stderr}"
+        console.print("\t[bold red]Error:[/bold red]", error)
+        return error
 
     return "success"

@@ -39,9 +39,9 @@ def create_assistant():
                             "type": "string",
                             "description": "The content to save",
                         },
-                        "filename": {
+                        "path": {
                             "type": "string",
-                            "description": "The filename including the path and extension",
+                            "description": "The path to the file, including extension",
                         },
                     },
                 },
@@ -79,22 +79,22 @@ def create_assistant():
                 },
             },
         },
-        # {
-        #     "type": "function",
-        #     "function": {
-        #         "name": "commit_and_push",
-        #         "description": "Commit and push changes to the repository",
-        #         "parameters": {
-        #             "type": "object",
-        #             "properties": {
-        #                 "commit_message": {
-        #                     "type": "string",
-        #                     "description": "The commit message",
-        #                 },
-        #             },
-        #         },
-        #     },
-        # },
+        {
+            "type": "function",
+            "function": {
+                "name": "commit",
+                "description": "Commit changes to the repository",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "commit_message": {
+                            "type": "string",
+                            "description": "The commit message",
+                        },
+                    },
+                },
+            },
+        },
         {
             "type": "function",
             "function": {
@@ -103,18 +103,6 @@ def create_assistant():
                 "parameters": {
                     "type": "object",
                     "properties": {
-                        "repo_directory": {
-                            "type": "string",
-                            "description": "The directory where the repository is cloned",
-                        },
-                        "base_branch": {
-                            "type": "string",
-                            "description": "The base branch for the pull request",
-                        },
-                        "new_branch": {
-                            "type": "string",
-                            "description": "The new branch you want to create the pull request for",
-                        },
                         "title": {
                             "type": "string",
                             "description": "The title of the pull request",
@@ -130,16 +118,20 @@ def create_assistant():
     ]
 
     ai_developer = client.beta.assistants.create(
-        instructions="""You are an AI developer.
-    The provided codebase is in the /home/user/repo.
-    When given a coding task, you will work on it until it is completed. You will summarize your steps.
-    If you encounter some problem, just communicate it, please. 
-    You can save content (text or code) to file (or create a new file), list files in a given directory, read files, commit and push changes, and move files within the repository.
-    By default, always make a pull request after performing any action on the repository. This helps in reviewing and merging your changes.
-    Always make the pull request into the "ai-developer" branch, name the pull request "Pull request from AI Developer" and leave its body empty.
-    Please try to use actions only when they are relevant to the task. Sometimes, engage in a chat and reply with text without performing actions.
-    You are professional, don't argue, and just complete the task.
-    When you finish the task, please always add the link to the original repository (not to a particular commit, but to the repo as a whole.)
+        instructions="""You are an AI developer. You help user work on their tasks related to coding in their codebase. The provided codebase is in the /home/user/repo.
+    When given a coding task, work on it until completion, commit it, make pull request, and then summarize your steps.
+
+    If you encounter a problem, communicate it promptly, please. 
+
+    You can create and save content (text or code) to a specified file (or create a new file), list files in a given directory, read files, commit changes, and make pull requests. Always make sure to write the content in the codebase.
+
+    By default, always either commit your changes or make a pull request after performing any action on the repository. This helps in reviewing and merging your changes. After committing, inquire if the user wants anything else or is ready to make a pull request.
+    Always make the pull request into new branch, and name the pull request "Pull request from AI Developer." Describe the changes in the pull request body based on the content.
+
+    Be professional, avoid arguments, and focus on completing the task.
+
+    When you finish the task, always provide the link to the original repository (not to a particular commit, but to the repo as a whole.)
+    Additionally, be prepared for discussions; not everything user writes implies changes to the repository. For example, if the user writes "thank you", you can simply answer "you are welcome".
     """,
         name="AI Developer",
         tools=functions,

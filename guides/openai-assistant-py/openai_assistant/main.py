@@ -28,21 +28,23 @@ load_dotenv()
 client = openai.Client()
 
 AI_ASSISTANT_ID = os.getenv("AI_ASSISTANT_ID")
-assistant = client.beta.assistants.retrieve(AI_ASSISTANT_ID)
+USER_GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
+assistant = client.beta.assistants.retrieve(AI_ASSISTANT_ID)
 
 custom_theme = Theme(
     {
-        "theme": "bold #666666",  # Adjust color as needed
+        "theme": "bold #666666",
     }
 )
+console = Console(theme=custom_theme)
 
 
 def prompt_user_for_github_repo():
     user_repo = MyPrompt.ask(
-        "\nWhat GitHub repository do you want to work in?\nPlease provide it in format [bold #E0E0E0]your_username/your_repository_name[/bold #E0E0E0]\n\nRepository: "
+        "\nWhat GitHub repository do you want to work in? Specify it like this [bold #E0E0E0]your_username/your_repository_name[/bold #E0E0E0].\n> "
     )
-    print("\n🔄[#E57B00][italic] Cloning the repo[/#E57B00][/italic]", end="\n")
+    print("\n🔄[#E57B00][italic] Cloning the repo...[/#E57B00][/italic]", end="\n")
     print("", end="\n")
 
     repo_url = f"https://github.com/{user_repo.strip()}.git"
@@ -52,7 +54,7 @@ def prompt_user_for_github_repo():
 
 def prompt_user_for_task(repo_url):
     user_task_specification = MyPrompt.ask(
-        "\n\n🤖[#E57B00][bold italic] The AI developer is working in the cloned repository[/bold italic][/#E57B00]\n\nWhat do you want to do? "
+        "\n\n🤖[#E57B00][bold italic] The AI developer is working in the cloned repository[/bold italic][/#E57B00]\n\nWhat do you want to do?\n> "
     )
     user_task = (
         f"Please work with the codebase repository called {repo_url} "
@@ -71,8 +73,43 @@ def prompt_user_for_auth():
     return user_auth
 
 
-# Create a Rich Console instance with our custom theme
-console = Console(theme=custom_theme)
+def setup_git(sandbox):
+    print("Logging into GitHub...")
+    # Identify AI developer in git
+    sandbox.process.start_and_wait(
+        "git config --global user.email 'ai-developer@email.com'"
+    )
+    sandbox.process.start_and_wait("git config --global user.name 'AI Developer'")
+
+    # Login user to GitHub
+    proc = sandbox.process.start_and_wait(
+        f"echo {USER_GITHUB_TOKEN} | gh auth login --with-token"
+    )
+    if proc.exit_code != 0:
+        print("Error: Unable to log into GitHub", end="\n")
+        print(proc.stderr)
+        print(proc.stdout)
+        exit(1)
+
+    # Setup user's Git credentials
+    proc = sandbox.process.start_and_wait("gh auth setup-git")
+    if proc.exit_code != 0:
+        print("Error: Unable to set up Git auth with GitHub")
+        print(proc.stderr)
+        print(proc.stdout)
+        exit(1)
+    else:
+        print("\n✅ [#E57B00][italic]Logged in[/#E57B00][/italic]")
+
+
+def clone_repo_in_sandbox(sandbox, repo_url):
+    # Clone the repository
+    git_clone_proc = sandbox.process.start_and_wait(
+        f"git clone {repo_url} {REPO_DIRECTORY}"
+    )
+    if git_clone_proc.exit_code != 0:
+        print("Error: Unable to clone the repository")
+        exit(1)
 
 
 def handle_sandbox_stdout(message):
@@ -84,11 +121,9 @@ def handle_sandbox_stderr(message):
 
 
 def main():
-    print("\n🤖[#E57B00][bold italic] AI developer[/#E57B00][/bold italic]")
-    user_gh_token = prompt_user_for_auth()
-    repo_url = prompt_user_for_github_repo()
+    global USER_GITHUB_TOKEN
 
-    # Create the sandbox
+    # Create the E2B sandbox
     sandbox = Sandbox(
         on_stderr=handle_sandbox_stderr,
         on_stdout=handle_sandbox_stdout,
@@ -97,47 +132,18 @@ def main():
         save_content_to_file
     ).add_action(list_files).add_action(commit).add_action(make_pull_request)
 
-    # Identify AI developer in git
-    sandbox.process.start_and_wait(
-        "git config --global user.email 'ai-developer@email.com'"
-    )
-    sandbox.process.start_and_wait("git config --global user.name 'AI Developer'")
-
-    # Use the GitHub token
-    proc = sandbox.process.start_and_wait(
-        f"echo {user_gh_token} | gh auth login --with-token"
-    )
-    if proc.exit_code != 0:
-        print("Error: Unable to log into GitHub", end="\n")
-        print(proc.stderr)
-        print(proc.stdout)
-        exit(1)
-
-    # Check that the user is logged into GitHub
-    proc = sandbox.process.start_and_wait("gh auth status")
-    if proc.exit_code != 0:
-        print("Error: Unable to log into GitHub")
-        print(proc.stderr)
-        print(proc.stdout)
-        exit(1)
-
-    # Setup user's credentials
-    proc = sandbox.process.start_and_wait("gh auth setup-git")
-    if proc.exit_code != 0:
-        print("Error: Unable to set up Git auth with GitHub")
-        print(proc.stderr)
-        print(proc.stdout)
-        exit(1)
+    print("\n🤖[#E57B00][bold italic] AI developer[/#E57B00][/bold italic]")
+    if USER_GITHUB_TOKEN is None:
+        USER_GITHUB_TOKEN = prompt_user_for_auth()
     else:
-        print("\n✅ [#E57B00][italic]Logged in[/#E57B00][/italic]")
+        print("\n✅ [#E57B00][italic]GitHub token loaded[/#E57B00][/italic]\n")
 
-    # Clone the repository
-    git_clone_proc = sandbox.process.start_and_wait(
-        f"git clone {repo_url} {REPO_DIRECTORY}"
-    )
-    if git_clone_proc.exit_code != 0:
-        print("Error: Unable to clone the repository")
-        exit(1)
+    # Setup git right away so user knows immediatelly if they passed wrong token
+    setup_git(sandbox)
+
+    # Clone repo
+    repo_url = prompt_user_for_github_repo()
+    clone_repo_in_sandbox(sandbox, repo_url)
 
     while True:
         user_task = prompt_user_for_task(repo_url)

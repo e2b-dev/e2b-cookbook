@@ -111,13 +111,9 @@ def create_assistant():
                         "title": {
                             "type": "string",
                             "description": "The title of the pull request",
-                        },
-                        "body": {
-                            "type": "string",
-                            "description": "The description of the pull request",
-                        },
+                        }
                     },
-                    "required": ["title", "body"],
+                    "required": ["title"],
                 },
             },
         },
@@ -132,7 +128,7 @@ def create_assistant():
     You can create and save content (text or code) to a specified file (or create a new file), list files in a given directory, read files, commit changes, and make pull requests. Always make sure to write the content in the codebase.
 
     By default, always either commit your changes or make a pull request after performing any action on the repo. This helps in reviewing and merging your changes.
-    Name and describe the PR based on the changes you made. You can use markdown in the PR's body
+    Name the PR based on the changes you made.
 
     Be professional, avoid arguments, and focus on completing the task.
 

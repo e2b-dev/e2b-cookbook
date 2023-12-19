@@ -101,7 +101,7 @@ def make_pull_request(sandbox: Sandbox, args: Dict[str, Any]) -> str:
     new_branch_name = f"ai-developer-{random_letters}"
 
     title = args["title"]
-    body = args["body"]
+    body = ""
 
     print_sandbox_action(
         f"Making a pull request from '{new_branch_name}' to '{base_branch}'"

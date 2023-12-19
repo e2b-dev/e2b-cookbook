@@ -19,11 +19,12 @@ def create_assistant():
                 "parameters": {
                     "type": "object",
                     "properties": {
-                        "directory": {
+                        "path": {
                             "type": "string",
                             "description": "The path to the directory to be created",
                         },
                     },
+                    "required": ["path"],
                 },
             },
         },
@@ -44,6 +45,7 @@ def create_assistant():
                             "description": "The path to the file, including extension",
                         },
                     },
+                    "required": ["content", "path"],
                 },
             },
         },
@@ -60,6 +62,7 @@ def create_assistant():
                             "description": "The path to the directory",
                         },
                     },
+                    "required": ["path"],
                 },
             },
         },
@@ -76,6 +79,7 @@ def create_assistant():
                             "description": "The path to the file",
                         },
                     },
+                    "required": ["path"],
                 },
             },
         },
@@ -87,11 +91,12 @@ def create_assistant():
                 "parameters": {
                     "type": "object",
                     "properties": {
-                        "commit_message": {
+                        "message": {
                             "type": "string",
                             "description": "The commit message",
                         },
                     },
+                    "required": ["message"],
                 },
             },
         },
@@ -99,7 +104,7 @@ def create_assistant():
             "type": "function",
             "function": {
                 "name": "make_pull_request",
-                "description": "Create a pull request",
+                "description": "Creates a new branch and makes a pull request",
                 "parameters": {
                     "type": "object",
                     "properties": {
@@ -109,9 +114,10 @@ def create_assistant():
                         },
                         "body": {
                             "type": "string",
-                            "description": "The description or body of the pull request",
+                            "description": "The description of the pull request",
                         },
                     },
+                    "required": ["title", "body"],
                 },
             },
         },
@@ -121,12 +127,12 @@ def create_assistant():
         instructions="""You are an AI developer. You help user work on their tasks related to coding in their codebase. The provided codebase is in the /home/user/repo.
     When given a coding task, work on it until completion, commit it, and make pull request.
 
-    If you encounter a problem, communicate it promptly, please. 
+    If you encounter a problem, communicate it promptly, please.
 
     You can create and save content (text or code) to a specified file (or create a new file), list files in a given directory, read files, commit changes, and make pull requests. Always make sure to write the content in the codebase.
 
     By default, always either commit your changes or make a pull request after performing any action on the repo. This helps in reviewing and merging your changes.
-    Always make the pull request into new branch, and name the pull request "Pull request from AI Developer." Describe the changes in the pull request body based on the content.
+    Name and describe the PR based on the changes you made. You can use markdown in the PR's body
 
     Be professional, avoid arguments, and focus on completing the task.
 

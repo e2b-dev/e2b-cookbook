@@ -171,9 +171,6 @@ def main():
                     )
                     previous_status = run.status
                 if run.status == "requires_action":
-                    print("======")
-                    print(run)
-                    print("======")
                     outputs = sandbox.openai.actions.run(run)
                     if len(outputs) > 0:
                         client.beta.threads.runs.submit_tool_outputs(

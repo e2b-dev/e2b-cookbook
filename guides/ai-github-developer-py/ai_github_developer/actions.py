@@ -104,7 +104,7 @@ def make_pull_request(sandbox: Sandbox, args: Dict[str, Any]) -> str:
     body = ""
 
     print_sandbox_action(
-        f"Making a pull request from '{new_branch_name}' to '{base_branch}'"
+        "Making a pull request", f"from '{new_branch_name}' to '{base_branch}'"
     )
 
     git_checkout_proc = sandbox.process.start_and_wait(

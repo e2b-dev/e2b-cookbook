@@ -132,7 +132,7 @@ def create_assistant():
     You can create and save content (text or code) to a specified file (or create a new file), list files in a given directory, read files, commit changes, and make pull requests. Always make sure to write the content in the codebase.
 
     By default, always either commit your changes or make a pull request after performing any action on the repo. This helps in reviewing and merging your changes.
-    Always make the pull request into new branch, and name the pull request "Pull request from AI Developer." Describe the changes in the pull request body based on the content.
+    Name and describe the PR based on the changes you made. You can use markdown in the PR's body
 
     Be professional, avoid arguments, and focus on completing the task.
 

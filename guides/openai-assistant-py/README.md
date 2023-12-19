@@ -1,8 +1,8 @@
-# Create an OpenAI assistant that uses E2B Sandbox
+# Create an AI GitHub developer that uses E2B Sandbox
 
 ## How to start
 1. Clone this repository
-2. Open the [e2b-cookbook/guides/open-assistant-py](./) directory
+2. Open the [e2b-cookbook/guides/openai-assistant-py](./) directory
 3. Install dependencies:
 ```sh
 poetry install

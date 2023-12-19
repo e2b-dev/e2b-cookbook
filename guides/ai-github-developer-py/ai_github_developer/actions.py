@@ -25,7 +25,7 @@ def print_sandbox_action(action_type: str, action_message: str):
 
 # List of actions for the assistant
 def create_directory(sandbox: Sandbox, args: Dict[str, Any]) -> str:
-    directory = args["directory"]
+    directory = args["path"]
     print_sandbox_action("Creating directory", directory)
 
     try:
@@ -75,7 +75,7 @@ def read_file(sandbox: Sandbox, args: Dict[str, Any]) -> str:
 
 def commit(sandbox: Sandbox, args: Dict[str, Any]) -> str:
     repo_directory = "/home/user/repo"
-    commit_message = args["commit_message"]
+    commit_message = args["message"]
     print_sandbox_action("Committing with the message", commit_message)
 
     git_add_proc = sandbox.process.start_and_wait(f"git -C {repo_directory} add .")
@@ -101,8 +101,8 @@ def make_pull_request(sandbox: Sandbox, args: Dict[str, Any]) -> str:
     random_letters = "".join(random.choice(string.ascii_letters) for _ in range(5))
     new_branch_name = f"ai-developer-{random_letters}"
 
-    title = "Pull request from AI Developer"
-    body = ""
+    title = args["title"]
+    body = args["body"]
 
     print_sandbox_action(
         "Making a pull request", f"from '{new_branch_name}' to '{base_branch}'"
@@ -127,7 +127,7 @@ def make_pull_request(sandbox: Sandbox, args: Dict[str, Any]) -> str:
         return error
 
     gh_pull_request_proc = sandbox.process.start_and_wait(
-        cmd=f"gh pr create --base {base_branch} --head {new_branch_name} --title '{title}' --body '{body}'",
+        cmd=f'gh pr create --base "{base_branch}" --head "{new_branch_name}" --title "{title}" --body "{body}"',
         cwd=REPO_DIRECTORY,
     )
     if gh_pull_request_proc.exit_code != 0:

@@ -126,7 +126,9 @@ def make_pull_request(sandbox: Sandbox, args: Dict[str, Any]) -> str:
         return error
 
     gh_pull_request_proc = sandbox.process.start_and_wait(
-        cmd=f'gh pr create --base "{base_branch}" --head "{new_branch_name}" --title "{title}" --body "{body}"',
+        cmd=f'gh pr create --base "{base_branch}" --head "{new_branch_name}" --title "{title}" --body "{body}"'.replace(
+            "`", "\\`"
+        ),
         cwd=REPO_DIRECTORY,
     )
     if gh_pull_request_proc.exit_code != 0:

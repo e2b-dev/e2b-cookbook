@@ -1,4 +1,4 @@
-# AI GitHub developer that uses E2B Sandbox
+# AI developer connected to GitHub and its own cloud sandbox
 
 ![Gif from developer](https://ntjfcwpzsxugrykskdgi.supabase.co/storage/v1/object/public/content-assets/1219_019.gif?t=2023-12-19T18%3A26%3A10.474Z)
 

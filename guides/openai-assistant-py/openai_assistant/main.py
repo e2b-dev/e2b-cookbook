@@ -18,7 +18,7 @@ from rich.console import Console
 from rich.theme import Theme
 from rich.prompt import Prompt
 
-
+ 
 class MyPrompt(Prompt):
     prompt_suffix = ""
 

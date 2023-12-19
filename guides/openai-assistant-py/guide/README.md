@@ -21,7 +21,7 @@ We will use the E2B Sandboxes for the remote execution of tasks, together with t
 > You can find the final code [here](https://github.com/e2b-dev/e2b-cookbook/tree/main/guides/openai-assistant-py/openai_assistant)
 . All links to particular parts of code in this post refer to the corresponding code on GitHub.
 
-# <TBD - ADD GIF WITH OUTPUT HERE>
+![Video](1219_003.mp4)
 
 ### Prerequisites
 

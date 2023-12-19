@@ -18,7 +18,7 @@ In this guide, we will build a custom AI agent that will clone our GitHub reposi
 
 We will use the E2B Sandboxes for the remote execution of tasks, together with the Assistants API by OpenAI. The crucial concept from OpenAI we will use is Function Calling.
 
-> You can find the final code [here](https://github.com/e2b-dev/e2b-cookbook/tree/main/guides/openai-assistant-py/openai_assistant)
+> You can find the final code [here](https://github.com/e2b-dev/e2b-cookbook/tree/main/guides/openai-assistant-py/openai_assistant) and an example of Next.js project  that the AI developer built [here](https://github.com/tizkovatereza/tt-app).
 . All links to particular parts of code in this post refer to the corresponding code on GitHub.
 
 ![Video](000.gif)
@@ -642,7 +642,9 @@ if __name__ == "__main__":
 ## Output
 
 > 🏁 Final code: [E2B Cookbook - OpenAI Assistant](https://github.com/e2b-dev/e2b-cookbook/tree/main/guides/openai-assistant-py/openai_assistant)
-)
+> 
+> Example of Next.js project  that the AI developer built: [Repository](https://github.com/tizkovatereza/tt-app)
+
 
 Here are some examples of my assistant working on simple tasks - writing me a README, and creating a new file with a simple JavaScript code.
 

@@ -575,8 +575,16 @@ def main():
         run = client.beta.threads.runs.create(
             thread_id=thread.id, assistant_id=assistant.id
         )
+```
 
-        spinner = ""
+Still  inside the main function, we print the assistant's process to the terminal. Each time it chooses to use one of the actions, we see in the terminal how it uses the action and whether it ends with success or error.
+
+![Assistants status](005.png "A schema of assistant's run steps")
+
+> Note: If the assistant is "queued", we are waiting for OpenAI's processes.
+
+```python
+ spinner = ""
         with console.status(spinner):
             previous_status = None
             while True:
@@ -618,70 +626,6 @@ def main():
                     thread_id=thread.id, run_id=run.id
                 )
                 time.sleep(0.5)
-
-                from actions import new_branch
-
-                pull_request_link = (
-                    f"https://github.com/{user_repo}/compare/{new_branch}"
-                )
-                print(pull_request_link)
-```
-
-Still  inside the main function, we print the assistant's process to the terminal. Each time it chooses to use one of the actions, we see in the terminal how it uses the action and whether it ends with success or error.
-
-![Assistants status](005.png "A schema of assistant's run steps")
-
-> Note: If the assistant is "queued", we are waiting for OpenAI's processes.
-
-```python
-with console.status(spinner):
-            previous_status = None
-            while True:
-                if run.status != previous_status:
-                    console.print(
-                        f"[bold #FF8800]>[/bold #FF8800] Assistant is currently in status: {run.status} [#666666](waiting for OpenAI)[/#666666]"
-                    )
-                    previous_status = run.status
-                if run.status == "requires_action":
-                    outputs = sandbox.openai.actions.run(run)
-                    if len(outputs) > 0:
-                        client.beta.threads.runs.submit_tool_outputs(
-                            thread_id=thread.id, run_id=run.id, tool_outputs=outputs
-                        )
-                elif run.status == "completed":
-                    console.print("\n✅[#666666] Run completed[/#666666]")
-                    messages = (
-                        client.beta.threads.messages.list(thread_id=thread.id)
-                        .data[0]
-                        .content
-                    )
-                    text_messages = [
-                        message for message in messages if message.type == "text"
-                    ]
-                    console.print("Thread finished:", text_messages[0].text.value)
-                    break
-
-                elif run.status in ["queued", "in_progress"]:
-                    pass
-
-                elif run.status in ["cancelled", "cancelling", "expired", "failed"]:
-                    break
-
-                else:
-                    print(f"Unknown status: {run.status}")
-                    break
-
-                run = client.beta.threads.runs.retrieve(
-                    thread_id=thread.id, run_id=run.id
-                )
-                time.sleep(0.5)
-
-                from actions import new_branch
-
-                pull_request_link = (
-                    f"https://github.com/{user_repo}/compare/{new_branch}"
-                )
-                print(pull_request_link)
 ```
 Finally, under the main function, we write the code that is run if the script is the main program being executed.
 

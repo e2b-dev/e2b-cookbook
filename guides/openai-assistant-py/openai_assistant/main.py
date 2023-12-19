@@ -205,13 +205,6 @@ def main():
                 )
                 time.sleep(0.5)
 
-                from actions import new_branch
-
-                pull_request_link = (
-                    f"https://github.com/{user_repo}/compare/{new_branch}"
-                )
-                print(pull_request_link)
-
 
 if __name__ == "__main__":
     main()

@@ -99,25 +99,25 @@ def make_pull_request(sandbox: Sandbox, args: Dict[str, Any]) -> str:
     base_branch = "main"
 
     random_letters = "".join(random.choice(string.ascii_letters) for _ in range(5))
-    new_branch = f"ai-developer-{random_letters}"
+    new_branch_name = f"ai-developer-{random_letters}"
 
     title = "Pull request from AI Developer"
     body = ""
 
     print_sandbox_action(
-        "Making a pull request", f"from '{new_branch}' to '{base_branch}'"
+        "Making a pull request", f"from '{new_branch_name}' to '{base_branch}'"
     )
 
     git_checkout_proc = sandbox.process.start_and_wait(
-        f"git -C {REPO_DIRECTORY} checkout -b {new_branch}"
+        f"git -C {REPO_DIRECTORY} checkout -b {new_branch_name}"
     )
     if git_checkout_proc.exit_code != 0:
-        error = f"Error creating a new git branch {new_branch}: {git_checkout_proc.stdout}\n\t{git_checkout_proc.stderr}"
+        error = f"Error creating a new git branch {new_branch_name}: {git_checkout_proc.stdout}\n\t{git_checkout_proc.stderr}"
         console.print("\t[bold red]Error:[/bold red]", error)
         return error
 
     git_push_proc = sandbox.process.start_and_wait(
-        f"git -C {REPO_DIRECTORY} push -u origin {new_branch}"
+        f"git -C {REPO_DIRECTORY} push -u origin {new_branch_name}"
     )
     if git_push_proc.exit_code != 0:
         error = (
@@ -127,7 +127,7 @@ def make_pull_request(sandbox: Sandbox, args: Dict[str, Any]) -> str:
         return error
 
     gh_pull_request_proc = sandbox.process.start_and_wait(
-        cmd=f"gh pr create --base {base_branch} --head {new_branch} --title '{title}' --body '{body}'",
+        cmd=f"gh pr create --base {base_branch} --head {new_branch_name} --title '{title}' --body '{body}'",
         cwd=REPO_DIRECTORY,
     )
     if gh_pull_request_proc.exit_code != 0:

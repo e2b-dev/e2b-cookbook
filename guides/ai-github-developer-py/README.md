@@ -1,5 +1,11 @@
 # Create an AI GitHub developer that uses E2B Sandbox
 
+A custom AI assistant that can clone any GitHub repository to its remote cloud environment, work on the repo there, and then make pull request to GitHub.
+
+The AI developer uses E2B sandboxes for the remote execution of tasks.
+
+You can write code, edit existing content in the repo, create new files, or list current files.
+
 ## How to start
 1. Clone this repository
 2. Open the [e2b-cookbook/guides/openai-assistant-py](./) directory

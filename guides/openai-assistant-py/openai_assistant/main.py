@@ -19,7 +19,6 @@ from rich.spinner import Spinner
 from rich.theme import Theme
 from rich.prompt import Prompt
 
-
 class MyPrompt(Prompt):
     prompt_suffix = ""
 

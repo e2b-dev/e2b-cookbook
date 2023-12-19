@@ -441,7 +441,6 @@ Then we set up the repo_directoryto be "/home/user/repo". This is the path in th
 
 ```python
 def prompt_user_for_github_repo():
-    global user_repo
     user_repo = MyPrompt.ask(
         "\nWhat GitHub repo do you want to work in? Specify it like this: [bold #E0E0E0]your_username/your_repo_name[/bold #E0E0E0].\n> "
     )

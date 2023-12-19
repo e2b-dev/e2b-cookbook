@@ -4,7 +4,13 @@ A custom AI assistant that can clone any GitHub repository to its remote cloud e
 
 The AI developer uses E2B sandboxes for the remote execution of tasks.
 
-You can write code, edit existing content in the repo, create new files, or list current files.
+### Features
+- Works directly any GitHub repository and makes a PR once done
+- AI can clone the repo and edit, read, and write files
+- Controllable from your terminal
+- Powered by GPT-4-Turbo
+- Runs in secure cloud [sandbox](https://e2b.dev/docs) by E2B
+
 
 ## How to start
 1. Clone this repository

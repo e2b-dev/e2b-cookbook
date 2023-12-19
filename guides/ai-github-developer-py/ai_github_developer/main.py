@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from e2b import Sandbox
 import openai
 import time
-from openai_assistant.actions import (
+from ai_github_developer.actions import (
     create_directory,
     read_file,
     save_content_to_file,

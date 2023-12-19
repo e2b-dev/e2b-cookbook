@@ -1,10 +1,10 @@
 [tool.poetry]
-name = "openai-assistant-py"
+name = "ai-ai_github_developer"
 version = "0.1.0"
 description = ""
 authors = []
 readme = "README.md"
-packages = [{ include = "openai_assistant" }]
+packages = [{ include = "ai_github_developer" }]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -20,5 +20,5 @@ build-backend = "poetry.core.masonry.api"
 
 
 [tool.poetry.scripts]
-start = "openai_assistant.main:main"
-create-ai-assistant = "openai_assistant.assistant:create_assistant"
+start = "ai_github_developer.main:main"
+create-ai-assistant = "ai_github_developer.assistant:create_assistant"

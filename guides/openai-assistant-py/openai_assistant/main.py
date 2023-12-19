@@ -15,12 +15,20 @@ from openai_assistant.actions import (
 
 from rich import print
 from rich.console import Console
-from rich.spinner import Spinner
 from rich.theme import Theme
 from rich.prompt import Prompt
 
+
 class MyPrompt(Prompt):
     prompt_suffix = ""
+
+
+custom_theme = Theme(
+    {
+        "theme": "bold #666666",
+    }
+)
+console = Console(theme=custom_theme)
 
 
 load_dotenv()
@@ -31,19 +39,13 @@ USER_GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
 assistant = client.beta.assistants.retrieve(AI_ASSISTANT_ID)
 
-custom_theme = Theme(
-    {
-        "theme": "bold #666666",
-    }
-)
-console = Console(theme=custom_theme)
-
 
 def prompt_user_for_github_repo():
+    global user_repo
     user_repo = MyPrompt.ask(
-        "\nWhat GitHub repository do you want to work in? Specify it like this [bold #E0E0E0]your_username/your_repository_name[/bold #E0E0E0].\n> "
+        "\nWhat GitHub repo do you want to work in? Specify it like this: [bold #E0E0E0]your_username/your_repo_name[/bold #E0E0E0].\n> "
     )
-    print("\n🔄[#E57B00][italic] Cloning the repo...[/#E57B00][/italic]", end="\n")
+    print("\n🔄[#666666] Cloning the repo...[/#666666]", end="\n")
     print("", end="\n")
 
     repo_url = f"https://github.com/{user_repo.strip()}.git"
@@ -53,10 +55,10 @@ def prompt_user_for_github_repo():
 
 def prompt_user_for_task(repo_url):
     user_task_specification = MyPrompt.ask(
-        "\n\n🤖[#E57B00][bold italic] The AI developer is working in the cloned repository[/bold italic][/#E57B00]\n\nWhat do you want to do?\n> "
+        "\n\n🤖[#E57B00][bold] The AI developer is working in the cloned repo[/bold][/#E57B00]\n\nWhat do you want to do?\n> "
     )
     user_task = (
-        f"Please work with the codebase repository called {repo_url} "
+        f"Please work with the codebase repo called {repo_url} "
         f"that is cloned in the /home/user/repo directory. React on the following user's comment: {user_task_specification}"
     )
     print("", end="\n")
@@ -98,16 +100,16 @@ def setup_git(sandbox):
         print(proc.stdout)
         exit(1)
     else:
-        print("\n✅ [#E57B00][italic]Logged in[/#E57B00][/italic]")
+        print("\n✅ [#666666]Logged in[/#666666]")
 
 
 def clone_repo_in_sandbox(sandbox, repo_url):
-    # Clone the repository
+    # Clone the repo
     git_clone_proc = sandbox.process.start_and_wait(
         f"git clone {repo_url} {REPO_DIRECTORY}"
     )
     if git_clone_proc.exit_code != 0:
-        print("Error: Unable to clone the repository")
+        print("Error: Unable to clone the repo")
         exit(1)
 
 
@@ -131,11 +133,11 @@ def main():
         save_content_to_file
     ).add_action(list_files).add_action(commit).add_action(make_pull_request)
 
-    print("\n🤖[#E57B00][bold italic] AI developer[/#E57B00][/bold italic]")
+    print("\n🤖[#E57B00][bold] AI developer[/#E57B00][/bold]")
     if USER_GITHUB_TOKEN is None:
         USER_GITHUB_TOKEN = prompt_user_for_auth()
     else:
-        print("\n✅ [#E57B00][italic]GitHub token loaded[/#E57B00][/italic]\n")
+        print("\n✅ [#666666]GitHub token loaded[/#666666]\n")
 
     # Setup git right away so user knows immediatelly if they passed wrong token
     setup_git(sandbox)
@@ -151,7 +153,7 @@ def main():
             messages=[
                 {
                     "role": "user",
-                    "content": f"Carefully plan this task and start working on it: {user_task} in the {repo_url} repository",
+                    "content": f"Carefully plan this task and start working on it: {user_task} in the {repo_url} repo",
                 },
             ],
         )
@@ -176,9 +178,7 @@ def main():
                             thread_id=thread.id, run_id=run.id, tool_outputs=outputs
                         )
                 elif run.status == "completed":
-                    console.print(
-                        "\n✅[#E57B00][italic] Run completed[/#E57B00][/italic]"
-                    )
+                    console.print("\n✅[#666666] Run completed[/#666666]")
                     messages = (
                         client.beta.threads.messages.list(thread_id=thread.id)
                         .data[0]
@@ -204,6 +204,13 @@ def main():
                     thread_id=thread.id, run_id=run.id
                 )
                 time.sleep(0.5)
+
+                from actions import new_branch
+
+                pull_request_link = (
+                    f"https://github.com/{user_repo}/compare/{new_branch}"
+                )
+                print(pull_request_link)
 
 
 if __name__ == "__main__":

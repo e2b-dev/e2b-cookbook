@@ -6,7 +6,6 @@ from e2b import Sandbox
 from rich.console import Console
 from rich.theme import Theme
 
-# Determine the directory where we clone the repository in the sandbox
 REPO_DIRECTORY = "/home/user/repo"
 
 custom_theme = Theme(
@@ -24,6 +23,7 @@ def print_sandbox_action(action_type: str, action_message: str):
     )
 
 
+# List of actions for the assistant
 def create_directory(sandbox: Sandbox, args: Dict[str, Any]) -> str:
     directory = args["directory"]
     print_sandbox_action("Creating directory", directory)

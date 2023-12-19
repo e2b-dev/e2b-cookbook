@@ -1,6 +1,6 @@
 # AI GitHub developer that uses E2B Sandbox
 
-![Gif from developer](developer.gif)
+![Gif from developer](https://ntjfcwpzsxugrykskdgi.supabase.co/storage/v1/object/public/content-assets/000.gif)
 
 A custom AI assistant that can clone any GitHub repository to its remote cloud environment, work on the repo there, and then make pull request to GitHub.
 

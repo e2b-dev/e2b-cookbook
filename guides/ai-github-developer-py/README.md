@@ -1,6 +1,6 @@
 # AI developer connected to GitHub and its own cloud sandbox
 
-![Gif from developer](run_example.gif)
+![Gif from developer](assets/run_example.gif)
 
 A custom AI assistant that can clone any GitHub repository to its remote cloud environment, work on the repo there, and then make pull request to GitHub.
 

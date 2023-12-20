@@ -2,6 +2,8 @@
 
 ## Python guide with complete code
 
+
+
 ![Cover image](https://ntjfcwpzsxugrykskdgi.supabase.co/storage/v1/object/public/content-assets/000.gif))
 
 We are E2B. We provide sandboxed cloud environments made for AI agents and AI apps. Try our Custom Sandboxes and support us on GitHub with a star if you like it. E2B sandboxes work with any LLM - we also support the new Assistants API.

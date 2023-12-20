@@ -16,7 +16,7 @@ The AI developer uses E2B sandboxes for the remote execution of tasks.
 
 ## How to start
 1. Clone this repository
-2. Open the [e2b-cookbook/guides/openai-assistant-py](./) directory
+2. Open the [e2b-cookbook/guides/ai-github0developer-py](./) directory
 3. Install dependencies:
 ```sh
 poetry install

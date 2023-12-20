@@ -1,4 +1,6 @@
-# AI GitHub Developer ## Python guide with complete code
+# AI GitHub Developer
+
+## Python guide with complete code
 
 ![Gif example](https://ntjfcwpzsxugrykskdgi.supabase.co/storage/v1/object/public/content-assets/000.gif)
 

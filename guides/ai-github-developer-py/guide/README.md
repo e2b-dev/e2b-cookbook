@@ -2,7 +2,7 @@
 
 ## Python guide with complete code
 
-![Gif example](https://ntjfcwpzsxugrykskdgi.supabase.co/storage/v1/object/public/content-assets/000.gif)
+![Gif example](assets/run_example.gif)
 
 **We are [E2B](https://e2b.dev/?ref=cookbook-ai-github-developer). We provide sandboxed cloud environments made for AI agents and AI apps. Try our [Custom Sandboxes](https://e2b.dev/docs/sandbox/templates/overview?ref=cookbook-ai-github-developer) and support us on [GitHub](https://github.com/e2b-dev/e2b?ref=cookbook-ai-github-developer) with a star if you like it. E2B sandboxes work with any LLM - we also support the new Assistants API.**
 
@@ -659,7 +659,7 @@ if __name__ == "__main__":
 > 
 > [Here](https://github.com/tizkovatereza/tt-app?ref=cookbook-ai-github-developer) is an example of a Next.js project bootstrapped with `create-next-app` that the AI developer built.
 
-![Gif example](https://ntjfcwpzsxugrykskdgi.supabase.co/storage/v1/object/public/content-assets/000.gif)
+![Gif example](assets/run_example.gif)
 
 ---
 Thank you for reading this guide. Hope it inspires you in building something similar. We are curious about your own projects - share your work on our [Discord server](https://discord.com/invite/U7KEcGErtQ?ref=cookbook-ai-github-developer) or let us know if you want to discuss anything.

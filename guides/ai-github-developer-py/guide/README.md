@@ -1,10 +1,7 @@
-# AI GitHub Developer (WIP guide) 
-
-## Python guide with complete code
+# AI GitHub Developer ## Python guide with complete code
 
 ![Gif example](https://ntjfcwpzsxugrykskdgi.supabase.co/storage/v1/object/public/content-assets/000.gif)
 
----
 **We are [E2B](https://e2b.dev/?ref=cookbook-ai-github-developer). We provide sandboxed cloud environments made for AI agents and AI apps. Try our [Custom Sandboxes](https://e2b.dev/docs/sandbox/templates/overview?ref=cookbook-ai-github-developer) and support us on [GitHub](https://github.com/e2b-dev/e2b?ref=cookbook-ai-github-developer) with a star if you like it. E2B sandboxes work with any LLM - we also support the new Assistants API.**
 
 > 🏁 **Final code:** [E2B Cookbook - AI GitHub Developer](https://github.com/e2b-dev/e2b-cookbook/tree/main/guides/ai-github-developer-py?ref=cookbook-ai-github-developer)

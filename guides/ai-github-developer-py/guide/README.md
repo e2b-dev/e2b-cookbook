@@ -536,9 +536,7 @@ def handle_sandbox_stderr(message):
 ### 4.5 Spawn the sandbox
 Now we can define the `main` function to spawn the E2B sandbox.
 
-![Assistants API OpenAI](https://ntjfcwpzsxugrykskdgi.supabase.co/storage/v1/object/public/content-assets/004.png?t=2023-12-19T18%3A24%3A46.208Z)
-
-Inside the function, we choose the preferred E2B sandbox, which is called just "`Sandbox`", since we chose the default one.
+Inside the function, we choose the preferred E2B sandbox, which is called simply "`Sandbox`", since we chose the default one.
 
 > 💡 **Tip**: E2B offers [premade sandboxes](https://e2b.dev/docs/sandbox/templates/premade?ref=cookbook-ai-github-developer) or an option to build your own [custom](https://e2b.dev/docs/sandbox/templates/overview?ref=cookbook-ai-github-developer) one with preferred packages. To keep this guide simple, we picked the Default Sandbox and equipped it with just the actions we have defined in the [`actions.py`](https://github.com/e2b-dev/e2b-cookbook/blob/main/guides/ai-github-developer-py/ai_github_developer/actions.py?ref=cookbook-ai-github-developer). 
 
@@ -594,6 +592,9 @@ def main():
             thread_id=thread.id, assistant_id=assistant.id
         )
 ```
+The threads, messages and runs are concept from the OpenAI's Assistants API:
+
+![Assistants API OpenAI](https://ntjfcwpzsxugrykskdgi.supabase.co/storage/v1/object/public/content-assets/004.png?t=2023-12-19T18%3A24%3A46.208Z)
 
 ### 4.6 Spawn the sandbox
 Still  inside the main function, we print the assistant's process to the terminal. Each time the developer chooses to use one of the actions, user can see logs about the chosen action and its success/fail in terminal.
@@ -662,4 +663,4 @@ if __name__ == "__main__":
 ![Gif example](assets/run_example.gif)
 
 ---
-Thank you for reading this guide. Hope it inspires you in building something similar. We are curious about your own projects - share your work on our [Discord server](https://discord.com/invite/U7KEcGErtQ?ref=cookbook-ai-github-developer) or let us know if you want to discuss anything.
+**Thank you for reading this guide. Hope it inspires you in building something similar. We are curious about your own projects - share your work on our [Discord server](https://discord.com/invite/U7KEcGErtQ?ref=cookbook-ai-github-developer) or let us know if you want to discuss anything.**

@@ -2,17 +2,12 @@
 
 ## Python guide with complete code
 
+![Gif example](https://ntjfcwpzsxugrykskdgi.supabase.co/storage/v1/object/public/content-assets/000.gif)
 
-
-![Cover image](https://ntjfcwpzsxugrykskdgi.supabase.co/storage/v1/object/public/content-assets/000.gif)
-
+---
 **We are [E2B](https://e2b.dev/?ref=cookbook-ai-github-developer). We provide sandboxed cloud environments made for AI agents and AI apps. Try our [Custom Sandboxes](https://e2b.dev/docs/sandbox/templates/overview?ref=cookbook-ai-github-developer) and support us on [GitHub](https://github.com/e2b-dev/e2b?ref=cookbook-ai-github-developer) with a star if you like it. E2B sandboxes work with any LLM - we also support the new Assistants API.**
 
----
-
 > 🏁 **Final code:** [E2B Cookbook - AI GitHub Developer](https://github.com/e2b-dev/e2b-cookbook/tree/main/guides/ai-github-developer-py?ref=cookbook-ai-github-developer)
-
----
 
 ## What we will do
 
@@ -22,7 +17,7 @@ We use E2B Sandboxes for the remote execution of AI developer's actions, and the
 
 > Find the complete final code [here](https://github.com/e2b-dev/e2b-cookbook/tree/main/guides/ai-github-developer-py?ref=cookbook-ai-github-developer). 🏁
 > 
-> [Here](https://github.com/tizkovatereza/tt-app) is an example of a Next.js project  that the AI developer built.
+> [Here](https://github.com/tizkovatereza/tt-app?ref=cookbook-ai-github-developer) is an example of a Next.js project  that the AI developer built.
 
 ![Cover pic](https://ntjfcwpzsxugrykskdgi.supabase.co/storage/v1/object/public/content-assets/AI_GitHub_Developer_v04.png?t=2023-12-20T14%3A27%3A03.702Z)
 
@@ -602,11 +597,11 @@ def main():
 ```
 
 ### 4.6 Spawn the sandbox
-Still  inside the main function, we print the assistant's process to the terminal. Each time it chooses to use one of the actions, we see in the terminal how it uses the action and whether it ends with success or error.
+Still  inside the main function, we print the assistant's process to the terminal. Each time the developer chooses to use one of the actions, user can see logs about the chosen action and its success/fail in terminal.
 
-![Assistants status](https://ntjfcwpzsxugrykskdgi.supabase.co/storage/v1/object/public/content-assets/005.png?t=2023-12-19T18%3A24%3A58.324Z)
+> Note: The assistant's runs duration is by huge part determined by OpenAI.
 
-> Note: If the assistant is "queued", we are waiting for OpenAI's processes.
+At the end, we use `time.sleep()` to specify how often should assistant's status be printed.
 
 ```python
  spinner = ""
@@ -663,9 +658,9 @@ if __name__ == "__main__":
 
 > Find the complete final code [here](https://github.com/e2b-dev/e2b-cookbook/tree/main/guides/ai-github-developer-py?ref=cookbook-ai-github-developer). 🏁
 > 
-> [Here](https://github.com/tizkovatereza/tt-app) is an example of a Next.js project  that the AI developer built.
+> [Here](https://github.com/tizkovatereza/tt-app?ref=cookbook-ai-github-developer) is an example of a Next.js project bootstrapped with `create-next-app` that the AI developer built.
 
+![Gif example](https://ntjfcwpzsxugrykskdgi.supabase.co/storage/v1/object/public/content-assets/000.gif)
 
-Here is an example of my assistant working on simple tasks - writing me a README, and creating a new file with a simple JavaScript code.
-
-![Assistants status](https://ntjfcwpzsxugrykskdgi.supabase.co/storage/v1/object/public/content-assets/1219_019.gif?t=2023-12-19T18%3A26%3A10.474Z)
+---
+Thank you for reading this guide. Hope it inspires you in building something similar. We are curious about your own projects - share your work on our [Discord server](https://discord.com/invite/U7KEcGErtQ?ref=cookbook-ai-github-developer) or let us know if you want to discuss anything.

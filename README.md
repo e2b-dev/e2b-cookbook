@@ -6,7 +6,6 @@ Example code and guides for building with [E2B](https://e2b.dev). Get your E2B A
 - [Python](guides/gpt4-code-interpreter-py)
 - [Nodejs](guides/gpt4-code-interpreter-js)
 
-**Create an OpenAI assistant that uses E2B Sandbox**
+**AI Developer with access to GitHub using OpenAI Assistants API**
 - 📖 [Documenation](https://e2b.dev/docs/llm-platforms/openai)
-- [Python Example](guides/openai-assistant-py)
-- [Nodejs Example](guides/openai-assistant-js)
+- [Python Code](https://github.com/e2b-dev/e2b-cookbook/tree/main/guides/ai-github-developer-py)

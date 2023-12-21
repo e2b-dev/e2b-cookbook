@@ -18,7 +18,6 @@ from rich.console import Console
 from rich.theme import Theme
 from rich.prompt import Prompt
 
-
 class MyPrompt(Prompt):
     prompt_suffix = ""
 
@@ -41,6 +40,7 @@ assistant = client.beta.assistants.retrieve(AI_ASSISTANT_ID)
 
 
 def prompt_user_for_github_repo():
+    global user_repo
     user_repo = MyPrompt.ask(
         "\nWhat GitHub repo do you want to work in? Specify it like this: [bold #E0E0E0]your_username/your_repo_name[/bold #E0E0E0].\n> "
     )

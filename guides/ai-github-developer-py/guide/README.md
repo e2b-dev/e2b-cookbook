@@ -4,7 +4,7 @@
 
 ![Gif example](assets/run_example.gif)
 
-**We are [E2B](https://e2b.dev/?ref=cookbook-ai-github-developer). We provide sandboxed cloud environments made for AI agents and AI apps. Try our [Custom Sandboxes](https://e2b.dev/docs/sandbox/templates/overview?ref=cookbook-ai-github-developer) and support us on [GitHub](https://github.com/e2b-dev/e2b?ref=cookbook-ai-github-developer) with a star if you like it. E2B sandboxes work with any LLM - we also support the new Assistants API.**
+**We are [E2B](https://e2b.dev/?ref=cookbook-ai-github-developer). We are building a cloud runtime for AI agents. Try our [Custom Sandboxes](https://e2b.dev/docs/sandbox/templates/overview?ref=cookbook-ai-github-developer) and support us on [GitHub](https://github.com/e2b-dev/e2b?ref=cookbook-ai-github-developer) with a star if you like it. E2B sandboxes work with any LLM - we also support the new Assistants API.**
 
 > 🏁 **Final code:** [E2B Cookbook - AI GitHub Developer](https://github.com/e2b-dev/e2b-cookbook/tree/main/guides/ai-github-developer-py?ref=cookbook-ai-github-developer)
 
@@ -92,9 +92,11 @@ Then we define actions that the AI developer can use. You can later modify the p
 6. Make a pull request
 
 
-> Actions are Python functions that will be executed remotely in the sandbox by the AI assistant. Each action corresponds to one OpenAI Function (see the next steps of the guide).
+> "Actions" are Python functions automatically called in the program by E2B SDK. Inside the actions
+> Each action corresponds to exactly one OpenAI Function (see the next steps of the guide).
 
-For each action, we need to specify arguments and add a string indicating success or an error message.
+For each action, we need to specify arguments and add printing of relevant information. For example, for `list_files` it makes sense to return a list of files within the folder.
+Inside actions, various operations are called within the sandbox.
 
 ```python
 # List of actions for the assistant
@@ -348,7 +350,8 @@ def create_assistant():
 Still inside the `create_assistant()` function, we give instructions to the assistant and choose its parameters. Once we run this file, it prints the assistant's ID which we can save as an environment variable.
 Don't forget to re-run the file with assistant and create new ID every time you update it.
 
-> 💡 **Tip**: The system message determine the assistant's style of answering a lot. One example is adjusting how much the AI developer engages in discussion with user vs limiting itself to performing given task. Adjust the instructions as needed.
+> 💡 **Tip**: Adjust the instructions as needed. For example, you can decide how much the AI developer engages in discussion with user vs limiting itself to performing given task. 
+> The OpenAI's [**prompt engineering guide**](https://platform.openai.com/docs/guides/prompt-engineering/six-strategies-for-getting-better-results) may come handy.
 
 ```python
     ai_developer = client.beta.assistants.create(
@@ -381,11 +384,8 @@ if __name__ == "__main__":
     create_assistant()
 ```
 
-
-
-
 ## 4. Create the main program
-Now we code the core program - the way that we run our assistant in the sandbox.
+Now we code the core program. The assistant calls OpenAI Functions through JSON, which the E2B SDK parses and automatically invokes defined actions.
 
 ### 4.1 Import packages
 First, we import the necessary packages - `openai`, `e2b Sandbox`, and the actions we created in the other file.
@@ -601,7 +601,7 @@ Still  inside the main function, we print the assistant's process to the termina
 
 > Note: The assistant's runs duration is by huge part determined by OpenAI.
 
-At the end, we use `time.sleep()` to specify how often should assistant's status be printed.
+At the end, we use `time.sleep()` to specify how often we want to poll assistant's status.
 
 ```python
  spinner = ""
@@ -663,4 +663,13 @@ if __name__ == "__main__":
 ![Gif example](assets/run_example.gif)
 
 ---
-**Thank you for reading this guide. Hope it inspires you in building something similar. We are curious about your own projects - share your work on our [Discord server](https://discord.com/invite/U7KEcGErtQ?ref=cookbook-ai-github-developer) or let us know if you want to discuss anything.**
+**Thank you for reading this guide - and I will appreciate your feedback!**
+
+Reach out to me on my [X (Twitter)](https://twitter.com/tereza_tizkova).
+
+**Where to find E2B:**
+- 💻 [Website](https://e2b.dev?ref=cookbook-ai-github-developer)
+- 🎮 [Discord server](https://discord.com/invite/U7KEcGErtQ?ref=cookbook-ai-github-developer)
+- 📝 [Docs](https://e2b.dev/docs?ref=cookbook-ai-github-developer)
+- 🧑🏼‍💻 [GitHub](https://github.com/e2b-dev/e2b?ref=cookbook-ai-github-developer)
+- 💬 [X (Twitter)](https://twitter.com/e2b_dev?ref=cookbook-ai-github-developer)

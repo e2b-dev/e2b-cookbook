@@ -596,7 +596,7 @@ The threads, messages and runs are concept from the OpenAI's Assistants API:
 
 ![Assistants API OpenAI](https://ntjfcwpzsxugrykskdgi.supabase.co/storage/v1/object/public/content-assets/004.png?t=2023-12-19T18%3A24%3A46.208Z)
 
-### 4.6 Spawn the sandbox
+### 4.6 Print assistant's runs
 Still  inside the main function, we print the assistant's process to the terminal. Each time the developer chooses to use one of the actions, user can see logs about the chosen action and its success/fail in terminal.
 
 > Note: The assistant's runs duration is by huge part determined by OpenAI.

@@ -168,7 +168,5 @@ function sleep(time: number) {
         }
     };
 
-    // if (require.main === module) {
     await main();
-    // }
 })();

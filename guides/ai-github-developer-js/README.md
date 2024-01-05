@@ -26,14 +26,3 @@ npm i
 ```sh
 npm start
 ```
-[//]: # (4. Get OpenAI API key at https://platform.openai.com)
-
-[//]: # (5. Get E2B API key at https://e2b.dev/docs/getting-started/api-key)
-
-[//]: # (6. Start the app:)
-
-[//]: # (```sh)
-
-[//]: # (OPENAI_API_KEY=<your-openai-api-key> E2B_API_KEY=<your-e2b-api-key> node index.js)
-
-[//]: # (```)

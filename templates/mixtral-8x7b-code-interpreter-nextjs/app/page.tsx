@@ -17,9 +17,7 @@ const marked = new Marked(
 )
 
 export default function Chat() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading, data } = useChat();
-  console.log('messages', messages)
-  console.log('data', data)
+  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat();
   const isWaitingForFirstChunk = messages[messages.length - 1]?.role === 'user'
   return (
     <div className="flex flex-col items-center justify-start overflow-hidden max-h-full w-full h-full gap-2">

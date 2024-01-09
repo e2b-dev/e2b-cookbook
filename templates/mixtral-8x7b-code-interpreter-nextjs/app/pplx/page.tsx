@@ -28,7 +28,7 @@ export default function Home() {
     setMessages(newMessages as Message[])
     setInput('')
 
-    const res = await fetch('/api/chat', {
+    const res = await fetch('/api/pplx', {
       method: 'POST',
       body: JSON.stringify({
         messages: newMessages.map((m) => ({ role: m.role, content: m.content })),
@@ -57,7 +57,7 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-start justify-start">
       <nav className="w-full flex justify-start items-start border-b p-2 space-y-4 bg-zinc-100 border border-zinc-300">
-        <h1 className="text-sm font-medium text-zinc-600">Mixtral 8x7b Code Interpreter</h1>
+        <h1 className="text-sm font-medium text-zinc-600">Mixtral 8x7b + Code Interpreter</h1>
       </nav>
 
       <div className="flex-1 w-full flex flex-col items-start justify-start py-8 px-16 gap-4">

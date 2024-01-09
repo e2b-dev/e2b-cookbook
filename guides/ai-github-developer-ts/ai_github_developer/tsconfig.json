@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+      "esModuleInterop": true,
+        "module": "ES2020",
+        "moduleResolution":"node",
+        "noEmit": true,
+        "allowImportingTsExtensions": true,
+    },
+
+  }

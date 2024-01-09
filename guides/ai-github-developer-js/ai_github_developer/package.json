@@ -1,0 +1,20 @@
+{
+  "dependencies": {
+    "@e2b/sdk": "^0.11.17",
+    "@inquirer/prompts": "^3.3.0",
+    "chalk": "^5.3.0",
+    "dotenv": "^16.3.1",
+    "inquirer": "^9.2.12",
+    "openai": "^4.24.1"
+  },
+  "name": "ai-github-developer-js",
+  "version": "0.0.1",
+  "description": "Javascript adaptation of E2B's AI Github Developer project.",
+  "main": "main.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

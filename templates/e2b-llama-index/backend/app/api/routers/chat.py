@@ -1,15 +1,25 @@
-from typing import List
+import asyncio
+import json
+import threading
+import uuid
+from collections import defaultdict
+from typing import List, Optional
 
+from e2b import Sandbox, ProcessOutput
 from fastapi.responses import StreamingResponse
 from llama_index.chat_engine.types import BaseChatEngine
 
+from app.context import system_prompt
 from app.engine.index import get_chat_engine
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status, WebSocket
 from llama_index.llms.base import ChatMessage
 from llama_index.llms.types import MessageRole
 from pydantic import BaseModel
 
 chat_router = r = APIRouter()
+
+
+# TODO: add chat ids
 
 
 class _Message(BaseModel):
@@ -19,6 +29,46 @@ class _Message(BaseModel):
 
 class _ChatData(BaseModel):
     messages: List[_Message]
+
+
+results = defaultdict(dict)
+
+
+def run_code(chat_id: str, code_id: str, code: str) -> ProcessOutput:
+    with Sandbox(cwd="/home/user") as sandbox:
+        sandbox.filesystem.write("main.py", code)
+        result = sandbox.process.start_and_wait("python3 main.py")
+        results[chat_id][code_id] = result
+        print('out', result.stdout)
+        print("err:", result.stderr)
+        return result
+
+
+class _ParsingData(BaseModel):
+    line: str
+    code_id: Optional[str]
+    codeblock: str
+    execute: bool
+    token: str
+
+
+def process_line(data: _ParsingData) -> _ParsingData:
+    if data.line.startswith("```") and not data.line.startswith("````"):
+        if 'execute' in data.line and "}" in data.token:
+            data.code_id = str(uuid.uuid4())
+            data.token = data.token.replace("}", f', "id": "{data.code_id}"' + "}")
+            data.line = ''
+            data.execute = True
+        elif data.code_id and data.execute:
+            # TODO: chat_id
+            print("Running code", data.code_id, data.codeblock)
+            thread = threading.Thread(target=run_code, args=('a', data.code_id, data.codeblock))
+            thread.start()
+            data.execute = False
+            data.code_id = None
+            data.codeblock = ""
+
+    return data
 
 
 @r.post("")
@@ -41,6 +91,8 @@ async def chat(
         )
     # convert messages coming from the request to type ChatMessage
     messages = [
+                   ChatMessage(role=MessageRole.SYSTEM, content=system_prompt)
+                ] + [
         ChatMessage(
             role=m.role,
             content=m.content,
@@ -53,10 +105,43 @@ async def chat(
 
     # stream response
     async def event_generator():
+        parsing_data = _ParsingData(line="", code_id=None, codeblock="", execute=False, token="")
+
         for token in response.response_gen:
+            parsing_data.token = token
+            if "\n" in parsing_data.token:
+                lines = parsing_data.token.split("\n")
+                parsing_data.line += lines[0]
+
+                parsing_data = process_line(parsing_data)
+
+                if parsing_data.code_id:
+                    parsing_data.codeblock += parsing_data.line + "\n"
+
+                for li in lines[1:-1]:
+                    if parsing_data.code_id:
+                        parsing_data.codeblock += li + "\n"
+                    elif "```" in li:
+                        parsing_data.code_id = str(uuid.uuid4())
+
+                parsing_data.line = lines[-1]
+            else:
+                parsing_data.line += token
+                parsing_data = process_line(parsing_data)
+
             # If client closes connection, stop sending events
             if await request.is_disconnected():
                 break
-            yield token
+            yield parsing_data.token
 
     return StreamingResponse(event_generator(), media_type="text/plain")
+
+
+@r.websocket("/chats/{chat_id}/ws")
+async def websocket_endpoint(websocket: WebSocket, chat_id: str):
+    await websocket.accept()
+    while True:
+        if chat_id in results:
+            result = results.pop(chat_id)
+            await websocket.send_text(json.dumps(result))
+        await asyncio.sleep(0.1)

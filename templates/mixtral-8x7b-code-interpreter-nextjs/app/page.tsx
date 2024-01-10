@@ -1,25 +1,16 @@
 'use client'
 import React from 'react'
 import { useChat } from 'ai/react'
-import { Marked } from 'marked'
-import { markedHighlight } from 'marked-highlight'
-import hljs from 'highlight.js'
 import 'highlight.js/styles/atom-one-dark.css'
 
-const marked = new Marked(
-  markedHighlight({
-    langPrefix: 'hljs language-',
-    highlight(code, lang, info) {
-      const language = hljs.getLanguage(lang) ? lang : 'plaintext';
-      return hljs.highlight(code, { language }).value;
-    }
-  }),
-)
+import { Markdown } from '@/components/Markdown'
+
 
 export default function Chat() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading, data } = useChat();
-  console.log('messages', messages)
-  console.log('data', data)
+  const { messages, input, handleInputChange, handleSubmit, isLoading, data } = useChat({
+    initialInput: 'get 5 random numbers',
+  })
+
   const isWaitingForFirstChunk = messages[messages.length - 1]?.role === 'user'
   return (
     <div className="flex flex-col items-center justify-start overflow-hidden max-h-full w-full h-full gap-2">
@@ -46,8 +37,9 @@ export default function Chat() {
                   )}
                   <div
                     className="py-1 px-4 border w-full min-h-[120px]"
-                    dangerouslySetInnerHTML={{ __html: marked.parse(m.content) }}
-                  />
+                  >
+                    <Markdown markdown={m.content} />
+                  </div>
                 </React.Fragment>
               )}
             </>
@@ -77,6 +69,6 @@ export default function Chat() {
         <span className="text-gray-400 font-bold absolute left-4 top-1/2 -translate-y-1/2">{`>`}</span>
         <button type="submit" className="absolute top-0 left-[calc(100%+8px)] bottoms-0 border border-gray-300 rounded p-2">Send</button>
       </form>
-    </div>
+    </div >
   );
 }

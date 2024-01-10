@@ -1,4 +1,5 @@
 import {
+  AIStream,
   OpenAIStream,
   StreamingTextResponse,
   experimental_StreamData,
@@ -7,13 +8,15 @@ import OpenAI from 'openai'
 import { CodeInterpreter } from '@e2b/sdk'
 import { Marked } from 'marked'
 import { systemPrompt } from '@/lib/prompt'
-import crypto from 'node:crypto'
+import { createClient } from '@supabase/supabase-js'
+import md5 from 'md5'
 
 
+const supabase = createClient(
+  process.env.SUPABASE_URL as string,
+  process.env.SUPABASE_KEY as string,
+)
 
-function calculateHash(inputString: string) {
-  return crypto.createHash('sha256').update(inputString).digest('hex');
-}
 
 const langIdentifiers = {
   python: {
@@ -29,7 +32,8 @@ const langIdentifiers = {
 class SandboxAutorun {
   encoder = new TextEncoder()
   transform = new TransformStream()
-  codeBlocks: { [key: string]: { hash: string, code: string, lang: string } } = {}
+  // codeBlocks: { [key: string]: { hash: string, code: string, lang: string } } = {}
+  hashes = new Set<string>()
   public readable: ReadableStream
   public writable: WritableStream
 
@@ -40,57 +44,35 @@ class SandboxAutorun {
     let completeText = ''
 
     const marked = new Marked()
-    // const marked = new Marked({
-    //   renderer: {
-    //     code(code) {
-    //       // console.log('FINISHED CODE', code)
-
-    //       // promises.push(
-    //       //   sandbox.runPython(code)
-    //       //     .then(({ stdout, stderr }) => {
-    //       //       console.log('✅✅✅FINISHED RUNNING CODE', stdout)
-    //       //       // data.append({ stdout, stderr, code })
-    //       //     })
-    //       // )
-
-    //       return false
-    //     },
-    //   },
-    // })
-    console.log('🔥 +++ CONSTRUCTOR')
-    const closedCodeBlocks: { code: string, lang: string }[] = []
-    let currentCodeBlock = { code: '', lang: '' }
 
 
-    const that = this
+    const self = this
     this.transform = new TransformStream({
       transform(chunk: Uint8Array, controller) {
-        const decodedString = textDecoder.decode(chunk)
-        // console.log('✅', decodedString)
+        let decodedString = textDecoder.decode(chunk)
         completeText += decodedString
 
 
-        let wasLastTokCode = false
         const codeBlockRegex = /```python\n?([\s\S]*?)```/g
 
         marked.parse(completeText, {
           walkTokens(token) {
-            if (token.type === 'code') {
-              console.log('CODE BLOCK FOUND', token.text)
+            if (token.type === 'code' || token.type === 'codespan') {
               const matches = token.raw.match(codeBlockRegex)
               if (matches) {
-                matches.forEach((match) => {
-                  // console.log(match)
-                  const hash = calculateHash(match)
-                  console.log('hash', hash)
-                  if (!that.codeBlocks[hash]) {
-                    that.codeBlocks[hash] = { code: token.text, lang: 'python', hash }
-                    // data.append({
-                    //   hash,
-                    //   code: match,
-                    //   lang: 'python',
-                    // })
-                    that.promises.push(sandbox.runPython(token.text))
+                matches.forEach(() => {
+                  const hash = md5(token.text.trim())
+                  console.log('1️⃣', hash, ':\n', token.text)
+                  if (!self.hashes.has(hash)) {
+                    self.hashes.add(hash)
+
+                    self.promises.push(
+                      sandbox.runPython(token.text).then(({ stdout, stderr }) => {
+                        console.log('code executed', { stdout, stderr })
+                        console.log('Setting supabase value')
+                        return supabase.from('code_blocks').upsert({ hash, stdout, stderr })
+                      })
+                    )
                   }
                 });
               }
@@ -98,11 +80,10 @@ class SandboxAutorun {
           },
         })
 
-        console.log('🏁 codeblocks', that.codeBlocks)
-        controller.enqueue(new Uint8Array(chunk))
+        controller.enqueue(chunk)
       },
-      flush() {
-        cb.onFinal(that.promises)
+      async flush() {
+        await cb.onFinal(self.promises)
       },
     })
 
@@ -136,10 +117,8 @@ const fireworks = new OpenAI({
 })
 
 export async function POST(req: Request) {
-  console.log('1️⃣ POST REQUEST 1️⃣')
   // Extract the `messages` from the body of the request
   const { messages } = await req.json()
-  console.log('📨 MESSAGES', messages)
 
 
   const response = await fireworks.chat.completions.create({
@@ -162,17 +141,11 @@ export async function POST(req: Request) {
     async onFinal(promises) {
       console.log('✨✨✨ finished parsing')
       const results = await Promise.all(promises)
-      // results.forEach(r => {
-      //   data.append({ stdout: r.stdout })
-      // })
       console.log('>>> results', results)
       await sandbox.close()
-      // data.close()
     }
   })
-  const stream = OpenAIStream(response).pipeThrough(sandboxStream)
 
-  // Respond with the stream
-  // return new StreamingTextResponse(stream, {}, data)
+  const stream = OpenAIStream(response).pipeThrough(sandboxStream)
   return new StreamingTextResponse(stream)
 }

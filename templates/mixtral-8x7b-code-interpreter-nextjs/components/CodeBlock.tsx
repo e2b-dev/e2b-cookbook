@@ -1,24 +1,43 @@
-interface CodeBlock {
-  type: 'language-py' | 'language-sh'
-  code: string
-  out: { text: string, timestamp: number }[]
-}
+import hljs from 'highlight.js'
+import { useCodeInterpreter } from '@/hooks/useCodeIntepreter'
+import md5 from 'md5'
+import {
+  Loader,
+} from 'lucide-react'
 
 export interface Props {
-  codeBlock: CodeBlock
+  code: string
 }
 
-function CodeBlock({ codeBlock }: Props) {
+function CodeBlock({
+  code,
+}: Props) {
+  const hash = md5(code.trim())
+  console.log('hash', hash)
+  const { stdout, stderr, isLoading } = useCodeInterpreter(hash)
   return (
-    <div className="w-full flex flex-col items-start rounded border p-2 space-y-4 border border-zinc-300 bg-zinc-100 whitespace-pre-line text-sm">
-      {codeBlock.out.map((out) => (
-        <div
-          className="font-mono text-zinc-600"
-          key={out.timestamp}
-        >
-          {out.text}
+    <div className="w-full flex flex-col items-start gap-4">
+      <div className="w-full flex flex-col items-start rounded border p-2 space-y-4 border border-zinc-300 bg-zinc-100 whitespace-pre-line text-sm">
+        <div className="flex items-center justify-center gap-1">
+          <span className="text-zinc-400 text-xs">Code</span>
         </div>
-      ))}
+        <pre
+          className="font-mono text-zinc-800"
+        >
+          {code}
+        </pre>
+
+      </div>
+
+      <div className="w-full flex flex-col items-start rounded border p-2 space-y-4 border border-zinc-300 bg-zinc-100 whitespace-pre-line text-sm">
+        <div className="flex items-center justify-center gap-1">
+          <span className="text-zinc-400 text-xs">Output</span>
+          {isLoading && <Loader className="animate-spin text-zinc-500" size={12} />}
+        </div>
+        <pre className="font-mono">
+          {stdout}
+        </pre>
+      </div>
     </div>
   )
 }

@@ -20,3 +20,7 @@ export interface ChatHandler {
   onFileUpload?: (file: File) => Promise<void>;
   onFileError?: (errMsg: string) => void;
 }
+
+export interface CodeBlocks {
+    [id: number]: string;
+}

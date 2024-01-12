@@ -1,5 +1,3 @@
-import asyncio
-import json
 import threading
 import uuid
 from collections import defaultdict
@@ -13,7 +11,7 @@ from starlette.responses import JSONResponse
 from app.context import system_prompt
 from app.db.client import supabase
 from app.engine.index import get_chat_engine
-from fastapi import APIRouter, Depends, HTTPException, Request, status, WebSocket
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from llama_index.llms.base import ChatMessage
 from llama_index.llms.types import MessageRole
 from pydantic import BaseModel

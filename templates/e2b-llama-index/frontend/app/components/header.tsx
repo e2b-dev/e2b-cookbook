@@ -12,7 +12,7 @@ export default function Header() {
           href="https://www.llamaindex.ai/"
           className="flex items-center justify-center font-nunito text-lg font-bold gap-2"
         >
-          <span>Built by LlamaIndex</span>
+          <span>Built by Llama</span>
           <Image
             className="rounded-xl"
             src="/llama.png"

@@ -21,6 +21,6 @@ export interface ChatHandler {
   onFileError?: (errMsg: string) => void;
 }
 
-export interface CodeBlocks {
+export interface CodeResults {
     [id: number]: string;
 }

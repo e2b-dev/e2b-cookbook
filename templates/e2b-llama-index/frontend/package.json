@@ -2,7 +2,7 @@
   "name": "e2b-llama-index",
   "version": "0.1.0",
   "scripts": {
-    "dev": "cross-env NEXT_PUBLIC_CHAT_API=http://localhost:8000/api/chat next dev",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -26,13 +26,15 @@
     "remark-gfm": "^3.0.1",
     "remark-math": "^5.1.1",
     "supports-color": "^9.4.0",
-    "tailwind-merge": "^2.1.0"
+    "tailwind-merge": "^2.1.0",
+    "ws": "^8.16.0"
   },
   "devDependencies": {
     "@types/node": "^20.10.3",
     "@types/react": "^18.2.42",
     "@types/react-dom": "^18.2.17",
     "@types/react-syntax-highlighter": "^15.5.11",
+    "@types/ws": "^8.5.10",
     "autoprefixer": "^10.4.16",
     "cross-env": "^7.0.3",
     "postcss": "^8.4.32",

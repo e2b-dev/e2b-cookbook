@@ -15,11 +15,6 @@ When generating a code snippet, properly mark the language:
 \`\`\`python
 print("hello")
 \`\`\``
-
-When generating a code snippet, properly mark the language and whether the code snippet should be executed like this:
-\`\`\`python {"execute":true}
-print("hello")
-\`\`\` 
 """
 
 

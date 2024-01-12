@@ -10,6 +10,7 @@ from fastapi.responses import StreamingResponse
 from llama_index.chat_engine.types import BaseChatEngine
 
 from app.context import system_prompt
+from app.db.client import supabase
 from app.engine.index import get_chat_engine
 from fastapi import APIRouter, Depends, HTTPException, Request, status, WebSocket
 from llama_index.llms.base import ChatMessage
@@ -35,7 +36,17 @@ def run_code(chat_id: str, code_id: str, code: str) -> ProcessOutput:
     with Sandbox(cwd="/home/user") as sandbox:
         sandbox.filesystem.write("main.py", code)
         result = sandbox.process.start_and_wait("python3 main.py")
-        results[chat_id][code_id] = result
+
+    supabase.table("results").insert(
+        {
+            "chat_id": chat_id,
+            "code_id": code_id,
+            "stdout": result.stdout,
+            "stderr": result.stderr,
+            "exit_code": result.exit_code,
+        }
+    ).execute()
+
     return result
 
 
@@ -49,22 +60,21 @@ class _ParsingData(BaseModel):
 
 
 def process_line(data: _ParsingData) -> _ParsingData:
-    if data.line.startswith("```") and not data.line.startswith("````"):
-        if "execute" in data.line and "}" in data.token:
-            data.code_id = str(uuid.uuid4())
-            data.token = data.token.replace("}", f', "id": "{data.code_id}"' + "}")
-            data.line = ""
-            data.execute = True
-        elif data.code_id and data.execute:
-            thread = threading.Thread(
-                target=run_code,
-                args=(data.chat_id, data.code_id, data.codeblock),
-                daemon=True,
-            )
-            thread.start()
-            data.execute = False
-            data.code_id = None
-            data.codeblock = ""
+    if data.line.startswith("```python"):
+        data.code_id = str(uuid.uuid4())
+        data.token = data.token + f' {{"id": "{data.code_id}"}}'
+        data.line = ""
+        data.execute = True
+    elif data.line.startswith("```") and not data.line.startswith("````") and data.execute:
+        thread = threading.Thread(
+            target=run_code,
+            args=(data.chat_id, data.code_id, data.codeblock),
+            daemon=True,
+        )
+        thread.start()
+        data.execute = False
+        data.code_id = None
+        data.codeblock = ""
 
     return data
 
@@ -95,7 +105,6 @@ async def chat(
             content=m.content,
         )
         for m in data.messages
-
     ]
 
     # query chat engine
@@ -126,8 +135,6 @@ async def chat(
                 for li in lines[1:-1]:
                     if parsing_data.code_id:
                         parsing_data.codeblock += li + "\n"
-                    elif "```" in li:
-                        parsing_data.code_id = str(uuid.uuid4())
 
                 parsing_data.line = lines[-1]
             else:
@@ -140,17 +147,3 @@ async def chat(
             yield parsing_data.token
 
     return StreamingResponse(event_generator(), media_type="text/plain")
-
-
-@r.websocket("/chats/{chat_id}/ws")
-async def websocket_endpoint(websocket: WebSocket, chat_id: str):
-    await websocket.accept()
-    while True:
-        if chat_id in results:
-            result = results.pop(chat_id)
-            for code_id, result in result.items():
-                await websocket.send_text(
-                    json.dumps({"output": result.stdout, "id": code_id})
-                )
-                await asyncio.sleep(0.1)
-        await asyncio.sleep(0.1)

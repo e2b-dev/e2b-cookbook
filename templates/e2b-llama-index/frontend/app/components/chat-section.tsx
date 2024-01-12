@@ -8,8 +8,7 @@ import { CodeResults } from '@/app/components/ui/chat/chat.interface'
 
 const API_URL = process.env.NEXT_PUBLIC_CHAT_API || "localhost:8000"
 
-export default function ChatSection() {
-  const chatID = crypto.randomUUID();
+export default function ChatSection({chatID}: {chatID: string}) {
   const {
     messages,
     input,
@@ -20,7 +19,7 @@ export default function ChatSection() {
     stop,
   } = useChat(
     {
-    api: "http://" + API_URL + `/chats/${chatID}`,
+    api: `http://${API_URL}/chats/${chatID}`,
     headers: {
       "Content-Type": "application/json", // using JSON because of vercel/ai 2.2.26
     },

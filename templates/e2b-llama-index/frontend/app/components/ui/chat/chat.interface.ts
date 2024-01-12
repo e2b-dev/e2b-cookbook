@@ -22,5 +22,5 @@ export interface ChatHandler {
 }
 
 export interface CodeResults {
-    [id: number]: string;
+    [codeID: string]:  string |undefined;
 }

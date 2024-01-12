@@ -8,6 +8,7 @@ from typing import List, Optional
 from e2b import Sandbox, ProcessOutput
 from fastapi.responses import StreamingResponse
 from llama_index.chat_engine.types import BaseChatEngine
+from starlette.responses import JSONResponse
 
 from app.context import system_prompt
 from app.db.client import supabase
@@ -147,3 +148,20 @@ async def chat(
             yield parsing_data.token
 
     return StreamingResponse(event_generator(), media_type="text/plain")
+
+
+@r.get("/chats/{chat_id}/code/{code_id}")
+async def code_result(
+    request: Request,
+    chat_id: str,
+    code_id: str,
+):
+    response = supabase.table("results").select("*").eq("code_id", code_id).eq("chat_id", chat_id).limit(1).execute()
+
+    if len(response.data) == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Code not found",
+        )
+
+    return JSONResponse({"result": response.data[0]["stdout"]})

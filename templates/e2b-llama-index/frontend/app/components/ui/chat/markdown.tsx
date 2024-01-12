@@ -5,10 +5,12 @@ import remarkMath from "remark-math";
 
 import { CodeBlock } from "./codeblock";
 import { Loader2 } from 'lucide-react'
-import { CodeBlocksContexts } from '@/app/providers/CodeResults'
+import { CodeResultsContext } from '@/app/providers/CodeResults'
 import { CodeResults } from '@/app/components/ui/chat/chat.interface'
 import { ReactElement, ReactMarkdownOptions } from 'react-markdown/lib/react-markdown'
-import { codeBlock } from 'md-utils-ts'
+import { useInterval } from '@/app/hooks/useIntervals'
+import { updateCodeResults } from '@/app/utils/updateCodeResults'
+import { ChatIDContext } from '@/app/providers/ChatID'
 
 function ReactMarkdownWithCR(options: ReactMarkdownOptions & {codeResults: CodeResults}): ReactElement {
   return <ReactMarkdown {...options}>
@@ -25,8 +27,27 @@ const MemoizedReactMarkdown: FC<Options & {codeResults: CodeResults}> = memo(
 );
 
 
+
+function CodeResult({ codeID, codeResult }: { codeID: string | undefined, codeResult: string | undefined }) {
+  if (!codeID) return null
+
+  if (codeResult === undefined) {
+    return <div className="text-xs text-gray-500">
+      <span>Executing code ID: {codeID}</span>
+      <Loader2 className="h-4 w-4 animate-spin"/>
+    </div>
+  }
+
+  return <div className="flex flex-col w-full justify-between">
+                    <span>Result for Code ID: {codeID}</span>
+                    <code className="border-2 border-r-2">{codeResult}</code>
+                  </div>
+
+}
+
 export default function Markdown({ content }: { content: string }) {
-  const codeResults = useContext(CodeBlocksContexts);
+  const {codeResults, setCodeResults} = useContext(CodeResultsContext);
+  const chatID = useContext(ChatIDContext)
 
   return (
     <MemoizedReactMarkdown
@@ -38,16 +59,22 @@ export default function Markdown({ content }: { content: string }) {
           return <p className="mb-2 last:mb-0">{children}</p>;
         },
         code({ node, inline, className, children, ...props }) {
-          const codeResults = useContext(CodeBlocksContexts);
+          const {codeResults, setCodeResults} = useContext(CodeResultsContext);
 
-          let codeID = undefined
+          let codeID: string | undefined
           let codeResult = undefined
           if (node.data?.meta) {
             if ((node.data?.meta as string).endsWith("}")) {
               try {
                 const data =JSON.parse(node.data?.meta as string)
-                codeID = data.id
-                codeResult =  codeResults[codeID]
+                codeID = data.id as string
+                codeResult = codeResults[codeID]
+
+                if (codeResult === undefined) {
+                  useInterval(() => {
+                    updateCodeResults(chatID, codeID as string, setCodeResults)
+                  }, 2000)
+                }
               } catch (e) {
                 console.error(e);
               }
@@ -81,11 +108,7 @@ export default function Markdown({ content }: { content: string }) {
                 value={String(children).replace(/\n$/, "")}
                 {...props}
               />
-              {codeID && <div className="text-xs text-gray-500">
-                <span>Executing code ID: {codeID}</span>
-                {codeResult !== undefined ? <span className="ml-2">{codeResult}</span> :
-                <Loader2 className="h-4 w-4 animate-spin" />}
-              </div>}
+              <CodeResult codeResult={codeResult} codeID={codeID}/>
             </Fragment>
           );
         },

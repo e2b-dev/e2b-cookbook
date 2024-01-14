@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "e2b-autogen"
+version = "0.1.0"
+description = "Autogen code interpreter assistant using e2b sandbox"
+authors = ["keeganmccallum <keeganmccallum3@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11,<3.12"
+pyautogen = "^0.2.6"
+e2b = "^0.13.15"
+python-dotenv = "^1.0.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.poetry.scripts]
+main = "e2b_autogen.main:main"

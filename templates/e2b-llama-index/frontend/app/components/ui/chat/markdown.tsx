@@ -59,8 +59,6 @@ export default function Markdown({ content }: { content: string }) {
           return <p className="mb-2 last:mb-0">{children}</p>;
         },
         code({ node, inline, className, children, ...props }) {
-          const {codeResults, setCodeResults} = useContext(CodeResultsContext);
-
           let codeID: string | undefined
           let codeResult = undefined
           if (node.data?.meta) {
@@ -71,9 +69,11 @@ export default function Markdown({ content }: { content: string }) {
                 codeResult = codeResults[codeID]
 
                 if (codeResult === undefined) {
-                  // useInterval(() => {
-                  //   updateCodeResults(chatID, codeID as string, setCodeResults)
-                  // }, 20000)
+                  useInterval(() => {
+                    // This is polling, no need to await
+                    // @ts-ignore
+                    updateCodeResults(chatID, codeID as string, setCodeResults, setDelay, delay)
+                  }, 1000)
                 }
               } catch (e) {
                 console.error(e);

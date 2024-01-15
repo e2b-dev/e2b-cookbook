@@ -2,8 +2,9 @@ import { CodeResults } from '@/app/components/ui/chat/chat.interface'
 import { Dispatch, SetStateAction } from 'react'
 import { API_URL } from '@/app/utils/constants'
 
-export const updateCodeResults = (chatID: string, codeID: string, setCodeResults: Dispatch<SetStateAction<CodeResults>>) => {
-  fetch(API_URL, {
+export const updateCodeResults = async (chatID: string, codeID: string, setCodeResults: Dispatch<SetStateAction<CodeResults>>, setDelay: Dispatch<SetStateAction<number | null >>, delay: number | null) => {
+  console.log(delay)
+  const response = await fetch(API_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -13,18 +14,19 @@ export const updateCodeResults = (chatID: string, codeID: string, setCodeResults
       chat_id: chatID,
       code_id: codeID,
     }),
-  }).then(
-    (res) => {
-      if (res.status === 200) {
-        res.json().then((data) => {
-          setCodeResults((prevCodeResults) => {
-            return {
-              ...prevCodeResults,
-              [codeID]: data.result,
-            }
-          })
-        })
-      }
-    },
-  )
+  })
+  if (response.ok) {
+    const data = await response.json()
+    if (data.result) {
+      setDelay(null)
+      setCodeResults((prevCodeResults) => {
+
+        return {
+          ...prevCodeResults,
+          [codeID]: data.result,
+        }
+      })
+      return
+    }
+  }
 }

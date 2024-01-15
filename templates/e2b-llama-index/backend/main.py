@@ -158,7 +158,7 @@ def code_result(
     )
 
     if len(response.data) == 0:
-        raise ValueError("Code not found")
+        return json.dumps({"result": None})
 
     return json.dumps({"result": response.data[0]["stdout"]})
 

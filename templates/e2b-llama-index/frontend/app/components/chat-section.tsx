@@ -21,9 +21,10 @@ export default function ChatSection() {
     stop,
   } = useChat(
     {
-    api: `${API_URL}/chats/${chatID}`,
-    headers: {
-      "Content-Type": "application/json", // using JSON because of vercel/ai 2.2.26
+    api: API_URL,
+    body: {
+      "chat_id": chatID,
+      "operation": "chat",
     },
   });
   const [codeResults, setCodeResults] = useState<CodeResults>({});

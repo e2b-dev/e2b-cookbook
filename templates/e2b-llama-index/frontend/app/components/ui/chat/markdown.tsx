@@ -59,6 +59,8 @@ export default function Markdown({ content }: { content: string }) {
           return <p className="mb-2 last:mb-0">{children}</p>;
         },
         code({ node, inline, className, children, ...props }) {
+          const [delay, setDelay] = useState<number | null>(1000)
+
           let codeID: string | undefined
           let codeResult = undefined
           if (node.data?.meta) {
@@ -73,7 +75,7 @@ export default function Markdown({ content }: { content: string }) {
                     // This is polling, no need to await
                     // @ts-ignore
                     updateCodeResults(chatID, codeID as string, setCodeResults, setDelay, delay)
-                  }, 1000)
+                  }, delay)
                 }
               } catch (e) {
                 console.error(e);

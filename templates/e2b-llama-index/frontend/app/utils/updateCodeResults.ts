@@ -3,7 +3,6 @@ import { Dispatch, SetStateAction } from 'react'
 import { API_URL } from '@/app/utils/constants'
 
 export const updateCodeResults = async (chatID: string, codeID: string, setCodeResults: Dispatch<SetStateAction<CodeResults>>, setDelay: Dispatch<SetStateAction<number | null >>, delay: number | null) => {
-  console.log(delay)
   const response = await fetch(API_URL, {
     method: 'POST',
     headers: {
@@ -20,7 +19,6 @@ export const updateCodeResults = async (chatID: string, codeID: string, setCodeR
     if (data.result) {
       setDelay(null)
       setCodeResults((prevCodeResults) => {
-
         return {
           ...prevCodeResults,
           [codeID]: data.result,

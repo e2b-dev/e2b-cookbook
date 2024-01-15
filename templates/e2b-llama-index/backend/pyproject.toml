@@ -13,6 +13,9 @@ python-dotenv = "^1.0.0"
 e2b = "^0.13.15"
 supabase = "^2.3.3"
 
+[tool.poetry.group.dev.dependencies]
+black = "^23.12.1"
+
 [build-system]
 requires = [ "poetry-core" ]
 build-backend = "poetry.core.masonry.api"

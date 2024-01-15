@@ -4,7 +4,7 @@ import { API_URL } from '@/app/utils/constants'
 
 export const updateCodeResults = (chatID: string, codeID: string, setCodeResults: Dispatch<SetStateAction<CodeResults>>) => {
   fetch(API_URL, {
-    method: 'GET',
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },

@@ -1,15 +1,14 @@
 import json
-import threading
 import uuid
 from typing import List, Optional
 
-from e2b import Sandbox, ProcessOutput
+from e2b import Sandbox
 from llama_index.llms.base import ChatMessage
 from llama_index.llms.types import MessageRole
 from pydantic import BaseModel
 
 from app.context import system_prompt
-from app.db.client import supabase
+from app.db.client import supabase, SUPABASE_KEY, SUPABASE_URL
 from app.engine.index import get_chat_engine
 
 
@@ -26,22 +25,24 @@ class _ChatData(BaseModel):
     messages: List[_Message]
 
 
-def run_code(chat_id: str, code_id: str, code: str) -> ProcessOutput:
-    with Sandbox(cwd="/home/user") as sandbox:
-        sandbox.filesystem.write("main.py", code)
-        result = sandbox.process.start_and_wait("python3 main.py")
-
-    supabase.table("results").insert(
-        {
-            "chat_id": chat_id,
-            "code_id": code_id,
-            "stdout": result.stdout,
-            "stderr": result.stderr,
-            "exit_code": result.exit_code,
-        }
-    ).execute()
-
-    return result
+def run_code(chat_id: str, code_id: str, code: str):
+    script_name = f"script-{code_id}.py"
+    with Sandbox(
+        template="code-interpreter-llama-index",
+        cwd="/home/user",
+        env_vars={
+            "SUPABASE_URL": SUPABASE_URL,
+            "SUPABASE_KEY": SUPABASE_KEY,
+        },
+    ) as sandbox:
+        sandbox.filesystem.write(f"/home/user/{script_name}", code)
+        sandbox.keep_alive(60)
+        sandbox.process.start(
+            f"python3 trigger_script.py "
+            f"--chat_id {chat_id} "
+            f"--code_id {code_id} "
+            f"--script_name {script_name}"
+        )
 
 
 class _ParsingData(BaseModel):
@@ -64,11 +65,7 @@ def process_line(data: _ParsingData) -> _ParsingData:
         and not data.line.startswith("````")
         and data.execute
     ):
-        threading.Thread(
-            target=run_code,
-            args=(data.chat_id, data.code_id, data.codeblock),
-            daemon=True,
-        ).start()
+        run_code(data.chat_id, data.code_id, data.codeblock)
         data.execute = False
         data.code_id = None
         data.codeblock = ""

@@ -71,9 +71,9 @@ export default function Markdown({ content }: { content: string }) {
                 codeResult = codeResults[codeID]
 
                 if (codeResult === undefined) {
-                  useInterval(() => {
-                    updateCodeResults(chatID, codeID as string, setCodeResults)
-                  }, 2000)
+                  // useInterval(() => {
+                  //   updateCodeResults(chatID, codeID as string, setCodeResults)
+                  // }, 20000)
                 }
               } catch (e) {
                 console.error(e);

@@ -1,4 +1,5 @@
 import json
+import re
 import uuid
 from datetime import timedelta, datetime, timezone
 from typing import List, Optional
@@ -17,6 +18,8 @@ chat_engine = get_chat_engine()
 
 
 RECONNECT_TIMEOUT = 60 * 10  # 10 minutes
+
+code_block_start_regex = re.compile(r'```python {"id": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"}', re.I)
 
 
 class _Message(BaseModel):
@@ -86,7 +89,7 @@ def process_line(data: _ParsingData) -> _ParsingData:
         data.code_id = str(uuid.uuid4())
         print("Code id", data.code_id)
         print("=====================================")
-        data.token = data.token + f' {{"id": "{data.code_id}"}}'
+        data.token = data.token.replace("\n", "") + f' {{"id": "{data.code_id}"}}\n'
         data.line = ""
         data.execute = True
     elif (
@@ -120,7 +123,7 @@ def chat(data: dict):
     messages = [ChatMessage(role=MessageRole.SYSTEM, content=system_prompt)] + [
         ChatMessage(
             role=m.role,
-            content=m.content,
+            content=code_block_start_regex.sub("```python", m.content).strip()
         )
         for m in data.messages
     ]
@@ -157,7 +160,6 @@ def chat(data: dict):
                 parsing_data.line = lines[-1]
             else:
                 parsing_data.line += token
-                parsing_data = process_line(parsing_data)
 
             yield parsing_data.token
 

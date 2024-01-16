@@ -31,18 +31,23 @@ const MemoizedReactMarkdown: FC<Options & {codeResults: CodeResults}> = memo(
 function CodeResult({ codeID, codeResult }: { codeID: string | undefined, codeResult: string | undefined }) {
   if (!codeID) return null
 
-  if (codeResult === undefined) {
-    return <div className="text-xs text-gray-500">
-      <span>Executing code ID: {codeID}</span>
-      <Loader2 className="h-4 w-4 animate-spin"/>
+  return <div className="flex flex-col my-4">
+    <div className="flex h-12 w-full items-center justify-between bg-zinc-800 px-6 py-2 pr-4 text-zinc-100">
+      <span className="text-xs lowercase">
+        Result
+      </span>
     </div>
-  }
-
-  return <div className="flex flex-col w-full justify-between">
-                    <span>Result for Code ID: {codeID}</span>
-                    <code className="border-2 border-r-2">{codeResult}</code>
-                  </div>
-
+    <div className="flex w-full space-x-2 bg-black text-white  p-2">
+    {codeResult === undefined ? (
+          <div className="flex flex-row space-x-4 p-2 pl-8 text-sm items-center">
+            <span>Executing code...</span>
+            <Loader2 className="h-4 w-4 animate-spin"/>
+          </div>
+        ) : (
+          <code className="p-2 pl-8 text-sm">{codeResult}</code>
+        )}
+      </div>
+  </div>
 }
 
 export default function Markdown({ content }: { content: string }) {

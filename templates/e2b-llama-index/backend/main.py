@@ -1,10 +1,15 @@
-import json
+import os
 import re
 import uuid
 from datetime import timedelta, datetime, timezone
 from typing import List, Optional
 
+import uvicorn
 from e2b import Sandbox
+from fastapi import FastAPI, HTTPException, Depends, status
+from fastapi.requests import Request
+from fastapi.responses import StreamingResponse, JSONResponse
+from llama_index.chat_engine.types import BaseChatEngine
 from llama_index.llms.base import ChatMessage
 from llama_index.llms.types import MessageRole
 from pydantic import BaseModel
@@ -14,7 +19,7 @@ from app.db.client import supabase, SUPABASE_KEY, SUPABASE_URL
 from app.engine.index import get_chat_engine
 
 
-chat_engine = get_chat_engine()
+app = FastAPI()
 
 
 RECONNECT_TIMEOUT = 60 * 10  # 10 minutes
@@ -31,7 +36,6 @@ class _Message(BaseModel):
 
 
 class _ChatData(BaseModel):
-    chat_id: str
     messages: List[_Message]
 
 
@@ -88,12 +92,7 @@ class _ParsingData(BaseModel):
 
 def process_line(data: _ParsingData) -> _ParsingData:
     if data.line.startswith("```python"):
-        print("=====================================")
-        print("Found codeblock", data.token)
-        print("Found codeblock", data.line)
         data.code_id = str(uuid.uuid4())
-        print("Code id", data.code_id)
-        print("=====================================")
         data.token = data.token.replace("\n", "") + f' {{"id": "{data.code_id}"}}\n'
         data.line = ""
         data.execute = True
@@ -110,19 +109,65 @@ def process_line(data: _ParsingData) -> _ParsingData:
     return data
 
 
-def chat(data: dict):
-    chat_id = data.get("chat_id", None)
+@app.get("/chats/{chat_id}/upload_url")
+def get_upload_url(
+    request: Request,
+    chat_id: str,
+) -> JSONResponse:
+    sandbox = _get_sandbox(chat_id)
+    return JSONResponse({"upload_url": sandbox.file_url()})
+
+
+@app.get("/chats/{chat_id}/codes/{code_id}")
+async def code_result(
+    request: Request,
+    chat_id: str,
+    code_id: str,
+) -> JSONResponse:
+    if code_id is None:
+        raise ValueError("No code id provided")
+
     if chat_id is None:
         raise ValueError("No chat id provided")
 
-    data = _ChatData(**data)
+    response = (
+        supabase.table("results")
+        .select("*")
+        .eq("code_id", code_id)
+        .eq("chat_id", chat_id)
+        .limit(1)
+        .execute()
+    )
+
+    if len(response.data) == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Code not found",
+        )
+
+    return JSONResponse({"result": response.data[0]["stdout"]})
+
+
+@app.post("/chats/{chat_id}")
+async def chat(
+    request: Request,
+    data: _ChatData,
+    chat_id: str,
+    chat_engine: BaseChatEngine = Depends(get_chat_engine),
+) -> StreamingResponse:
     # check preconditions and get last message
     if len(data.messages) == 0:
-        raise ValueError("No messages provided")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No messages provided",
+        )
 
     last_message = data.messages.pop()
     if last_message.role != MessageRole.USER:
-        raise ValueError("Last message must be from user")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Last message must be from user",
+        )
 
     # convert messages coming from the request to type ChatMessage
     messages = [ChatMessage(role=MessageRole.SYSTEM, content=system_prompt)] + [
@@ -168,56 +213,13 @@ def chat(data: dict):
 
             yield parsing_data.token
 
-    return "".join(token for token in event_generator())
+    return StreamingResponse(event_generator(), media_type="text/plain")
 
 
-def code_result(
-    body: dict,
-) -> str:
-    code_id = body.get("code_id", None)
-    if code_id is None:
-        raise ValueError("No code id provided")
+def main():
+    uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", "8080")))
 
-    chat_id = body.get("chat_id", None)
-    if chat_id is None:
-        raise ValueError("No chat id provided")
-
-    response = (
-        supabase.table("results")
-        .select("*")
-        .eq("code_id", code_id)
-        .eq("chat_id", chat_id)
-        .limit(1)
-        .execute()
-    )
-
-    if len(response.data) == 0:
-        return json.dumps({"result": None})
-
-    return json.dumps({"result": response.data[0]["stdout"]})
+if __name__ == "__main__":
+    main()
 
 
-def get_upload_url(chat_id: str):
-    sandbox = _get_sandbox(chat_id)
-    return json.dumps({"result": sandbox.file_url()})
-
-
-def handler(event, context):
-    print("Event: {}".format(event))
-    body = json.loads(event.get("body", {}))
-
-    operation = body.pop("operation", None)
-
-    operations = {
-        "chat": chat,
-        "code_result": code_result,
-        "echo": lambda x: x,
-        "get_upload_url": get_upload_url,
-    }
-
-    if operation in operations:
-        print("Operation: {}".format(operation))
-        return operations[operation](body)
-    else:
-        print("Unrecognized operation: {}".format(operation))
-        raise ValueError('Unrecognized operation "{}"'.format(operation))

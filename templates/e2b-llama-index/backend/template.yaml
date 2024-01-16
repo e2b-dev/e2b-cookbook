@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+    e2b-llama-index
+    
+    Sample SAM Template for e2b-llama-index
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 300
+
+Resources:
+  CodeInterpreterLlamaIndex:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      MemorySize: 512
+      Environment:
+        Variables:
+          AWS_LWA_INVOKE_MODE: RESPONSE_STREAM
+      FunctionUrlConfig:
+        AuthType: NONE
+        InvokeMode: RESPONSE_STREAM
+        Cors:
+          AllowMethods:
+            - '*'
+          AllowHeaders:
+            - '*'
+          AllowOrigins:
+            - '*'
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: .
+      DockerTag: v1
+
+Outputs:
+  CodeInterpreterLlamaIndexUrl:
+    Description: "URL for the lambda function"
+    Value: !GetAtt CodeInterpreterLlamaIndexUrl.FunctionUrl

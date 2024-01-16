@@ -1,12 +1,13 @@
 "use client";
 
 import { useChat } from "ai/react";
-import { ChatInput, ChatMessages } from "./ui/chat";
+import { ChatInput, ChatMessages, Message } from './ui/chat'
 import { CodeResultsContext } from '@/app/providers/CodeResults'
 import { useContext, useState } from 'react'
 import { CodeResults } from '@/app/components/ui/chat/chat.interface'
 import { ChatIDContext } from '@/app/providers/ChatID'
 import { API_URL } from '@/app/utils/constants'
+import { nanoid } from 'ai'
 
 
 export default function ChatSection() {
@@ -18,17 +19,25 @@ export default function ChatSection() {
     handleSubmit,
     handleInputChange,
     reload,
+    setMessages,
     stop,
   } = useChat(
     {
     id: chatID,
-    api: API_URL,
-    body: {
-      "chat_id": chatID,
-      "operation": "chat",
-    },
+    api: `${API_URL}/chats/${chatID}`,
   });
   const [codeResults, setCodeResults] = useState<CodeResults>({});
+
+  const onFileUpload = async (file: File) => {
+    setMessages([
+      ...messages,
+      {
+        id: nanoid(),
+        role: "system",
+        content: `The user has uploaded file ${file.name}`,
+      },
+    ]);
+  }
 
   return (
     <div className="space-y-4 max-w-5xl w-full">
@@ -44,6 +53,7 @@ export default function ChatSection() {
         input={input}
         handleSubmit={handleSubmit}
         handleInputChange={handleInputChange}
+        onFileUpload={onFileUpload}
         isLoading={isLoading}
         multiModal={process.env.NEXT_PUBLIC_MODEL === "gpt-4-vision-preview"}
       />

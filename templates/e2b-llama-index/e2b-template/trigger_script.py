@@ -44,6 +44,8 @@ def main():
         }
     ).execute()
 
+    os.remove(script_name)
+
 
 if __name__ == "__main__":
     main()

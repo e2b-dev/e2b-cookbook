@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useContext, useState } from 'react'
 import { Button } from "../button";
 import FileUploader from "../file-uploader";
 import { Input } from "../input";
-import UploadImagePreview from "../upload-image-preview";
 import { ChatHandler } from "./chat.interface";
+import { API_URL } from '@/app/utils/constants'
+import { ChatIDContext } from '@/app/providers/ChatID'
 
 export default function ChatInput(
   props: Pick<
@@ -18,38 +19,41 @@ export default function ChatInput(
     multiModal?: boolean;
   },
 ) {
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const chatID = useContext(ChatIDContext)
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    if (imageUrl) {
-      props.handleSubmit(e, {
-        data: { imageUrl: imageUrl },
-      });
-      setImageUrl(null);
-      return;
-    }
     props.handleSubmit(e);
-  };
-
-  const onRemovePreviewImage = () => setImageUrl(null);
-
-  const handleUploadImageFile = async (file: File) => {
-    const base64 = await new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = (error) => reject(error);
-    });
-    setImageUrl(base64);
   };
 
   const handleUploadFile = async (file: File) => {
     try {
-      if (props.multiModal && file.type.startsWith("image/")) {
-        return await handleUploadImageFile(file);
+      const response = await fetch(`${API_URL}/chats/${chatID}/upload_url`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok')
+      }
+
+      const data = await response.json()
+      const uploadUrl = data.upload_url
+
+      const formData = new FormData()
+      formData.append('file', file)
+      const uploadResponse = await fetch(uploadUrl, {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!uploadResponse.ok) {
+        throw new Error('Network response was not ok')
       }
       props.onFileUpload?.(file);
     } catch (error: any) {
+      console.error('There has been a problem with your fetch operation:', error.message);
       props.onFileError?.(error.message);
     }
   };
@@ -59,9 +63,6 @@ export default function ChatInput(
       onSubmit={onSubmit}
       className="rounded-xl bg-white p-4 shadow-xl space-y-4"
     >
-      {imageUrl && (
-        <UploadImagePreview url={imageUrl} onRemove={onRemovePreviewImage} />
-      )}
       <div className="flex w-full items-start justify-between gap-4 ">
         <Input
           autoFocus

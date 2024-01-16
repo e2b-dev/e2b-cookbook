@@ -29,16 +29,6 @@ export default function FileUploader({
 
   const inputId = config?.inputId || DEFAULT_INPUT_ID;
   const fileSizeLimit = config?.fileSizeLimit || DEFAULT_FILE_SIZE_LIMIT;
-  const allowedExtensions = config?.allowedExtensions;
-  const defaultCheckExtension = (extension: string) => {
-    if (allowedExtensions && !allowedExtensions.includes(extension)) {
-      return `Invalid file type. Please select a file with one of these formats: ${allowedExtensions!.join(
-        ",",
-      )}`;
-    }
-    return null;
-  };
-  const checkExtension = config?.checkExtension ?? defaultCheckExtension;
 
   const isFileSizeExceeded = (file: File) => {
     return file.size > fileSizeLimit;
@@ -61,11 +51,6 @@ export default function FileUploader({
 
   const handleUpload = async (file: File) => {
     const onFileUploadError = onFileError || window.alert;
-    const fileExtension = file.name.split(".").pop() || "";
-    const extensionFileError = checkExtension(fileExtension);
-    if (extensionFileError) {
-      return onFileUploadError(extensionFileError);
-    }
 
     if (isFileSizeExceeded(file)) {
       return onFileUploadError(
@@ -83,7 +68,6 @@ export default function FileUploader({
         id={inputId}
         style={{ display: "none" }}
         onChange={onFileChange}
-        accept={allowedExtensions?.join(",")}
         disabled={config?.disabled || uploading}
       />
       <label

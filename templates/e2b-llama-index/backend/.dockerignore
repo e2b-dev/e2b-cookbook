@@ -3,3 +3,6 @@ storage
 .env
 .gitignore
 README.md
+.aws-sam
+samconfig.toml
+template.yaml

@@ -21,6 +21,7 @@ export default function ChatSection() {
     stop,
   } = useChat(
     {
+    id: chatID,
     api: API_URL,
     body: {
       "chat_id": chatID,

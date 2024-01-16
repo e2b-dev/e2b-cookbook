@@ -1,5 +1,6 @@
 import json
 import uuid
+from datetime import timedelta, datetime, timezone
 from typing import List, Optional
 
 from e2b import Sandbox
@@ -15,6 +16,9 @@ from app.engine.index import get_chat_engine
 chat_engine = get_chat_engine()
 
 
+RECONNECT_TIMEOUT = 60 * 10  # 10 minutes
+
+
 class _Message(BaseModel):
     role: MessageRole
     content: str
@@ -27,22 +31,42 @@ class _ChatData(BaseModel):
 
 def run_code(chat_id: str, code_id: str, code: str):
     script_name = f"script-{code_id}.py"
-    with Sandbox(
-        template="code-interpreter-llama-index",
-        cwd="/home/user",
-        env_vars={
-            "SUPABASE_URL": SUPABASE_URL,
-            "SUPABASE_KEY": SUPABASE_KEY,
-        },
-    ) as sandbox:
-        sandbox.filesystem.write(f"/home/user/{script_name}", code)
-        sandbox.keep_alive(60)
-        sandbox.process.start(
-            f"python3 trigger_script.py "
-            f"--chat_id {chat_id} "
-            f"--code_id {code_id} "
-            f"--script_name {script_name}"
+
+    results = supabase.table("sandboxes").select("*").eq("chat_id", chat_id).execute()
+    if len(results.data) > 0 and datetime.fromisoformat(results.data[0]["expected_to_end_at"]) > datetime.now(timezone.utc):
+        sandbox = Sandbox.reconnect(
+            sandbox_id=results.data[0]["id"],
+            cwd="/home/user",
+            env_vars={
+                "SUPABASE_URL": SUPABASE_URL,
+                "SUPABASE_KEY": SUPABASE_KEY,
+            },
         )
+        print("Reusing sandbox")
+    else:
+        sandbox = Sandbox(
+            template="code-interpreter-llama-index",
+            cwd="/home/user",
+            env_vars={
+                "SUPABASE_URL": SUPABASE_URL,
+                "SUPABASE_KEY": SUPABASE_KEY,
+            },
+        )
+    sandbox.filesystem.write(f"/home/user/{script_name}", code)
+    supabase.table("sandboxes").upsert(
+        {
+            "chat_id": chat_id,
+            "id": sandbox.id,
+            "expected_to_end_at": (datetime.now(timezone.utc) + timedelta(seconds=RECONNECT_TIMEOUT)).isoformat(),
+        }
+    ).execute()
+    sandbox.keep_alive(RECONNECT_TIMEOUT)
+    sandbox.process.start(
+        f"python3 trigger_script.py "
+        f"--chat_id {chat_id} "
+        f"--code_id {code_id} "
+        f"--script_name {script_name}"
+    )
 
 
 class _ParsingData(BaseModel):
@@ -56,7 +80,12 @@ class _ParsingData(BaseModel):
 
 def process_line(data: _ParsingData) -> _ParsingData:
     if data.line.startswith("```python"):
+        print("=====================================")
+        print("Found codeblock", data.token)
+        print("Found codeblock", data.line)
         data.code_id = str(uuid.uuid4())
+        print("Code id", data.code_id)
+        print("=====================================")
         data.token = data.token + f' {{"id": "{data.code_id}"}}'
         data.line = ""
         data.execute = True
@@ -73,9 +102,7 @@ def process_line(data: _ParsingData) -> _ParsingData:
     return data
 
 
-def chat(
-    data: dict,
-):
+def chat(data: dict):
     chat_id = data.get("chat_id", None)
     if chat_id is None:
         raise ValueError("No chat id provided")

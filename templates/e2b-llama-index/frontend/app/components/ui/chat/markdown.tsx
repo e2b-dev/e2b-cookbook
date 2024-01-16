@@ -59,7 +59,7 @@ export default function Markdown({ content }: { content: string }) {
           return <p className="mb-2 last:mb-0">{children}</p>;
         },
         code({ node, inline, className, children, ...props }) {
-          const [delay, setDelay] = useState<number | null>(1000)
+          const [delay, setDelay] = useState<number | null>(2000)
 
           let codeID: string | undefined
           let codeResult = undefined

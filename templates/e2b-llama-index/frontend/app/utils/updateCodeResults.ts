@@ -16,7 +16,7 @@ export const updateCodeResults = async (chatID: string, codeID: string, setCodeR
   })
   if (response.ok) {
     const data = await response.json()
-    if (data.result) {
+    if (data.result !== null) {
       setDelay(null)
       setCodeResults((prevCodeResults) => {
         return {

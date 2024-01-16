@@ -16,7 +16,7 @@ When generating a code snippet, properly mark the language:
 print("hello")
 \`\`\``
 
-Use python whenever possible
+Use python whenever possible and print the final result.
 """
 
 

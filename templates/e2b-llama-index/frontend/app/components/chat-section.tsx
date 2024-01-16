@@ -25,6 +25,7 @@ export default function ChatSection() {
     {
     id: chatID,
     api: `${API_URL}/chats/${chatID}`,
+      initialInput:"Calculate the 13th Fibonacci number, but the series starts with 4 and 5",
   });
   const [codeResults, setCodeResults] = useState<CodeResults>({});
 

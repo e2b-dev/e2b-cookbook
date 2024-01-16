@@ -19,7 +19,10 @@ chat_engine = get_chat_engine()
 
 RECONNECT_TIMEOUT = 60 * 10  # 10 minutes
 
-code_block_start_regex = re.compile(r'```python {"id": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"}', re.I)
+code_block_start_regex = re.compile(
+    r'```python {"id": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"}',
+    re.I,
+)
 
 
 class _Message(BaseModel):
@@ -32,35 +35,37 @@ class _ChatData(BaseModel):
     messages: List[_Message]
 
 
+def _get_sandbox(chat_id: str) -> Sandbox:
+    results = supabase.table("sandboxes").select("*").eq("chat_id", chat_id).execute()
+
+    if len(results.data) > 0 and datetime.fromisoformat(
+        results.data[0]["expected_to_end_at"]
+    ) > datetime.now(timezone.utc):
+        sandbox = Sandbox.reconnect(sandbox_id=results.data[0]["id"])
+    else:
+        sandbox = Sandbox(template="code-interpreter-llama-index")
+
+    sandbox.env_vars = {
+        "SUPABASE_URL": SUPABASE_URL,
+        "SUPABASE_KEY": SUPABASE_KEY,
+    }
+    sandbox.cwd = "/home/user"
+
+    return sandbox
+
+
 def run_code(chat_id: str, code_id: str, code: str):
     script_name = f"script-{code_id}.py"
 
-    results = supabase.table("sandboxes").select("*").eq("chat_id", chat_id).execute()
-    if len(results.data) > 0 and datetime.fromisoformat(results.data[0]["expected_to_end_at"]) > datetime.now(timezone.utc):
-        sandbox = Sandbox.reconnect(
-            sandbox_id=results.data[0]["id"],
-            cwd="/home/user",
-            env_vars={
-                "SUPABASE_URL": SUPABASE_URL,
-                "SUPABASE_KEY": SUPABASE_KEY,
-            },
-        )
-        print("Reusing sandbox")
-    else:
-        sandbox = Sandbox(
-            template="code-interpreter-llama-index",
-            cwd="/home/user",
-            env_vars={
-                "SUPABASE_URL": SUPABASE_URL,
-                "SUPABASE_KEY": SUPABASE_KEY,
-            },
-        )
+    sandbox = _get_sandbox(chat_id)
     sandbox.filesystem.write(f"/home/user/{script_name}", code)
     supabase.table("sandboxes").upsert(
         {
             "chat_id": chat_id,
             "id": sandbox.id,
-            "expected_to_end_at": (datetime.now(timezone.utc) + timedelta(seconds=RECONNECT_TIMEOUT)).isoformat(),
+            "expected_to_end_at": (
+                datetime.now(timezone.utc) + timedelta(seconds=RECONNECT_TIMEOUT)
+            ).isoformat(),
         }
     ).execute()
     sandbox.keep_alive(RECONNECT_TIMEOUT)
@@ -123,7 +128,7 @@ def chat(data: dict):
     messages = [ChatMessage(role=MessageRole.SYSTEM, content=system_prompt)] + [
         ChatMessage(
             role=m.role,
-            content=code_block_start_regex.sub("```python", m.content).strip()
+            content=code_block_start_regex.sub("```python", m.content).strip(),
         )
         for m in data.messages
     ]
@@ -192,13 +197,23 @@ def code_result(
     return json.dumps({"result": response.data[0]["stdout"]})
 
 
+def get_upload_url(chat_id: str):
+    sandbox = _get_sandbox(chat_id)
+    return json.dumps({"result": sandbox.file_url()})
+
+
 def handler(event, context):
     print("Event: {}".format(event))
     body = json.loads(event.get("body", {}))
 
     operation = body.pop("operation", None)
 
-    operations = {"chat": chat, "code_result": code_result, "echo": lambda x: x}
+    operations = {
+        "chat": chat,
+        "code_result": code_result,
+        "echo": lambda x: x,
+        "get_upload_url": get_upload_url,
+    }
 
     if operation in operations:
         print("Operation: {}".format(operation))

@@ -10,7 +10,7 @@
 
 ## What we will do
 
-In this guide, we build a custom AI developer that clones GitHub repository of your choice to its remote cloud environment, works on it, and then make a pull request with the changes.
+In this guide, we build a custom AI developer that clones a GitHub repository of your choice to its remote cloud environment, works on it, and then makes a pull request with the changes.
 
 We use E2B Sandboxes for the remote execution of AI developer's actions, and the OpenAI's Assistants API for the AI assistant.
 
@@ -87,7 +87,7 @@ Then we define actions that the AI developer can use. You can later modify the p
 1. Create a directory in the remote sandbox
 2. Save content (e.g., code) to a file
 3. List files in a directory
-4. Read files content
+4. Read content of files
 5. Commit changes
 6. Make a pull request
 
@@ -442,7 +442,7 @@ We define three functions that ask the user for
 - Specifying the task for the AI agent (e.g., "Please create a calculator in JavaScript and save it to new file")
 - GitHub authentication token.
 
-> The user is asked for their GitHub [personal access token (classic)](https://github.com/settings/tokens) as a standard way to securely interact with the GitHub API.
+> The user is asked for their GitHub [personal access token (classic)](https://github.com/settings/tokens) as a standard way to interact with the GitHub API securely.
 
 > 💡 **Tip**: Save your GitHub token as `GITHUB_TOKEN` in your `.env` file to avoid having to paste it every time you run the program.
 
@@ -482,7 +482,7 @@ def prompt_user_for_auth():
 ```
 
 ### 4.3 Setup git
-We set up the Git configuration and authentication for user's account within the specified sandbox environment. It involves configuring the user's email and name, logging in with a GitHub personal access token, and setting up Git credentials for GitHub. To monitor the process, we add printing exit codes in each step.
+We set up the Git configuration and authentication for the user's account within the specified sandbox environment. It involves configuring the user's email and name, logging in with a GitHub personal access token, and setting up Git credentials for GitHub. To monitor the process, we add printing exit codes in each step.
 ```python
 def setup_git(sandbox):
     print("Logging into GitHub...")
@@ -544,11 +544,11 @@ We use a `sandbox.add_action()` method to register the actions with the sandbox.
 We start the sandbox and configure the AI assistant in git. We log the user to GitHub via the authentication token.
 We assign the user's task to the assistant. Then we create a thread, send messages to the thread, and finally run the thread.
 
-We register actions with the sandbox using a `sandbox.add_action()` method. We start the sandbox, configure the AI developer in Git, and ask the user for GitHub token, if they haven't added it as environment variable already.
+We register actions with the sandbox using a `sandbox.add_action()` method. We start the sandbox, configure the AI developer in Git, and ask the user for a GitHub token, if they haven't added it as the environment variable already.
 
-Then, we assign the user's task to the assistant, create and run a thread to send messages to complete the task.
+Then, we assign the user's task to the assistant and create and run a thread to send messages to complete the task.
 
-> Here, we are using the OpenAI's concept of threads, messages and runs.
+> Here, we are using OpenAI's concept of threads, messages, and runs.
 
 ```python
 def main():
@@ -592,7 +592,7 @@ def main():
             thread_id=thread.id, assistant_id=assistant.id
         )
 ```
-The threads, messages and runs are concept from the OpenAI's Assistants API:
+The threads, messages, and runs are a concept from the OpenAI's Assistants API:
 
 ![Assistants API OpenAI](https://ntjfcwpzsxugrykskdgi.supabase.co/storage/v1/object/public/content-assets/004.png?t=2023-12-19T18%3A24%3A46.208Z)
 
@@ -601,7 +601,7 @@ Still  inside the main function, we print the assistant's process to the termina
 
 > Note: The assistant's runs duration is by huge part determined by OpenAI.
 
-At the end, we use `time.sleep()` to specify how often we want to poll assistant's status.
+At the end, we use `time.sleep()` to specify how often we want to poll the assistant's status.
 
 ```python
  spinner = ""

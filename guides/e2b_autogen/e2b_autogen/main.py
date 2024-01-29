@@ -92,7 +92,7 @@ llm_config = {
                     },
                     "packages": {
                         "type": "string",
-                        "description": "A list of package names imported by the function, and that need to be installed with pip prior to invoking the function. This solves ModuleNotFoundError.",
+                        "description": "A list of package names imported by the function, and that need to be installed with pip prior to invoking the function, for example `requests`. This solves ModuleNotFoundError.",
                     },
                     "code": {
                         "type": "string",

@@ -36,14 +36,16 @@ def execute_code(code: Optional[str] = None,
 
     if lang == "node":
         binary = "node"
+        file_extension = "js"
     elif lang == "python":
         binary = "python3"
+        file_extension = "py"
     else:
         raise ValueError(f"Unsupported runtime {lang}")
 
     if filename is None:
         code_hash = md5(code.encode()).hexdigest()
-        filename = f"{work_dir}/{code_hash}.py"
+        filename = f"{work_dir}/{code_hash}.{file_extension}"
 
 
     if code is not None:

@@ -1,6 +1,8 @@
 import json
+import logging
+
+from hashlib import md5
 from typing import Optional
-import uuid
 
 # Import E2B
 from e2b import Sandbox
@@ -16,6 +18,8 @@ load_dotenv()
 # Get your Sandbox session
 sandbox = Sandbox(template="base")
 
+logger = logging.getLogger(__name__)
+
 
 # mock autogen execute_code function with e2b equivalent
 # To run locally: from autogen.code_utils import execute_code
@@ -23,8 +27,13 @@ def execute_code(code: Optional[str] = None,
                  timeout: Optional[int] = None,
                  filename: Optional[str] = None,
                  work_dir: Optional[str] = "/home/user",  # default to e2b default cwd
-                 # use_docker: Optional[Union[List[str], str, bool]] = None,  # N/A we're using e2b
-                 lang: Optional[str] = "python"):
+                 lang: Optional[str] = "python",
+                 sandbox: Sandbox = None):
+    if all((code is None, filename is None)):
+        error_msg = f"Either {code=} or {filename=} must be provided."
+        logger.error(error_msg)
+        raise AssertionError(error_msg)
+
     if lang == "node":
         binary = "node"
     elif lang == "python":
@@ -33,8 +42,9 @@ def execute_code(code: Optional[str] = None,
         raise ValueError(f"Unsupported runtime {lang}")
 
     if filename is None:
-        # generate a random filename
-        filename = f"{work_dir}/{str(uuid.uuid4())}.py"
+        code_hash = md5(code.encode()).hexdigest()
+        filename = f"{work_dir}/{code_hash}.py"
+
 
     if code is not None:
         sandbox.filesystem.write(filename, code)
@@ -47,16 +57,15 @@ def execute_code(code: Optional[str] = None,
     proc.wait(timeout)
 
     # https://microsoft.github.io/autogen/docs/reference/code_utils/#execute_code
-    return [proc.exit_code, proc.stderr if proc.exit_code > 0 else proc.stdout]
+    return [proc.exit_code, proc.stderr if proc.exit_code > 0 else proc.stdout, ""]
 
 
 config_list = config_list_from_json(
     "OAI_CONFIG_LIST",
     filter_dict={
-        # Function calling with GPT 3.5
+        # Function calling with GPT 3.5 - cheaper/faster but less accurate
         "model": ["gpt-3.5-turbo-16k-0613"],
 
-        # Uncomment to use gpt-4 turbo
         # "model": ["gpt-4-1106-preview"],
     },
 )
@@ -104,8 +113,7 @@ def define_function(name, description, arguments, packages, code):
         "name": name,
         "description": description,
         "parameters": {"type": "object", "properties": json_args},
-        # TODO Make all arguments required
-        "required": ["url"],
+        "required": list(json_args.keys()),
     }
     llm_config["functions"] = llm_config["functions"] + [function_config]
     user_proxy.register_function(function_map={name: lambda **args: execute_func(name, packages, code, **args)})
@@ -129,7 +137,7 @@ result={name}(**args)
 if result is not None: print(result)
 """
     print(f"execute_code:\n{str}")
-    result = execute_code(str, timeout=120)[1]
+    result = execute_code(str, timeout=120, sandbox=sandbox)[1]
     print(f"Result: {result}")
     return result
 
@@ -179,7 +187,7 @@ def main():
         assistant, message="List functions do you know about.")
 
     user_proxy.initiate_chat(
-        assistant, message="Print the response body of https://api.costly.ai/v1/\nUse the functions you know about.")
+        assistant, message="Print the response body of https://api.xler.ai/v1/\nUse the functions you know about.")
 
 
     # Close the sandbox once done

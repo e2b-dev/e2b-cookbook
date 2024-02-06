@@ -21,44 +21,28 @@ sandbox = Sandbox(template="base")
 logger = logging.getLogger(__name__)
 
 
-# mock autogen execute_code function with e2b equivalent
-# To run locally: from autogen.code_utils import execute_code
-def execute_code(code: Optional[str] = None,
-                 timeout: Optional[int] = None,
-                 filename: Optional[str] = None,
-                 work_dir: Optional[str] = "/home/user",  # default to e2b default cwd
-                 lang: Optional[str] = "python",
-                 sandbox: Sandbox = None):
-    if all((code is None, filename is None)):
-        error_msg = f"Either {code=} or {filename=} must be provided."
-        logger.error(error_msg)
-        raise AssertionError(error_msg)
+def execute_code(
+    code: str,
+    sandbox: Sandbox,
+    timeout: Optional[int] = None,
+    work_dir: Optional[str] = "/home/user",  # default to e2b default cwd
+    packages: Optional[str] = None,
+):
+    if packages is not None and packages != "":
+        sandbox.process.start_and_wait(f"pip install -qq {packages}")
 
-    if lang == "node":
-        binary = "node"
-        file_extension = "js"
-    elif lang == "python":
-        binary = "python3"
-        file_extension = "py"
-    else:
-        raise ValueError(f"Unsupported runtime {lang}")
+    binary = "python3"
+    file_extension = "py"
 
-    if filename is None:
-        code_hash = md5(code.encode()).hexdigest()
-        filename = f"{work_dir}/{code_hash}.{file_extension}"
+    code_hash = md5(code.encode()).hexdigest()
+    filename = f"{work_dir}/{code_hash}.{file_extension}"
+    sandbox.filesystem.write(filename, code)
 
-
-    if code is not None:
-        sandbox.filesystem.write(filename, code)
-
-    proc = sandbox.process.start(
+    proc = sandbox.process.start_and_wait(
         f"{binary} {filename}",
+        timeout=timeout,
         cwd=work_dir,
     )
-
-    proc.wait(timeout)
-
-    # https://microsoft.github.io/autogen/docs/reference/code_utils/#execute_code
     return [proc.exit_code, proc.stderr if proc.exit_code > 0 else proc.stdout, ""]
 
 
@@ -94,7 +78,7 @@ llm_config = {
                     },
                     "packages": {
                         "type": "string",
-                        "description": "A list of package names imported by the function, and that need to be installed with pip prior to invoking the function, for example `requests`. This solves ModuleNotFoundError.",
+                        "description": "A list of space separated package names imported by the function, and that need to be installed with pip prior to invoking the function, for example `requests`. This solves ModuleNotFoundError.",
                     },
                     "code": {
                         "type": "string",
@@ -124,14 +108,7 @@ def define_function(name, description, arguments, packages, code):
 
 
 def execute_func(name, packages, code, **args):
-    pip_install = (
-        f"""print("Installing package: {packages}")\nsubprocess.run(["pip", "-qq", "install", "{packages}"])"""
-        if packages
-        else ""
-    )
     str = f"""
-import subprocess
-{pip_install}
 print("Result of {name} function execution:")
 {code}
 args={args}
@@ -139,7 +116,7 @@ result={name}(**args)
 if result is not None: print(result)
 """
     print(f"execute_code:\n{str}")
-    result = execute_code(str, timeout=120, sandbox=sandbox)[1]
+    result = execute_code(str, sandbox=sandbox, timeout=120, packages=packages)[1]
     print(f"Result: {result}")
     return result
 
@@ -189,7 +166,7 @@ def main():
         assistant, message="List functions do you know about.")
 
     user_proxy.initiate_chat(
-        assistant, message="Print the response body of https://api.xler.ai/v1/\nUse the functions you know about.")
+        assistant, message="Print the response body of https://echo.free.beeceptor.com/ \nUse the functions you know about.")
 
 
     # Close the sandbox once done

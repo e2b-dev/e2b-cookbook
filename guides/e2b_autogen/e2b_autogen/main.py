@@ -31,20 +31,19 @@ def execute_code(
     if packages is not None and packages != "":
         sandbox.process.start_and_wait(f"pip install -qq {packages}")
 
-    binary = "python3"
-    file_extension = "py"
-
     code_hash = md5(code.encode()).hexdigest()
-    filename = f"{work_dir}/{code_hash}.{file_extension}"
+    filename = f"{work_dir}/{code_hash}.py"
     sandbox.filesystem.write(filename, code)
 
     proc = sandbox.process.start_and_wait(
-        f"{binary} {filename}",
+        f"python3 {filename}",
         timeout=timeout,
         cwd=work_dir,
     )
-    return [proc.exit_code, proc.stderr if proc.exit_code > 0 else proc.stdout, ""]
-
+    
+    if proc.exit_code > 0:
+        raise Exception(proc.stderr)
+    return proc.stdout
 
 config_list = config_list_from_json(
     "OAI_CONFIG_LIST",
@@ -116,7 +115,7 @@ result={name}(**args)
 if result is not None: print(result)
 """
     print(f"execute_code:\n{str}")
-    result = execute_code(str, sandbox=sandbox, timeout=120, packages=packages)[1]
+    result = execute_code(str, sandbox=sandbox, timeout=120, packages=packages)
     print(f"Result: {result}")
     return result
 

@@ -12,13 +12,13 @@ session: e2b.Session
 functions = [
   {
       "name": "exec_code",
-      "description": "Executes the passed JavaScript code using Nodejs and returns the stdout and stderr.",
+      "description": "Executes the passed Python code using python environment and returns the console input and console output.",
       "parameters": {
           "type": "object",
           "properties": {
               "code": {
                   "type": "string",
-                  "description": "The JavaScript code to execute.",
+                  "description": "The Python code to execute.",
               },
           },
           "required": ["code"],
@@ -26,13 +26,13 @@ functions = [
   },
   {
     "name": "install_package",
-    "description": "Installs the passed npm package.",
+    "description": "Installs the passed pip packages.",
     "parameters": {
         "type": "object",
         "properties": {
             "name": {
                 "type": "string",
-                "description": "The name of an npm package to install.",
+                "description": "The name of a pip package to install.",
             },
         },
         "required": ["name"],
@@ -43,9 +43,9 @@ functions = [
 async def run_code(code: str):
   global session
   # 1. First we need to write the code to a file.
-  await session.filesystem.write("/home/user/index.js", code)
+  await session.filesystem.write("/home/user/main.py", code)
   # 2. Then execute the file with Node.
-  proc = await session.process.start("node /home/user/index.js")
+  proc = await session.process.start("node /home/user/main.py")
   # 3. Wait for the process to finish.
   out = await proc
   # 4. Return the stdout and stderr.
@@ -86,9 +86,9 @@ async def main():
   response = openai.ChatCompletion.create(
     model="gpt-4", # Or use "gpt-3.5-turbo"
     messages=[
-        {"role": "system", "content": "You are a senior developer that can code in JavaScript. Always produce valid JSON."},
+        {"role": "system", "content": "You are a senior developer that can code in Python. Always produce valid JSON."},
         {"role": "user", "content": "Write hello world"},
-        {"role": "assistant", "content": '{"code": "console.log(\"hello world\")"}', "name":"exec_code"},
+        {"role": "assistant", "content": '{"code": "print(\"hello world\")"}', "name":"exec_code"},
         {"role": "user", "content": "Generate first 100 fibonacci numbers"},
     ],
     functions=functions,

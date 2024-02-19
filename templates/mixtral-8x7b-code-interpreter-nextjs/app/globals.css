@@ -8,10 +8,10 @@ body {
 }
 
 pre {
-  margin: 8px 0;
+  /* margin: 8px 0;
   overflow-x: auto;
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 14px; */
 }
 
 p > code, li > code {

@@ -14,12 +14,13 @@ const components: Partial<Components> = {
     const isInline = node?.position?.start.line === node?.position?.end.line
     if (isInline) {
       return (
-        <code>{children}</code>
+        <code {...props}>{children}</code>
       )
     }
     return (
       <CodeBlock
         code={children as string}
+        {...props}
       />
     )
   }

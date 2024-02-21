@@ -50,9 +50,6 @@ class SandboxAutorun {
         let decodedString = textDecoder.decode(chunk)
         completeText += decodedString
 
-
-
-
         const startCodeBlockRegex = /```python/g
 
         const fullPythonOrBashCodeBlockRegex = /```(python|bash)\n?([\s\S]*?)```/g
@@ -78,15 +75,15 @@ class SandboxAutorun {
                       )
                     }
 
-                    // if (token.raw.startsWith('```bash')) {
-                    //   self.promises.push(
-                    //     sandbox.process.startAndWait(token.text).then(({ stdout, stderr }) => {
-                    //       console.log('Bash code executed', { stdout, stderr })
-                    //       console.log('Setting supabase value')
-                    //       return supabase.from('code_blocks').upsert({ hash, stdout, stderr })
-                    //     })
-                    //   )
-                    // }
+                    if (token.raw.startsWith('```bash')) {
+                      self.promises.push(
+                        sandbox.process.startAndWait(token.text).then(({ stdout, stderr }) => {
+                          console.log('Bash code executed', { stdout, stderr })
+                          console.log('Setting supabase value')
+                          return supabase.from('code_blocks').upsert({ hash, stdout, stderr })
+                        })
+                      )
+                    }
                   }
                 })
               }
@@ -106,7 +103,6 @@ class SandboxAutorun {
     this.writable = this.transform.writable
   }
 }
-
 
 export const sandbox: Sandbox = {
   async init() {

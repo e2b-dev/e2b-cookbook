@@ -19,3 +19,4 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 main = "e2b_autogen.main:main"
+demo = "e2b_autogen.main:demo"

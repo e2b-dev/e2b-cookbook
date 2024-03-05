@@ -17,7 +17,7 @@ This example shows the workflow without human (end-user) input, but you can chan
 poetry install
 ```
 4. Rename `.env.example` to `.env` and set up the `OPENAI_API_KEY` key and the `E2B_API_KEY` key. You can get `E2B_API_KEY` at  https://e2b.dev/docs/getting-started/api-key
-5. Run `poetry run main` to launch the demo
+5. Run `poetry run demo` to launch the demo or `poetry run main` to drop into an interactive session
 
 ## Next steps
 If you want to build on top of this example, feel free to make a PR to this cookbook. Or discuss your idea with us via [hello@e2b.dev](mailto:hello@e2b.dev).

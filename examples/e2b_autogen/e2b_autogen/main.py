@@ -40,7 +40,7 @@ def execute_code(
         timeout=timeout,
         cwd=work_dir,
     )
-    
+
     if proc.exit_code > 0:
         raise Exception(proc.stderr)
     return proc.stdout
@@ -155,6 +155,18 @@ user_proxy.register_function(
 )
 
 def main():
+    while True:
+        message = input("What task would you like executed?\n\n> ")
+        print("\n")
+        if message in ["exit", "TERMINATE"]:
+            print("Exiting...")
+            sandbox.close()
+            break
+
+        user_proxy.initiate_chat(
+            assistant, message=message)
+
+def demo():
     user_proxy.initiate_chat(
         assistant, message="What functions do you know about?")
 

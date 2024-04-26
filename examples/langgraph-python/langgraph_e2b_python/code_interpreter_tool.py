@@ -36,6 +36,9 @@ class CodeInterpreterFunctionTool:
             )
         self.code_interpreter = CodeInterpreter()
 
+    def close(self):
+        self.code_interpreter.close()
+
     def call(self, parameters: dict, **kwargs: Any):
         # TODO: E2B supports generating and streaming charts and other rich data
         # because it has a full Jupyter server running inside the sandbox.
@@ -69,6 +72,11 @@ class CodeInterpreterFunctionTool:
         tool_call_id: str,
         output: dict,
     ) -> RichToolMessage:
+        """
+        Format the output of the CodeInterpreter tool to be returned as a RichToolMessage.
+        """
+
+        # TODO: Add info about the results for the LLM
         content = json.dumps(
             {k: v for k, v in output.items() if k not in ("results")}, indent=2
         )

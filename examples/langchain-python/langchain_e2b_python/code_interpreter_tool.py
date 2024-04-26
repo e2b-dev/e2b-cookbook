@@ -32,11 +32,10 @@ class CodeInterpreterFunctionTool:
             )
         self.code_interpreter = CodeInterpreter()
 
-    def call(self, parameters: dict, **kwargs: Any):
-        # TODO: E2B supports generating and streaming charts and other rich data
-        # because it has a full Jupyter server running inside the sandbox.
-        # What's the best way to send this data back to frontend and render them in chat?
+    def close(self):
+        self.code_interpreter.close()
 
+    def call(self, parameters: dict, **kwargs: Any):
         code = parameters.get("code", "")
         print(f"***Code Interpreting...\n{code}\n====")
         execution = self.code_interpreter.notebook.exec_cell(code)
@@ -65,11 +64,12 @@ class CodeInterpreterFunctionTool:
         agent_action: ToolAgentAction,
         observation: dict,
     ) -> List[BaseMessage]:
+        """
+        Format the output of the CodeInterpreter tool to be returned as a ToolMessage.
+        """
         new_messages = list(agent_action.message_log)
-        # Here we filter out non-LLM output from CodeInterpreter tool (eg charts)
-        # TODO: How do we nicely give users access to these outputs though?
-        # Users probably need it to render charts, send it to frontend, etc
 
+        # TODO: Add info about the results for the LLM
         content = json.dumps(
             {k: v for k, v in observation.items() if k not in ("results")}, indent=2
         )

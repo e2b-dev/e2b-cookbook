@@ -70,7 +70,7 @@ class CodeInterpreterFunctionTool:
         output: dict,
     ) -> RichToolMessage:
         content = json.dumps(
-            {k: v for k, v in output.items() if k not in ("result")}, indent=2
+            {k: v for k, v in output.items() if k not in ("results")}, indent=2
         )
 
         return RichToolMessage(

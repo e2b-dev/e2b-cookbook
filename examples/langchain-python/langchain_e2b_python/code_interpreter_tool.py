@@ -1,10 +1,9 @@
 import os
 from typing import Any
 
-from langchain_core.tools import Tool
+from langchain_core.tools import tool, Tool
 from pydantic.v1 import BaseModel, Field
 from e2b_code_interpreter import CodeInterpreter
-
 
 class LangchainCodeInterpreterToolInput(BaseModel):
   code: str = Field(description="Python code to execute.")

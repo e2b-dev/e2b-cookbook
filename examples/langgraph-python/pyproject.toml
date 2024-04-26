@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "langgraph-e2b-python"
+version = "0.1.0"
+description = "Example project for showcasing E2B code interpreter with LangGraph"
+authors = ["Vasek Mlejnsky <vasek@e2b.dev>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+e2b = "^0.15.0"
+langgraph = "^0.0.39"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+start = "langgraph_e2b_python.main:main"

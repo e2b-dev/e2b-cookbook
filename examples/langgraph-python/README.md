@@ -12,7 +12,7 @@ poetry install
 ```
 
 ### 2. Set up `.env`
-Copy `.env.template` to `.env` and your API keys
+Copy `.env.template` to `.env` and set the API keys
 
 ### 3. Run the example
 ```

@@ -14,8 +14,6 @@ Example code and guides for building with [E2B](https://e2b.dev). Get your E2B A
 ### 1. Get your E2B API key
 1. [Sign up](https://e2b.dev/docs/sign-in?view=sign-up)
 2. [Get your API key](https://e2b.dev/docs/getting-started/api-key)
-1. [Sign up](https://e2b.dev/docs/sign-in?view=sign-up)
-2. [Get your API key](https://e2b.dev/docs/getting-started/api-key)
 
 ### 2. Get code interpreter SDK or E2B SDK
 - We have built a [dedicated SDK](https://github.com/e2b-dev/code-interpreter) for building custom code interpreters in your AI apps. It's build on top of E2B and our core E2B SDK.

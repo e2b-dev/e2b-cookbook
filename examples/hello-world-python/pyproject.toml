@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "e2b-hello-world"
+version = "0.1.0"
+description = "Hello world example for E2B"
+authors = ["Vasek Mlejnsky <vasek@e2b.dev>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+e2b-code-interpreter = "^0.0.3"
+anthropic = "^0.25.6"
+python-dotenv = "^1.0.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.poetry.scripts]
+start = "e2b_hello_world.main:main"

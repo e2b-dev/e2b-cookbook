@@ -11,6 +11,10 @@ from langchain.agents.output_parsers.tools import (
 )
 
 
+class RichToolMessage(ToolMessage):
+    raw_output: dict
+
+
 class LangchainCodeInterpreterToolInput(BaseModel):
     code: str = Field(description="Python code to execute.")
 
@@ -36,6 +40,10 @@ class CodeInterpreterFunctionTool:
         self.code_interpreter.close()
 
     def call(self, parameters: dict, **kwargs: Any):
+        # TODO: E2B supports generating and streaming charts and other rich data
+        # because it has a full Jupyter server running inside the sandbox.
+        # What's the best way to send this data back to frontend and render them in chat?
+
         code = parameters.get("code", "")
         print(f"***Code Interpreting...\n{code}\n====")
         execution = self.code_interpreter.notebook.exec_cell(code)
@@ -61,20 +69,20 @@ class CodeInterpreterFunctionTool:
 
     @staticmethod
     def format_to_tool_message(
-        agent_action: ToolAgentAction,
-        observation: dict,
-    ) -> List[BaseMessage]:
+        tool_call_id: str,
+        output: dict,
+    ) -> RichToolMessage:
         """
-        Format the output of the CodeInterpreter tool to be returned as a ToolMessage.
+        Format the output of the CodeInterpreter tool to be returned as a RichToolMessage.
         """
-        new_messages = list(agent_action.message_log)
 
         # TODO: Add info about the results for the LLM
         content = json.dumps(
-            {k: v for k, v in observation.items() if k not in ("results")}, indent=2
-        )
-        new_messages.append(
-            ToolMessage(content=content, tool_call_id=agent_action.tool_call_id)
+            {k: v for k, v in output.items() if k not in ("results")}, indent=2
         )
 
-        return new_messages
+        return RichToolMessage(
+            content=content,
+            raw_output=output,
+            tool_call_id=tool_call_id,
+        )

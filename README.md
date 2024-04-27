@@ -8,7 +8,7 @@ Example code and guides for building with [E2B's Code Interpreter](https://e2b.d
 - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/hello-world-python)
 
 **LLM Providers**
-- 🪸 [Claude with code intepreter](https://github.com/e2b-dev/e2b-cookbook/blob/main/examples/claude-code-interpreter/claude_code_interpreter.ipynb)
+- [Anthropic Claude 3 Opus with code intepreter](https://github.com/e2b-dev/e2b-cookbook/blob/main/examples/claude-code-interpreter/claude_code_interpreter.ipynb)
 - 🦙 [Llama 3 with code interpreter](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/llama-3-code-interpreter)
 - [Mixtral with code interpreter and chat UI](https://github.com/e2b-dev/e2b-cookbook/tree/main/templates/mixtral-8x7b-code-interpreter-nextjs)
 

@@ -65,7 +65,3 @@ def main():
           f.write(png_data)
 
       print(f"Saved chart to {filename}")
-
-
-
-

@@ -1,6 +1,6 @@
 # E2B Hello World for Python
 
-This example shows how to add code interpreting to an LLM using the [Code Interpreter SDK](https://github.com/e2b-e2b/code-interpreter).
+This example shows how to add code interpreting to an LLM using the [Code Interpreter SDK](https://github.com/e2b-dev/code-interpreter).
 
 ## Official guide
 Visit the [official guide](https://e2b.dev/docs/hello-world/py) related to this example.

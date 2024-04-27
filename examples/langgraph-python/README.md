@@ -1,6 +1,6 @@
 # 🦜🕸️ LangGraph with Code Interpreting
 
-This example shows how to add code interpreting to an LLM using the [Code Interpreter SDK](https://github.com/e2b-e2b/code-interpreter) and LangGraph.
+This example shows how to add code interpreting to an LLM using the [Code Interpreter SDK](https://github.com/e2b-dev/code-interpreter) and LangGraph.
 
 ## Python notebook
 Check out the [official Python notebook](./langgraph_code_interpreter.ipynb) related to this example.

@@ -10,7 +10,7 @@ if (!E2B_API_KEY) {
 /**
  * If you don't reconnect to the sandbox in this time (calculated after closing the sandbox), the sandbox will be killed.
  */
-const sandboxTimeout = 10 * 60 * 1000 * 1000; // 10 minutes in ms
+const sandboxTimeout = 10 * 60 * 1000; // 10 minutes in ms
 
 /**
  * The template to use for the sandbox.

@@ -87,8 +87,8 @@ export default function Chat() {
           </div>
         ))
         : null}
-      {isLoading && <div className="flex justify-center"><Spinner /></div>}
       <div id="chart-goes-here"></div>
+      {isLoading && <div className="fixed bottom-24 flex justify-center w-full max-w-md"><Spinner /></div>}
       <form onSubmit={handleSubmit}>
         <input
           className="fixed bottom-0 w-full max-w-md p-2 mb-8 border border-gray-300 rounded shadow-xl"

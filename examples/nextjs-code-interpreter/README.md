@@ -22,4 +22,5 @@ Code interpreter implementation is in [`app/api/chat/codeInterpreter.ts`](./app/
 
 The `evaluateCode` method is the main method that takes Python `code` to be executed and `sessionID`. Based on the `sessionID` it will try to reconnect to an existing sandbox or create a new one if it doesn't exist.
 After executing the code it will disconnect from the sandbox and call the `.keelAlive` method to ensure that the sandbox can be reused for the specified duration.
-The code execution is stateful (using Jupyter Notebook underneath) and per session — you can refer variable from the previous execution, define functions that you will use later, etc.
+
+The code execution is stateful (using Jupyter Notebook underneath) and per session — you can refer to variables from the previous execution, define functions that you will use later, etc.

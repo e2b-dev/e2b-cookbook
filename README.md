@@ -17,6 +17,9 @@ Example code and guides for building with [E2B's Code Interpreter](https://e2b.d
 - 🦜🕸️ [LangGraph with code interpreter](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/langgraph-python)
 - [Autogen with secure sandboxed code interpreter](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/e2b_autogen)
 
+**Next.js**
+- [Next.js + AI SDK + Code Interpreter](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/nextjs-code-interpreter) 
+
 ## Getting started with E2B
 
 ### 1. Get API key

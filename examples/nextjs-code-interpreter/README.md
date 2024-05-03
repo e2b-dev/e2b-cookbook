@@ -14,7 +14,7 @@ OPENAI_API_KEY=your_openai_api_key
 
 3. Run `npm run dev` to start the development server
 4. Open the app in your browser at `http://localhost:3000`
-5. Chat with the app and execute code with the `execute_python_code` tool connected to the LLM.
+5. Chat with the app and execute code with the `execute_python_code` tool connected to the LLM
 
 ## Code Interpreter
 

@@ -1,6 +1,9 @@
-# Next.js Code Interpreter
+# Next.js Code Interpreter with streaming
 
 This example shows how to use the E2B Code Interpreter to execute code in Next.js serverless functions.
+
+![image](https://github.com/e2b-dev/e2b-cookbook/assets/5136688/aa68e50e-9110-41f9-92a7-9e85b1f8dbbc)
+
 
 ## Setup
 

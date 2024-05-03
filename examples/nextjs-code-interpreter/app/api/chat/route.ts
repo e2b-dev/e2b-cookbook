@@ -15,6 +15,7 @@ const openai = new OpenAI({
 });
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'edge';
 
 const tools: Tool[] = [
   {

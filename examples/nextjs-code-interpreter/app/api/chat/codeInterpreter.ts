@@ -8,7 +8,7 @@ if (!E2B_API_KEY) {
 }
 
 /**
- * If you don't reconnect to the sandbox in this time (calculated after closing the sandbox), the sandbox will be closed.
+ * If you don't reconnect to the sandbox in this time (calculated after closing the sandbox), the sandbox will be killed.
  */
 const sandboxTimeout = 10 * 60 * 1000 * 1000; // 10 minutes in ms
 
@@ -34,10 +34,10 @@ export async function evaluateCode(
   const sandbox = await getSandbox(sessionID);
 
   try {
-    // Execute the code in a Jupyter Notebook in sandbox
+    // Execute the code in a Jupyter Notebook in the sandbox
     // https://e2b.dev/docs/code-interpreter/execution
     const execution = await sandbox.notebook.execCell(code, {
-      // We can also use callbacks to handle streaming stdout, stderr, and result from the sandbox.
+      // We can also use callbacks to handle streaming stdout, stderr, and results from the sandbox.
       // This is useful if you want to stream the results to client directly.
       // onStdout,
       // onStderr,
@@ -55,10 +55,10 @@ export async function evaluateCode(
       // This will ensure the sandbox is not killed after closing the connection in the next 10 minutes.
       await sandbox.keepAlive(sandboxTimeout);
     } catch {
-      // ignore errors from the keepalive and close the sandbox
+      // Ignore errors from the keepalive and close the sandbox
     }
 
-    // We disconnect from the sandbox because we are calling this function in a serverless environment.
+    // We disconnect from the sandbox because we are calling this function in a serverless environment and don't want to keep the connection active.
     await sandbox.close();
   }
 }

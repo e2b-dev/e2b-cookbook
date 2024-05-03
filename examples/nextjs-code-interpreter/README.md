@@ -1,4 +1,4 @@
-# Next.js Code Interpreter with streaming
+# Next.js app with LLM + Code Interpreter and streaming
 
 This example shows how to use the E2B Code Interpreter to execute code in Next.js serverless functions.
 

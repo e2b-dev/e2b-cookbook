@@ -1,42 +1,23 @@
-# Vercel AI SDK, Next.js, and OpenAI Chat Example
+# Next.js Code Interpreter
 
-This example shows how to use the [Vercel AI SDK](https://sdk.vercel.ai/docs) with [Next.js](https://nextjs.org/) and [OpenAI](https://openai.com) to create a ChatGPT-like AI-powered streaming chat bot.
+This example show how to use the E2B Code Interpreter API to run code in a Jupyter Notebook in a sandbox.
 
-## Deploy your own
+## Setup
 
-Deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=ai-sdk-example):
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fai%2Ftree%2Fmain%2Fexamples%2Fnext-openai&env=OPENAI_API_KEY&envDescription=OpenAI%20API%20Key&envLink=https%3A%2F%2Fplatform.openai.com%2Faccount%2Fapi-keys&project-name=vercel-ai-chat-openai&repository-name=vercel-ai-chat-openai)
-
-## How to use
-
-Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [npm](https://docs.npmjs.com/cli/init), [Yarn](https://yarnpkg.com/lang/en/docs/cli/create/), or [pnpm](https://pnpm.io) to bootstrap the example:
+1. Run `npm i`
+2. Create a `.env` file in the root of the project and add the following environment variables:
 
 ```bash
-npx create-next-app --example https://github.com/vercel/ai/tree/main/examples/next-openai next-openai-app
+E2B_API_KEY=your_e2b_api_key # Get one at https://e2b.dev/docs
+OPENAI_API_KEY=your_openai_api_key
 ```
 
-```bash
-yarn create next-app --example https://github.com/vercel/ai/tree/main/examples/next-openai next-openai-app
-```
+3. Run `npm run dev` to start the development server
+4. Open the app in your browser at `http://localhost:3000`
+5. Chat with the app and execute code with the `execute_python_code` connected to the LLM
 
-```bash
-pnpm create next-app --example https://github.com/vercel/ai/tree/main/examples/next-openai next-openai-app
-```
+## Code Interpreter
 
-To run the example locally you need to:
+Code interpreter implementation is in [`app/api/chat/codeInterpreter.ts`](./app/api/chat/codeInterpreter.ts).
 
-1. Sign up at [OpenAI's Developer Platform](https://platform.openai.com/signup).
-2. Go to [OpenAI's dashboard](https://platform.openai.com/account/api-keys) and create an API KEY.
-3. Set the required OpenAI environment variable as the token value as shown [the example env file](./.env.local.example) but in a new file called `.env.local`
-4. `pnpm install` to install the required dependencies.
-5. `pnpm dev` to launch the development server.
-
-## Learn More
-
-To learn more about OpenAI, Next.js, and the Vercel AI SDK take a look at the following resources:
-
-- [Vercel AI SDK docs](https://sdk.vercel.ai/docs)
-- [Vercel AI Playground](https://play.vercel.ai)
-- [OpenAI Documentation](https://platform.openai.com/docs) - learn about OpenAI features and API.
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+The `evaluateCode` method is the main method that takes the code to be executed and sessionID. Based on the `sessionID` it will try to reconnect to an existing sandbox or create a new one if it doesn't exist. After executing the code it will disconnect from the sandbox and call the `.keelAlive` method to ensure that the sandbox can be reused for the specified duration.

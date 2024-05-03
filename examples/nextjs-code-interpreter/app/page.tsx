@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react'
+import { useState } from 'react';
 import { generateId } from 'ai';
 import { Message, useChat } from 'ai/react';
+import Spinner from './Spinner';
 
 // Specific to the e2b code interpreter
 interface ToolCallResult {
-  messageIdx: number
+  messageIdx: number;
   tool_call_id: string;
   function_name: string;
   parameters: {
@@ -19,9 +20,9 @@ interface ToolCallResult {
       traceback: string;
       name: string;
       value: string;
-    }
+    };
     results: any[];
-  }
+  };
 }
 
 function ToolResult({ toolCallResult }: { toolCallResult: ToolCallResult }) {
@@ -46,16 +47,16 @@ function ToolResult({ toolCallResult }: { toolCallResult: ToolCallResult }) {
 }
 
 export default function Chat() {
-  const [sessionID] = useState(generateId(4))
+  const [sessionID] = useState(generateId(4));
 
-  const { messages, input, handleInputChange, handleSubmit, data } = useChat({
+  const { messages, input, handleInputChange, handleSubmit, data, isLoading } = useChat({
     api: '/api/chat',
     body: {
       sessionID,
     },
   });
 
-  const toolCallsResults = data ? (data as unknown as ToolCallResult[]) : []
+  const toolCallsResults = data ? (data as unknown as ToolCallResult[]) : [];
 
   // Generate a map of message role to text color
   const roleToColorMap: Record<Message['role'], string> = {
@@ -86,6 +87,7 @@ export default function Chat() {
           </div>
         ))
         : null}
+      {isLoading && <div className="flex justify-center"><Spinner /></div>}
       <div id="chart-goes-here"></div>
       <form onSubmit={handleSubmit}>
         <input

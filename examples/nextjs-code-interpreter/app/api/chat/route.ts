@@ -57,11 +57,13 @@ export async function POST(req: Request) {
       call: ToolCallPayload,
       appendToolCallMessage,
     ) => {
-      const newMessages: CreateMessage[] = []
+      const newMessages: CreateMessage[] = [];
 
       for (const toolCall of call.tools) {
         if (toolCall.func.name === 'execute_python_code') {
-          const evaluation = await evaluateCode(sessionID, toolCall.func.arguments.code as string)
+          const evaluation = await evaluateCode(
+            sessionID, toolCall.func.arguments.code as string,
+          );
 
           data.append({
             messageIdx: messages.length,
@@ -82,7 +84,7 @@ export async function POST(req: Request) {
               }),
               results: evaluation.results.map(t => JSON.parse(JSON.stringify(t))),
             }
-          })
+          });
 
           const msgs = appendToolCallMessage({
             tool_call_id: toolCall.id,
@@ -100,7 +102,7 @@ export async function POST(req: Request) {
             },
           });
 
-          newMessages.push(...msgs)
+          newMessages.push(...msgs);
         }
       }
 

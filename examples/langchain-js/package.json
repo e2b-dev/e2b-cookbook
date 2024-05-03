@@ -12,8 +12,10 @@
   "license": "ISC",
   "dependencies": {
     "@e2b/code-interpreter": "^0.0.4",
+    "@langchain/core": "^0.1.61",
     "@langchain/openai": "^0.0.28",
     "dotenv": "^16.3.1",
+    "langchain": "^0.1.36",
     "openai": "^4.20.1"
   },
   "devDependencies": {

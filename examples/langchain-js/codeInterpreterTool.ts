@@ -34,7 +34,7 @@ export class CodeInterpreterFunctionTool {
     await this.codeInterpreter.close();
   }
 
-  async call(parameters: LangchainCodeInterpreterToolInput) {
+  async call(parameters: { code: string }) {
     const code = parameters.code;
     console.log(`***Code Interpreting...\n${code}\n====`);
     const execution = await this.codeInterpreter.notebook.execCell(code);

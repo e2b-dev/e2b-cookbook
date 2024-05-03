@@ -1,21 +1,20 @@
-import base64 from 'base64';
+import fs from 'fs';
 
-import { List, Sequence, Tuple } from 'typescript-collections';
-import { load_dotenv } from 'dotenv';
-import { ChatGroq } from 'langchain-groq';
-import { CodeInterpreterFunctionTool } from './codeInterpreterTool';
-import { AgentExecutor } from 'langchain/agents';
-import { ChatOpenAI } from 'langchain/llms/openai';
-import { BaseMessage } from 'langchain/schema';
-import { RunnablePassthrough } from 'langchain/runnables';
+import { config } from 'dotenv';
+import { AgentExecutor } from "langchain/agents";
+import { ChatOpenAI } from '@langchain/openai';
+import { BaseMessage } from '@langchain/core/schema';
+import { RunnablePassthrough } from '@langchain/core/runnables';
 import { ChatPromptTemplate } from "@langchain/core/prompts";
-import { 
+import {
   ToolAgentAction,
   ToolsAgentOutputParser,
 } from 'langchain/agents';
-import { Result } from 'e2b-code-interpreter';
 
-load_dotenv();
+import { CodeInterpreterFunctionTool } from './codeInterpreterTool';
+import { Result } from '@e2b/code-interpreter'
+
+config();
 
 function format_to_tool_messages(
   intermediate_steps: Sequence<[ToolAgentAction, Record<string, any>]>,
@@ -37,19 +36,19 @@ function format_to_tool_messages(
   return messages;
 }
 
-
 async function main() {
   // 1. Pick your favorite llm
   const llm = new ChatOpenAI({ modelName: "gpt-3.5-turbo-0125", temperature: 0 });
   // const llm = new ChatGroq({ temperature: 0, modelName: "llama3-70b-8192" });
 
   // 2. Initialize the code interpreter tool
-  const code_interpreter = new CodeInterpreterFunctionTool();
+  const code_interpreter = await CodeInterpreterFunctionTool.create()
+
   const code_interpreter_tool = code_interpreter.to_langchain_tool();
   const tools = [code_interpreter_tool];
 
   // 3. Define the prompt
-  const prompt = ChatPromptTemplate.fromPromptMessages([
+  const prompt = ChatPromptTemplate.fromMessages([
     { role: "human", content: "{input}" },
     { role: "placeholder", content: "{agent_scratchpad}" },
   ]);
@@ -80,7 +79,7 @@ async function main() {
   const r: Result = result.intermediate_steps[0][1].results[0];
 
   // Save the chart image
-  for (const [format, data] of Object.entries(r.raw)) {
+  for (const [format, data] of Object.entries(r)) {
     if (format === "image/png") {
       const buffer = Buffer.from(data, 'base64');
       await fs.promises.writeFile("image.png", buffer);
@@ -89,3 +88,5 @@ async function main() {
     }
   }
 }
+
+main();

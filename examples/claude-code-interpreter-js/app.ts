@@ -49,17 +49,17 @@ const tools: Array<Tool> = [
 
 
 async function codeInterpret(codeInterpreter: CodeInterpreter, code: string): Promise<Result[]> {
-    console.log("Running code interpreter...");
+    console.log('Running code interpreter...');
 
     const exec = await codeInterpreter.notebook.execCell(code, {
-        onStderr: (msg: ProcessMessage) => console.log("[Code Interpreter stderr]", msg),
-        onStdout: (stdout: ProcessMessage) => console.log("[Code Interpreter stdout]", stdout),
+        onStderr: (msg: ProcessMessage) => console.log('[Code Interpreter stderr]', msg),
+        onStdout: (stdout: ProcessMessage) => console.log('[Code Interpreter stdout]', stdout),
         // You can also stream additional results like charts, images, etc.
         // onResult: ...
     });
     console.log(2)
     if (exec.error) {
-        console.log("[Code Interpreter ERROR]", exec.error);
+        console.log('[Code Interpreter ERROR]', exec.error);
         // return undefined;
         throw new Error(exec.error.value);
     }
@@ -75,8 +75,8 @@ const client = new Anthropic({
 });
 
 async function processToolCall(codeInterpreter: CodeInterpreter, toolName: string, toolInput: any): Promise<Result[]> {
-    if (toolName === "execute_python") {
-        return await codeInterpret(codeInterpreter, toolInput["code"]);
+    if (toolName === 'execute_python') {
+        return await codeInterpret(codeInterpreter, toolInput['code']);
     }
     return [];
 }
@@ -88,16 +88,16 @@ async function chatWithClaude(codeInterpreter: CodeInterpreter, userMessage: str
         model: MODEL_NAME,
         system: SYSTEM_PROMPT,
         max_tokens: 4096,
-        messages: [{ role: "user", content: userMessage }],
+        messages: [{ role: 'user', content: userMessage }],
         tools: tools,
     });
 
     console.log(`\nInitial Response:\nStop Reason: ${message.stop_reason}`);
 
-    if (message.stop_reason === "tool_use") {
-        const toolUse = message.content.find(block => block.type === "tool_use") as ToolUseBlock;
+    if (message.stop_reason === 'tool_use') {
+        const toolUse = message.content.find(block => block.type === 'tool_use') as ToolUseBlock;
         if (!toolUse){
-            console.error("Tool use block not found in message content.");
+            console.error('Tool use block not found in message content.');
             return [];
         }
 
@@ -110,7 +110,7 @@ async function chatWithClaude(codeInterpreter: CodeInterpreter, userMessage: str
         console.log(`Tool Result: ${codeInterpreterResults}`);
         return codeInterpreterResults;
     }
-    throw new Error("Tool use block not found in message content.");
+    throw new Error('Tool use block not found in message content.');
 }
 
 
@@ -120,13 +120,13 @@ async function run() {
     try {
         const codeInterpreterResults = await chatWithClaude(
             await codeInterpreter,
-            "Calculate value of pi using monte carlo method. Use 1000 iterations. Visualize all point of all iterations on a single plot, a point inside the unit circle should be orange, other points should be grey."
+            'Calculate value of pi using monte carlo method. Use 1000 iterations. Visualize all point of all iterations on a single plot, a point inside the unit circle should be orange, other points should be grey.'
         );
 
         const result = codeInterpreterResults[0];
-        console.log("Result:", result);
+        console.log('Result:', result);
         if (result.png) {
-            fs.writeFileSync("image.png", Buffer.from(result.png, 'base64'))
+            fs.writeFileSync('image.png', Buffer.from(result.png, 'base64'))
         }
 
         // This would display or process the image/result if applicable

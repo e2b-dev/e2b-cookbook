@@ -6,11 +6,12 @@ This is an example of running LLM-generated code tasks in a secure and isolated 
 - [Anthropic AI SDK](https://www.npmjs.com/package/@anthropic-ai/sdk) for using Claude as an LLM
 - JavaScript/TypeScript
 
-## How to run the program
+## Setup
 
-### Prerequisites
-  - [E2B API KEY](https://e2b.dev/docs/getting-started/api-key)
-  - [ANTHROPIC API KEY](https://console.anthropic.com/settings/keys)
+### Set up env
+- Copy .env.template to .env
+  - Get the [E2B API KEY](https://e2b.dev/docs/getting-started/api-key)
+  - Get the [ANTHROPIC API KEY](https://console.anthropic.com/settings/keys)
 
 ### Install packages
 
@@ -20,7 +21,13 @@ Install the E2B Code Interpreter SDK and the Anthropic AI SDK.
 npm i
 ```
 
-### Have fun
+### Run the example
+
+```
+npm run start
+```
+
+
 After running the program, you should get the result for an approximate value of pi, and a visualization of the simulation.
 
 ![Example of the output](example.png)

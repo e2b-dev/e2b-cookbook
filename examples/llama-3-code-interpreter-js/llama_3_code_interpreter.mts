@@ -2,17 +2,22 @@ import { CodeInterpreter, Result } from '@e2b/code-interpreter'
 import { Groq } from 'groq-sdk';
 import { CompletionCreateParams } from "groq-sdk/src/resources/chat/completions";
 import fs from 'node:fs';
+import dotenv from 'dotenv'
+dotenv.config()
 
+// Define API keys
 // TODO: Get your Groq AI API key from https://console.groq.com/
-const GROQ_API_KEY = ''
+const GROQ_API_KEY = process.env.GROQ_API_KEY
 
 // TODO: Get your E2B API key from https://e2b.dev/docs
-const E2B_API_KEY = ''
+const E2B_API_KEY = process.env.E2B_API_KEY
 
-// Or use 8b version
-// MODEL_NAME = "llama3-8b-8192"
+// Choose the model
+// You can use 8b or 70b version
+// const MODEL_NAME = "llama3-8b-8192"
 const MODEL_NAME = "llama3-70b-8192"
 
+// Provide system prompt
 const SYSTEM_PROMPT = `you are a python data scientist. you are given tasks to complete and you run python code to solve them.
 - the python code runs in jupyter notebook.
 - every time you call "execute_python" tool, the python code is executed in a separate cell. it's okay to multiple calls to "execute_python".
@@ -23,7 +28,7 @@ const SYSTEM_PROMPT = `you are a python data scientist. you are given tasks to c
 - you can run any python code you want, everything is running in a secure sandbox environment
 `
 
-
+// Define e2b code interpreter as a tool for the model
 const tools: Array<CompletionCreateParams.Tool> = [
   {
     type: "function",
@@ -44,7 +49,12 @@ const tools: Array<CompletionCreateParams.Tool> = [
   }
 ]
 
+// Create Groq client
+const client = new Groq({apiKey: GROQ_API_KEY})
 
+
+// Here's the main function that use the E2B code interpreter SDK.
+// The function is called from the main function, when the model returns a tool call.
 async function codeInterpret(e2b_code_interpreter: CodeInterpreter, code: string) {
     console.log("Running code interpreter...")
     const exec = await e2b_code_interpreter.notebook.execCell(
@@ -66,10 +76,10 @@ async function codeInterpret(e2b_code_interpreter: CodeInterpreter, code: string
 
 
 
-const client = new Groq({apiKey: GROQ_API_KEY})
-
+// Here's the main function that chat with the model.
+// We parse the response from the model and call the E2B code interpreter tool, when requested.
 async function chatWithLlama(e2b_code_interpreter: CodeInterpreter, user_message: string): Promise<Result[]> {
-    console.log(`\n{'='*50}\nUser message: ${user_message}\n{'='*50}`)
+    console.log(`\n${'='*50}\nUser message: ${user_message}\n${'='*50}`)
 
     const messages = [
         {"role": "system", "content": SYSTEM_PROMPT},
@@ -103,25 +113,30 @@ async function chatWithLlama(e2b_code_interpreter: CodeInterpreter, user_message
 }
 
 
+// Putting it together
+// We create the E2B code interpreter which we will use to run the code generated from the model
 const code_interpreter = await CodeInterpreter.create({apiKey: E2B_API_KEY})
+
+// Now we chat with the model
 const code_results = await chatWithLlama(
     code_interpreter,
     "Visualize a distribution of height of men based on the latest data you know"
-  )
-  if (!code_results) {
+)
+
+// Check if we have any code results
+if (!code_results) {
       console.log("No code results")
       process.exit(1)
-  }
+}
+
+// We can now access the results from the code interpreter
 const first_result = code_results[0]
-console.log("First result:", first_result.formats())
 
-// This will render the image
-//  You can also access the data directly
-// first_result.png
-// first_result.jpg
-// first_result.pdf
-// ...
-// first_result
+// We can access the formats of the result
+console.log("Result has following formats:", first_result.formats())
 
+// E.g we can render the image
 fs.writeFileSync("height_distribution.png", Buffer.from(first_result.png, 'base64'))
+
+console.log("Execution completed successfully")
 process.exit(0)

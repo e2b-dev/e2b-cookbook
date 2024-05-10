@@ -20,18 +20,6 @@ Install the E2B Code Interpreter SDK and the Anthropic AI SDK.
 npm i
 ```
 
-or
-  
-```
-npm init -y \
-&& npm i --save-dev typescript tsx @types/node \
-&& npm i @e2b/code-interpreter
-```
-
-```
-npm install @anthropic-ai/sdk
-```
-
 ### Have fun
 After running the program, you should get the result for an approximate value of pi, and a visualization of the simulation.
 

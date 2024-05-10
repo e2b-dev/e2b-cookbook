@@ -4,7 +4,6 @@
   "description": "This is an example of running LLM-generated code tasks in a secure and isolated cloud environment using the E2B Code Interpreter SDK.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "tsx app.ts"
   },
   "keywords": [],
@@ -18,6 +17,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.20.9",
-    "@e2b/code-interpreter": "^0.0.5"
+    "@e2b/code-interpreter": "^0.0.5",
+    "dotenv": "^16.4.5"
   }
 }

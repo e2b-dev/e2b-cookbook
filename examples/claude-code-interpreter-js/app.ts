@@ -110,12 +110,11 @@ async function chatWithClaude(codeInterpreter: CodeInterpreter, userMessage: str
         console.log(`Tool Result: ${codeInterpreterResults}`);
         return codeInterpreterResults;
     }
-    throw new Error("Tool use block not found in message content."); 
+    throw new Error("Tool use block not found in message content.");
 }
 
 
-
-async function main() {
+async function run() {
     const codeInterpreter = await CodeInterpreter.create({ apiKey: E2B_API_KEY });
 
     try {
@@ -139,4 +138,4 @@ async function main() {
     }
 }
 
-main();
+run();

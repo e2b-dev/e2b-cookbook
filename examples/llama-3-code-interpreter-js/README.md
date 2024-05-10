@@ -14,23 +14,17 @@ You can do that by simply calling
 npm i
 ```
 
-### Step 2: Define API keys, prompt, and tools
+### Step 2: Define API keys
 
-Let's define our variables with API keys for Groq and E2B together with the model ID, prompt, and our tools.
-
-### Step 3: Implement the method for code interpreting
-
-Here's the main function that use the E2B code interpreter SDK. We'll be calling this function a little bit further when we're parsing the Llama's response with tool calls.
-
-
-### Step 4: Implement the method for calling LLM and parsing tools
-
-Now we're going to define and implement `chat_with_llama` method. In this method, we'll call the LLM with our `tools` dictionary, parse the output, and call our `code_interpret` method we defined above.
-
-### Step 5: Put everything together
-In this last step, we put all the pieces together. We intantiate a new code interpreter instance using
-```python
-with CodeInterpreter(api_key=E2B_API_KEY) as code_interpreter:
+Create `.env` file in the root of the project and add your E2B API key to it.
+You can use `.env.template` as a template.
+```bash
+cp .env.template .env
 ```
 
-and then call the `chat_with_llama` method with our user message and the `code_interpreter` instance.
+### Step 3: Run the code
+
+Just run the code by calling
+```bash
+npm start
+```

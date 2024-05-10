@@ -1,18 +1,15 @@
-// Import necessary libraries and SDKs
-import { Anthropic } from '@anthropic-ai/sdk'
-import { CodeInterpreter, Result } from '@e2b/code-interpreter'
-
-import { ProcessMessage } from '@e2b/code-interpreter'
-import { Tool, ToolUseBlock } from '@anthropic-ai/sdk/resources/beta/tools/messages'
-
 import fs from 'node:fs'
 
+import { Anthropic } from '@anthropic-ai/sdk'
+import { Tool, ToolUseBlock } from '@anthropic-ai/sdk/resources/beta/tools/messages'
+import { CodeInterpreter, Result } from '@e2b/code-interpreter'
+import { ProcessMessage } from '@e2b/code-interpreter'
+
 import * as dotenv from 'dotenv'
+
 dotenv.config()
 
-// Constants: API Keys, Model Name, and system prompt
 const MODEL_NAME = 'claude-3-opus-20240229'
-
 const SYSTEM_PROMPT = `
 ## your job & context
 you are a python data scientist. you are given tasks to complete and you run python code to solve them.
@@ -31,17 +28,17 @@ tool response values that have text inside "[]"  mean that a visual element got 
 
 const tools: Array<Tool> = [
     {
-        "name": "execute_python",
-        "description": "Execute python code in a Jupyter notebook cell and returns any result, stdout, stderr, display_data, and error.",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "type": "string",
-                    "description": "The python code to execute in a single cell."
+        name: 'execute_python',
+        description: 'Execute python code in a Jupyter notebook cell and returns any result, stdout, stderr, display_data, and error.',
+        input_schema: {
+            type: 'object',
+            properties: {
+                code: {
+                    type: 'string',
+                    description: 'The python code to execute in a single cell.'
                 }
             },
-            "required": ["code"]
+            required: ['code']
         }
     }
 ]
@@ -56,15 +53,12 @@ async function codeInterpret(codeInterpreter: CodeInterpreter, code: string): Pr
         // You can also stream additional results like charts, images, etc.
         // onResult: ...
     })
-    console.log(2)
+
     if (exec.error) {
         console.log('[Code Interpreter ERROR]', exec.error)
-        // return undefined
         throw new Error(exec.error.value)
     }
-    console.log(3)
-    return exec.results  // Ensure that 'results' is the correct property
-
+    return exec.results
 }
 
 
@@ -81,6 +75,7 @@ async function processToolCall(codeInterpreter: CodeInterpreter, toolName: strin
 async function chatWithClaude(codeInterpreter: CodeInterpreter, userMessage: string): Promise<Result[]> {
     console.log(`\n${'='.repeat(50)}\nUser Message: ${userMessage}\n${'='.repeat(50)}`)
 
+    console.log('Waiting for Claude to respond...')
     const message = await client.beta.tools.messages.create({
         model: MODEL_NAME,
         system: SYSTEM_PROMPT,
@@ -116,18 +111,14 @@ async function run() {
 
     try {
         const codeInterpreterResults = await chatWithClaude(
-            await codeInterpreter,
+            codeInterpreter,
             'Calculate value of pi using monte carlo method. Use 1000 iterations. Visualize all point of all iterations on a single plot, a point inside the unit circle should be orange, other points should be grey.'
         )
-
         const result = codeInterpreterResults[0]
         console.log('Result:', result)
         if (result.png) {
             fs.writeFileSync('image.png', Buffer.from(result.png, 'base64'))
         }
-
-        // This would display or process the image/result if applicable
-        // You might need additional logic here to handle images or other outputs
     } catch (error) {
         console.error('An error occurred:', error)
     } finally {

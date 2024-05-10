@@ -35,3 +35,6 @@ After running the program, you should get the result for an approximate value of
 If you encounter any problems, please let us know at our [Discord](https://discord.com/invite/U7KEcGErtQ).
 
 If you want to let the world know about what you're building with E2B, tag [@e2b_dev](https://twitter.com/e2b_dev) on X (Twitter).
+
+### 4. Visit our docs
+Check the [documentation](https://e2b.dev/docs) to learn more about how to use E2B.

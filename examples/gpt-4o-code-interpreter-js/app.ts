@@ -6,8 +6,8 @@ import { CodeInterpreter, Result } from '@e2b/code-interpreter'
 import { ProcessMessage } from '@e2b/code-interpreter'
 
 import * as dotenv from 'dotenv'
-
 dotenv.config()
+
 
 const MODEL_NAME = 'gpt-4o'
 const SYSTEM_PROMPT = `
@@ -29,24 +29,25 @@ tool response values that have text inside "[]"  mean that a visual element got 
 // Creating a list of tools available for the agents. Here is just one tool for Python code execution. (It's good usecase for the Code Interpreter SDK.)
 const tools: Array<Tool> = [
     {
-        name: 'execute_python',
-        description: 'Execute python code in a Jupyter notebook cell and returns any result, stdout, stderr, display_data, and error.',
-        input_schema: {
-            type: 'object',
-            properties: {
-                code: {
-                    type: 'string',
-                    description: 'The python code to execute in a single cell.'
-                }
+      "type": "function",
+      "function": {
+        "name": "execute_python",
+        "description": "Execute python code in a Jupyter notebook cell and returns any result, stdout, stderr, display_data, and error.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string",
+              "description": "The python code to execute in a single cell.",
             },
-            required: ['code']
-        }
+            "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]},
+          },
+          "required": ["code"],
+        },
+      }
     }
-]
+  ]
 
-// This is not necessary, it's possible to have the keys stored in .env.
-const OPENAI_API_KEY = 'your-api-key'
-const openai = new OpenAI({ apiKey: OPENAI_API_KEY }) // TBD: is this correct way of initialization or should i use client?
 
 
 // Definine the function to execute code, using the E2B Code Interpreter SDK as a tool.
@@ -72,6 +73,7 @@ interface IMessage {
     content: any;
   }
 
+const openai = new OpenAI() // Initialize openai (this was "client" before)
 
 // Defining new function (in the Claude example, it was ProcessToolCall and ChatWithCLaude, now we will have chat.
 async function chat(codeInterpreter: CodeInterpreter, userMessage: string, base64_image = null): Promise<Result[]> {
@@ -108,7 +110,7 @@ async function chat(codeInterpreter: CodeInterpreter, userMessage: string, base6
           model: "gpt-4o",
           messages: messages,
           tools: tools,
-          toolChoice: "auto"
+          tool_choice: "auto"
         });
     
         response.choices.forEach(choice => {

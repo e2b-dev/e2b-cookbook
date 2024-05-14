@@ -1,12 +1,10 @@
 import fs from 'node:fs'
-
-// Import OpenAI. Always have single quotes for TS and don't use semicolons!
 import { OpenAI } from 'openai'
 import { CodeInterpreter, Result } from '@e2b/code-interpreter'
 import { ProcessMessage } from '@e2b/code-interpreter'
 
 import * as dotenv from 'dotenv'
-import { ChatCompletionMessageParam, ChatCompletionTool } from "openai/src/resources/chat/completions";
+import { ChatCompletionTool, ChatCompletionMessageParam } from 'openai/resources/index'
 dotenv.config()
 
 
@@ -27,23 +25,23 @@ tool response values that have text inside "[]"  mean that a visual element got 
 - "[chart]" means that a chart was generated in the notebook.
 `
 
-// Creating a list of tools available for the agents. Here is just one tool for Python code execution. (It's good usecase for the Code Interpreter SDK.)
+// Creating a list of tools available for the agents
 const tools: Array<ChatCompletionTool> = [
     {
-      "type": "function",
-      "function": {
-        "name": "execute_python",
-        "description": "Execute python code in a Jupyter notebook cell and returns any result, stdout, stderr, display_data, and error.",
-        "parameters": {
-          "type": "object",
-          "properties": {
-            "code": {
-              "type": "string",
-              "description": "The python code to execute in a single cell.",
+      'type': 'function',
+      'function': {
+        'name': 'execute_python',
+        'description': 'Execute python code in a Jupyter notebook cell and returns any result, stdout, stderr, display_data, and error.',
+        'parameters': {
+          'type': 'object',
+          'properties': {
+            'code': {
+              'type': 'string',
+              'description': 'The python code to execute in a single cell.',
             },
-            "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]},
+            'unit': {'type': 'string', 'enum': ['celsius', 'fahrenheit']},
           },
-          "required": ["code"],
+          'required': ['code'],
         },
       }
     }
@@ -51,7 +49,7 @@ const tools: Array<ChatCompletionTool> = [
 
 
 
-// Definine the function to execute code, using the E2B Code Interpreter SDK as a tool.
+// Definine the function to execute code, using the E2B Code Interpreter SDK as a tool
 async function codeInterpret(codeInterpreter: CodeInterpreter, code: string): Promise<Result[]> {
     console.log('Running code interpreter...')
 
@@ -59,7 +57,6 @@ async function codeInterpret(codeInterpreter: CodeInterpreter, code: string): Pr
         onStderr: (msg: ProcessMessage) => console.log('[Code Interpreter stderr]', msg),
         onStdout: (stdout: ProcessMessage) => console.log('[Code Interpreter stdout]', stdout),
         // You can also stream additional results like charts, images, etc.
-        // onResult: ...
     })
 
     if (exec.error) {
@@ -69,68 +66,68 @@ async function codeInterpret(codeInterpreter: CodeInterpreter, code: string): Pr
     return exec.results
 }
 
-const openai = new OpenAI() // Initialize openai (this was "client" before)
+const openai = new OpenAI() // Initialize openai client
 
-// Defining new function (in the Claude example, it was ProcessToolCall and ChatWithCLaude, now we will have chat.
+// Define function to chat with the model
 async function chat(codeInterpreter: CodeInterpreter, userMessage: string, base64_image = null): Promise<Result[]> {
-    console.log(`\n${'='.repeat(50)}\nUser Message: ${userMessage}\n${'='.repeat(50)}`)  // TBD: Find user message equivalent in OpenAI docs
+    console.log(`\n${'='.repeat(50)}\nUser Message: ${userMessage}\n${'='.repeat(50)}`)
     const messages: Array<ChatCompletionMessageParam> = [
         {
-          role: "system",
+          role: 'system',
           content: SYSTEM_PROMPT,
         },
-      ];
+      ]
     
       if (base64_image) {
         messages.push({
-          role: "user",
+          role: 'user',
           content: [
             {
-              type: "text",
+              type: 'text',
               text: userMessage,
             },
             {
-              type: "image_url",
+              type: 'image_url',
               image_url: {
                 url: `data:image/jpeg;base64,${base64_image}`
               }
             }
           ]
-        });
+        })
       } else {
-        messages.push({ role: "user", content: userMessage });
+        messages.push({ role: 'user', content: userMessage })
       }
     
       try {
-        const response = await openai.chat.completions.create({  // client -> openai
+        const response = await openai.chat.completions.create({
           model: MODEL_NAME,
           messages: messages,
           tools: tools,
-          tool_choice: "auto"
-        });
+          tool_choice: 'auto'
+        })
     
         for (const choice of response.choices) {
           if (choice.message.tool_calls && choice.message.tool_calls.length > 0) {
             for (const toolCall of choice.message.tool_calls) {
-                if (toolCall.function.name === "execute_python") {
-                    let code: string;
-                    if (typeof toolCall.function.arguments === "object" && "code" in toolCall.function.arguments) {
-                        code = (toolCall.function.arguments as { code: string }).code;
+                if (toolCall.function.name === 'execute_python') {
+                    let code: string
+                    if (typeof toolCall.function.arguments === 'object' && 'code' in toolCall.function.arguments) {
+                        code = (toolCall.function.arguments as { code: string }).code
                     } else {
-                        code = toolCall.function.arguments as string;
+                        code = toolCall.function.arguments as string
                     }
-                    console.log("CODE TO RUN"); // Printing logs to debug my code
-                    console.log(code); // Printing logs to debug my code
-                    const codeInterpreterResults = await codeInterpret(codeInterpreter, code);
-                    return codeInterpreterResults;
+                    console.log('CODE TO RUN') 
+                    console.log(code)
+                    const codeInterpreterResults = await codeInterpret(codeInterpreter, code)
+                    return codeInterpreterResults
                 }
             }
           } else {
-            console.log("Answer:", choice.message.content);
+            console.log('Answer:', choice.message.content)
           }
         }
       } catch (error) {
-        console.error('Error during API call:', error);
+        console.error('Error during API call:', error)
       }
       return []
     }
@@ -143,22 +140,45 @@ async function run() {
         const codeInterpreterResults = await chat(
             codeInterpreter,
             'Plot a chart visualizing the height distribution of men based on the data you know.'
-        );
-        console.log("codeInterpreterResults:", codeInterpreterResults); // See what you actually get here
+        )
+        console.log('codeInterpreterResults:', codeInterpreterResults)
         
-        const result = codeInterpreterResults[0];
-        console.log("Result object:", result); // Check if result is undefined or not
+        const result = codeInterpreterResults[0]
+        console.log('Result object:', result)
         
         if (result && result.png) {
-            fs.writeFileSync('image.png', Buffer.from(result.png, 'base64'));
+            fs.writeFileSync('image_1.png', Buffer.from(result.png, 'base64'))
         } else {
-            console.log("No PNG data available.");
+            console.log('No PNG data available.')
         }
     } catch (error) {
         console.error('An error occurred:', error)
     } finally {
         await codeInterpreter.close()
     }
+    const image = fs.readFileSync('image_1.png') // Added part of the function to see the output and generate second plot
+    try {
+        const codeInterpreterResults = await chat(
+            codeInterpreter,
+            'Based on what you see, what is name of this distribution? Show me the distribution function.',
+            image // TBD - Debug
+        )
+        console.log('codeInterpreterResults:', codeInterpreterResults)
+        
+        const result = codeInterpreterResults[0]
+        console.log('Result object:', result)
+        
+        if (result && result.png) {
+            fs.writeFileSync('image_2.png', Buffer.from(result.png, 'base64'))
+        } else {
+            console.log('No PNG data available.')
+        }
+    } catch (error) {
+        console.error('An error occurred:', error)
+    } finally {
+        await codeInterpreter.close()
+    }
+
 }
 
 run()

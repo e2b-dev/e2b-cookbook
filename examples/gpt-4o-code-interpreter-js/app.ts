@@ -109,9 +109,9 @@ async function chat(codeInterpreter: CodeInterpreter, userMessage: string, base6
           tool_choice: "auto"
         });
     
-        response.choices.forEach(choice => {
+        for (const choice of response.choices) {
           if (choice.message.tool_calls && choice.message.tool_calls.length > 0) {
-            choice.message.tool_calls.forEach(async (toolCall) => {
+            for (const toolCall of choice.message.tool_calls) {
                 if (toolCall.function.name === "execute_python") {
                     let code: string;
                     if (typeof toolCall.function.arguments === "object" && "code" in toolCall.function.arguments) {
@@ -124,11 +124,11 @@ async function chat(codeInterpreter: CodeInterpreter, userMessage: string, base6
                     const codeInterpreterResults = await codeInterpret(codeInterpreter, code);
                     return codeInterpreterResults;
                 }
-            });
+            }
           } else {
             console.log("Answer:", choice.message.content);
           }
-        });
+        }
       } catch (error) {
         console.error('Error during API call:', error);
       }

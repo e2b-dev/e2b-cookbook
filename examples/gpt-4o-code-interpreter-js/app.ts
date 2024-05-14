@@ -6,6 +6,7 @@ import { CodeInterpreter, Result } from '@e2b/code-interpreter'
 import { ProcessMessage } from '@e2b/code-interpreter'
 
 import * as dotenv from 'dotenv'
+import { ChatCompletionMessageParam, ChatCompletionTool } from "openai/src/resources/chat/completions";
 dotenv.config()
 
 
@@ -27,7 +28,7 @@ tool response values that have text inside "[]"  mean that a visual element got 
 `
 
 // Creating a list of tools available for the agents. Here is just one tool for Python code execution. (It's good usecase for the Code Interpreter SDK.)
-const tools: Array<Tool> = [
+const tools: Array<ChatCompletionTool> = [
     {
       "type": "function",
       "function": {
@@ -68,17 +69,12 @@ async function codeInterpret(codeInterpreter: CodeInterpreter, code: string): Pr
     return exec.results
 }
 
-interface IMessage {
-    role: string;
-    content: any;
-  }
-
 const openai = new OpenAI() // Initialize openai (this was "client" before)
 
 // Defining new function (in the Claude example, it was ProcessToolCall and ChatWithCLaude, now we will have chat.
 async function chat(codeInterpreter: CodeInterpreter, userMessage: string, base64_image = null): Promise<Result[]> {
     console.log(`\n${'='.repeat(50)}\nUser Message: ${userMessage}\n${'='.repeat(50)}`)  // TBD: Find user message equivalent in OpenAI docs
-    const messages: IMessage[] = [
+    const messages: Array<ChatCompletionMessageParam> = [
         {
           role: "system",
           content: SYSTEM_PROMPT,
@@ -107,7 +103,7 @@ async function chat(codeInterpreter: CodeInterpreter, userMessage: string, base6
     
       try {
         const response = await openai.chat.completions.create({  // client -> openai
-          model: "gpt-4o",
+          model: MODEL_NAME,
           messages: messages,
           tools: tools,
           tool_choice: "auto"

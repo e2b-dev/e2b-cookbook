@@ -115,19 +115,19 @@ async function chat(codeInterpreter: CodeInterpreter, userMessage: string, base6
     
         response.choices.forEach(choice => {
           if (choice.message.tool_calls && choice.message.tool_calls.length > 0) {
-            choice.message.tool_calls.forEach(toolCall => {
-              if (toolCall.function.name === "execute_python") {
-                let code: string;
-                if ("code" in toolCall.function.arguments) {
-                  code = toolCall.function.arguments.code;
-                } else {
-                  code = toolCall.function.arguments;
+            choice.message.tool_calls.forEach(async (toolCall) => {
+                if (toolCall.function.name === "execute_python") {
+                    let code: string;
+                    if (typeof toolCall.function.arguments === "object" && "code" in toolCall.function.arguments) {
+                        code = (toolCall.function.arguments as { code: string }).code;
+                    } else {
+                        code = toolCall.function.arguments as string;
+                    }
+                    console.log("CODE TO RUN"); // Printing logs to debug my code
+                    console.log(code); // Printing logs to debug my code
+                    const codeInterpreterResults = await codeInterpret(codeInterpreter, code);
+                    return codeInterpreterResults;
                 }
-                console.log("CODE TO RUN");
-                console.log(code);
-                const codeInterpreterResults = codeInterpreter(code);
-                return codeInterpreterResults;
-              }
             });
           } else {
             console.log("Answer:", choice.message.content);
@@ -136,6 +136,7 @@ async function chat(codeInterpreter: CodeInterpreter, userMessage: string, base6
       } catch (error) {
         console.error('Error during API call:', error);
       }
+      return []
     }
 
 
@@ -143,14 +144,19 @@ async function run() {
     const codeInterpreter = await CodeInterpreter.create()
 
     try {
-        const codeInterpreterResults = await chat( // This was chatWithClaude
+        const codeInterpreterResults = await chat(
             codeInterpreter,
             'Plot a chart visualizing the height distribution of men based on the data you know.'
-        )
-        const result = codeInterpreterResults[0]
-        console.log('Result:', result)
-        if (result.png) {
-            fs.writeFileSync('image.png', Buffer.from(result.png, 'base64'))
+        );
+        console.log("codeInterpreterResults:", codeInterpreterResults); // See what you actually get here
+        
+        const result = codeInterpreterResults[0];
+        console.log("Result object:", result); // Check if result is undefined or not
+        
+        if (result && result.png) {
+            fs.writeFileSync('image.png', Buffer.from(result.png, 'base64'));
+        } else {
+            console.log("No PNG data available.");
         }
     } catch (error) {
         console.error('An error occurred:', error)

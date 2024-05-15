@@ -5,6 +5,7 @@ import { ProcessMessage } from '@e2b/code-interpreter'
 
 import * as dotenv from 'dotenv'
 import { ChatCompletionTool, ChatCompletionMessageParam } from 'openai/resources/index'
+import { buffer } from 'stream/consumers'
 dotenv.config()
 
 
@@ -69,7 +70,7 @@ async function codeInterpret(codeInterpreter: CodeInterpreter, code: string): Pr
 const openai = new OpenAI() // Initialize openai client
 
 // Define function to chat with the model
-async function chat(codeInterpreter: CodeInterpreter, userMessage: string, base64_image = null): Promise<Result[]> {
+async function chat(codeInterpreter: CodeInterpreter, userMessage: string, base64_image?: string): Promise<Result[]> {
     console.log(`\n${'='.repeat(50)}\nUser Message: ${userMessage}\n${'='.repeat(50)}`)
     const messages: Array<ChatCompletionMessageParam> = [
         {
@@ -135,7 +136,7 @@ async function chat(codeInterpreter: CodeInterpreter, userMessage: string, base6
 
 async function run() {
     const codeInterpreter = await CodeInterpreter.create()
-
+    // Let the model do the task
     try {
         const codeInterpreterResults = await chat(
             codeInterpreter,
@@ -150,26 +151,21 @@ async function run() {
             fs.writeFileSync('image_1.png', Buffer.from(result.png, 'base64'))
         } else {
             console.log('No PNG data available.')
+            return
         }
-    } catch (error) {
-        console.error('An error occurred:', error)
-    } finally {
-        await codeInterpreter.close()
-    }
-    const image = fs.readFileSync('image_1.png') // Added part of the function to see the output and generate second plot
-    try {
-        const codeInterpreterResults = await chat(
+
+        const codeInterpreterResults2 = await chat(
             codeInterpreter,
             'Based on what you see, what is name of this distribution? Show me the distribution function.',
-            image // TBD - Debug
+            result.png
         )
-        console.log('codeInterpreterResults:', codeInterpreterResults)
+        console.log('codeInterpreterResults:', codeInterpreterResults2)
         
-        const result = codeInterpreterResults[0]
-        console.log('Result object:', result)
+        const result2 = codeInterpreterResults2[0]
+        console.log('Result object:', result2)
         
-        if (result && result.png) {
-            fs.writeFileSync('image_2.png', Buffer.from(result.png, 'base64'))
+        if (result2 && result2.png) {
+            fs.writeFileSync('image_2.png', Buffer.from(result2.png, 'base64'))
         } else {
             console.log('No PNG data available.')
         }

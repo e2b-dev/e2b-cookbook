@@ -14,7 +14,7 @@ This is an example that tests the capabilities of the OpenAI's GPT-4o model. We 
 - Get the [OPENAI API KEY](https://platform.openai.com/settings)
 
 ### 2. Install packages
-Install the E2B Code Interpreter SDK and the OpenAI SDK.
+Install the E2B Code Interpreter SDK and OpenAI.
 
 ```
 npm i
@@ -24,15 +24,12 @@ npm i
 npm run start
 ```
 
-After running the program, you should get the result for an approximate value of pi, and a visualization of the simulation in an `image.png` file.
+After running the program, you should get the results of two charts visualizing the height distribution and the distribution function, saved as `image_1.png` and `image_2.png` files.
 
 ![Example of the output](example.png)
 
 If you encounter any problems, please let us know at our [Discord]((https://discord.com/invite/U7KEcGErtQ)).
-
 If you want to let the world know about what you're building with E2B, tag [@e2b_dev](https://twitter.com/e2b_dev) on X (Twitter).
 
 ### 4. Visit our docs
 Check the documentation to learn more about how to use E2B. [Visit our docs](https://e2b.dev/docs).
-
-This format will display correctly as Markdown on platforms such as GitHub, providing a structured and easy-to-read documentation for your project.

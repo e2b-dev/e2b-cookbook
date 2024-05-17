@@ -7,6 +7,9 @@ Example code and guides for building with [E2B's Code Interpreter](https://e2b.d
 - [TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/hello-world-js)
 - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/hello-world-python)
 
+**Analyze files**
+- [Upload dataset and analyze it with Llama3](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/upload-dataset-code-interpreter)
+
 **LLM Providers**
 - [GPT-4o with code interpreter and reasoning on image date](https://github.com/e2b-dev/e2b-cookbook/blob/main/examples/gpt-4o-code-interpreter/gpt_4o.ipynb)
 - Anthropic Claude 3 Opus with code intepreter

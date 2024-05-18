@@ -140,7 +140,7 @@ async function run() {
     try {
         const codeInterpreterResults = await chat(
             codeInterpreter,
-            'Plot a chart visualizing the height distribution of men based on the data you know.'
+            'Write a second order differential equation with initial conditions and plot its solutions on a chart, add the conditions to description.'
         )
         console.log('codeInterpreterResults:', codeInterpreterResults)
         
@@ -156,7 +156,7 @@ async function run() {
 
         const codeInterpreterResults2 = await chat(
             codeInterpreter,
-            'Based on what you see, what is name of this distribution? Show me the distribution function.',
+            'Based on what you see, can you tell me what is the differential equation whose solutions are plotted in the chart? Then make a new plot with the same equation, but different initial conditions.',
             result.png
         )
         console.log('codeInterpreterResults:', codeInterpreterResults2)

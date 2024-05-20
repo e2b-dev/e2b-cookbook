@@ -1,5 +1,5 @@
 # ✴️ E2B Cookbook
-Example code and guides for building with [E2B's Code Interpreter](https://e2b.dev).
+Example code and guides for building with [E2B's Code Interpreter SDK](https://github.com/e2b-dev/code-interpreter).
 
 ## Examples
 

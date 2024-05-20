@@ -12,7 +12,7 @@ Example code and guides for building with [E2B's Code Interpreter](https://e2b.d
 
 **LLM Providers**
 - [GPT-4o with code interpreter and reasoning on image date](https://github.com/e2b-dev/e2b-cookbook/blob/main/examples/gpt-4o-code-interpreter/gpt_4o.ipynb)
-- [Gemini 1.5 Pro/Flash](https://github.com/e2b-dev/e2b-cookbook/blob/main/examples/examples/gemini-1.5-code-interpreter/gemini_1.5.ipynb)
+- [Gemini 1.5 Pro/Flash](https://github.com/e2b-dev/e2b-cookbook/blob/main/examples/gemini-1.5-code-interpreter/gemini_1.5.ipynb)
 - Anthropic Claude 3 Opus with code intepreter
   - [Python](https://github.com/e2b-dev/e2b-cookbook/blob/main/examples/claude-code-interpreter/claude_code_interpreter.ipynb)
   - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/blob/main/examples/claude-code-interpreter-js)

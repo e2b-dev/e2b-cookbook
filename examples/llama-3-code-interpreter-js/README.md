@@ -7,7 +7,7 @@ Inside this sandbox is a running Jupyter server that the LLM can use.
 
 ### Step 1: Install dependencies
 
-We start by install the [E2B code interpreter SDK](https://github.com/e2b-dev/code-interpreter) and [Groq's JS SDK](https://github.com/groq/groq-typescript).
+We start by installing the [E2B Code Interpreter SDK](https://github.com/e2b-dev/code-interpreter) and [Groq's JS SDK](https://github.com/groq/groq-typescript).
 
 You can do that by simply calling
 ```bash

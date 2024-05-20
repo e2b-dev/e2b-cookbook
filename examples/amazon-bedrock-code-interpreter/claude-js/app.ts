@@ -13,7 +13,7 @@ import * as dotenv from 'dotenv'
 
 dotenv.config()
 
-const MODEL_NAME = 'claude-3-opus-20240229'
+const MODEL_NAME = 'anthropic.claude-3-opus-20240229-v1:0'  // or anthropic.claude-3-haiku-20240307-v1:0, anthropic.claude-3-sonnet-20240229-v1:0, anthropic.claude-instant-v1
 const SYSTEM_PROMPT = `
 ## your job & context
 you are a python data scientist. you are given tasks to complete and you run python code to solve them.

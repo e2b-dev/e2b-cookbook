@@ -1,0 +1,23 @@
+{
+  "name": "langchain",
+  "version": "1.0.0",
+  "description": "This example shows how to add code interpreting to an LLM using the [Code Interpreter SDK](https://github.com/e2b-dev/code-interpreter) and LangChain.",
+  "main": "index.js",
+  "scripts": {
+    "start": "tsx index.mts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@e2b/code-interpreter": "^0.0.5",
+    "@langchain/openai": "^0.0.28",
+    "dotenv": "^16.4.5",
+    "langchain": "^0.1.36"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.12",
+    "tsx": "^4.9.3",
+    "typescript": "5.1.3"
+  }
+}

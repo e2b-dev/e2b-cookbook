@@ -1,6 +1,6 @@
 # Scrape and Analyze Airbnb Data with Firecrawl and E2B
 
-This example demonstrates how to scrape Airbnb data and analyze it using Firecrawl and the Code Interpreter SDK from E2B.
+This example demonstrates how to scrape Airbnb data and analyze it using [Firecrawl](https://www.firecrawl.dev/) and the [Code Interpreter SDK](https://github.com/e2b-dev/code-interpreter) from E2B.
 
 ## Prerequisites
 

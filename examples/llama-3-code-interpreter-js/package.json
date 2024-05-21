@@ -1,0 +1,21 @@
+{
+  "name": "llama-3-code-interpreter",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "tsx llama_3_code_interpreter.mts"
+  },
+  "dependencies": {
+    "@e2b/code-interpreter": "^0.0.4",
+    "dotenv": "^16.4.5",
+    "groq-sdk": "^0.3.3"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.12",
+    "autoprefixer": "^10.4.14",
+    "eslint": "^7.32.0",
+    "eslint-config-next": "13.4.12",
+    "tsx": "^4.9.3",
+    "typescript": "5.1.3"
+  }
+}

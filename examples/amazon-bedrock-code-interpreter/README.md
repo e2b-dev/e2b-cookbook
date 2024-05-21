@@ -9,10 +9,12 @@ This is an example of running LLM-generated code tasks in a secure and isolated 
 
 ## Setup
 
-### 1. Set up API keys
+### 1. Prerequisites
+
 - Copy `.env.template`   to `.env`
-  - Get the [E2B API KEY](https://e2b.dev/docs/getting-started/api-key)
-  - Get the [ANTHROPIC API KEY](https://console.anthropic.com/settings/keys)
+- Get the [E2B API KEY](https://e2b.dev/docs/getting-started/api-key)
+- Get the [ANTHROPIC API KEY](https://console.anthropic.com/settings/keys)
+- Set up [access to available Bedrock foundation models ](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/modelaccess)
 
 ### 2. Install packages
 

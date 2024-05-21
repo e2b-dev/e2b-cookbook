@@ -40,7 +40,6 @@ const tools: Array<ChatCompletionTool> = [
               'type': 'string',
               'description': 'The python code to execute in a single cell.',
             },
-            'unit': {'type': 'string', 'enum': ['celsius', 'fahrenheit']},
           },
           'required': ['code'],
         },

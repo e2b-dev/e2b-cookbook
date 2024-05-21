@@ -109,7 +109,7 @@ async function run() {
     const pngData = Buffer.from(firstResult.png, 'base64')
     const filename = 'airbnb_prices_chart.png'
     fs.writeFileSync(filename, pngData)
-    console.log(`Saved chart to ${filename}`)
+    console.log(`✅ Saved chart to ${filename}`)
   }
 
   await codeInterpreter.close()

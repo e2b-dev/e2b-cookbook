@@ -3,28 +3,39 @@ Example code and guides for building with [E2B's Code Interpreter SDK](https://g
 
 ## Examples
 
-**Hello World**
+**Hello Worldg guide**
 - [TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/hello-world-js)
 - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/hello-world-python)
 
-**Analyze files**
-- [Upload dataset and analyze it with Llama3](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/upload-dataset-code-interpreter)
+**Example use cases**
+  - [Upload dataset and analyze it with Llama3](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/upload-dataset-code-interpreter)
+  - [Scrape Airbnb and analyze data with Firecrawl](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/scrape-and-analyze-airbnb-data-with-firecrawl)
 
-**LLM Providers**
-- [GPT-4o with code interpreter and reasoning on image date](https://github.com/e2b-dev/e2b-cookbook/blob/main/examples/gpt-4o-code-interpreter/gpt_4o.ipynb)
-- Anthropic Claude 3 Opus with code intepreter
-  - [Python](https://github.com/e2b-dev/e2b-cookbook/blob/main/examples/claude-code-interpreter/claude_code_interpreter.ipynb)
-  - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/blob/main/examples/claude-code-interpreter-js)
-- 🦙 [Llama 3 with code interpreter](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/llama-3-code-interpreter)
-- [Mixtral with code interpreter and chat UI](https://github.com/e2b-dev/e2b-cookbook/tree/main/templates/mixtral-8x7b-code-interpreter-nextjs)
+**LLM providers**
+  - OpenAI
+    - [GPT-4o with code interpreter and reasoning on image date](https://github.com/e2b-dev/e2b-cookbook/blob/main/examples/gpt-4o-code-interpreter/gpt_4o.ipynb)
+  - Anthropic
+    - Claude 3 Opus with code intepreter
+      - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/claude-code-interpreter-python)
+      - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/claude-code-interpreter-js)
+  - MetaAI
+    - 🦙 Llama 3 with code interpreter
+      - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/llama-3-code-interpreter-python)
+      - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/llama-3-code-interpreter-js)
 
-**AI Frameworks**
-- 🦜⛓️ [LangChain with code interpreter](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/langchain-python)
-- 🦜🕸️ [LangGraph with code interpreter](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/langgraph-python)
-- [Autogen with secure sandboxed code interpreter](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/e2b_autogen)
+**AI frameworks integrations**
+  - 🦜⛓️ LangChain
+    - [LangChain with Code Interpreter](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/langchain-python)
 
-**Next.js**
-- [Next.js + AI SDK + Code Interpreter](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/nextjs-code-interpreter)
+  - 🦜🕸️ LangGraph
+    - [LangGraph with code interpreter](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/langgraph-python)
+
+  - Autogen
+    - [Autogen with secure sandboxed for code interpreting](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/e2b_autogen)
+
+  - ▲ Vercel's AI SDK Next.js
+    - [Next.js + AI SDK + Code Interpreter](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/nextjs-code-interpreter)
+
 
 ## Getting started with E2B
 

@@ -17,16 +17,17 @@ you are a python data scientist. you are given tasks to complete and you run pyt
 export const tools: Tool[] = [
   {
     name: 'execute_python',
-    description: 'Execute python code in a Jupyter notebook cell and returns any result, stdout, stderr, display_data, and error.',
+    description:
+      'Execute python code in a Jupyter notebook cell and returns any result, stdout, stderr, display_data, and error.',
     input_schema: {
       type: 'object',
       properties: {
         code: {
           type: 'string',
-          description: 'The python code to execute in a single cell.'
-        }
+          description: 'The python code to execute in a single cell.',
+        },
       },
-      required: ['code']
-    }
-  }
+      required: ['code'],
+    },
+  },
 ]

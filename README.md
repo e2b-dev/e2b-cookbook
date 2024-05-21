@@ -3,12 +3,12 @@ Example code and guides for building with [E2B's Code Interpreter SDK](https://g
 
 ## Examples
 
-**Hello Worldg guide**
+**Hello World guide**
 - [TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/hello-world-js)
 - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/hello-world-python)
 
 **Example use cases**
-  - [Upload dataset and analyze it with Llama3](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/upload-dataset-code-interpreter)
+  - [Upload dataset and analyze it with Llama 3](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/upload-dataset-code-interpreter)
   - [Scrape Airbnb and analyze data with Firecrawl](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/scrape-and-analyze-airbnb-data-with-firecrawl)
 
 **LLM providers**

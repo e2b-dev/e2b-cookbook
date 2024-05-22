@@ -1,0 +1,24 @@
+{
+  "name": "langgraph-code-interpreter",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "tsx app.mts"
+  },
+  "dependencies": {
+    "@e2b/code-interpreter": "^0.0.5",
+    "@langchain/langgraph": "^0.0.19",
+    "@langchain/openai": "^0.0.33",
+    "dotenv": "^16.4.5",
+    "langchain": "^0.2.0"
+  },
+  "devDependencies": {
+    "@tsconfig/recommended": "^1.0.6",
+    "@types/node": "^17.0.12",
+    "autoprefixer": "^10.4.14",
+    "eslint": "^7.32.0",
+    "eslint-config-next": "13.4.12",
+    "tsx": "^4.9.3",
+    "typescript": "5.1.3"
+  }
+}

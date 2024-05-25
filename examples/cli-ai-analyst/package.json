@@ -1,0 +1,6 @@
+{
+  "dependencies": { "@e2b/code-interpreter": "0.0.4-deno.0", "commander": "^12.1.0" },
+  "devDependencies": {
+    "bun-types": "^1.1.10"
+  }
+}

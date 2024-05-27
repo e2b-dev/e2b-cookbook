@@ -24,9 +24,10 @@ npm i
 npm run start
 ```
 
-After running the program, you should get the results of two charts visualizing the height distribution and the distribution function, saved as `image_1.png` and `image_2.png` files.
+After running the program, you should get the results of two charts visualizing the results of your data analysis task saved as `image_1.png` and `image_2.png` files. This is the example output:
 
-![Example of the output](example.png)
+![Example of the output](image_1.png)
+![Example of the output](image_2.png)
 
 If you encounter any problems, please let us know at our [Discord]((https://discord.com/invite/U7KEcGErtQ)).
 If you want to let the world know about what you're building with E2B, tag [@e2b_dev](https://twitter.com/e2b_dev) on X (Twitter).

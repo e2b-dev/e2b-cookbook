@@ -197,3 +197,39 @@ export const invokeModel = async (
   run()
 
 } // This is closing body of InvokeModel function
+
+
+// Add action group (TBD correct order)
+
+{
+    "openapi": "3.0.0",
+    "paths": {
+        "/path": {
+            "method": {
+                "description": "string",
+                "operationId": "string",
+                "parameters": [ ... ],
+                "requestBody": { ... },
+                "responses": { ... }
+           }
+       }
+    }
+}
+
+
+const tools: Array<Tool> = [
+    {
+        name: 'execute_python',
+        description: 'Execute python code in a Jupyter notebook cell and returns any result, stdout, stderr, display_data, and error.',
+        input_schema: {
+            type: 'object',
+            properties: {
+                code: {
+                    type: 'string',
+                    description: 'The python code to execute in a single cell.'
+                }
+            },
+            required: ['code']
+        }
+    }
+]

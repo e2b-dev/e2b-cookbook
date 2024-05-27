@@ -1,7 +1,6 @@
 # GPT-4o Code Interpreter in JS/TS
 This is an example that tests the capabilities of the OpenAI's GPT-4o model. We let it generate a chart and reason about it. We use the E2B Code Interpreter SDK for running the LLM-generated code tasks in a secure and isolated cloud environment.
 
-
 ## Tech Stack
 - [E2B Code Interpreter SDK]((https://github.com/e2b-dev/code-interpreter)) for running the LLM-generated code
 - [OpenAI's GPT-4o](https://openai.com/index/hello-gpt-4o/) as an LLM

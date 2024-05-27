@@ -36,6 +36,9 @@ Example code and guides for building with [E2B's Code Interpreter SDK](https://g
   - ▲ Vercel's AI SDK Next.js
     - [Next.js + AI SDK + Code Interpreter](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/nextjs-code-interpreter)
 
+  - magentic
+    - [Code Interpreter with magentic and GPT-4o](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/magentic-code-interpreter/gpt_4o.ipynb)
+
 
 ## Getting started with E2B
 

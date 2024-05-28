@@ -233,3 +233,258 @@ const tools: Array<Tool> = [
         }
     }
 ]
+
+
+///////////
+
+// Agent request 1
+PUT /agents/ HTTP/1.1
+Content-type: application/json
+
+{
+   "agentName": "AI Agent",
+   "agentResourceRoleArn": "string",
+   "clientToken": "string",
+   "customerEncryptionKeyArn": "string",
+   "description": "string",
+   "foundationModel": "anthropic.claude-v2",
+   "guardrailConfiguration": { 
+      "guardrailIdentifier": "string",
+      "guardrailVersion": "string"
+   },
+   "idleSessionTTLInSeconds": number,
+   "instruction": `
+   ## your job & context
+   you are a python data scientist. you are given tasks to complete and you run python code to solve them.
+   - the python code runs in jupyter notebook.
+   - every time you call \`execute_python\` tool, the python code is executed in a separate cell. it's okay to multiple calls to \`execute_python\`.
+   - display visualizations using matplotlib or any other visualization library directly in the notebook. don't worry about saving the visualizations to a file.
+   - you have access to the internet and can make api requests.
+   - you also have access to the filesystem and can read/write files.
+   - you can install any pip package (if it exists) if you need to but the usual packages for data analysis are already preinstalled.
+   - you can run any python code you want, everything is running in a secure sandbox environment.
+   
+   ## style guide
+   tool response values that have text inside "[]"  mean that a visual element got rendered in the notebook. for example:
+   - "[chart]" means that a chart was generated in the notebook.
+   `,
+   "promptOverrideConfiguration": { 
+      "overrideLambda": "string",
+      "promptConfigurations": [ 
+         { 
+            "basePromptTemplate": "string",
+            "inferenceConfiguration": { 
+               "maximumLength": number,
+               "stopSequences": [ "string" ],
+               "temperature": number,
+               "topK": number,
+               "topP": number
+            },
+            "parserMode": "string",
+            "promptCreationMode": "string",
+            "promptState": "string",
+            "promptType": "string"
+         }
+      ]
+   },
+   "tags": { 
+      "string" : "string" 
+   }
+}
+
+
+
+
+
+// Agent request 2
+
+// PUT /agents/ HTTP/1.1
+// Content-type: application/json
+
+{
+  "agentName": "Agent",
+  "agentResourceRoleArn": "arn:aws:iam::123456789012:role/myRole",
+  "instruction": "`
+  ## your job & context
+  you are a python data scientist. you are given tasks to complete and you run python code to solve them.
+  - the python code runs in jupyter notebook.
+  - every time you call \`execute_python\` tool, the python code is executed in a separate cell. it's okay to multiple calls to \`execute_python\`.
+  - display visualizations using matplotlib or any other visualization library directly in the notebook. don't worry about saving the visualizations to a file.
+  - you have access to the internet and can make api requests.
+  - you also have access to the filesystem and can read/write files.
+  - you can install any pip package (if it exists) if you need to but the usual packages for data analysis are already preinstalled.
+  - you can run any python code you want, everything is running in a secure sandbox environment.
+  
+  ## style guide
+  tool response values that have text inside "[]"  mean that a visual element got rendered in the notebook. for example:
+  - "[chart]" means that a chart was generated in the notebook.
+  `",
+  "description": "Description is here",
+  "idleSessionTTLInSeconds": 900,
+  "foundationModel": "anthropic.claude-v2"
+}
+
+
+
+
+
+
+// Create agent
+// https://docs.aws.amazon.com/bedrock/latest/userguide/bedrock-agent_example_bedrock-agent_CreateAgent_section.html
+// https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/bedrock-agent/command/CreateAgentCommand/
+
+import { checkForPlaceholders } from "../lib/utils.js";
+
+import {
+  BedrockAgentClient,
+  CreateAgentCommand,
+} from "@aws-sdk/client-bedrock-agent";
+import { config } from 'dotenv'
+
+/**
+ * Creates an Amazon Bedrock Agent.
+ *
+ * @param {string} agentName - A name for the agent that you create.
+ * @param {string} foundationModel - The foundation model to be used by the agent you create.
+ * @param {string} agentResourceRoleArn - The ARN of the IAM role with permissions required by the agent.
+ * @param {string} [region='us-east-1'] - The AWS region in use.
+ * @returns {Promise<import("@aws-sdk/client-bedrock-agent").Agent>} An object containing details of the created agent.
+ */
+export const createAgent = async (
+  agentName,
+  foundationModel,
+  agentResourceRoleArn,
+  region = "us-east-1",
+) => {
+  const client = new BedrockAgentClient({ region });
+
+  const command = new CreateAgentCommand({
+    agentName,
+    foundationModel,
+    agentResourceRoleArn,
+  });
+  const response = await client.send(command);
+
+  return response.agent;
+};
+
+// Invoke main function if this file was run directly.
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  // Replace the placeholders for agentName and accountId, and roleName with a unique name for the new agent,
+  // the id of your AWS account, and the name of an existing execution role that the agent can use inside your account.
+  // For foundationModel, specify the desired model. Ensure to remove the brackets '[]' before adding your data.
+
+  // A string (max 100 chars) that can include letters, numbers, dashes '-', and underscores '_'.
+  const agentName = "[your-bedrock-agent-name]";
+
+  // Your AWS account id.
+  const accountId = "[123456789012]";
+
+  // The name of the agent's execution role. It must be prefixed by `AmazonBedrockExecutionRoleForAgents_`.
+  const roleName = "[AmazonBedrockExecutionRoleForAgents_your-role-name]";
+
+  // The ARN for the agent's execution role.
+  // Follow the ARN format: 'arn:aws:iam::account-id:role/role-name'
+  const roleArn = `arn:aws:iam::${accountId}:role/${roleName}`;
+
+  // Specify the model for the agent. Change if a different model is preferred.
+  const foundationModel = "anthropic.claude-v2";
+
+  // Check for unresolved placeholders in agentName and roleArn.
+  checkForPlaceholders([agentName, roleArn]);
+
+  console.log(`Creating a new agent...`);
+
+  const agent = await createAgent(agentName, foundationModel, roleArn);
+  console.log(agent);
+}
+
+
+
+// Creating agents action group
+// https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/bedrock-agent/command/CreateAgentActionGroupCommand/
+
+
+// Remove the duplicate import statement for 'BedrockAgentClient'
+// import { BedrockAgentClient, CreateAgentActionGroupCommand } from "@aws-sdk/client-bedrock-agent"; // ES Modules import
+// const { BedrockAgentClient, CreateAgentActionGroupCommand } = require("@aws-sdk/client-bedrock-agent"); // CommonJS import
+
+const client = new BedrockAgentClient(config);
+const input = { // CreateAgentActionGroupRequest
+  agentId: "STRING_VALUE", // required
+  agentVersion: "STRING_VALUE", // required
+  actionGroupName: "STRING_VALUE", // required
+  clientToken: "STRING_VALUE",
+  description: "STRING_VALUE",
+  parentActionGroupSignature: "AMAZON.UserInput",
+  actionGroupExecutor: { // ActionGroupExecutor Union: only one key present
+    lambda: "STRING_VALUE",
+    customControl: "RETURN_CONTROL",
+  },
+  apiSchema: { // APISchema Union: only one key present
+    s3: { // S3Identifier
+      s3BucketName: "STRING_VALUE",
+      s3ObjectKey: "STRING_VALUE",
+    },
+    payload: "STRING_VALUE",
+  },
+  actionGroupState: "ENABLED" || "DISABLED",
+  functionSchema: { // FunctionSchema Union: only one key present
+    functions: [ // Functions
+      { // Function
+        name: "STRING_VALUE", // required
+        description: "STRING_VALUE",
+        parameters: { // ParameterMap
+          "<keys>": { // ParameterDetail
+            description: "STRING_VALUE",
+            type: "string" || "number" || "integer" || "boolean" || "array", // required
+            required: true || false,
+          },
+        },
+      },
+    ],
+  },
+};
+const command = new CreateAgentActionGroupCommand(input);
+const response = await client.send(command);
+// { // CreateAgentActionGroupResponse
+//   agentActionGroup: { // AgentActionGroup
+//     agentId: "STRING_VALUE", // required
+//     agentVersion: "STRING_VALUE", // required
+//     actionGroupId: "STRING_VALUE", // required
+//     actionGroupName: "STRING_VALUE", // required
+//     clientToken: "STRING_VALUE",
+//     description: "STRING_VALUE",
+//     createdAt: new Date("TIMESTAMP"), // required
+//     updatedAt: new Date("TIMESTAMP"), // required
+//     parentActionSignature: "AMAZON.UserInput",
+//     actionGroupExecutor: { // ActionGroupExecutor Union: only one key present
+//       lambda: "STRING_VALUE",
+//       customControl: "RETURN_CONTROL",
+//     },
+//     apiSchema: { // APISchema Union: only one key present
+//       s3: { // S3Identifier
+//         s3BucketName: "STRING_VALUE",
+//         s3ObjectKey: "STRING_VALUE",
+//       },
+//       payload: "STRING_VALUE",
+//     },
+//     functionSchema: { // FunctionSchema Union: only one key present
+//       functions: [ // Functions
+//         { // Function
+//           name: "STRING_VALUE", // required
+//           description: "STRING_VALUE",
+//           parameters: { // ParameterMap
+//             "<keys>": { // ParameterDetail
+//               description: "STRING_VALUE",
+//               type: "string" || "number" || "integer" || "boolean" || "array", // required
+//               required: true || false,
+//             },
+//           },
+//         },
+//       ],
+//     },
+//     actionGroupState: "ENABLED" || "DISABLED", // required
+//   },
+// };
+

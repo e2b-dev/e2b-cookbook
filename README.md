@@ -12,28 +12,31 @@ Example code and guides for building with [E2B's Code Interpreter SDK](https://g
   - [Scrape Airbnb and analyze data with Firecrawl](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/scrape-and-analyze-airbnb-data-with-firecrawl)
 
 **LLM providers**
-  - OpenAI
+  - **OpenAI**
     - [GPT-4o with code interpreter and reasoning on image date](https://github.com/e2b-dev/e2b-cookbook/blob/main/examples/gpt-4o-code-interpreter/gpt_4o.ipynb)
-  - Anthropic
+  - **Anthropic**
     - Claude 3 Opus with code intepreter
       - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/claude-code-interpreter-python)
       - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/claude-code-interpreter-js)
-  - MetaAI
+  - **MetaAI**
     - 🦙 Llama 3 with code interpreter
       - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/llama-3-code-interpreter-python)
       - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/llama-3-code-interpreter-js)
+  - **Mistral AI**
+    - Codestral with code interpreter
+      - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/codestral-code-interpreter-python)
 
 **AI frameworks integrations**
-  - 🦜⛓️ LangChain
+  - **🦜⛓️ LangChain**
     - [LangChain with Code Interpreter](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/langchain-python)
 
-  - 🦜🕸️ LangGraph
+  - **🦜🕸️ LangGraph**
     - [LangGraph with code interpreter](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/langgraph-python)
 
-  - Autogen
+  - **Autogen**
     - [Autogen with secure sandboxed for code interpreting](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/e2b_autogen)
 
-  - ▲ Vercel's AI SDK Next.js
+  - **▲ Vercel's AI SDK Next.js**
     - [Next.js + AI SDK + Code Interpreter](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/nextjs-code-interpreter)
 
 

@@ -1,0 +1,23 @@
+{
+  "name": "claude",
+  "version": "1.0.0",
+  "description": "This is an example of running LLM-generated code tasks in a secure and isolated cloud environment using the E2B Code Interpreter SDK.",
+  "main": "app.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "tsx app.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@anthropic-ai/bedrock-sdk": "^0.10.0",
+    "@aws-sdk/client-bedrock": "^3.583.0",
+    "@aws-sdk/client-bedrock-agent": "^3.583.0",
+    "@aws-sdk/client-bedrock-agent-runtime": "^3.583.0",
+    "@aws-sdk/client-bedrock-runtime": "^3.577.0",
+    "@aws-sdk/client-iam": "^3.583.0",
+    "@aws-sdk/client-s3": "^3.577.0",
+    "dotenv": "^16.4.5"
+  }
+}

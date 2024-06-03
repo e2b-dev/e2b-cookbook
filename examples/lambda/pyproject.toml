@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "e2b_lambda"
+version = "0.1.0"
+description = "Example project for showcasing E2B code interpreter deployed to lambda"
+authors = ["e2b <hello@e2b.dev>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+e2b-code-interpreter = "^0.0.7"
+langchain = "^0.2.1"
+python-dotenv = "^1.0.1"
+langchain-openai = "^0.1.8"
+fastapi = "^0.111.0"
+langgraph = "^0.0.61"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

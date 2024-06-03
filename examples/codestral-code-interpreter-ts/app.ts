@@ -8,6 +8,10 @@ dotenv.config();
 const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY || '';
 const E2B_API_KEY = process.env.E2B_API_KEY || '';
 
+// Remove this later, it's just for my debugging
+console.log('MISTRAL_API_KEY:', MISTRAL_API_KEY ? 'Loaded' : 'Not Loaded');
+console.log('E2B_API_KEY:', E2B_API_KEY ? 'Loaded' : 'Not Loaded');
+
 const MODEL_NAME = 'codestral-latest';
 const SYSTEM_PROMPT = `
 You're a python data scientist that is analyzing daily temperature of major cities. You are given tasks to complete and you run Python code to solve them.
@@ -40,7 +44,7 @@ Generally, you follow these rules:
 - you can run any python code you want, everything is running in a secure sandbox environment
 `;
 
-const client = new MistralClient({ apiKey: MISTRAL_API_KEY });
+const client = new MistralClient();
 
 async function codeInterpret(codeInterpreter: CodeInterpreter, code: string): Promise<Result[]> {
     console.log('Running code interpreter...');
@@ -66,40 +70,61 @@ async function chat(codeInterpreter: CodeInterpreter, userMessage: string): Prom
         { role: 'user', content: userMessage }
     ];
 
-    const response = await client.chat({
-        model: MODEL_NAME,
-        messages: messages,
-    });
+    try {
+        const response = await client.chat({
+            model: MODEL_NAME,
+            messages: messages,
+        });
 
-    const responseMessage = response.choices[0].message.content;
-    const codeBlockMatch = responseMessage.match(/```python\n([\s\S]*?)\n```/);
+        const responseMessage = response.choices[0].message.content;
+        const codeBlockMatch = responseMessage.match(/```python\n([\s\S]*?)\n```/);
 
-    if (codeBlockMatch && codeBlockMatch[1]) {
-        const pythonCode = codeBlockMatch[1];
-        console.log('CODE TO RUN');
-        console.log(pythonCode);
-        const codeInterpreterResults = await codeInterpret(codeInterpreter, pythonCode);
-        return codeInterpreterResults;
-    } else {
-        console.log('Failed to match any Python code in model\'s response');
-        return [];
+        if (codeBlockMatch && codeBlockMatch[1]) {
+            const pythonCode = codeBlockMatch[1];
+            console.log('CODE TO RUN');
+            console.log(pythonCode);
+            const codeInterpreterResults = await codeInterpret(codeInterpreter, pythonCode);
+            return codeInterpreterResults;
+        } else {
+            console.log('Failed to match any Python code in model\'s response');
+            return [];
+        }
+    } catch (error) {
+        console.error('Error during API call:', error);
+        throw error;
     }
 }
 
 async function uploadDataset(codeInterpreter: CodeInterpreter): Promise<string> {
     console.log('Uploading dataset to Code Interpreter sandbox...');
     const datasetPath = './city_temperature.csv';
-    const fileStream = fs.createReadStream(datasetPath);
-    const remotePath = await codeInterpreter.uploadFile(fileStream);
-    console.log('Uploaded at', remotePath);
-    return remotePath;
+
+    if (!fs.existsSync(datasetPath)) {
+        throw new Error('Dataset file not found');
+    }
+
+    // Read the file into a buffer
+    const fileBuffer = fs.readFileSync(datasetPath);
+
+    try {
+        const remotePath = await codeInterpreter.uploadFile(fileBuffer, 'city_temperature.csv'); // Pass the buffer and filename
+        if (!remotePath) {
+            throw new Error('Failed to upload dataset');
+        }
+        console.log('Uploaded at', remotePath);
+        return remotePath;
+    } catch (error) {
+        console.error('Error during file upload:', error);
+        throw error;
+    }
 }
 
 async function run() {
-    const codeInterpreter = await CodeInterpreter.create({ apiKey: E2B_API_KEY });
+    const codeInterpreter = await CodeInterpreter.create();
 
     try {
-        await uploadDataset(codeInterpreter);
+        const remotePath = await uploadDataset(codeInterpreter);
+        console.log('Remote path of the uploaded dataset:', remotePath);
 
         const codeInterpreterResults = await chat(
             codeInterpreter,
@@ -112,9 +137,9 @@ async function run() {
 
         if (result && result.png) {
             fs.writeFileSync('image_1.png', Buffer.from(result.png, 'base64'));
+            console.log('Success: Image generated and saved as image_1.png');
         } else {
-            console.log('No PNG data available.');
-            return;
+            console.log('Error: No PNG data available.');
         }
 
     } catch (error) {

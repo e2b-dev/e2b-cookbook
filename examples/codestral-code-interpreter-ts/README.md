@@ -1,6 +1,6 @@
 # AI Code Execution with Mistral's Codestral
 
-This project tests capabilities of the new Mistral's model on data analysis tasks, using the [Code Interpreter SDK](https://github.com/e2b-dev/code-interpreter) by E2B. Codestral doesn't support using tools for code execution yet, so in this Python example, we added the code interpreting capabilities. We are going to build an AI agent that performs data analysis tasks on provided data, in a form of a csv file.
+This project tests capabilities of the new Mistral's model on data analysis tasks, using the [Code Interpreter SDK](https://github.com/e2b-dev/code-interpreter) by E2B. Codestral doesn't support using tools yet, so in this Python example, we added the code interpreting capabilities. We are going to build an AI assistant that performs data analysis on a CSV file.
 
 
 # Installation
@@ -11,10 +11,6 @@ First, cone the E2B Cookbook repository, and navigate to the correct directory.
 ## Install dependencies
 
 Ensure all dependencies are installed via `npm install`.
-
-- `@mistralai/mistralai`
-- `@e2b/code-interpreter`
-- `dotenv`
 
 
 ## Set up environment variables
@@ -27,13 +23,14 @@ Create a `.env` file in the project root directory and add your API keys:
 
 # Usage
 
-Ensure you have the `city_temperature.csv` dataset file in the project root directory.
+Ensure you have the [`city_temperature.csv`](https://github.com/e2b-dev/e2b-cookbook/blob/main/examples/codestral-code-interpreter-python/city_temperature.csv) dataset file in the project root directory.
 
 
 ## Run the program:
 
-    npm run start
-
+```
+npm run start
+```
 
 The script performs the following steps:
     

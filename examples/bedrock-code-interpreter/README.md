@@ -3,13 +3,14 @@ This is an example of running LLM-generated code tasks in a secure and isolated 
 
 ## Techstack
 - [E2B Code Interpreter SDK](https://github.com/e2b-dev/code-interpreter) for running the LLM-generated code
-- [Amazon Bedrock]
+- [Amazon Bedrock](https://aws.amazon.com/bedrock/)
 - [Anthropic AI SDK](https://www.npmjs.com/package/@anthropic-ai/sdk) for using Claude as an LLM
 - JavaScript/TypeScript
 
 
 ## 1. Prerequisites
 
+- Create an AWS account
 - Copy `.env.template`   to `.env`
 - Get the [E2B API KEY](https://e2b.dev/docs/getting-started/api-key)
 - Get the [ANTHROPIC API KEY](https://console.anthropic.com/settings/keys)

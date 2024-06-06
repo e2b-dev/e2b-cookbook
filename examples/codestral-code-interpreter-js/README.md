@@ -7,28 +7,23 @@ We are going to build an AI assistant that performs data analysis on a CSV file.
 
 # Installation
 
-First, cone the E2B Cookbook repository, and navigate to the correct directory.
+## 1. Install dependencies
 
+Ensure all dependencies are installed:
 
-## Install dependencies
+```
+npm install
+```
 
-Ensure all dependencies are installed via `npm install`.
-
-
-## Set up environment variables
+## 2. Set up environment variables
 
 Create a `.env` file in the project root directory and add your API keys:
 
-- Copy `.env.template`   to `.env`
+- Copy `.env.template` to `.env`
 - Get the [E2B API KEY](https://e2b.dev/docs/getting-started/api-key)
 - Get the [MISTRAL API KEY](https://console.mistral.ai/api-keys/)
 
-# Usage
-
-Ensure you have the [`city_temperature.csv`](https://github.com/e2b-dev/e2b-cookbook/blob/main/examples/codestral-code-interpreter-js/city_temperature.csv) dataset file in the project root directory.
-
-
-## Run the program:
+## 3. Run the program
 
 ```
 npm run start
@@ -48,7 +43,7 @@ After running the program, you should get the result of the data analysis task s
 ![Example of the output](image_1.png)
 
 
-### Connect with E2B & learn more
+# Connect with E2B & learn more
 If you encounter any problems, please let us know at our [Discord](https://discord.com/invite/U7KEcGErtQ).
 
 If you want to let the world know about what you're building with E2B, tag [@e2b_dev](https://twitter.com/e2b_dev) on X (Twitter).

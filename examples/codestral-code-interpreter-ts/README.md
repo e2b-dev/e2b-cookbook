@@ -5,13 +5,7 @@ This project tests capabilities of the new Mistral's model on data analysis task
 
 # Installation
 
-## Clone the repository
-
-Clone the repository:
-
-
-    git clone <repository_url>
-    cd <repository_directory>
+First, cone the E2B Cookbook repository, and navigate to the correct directory.
 
 
 ## Install dependencies

@@ -1,4 +1,4 @@
-# Claude Code Interpreter in JS/TS
+# Claude Code Interpreter with Bedrock in JS/TS
 This is an example of running LLM-generated code tasks in a secure and isolated cloud environment using the E2B Code Interpreter SDK.
 
 ## Techstack

@@ -27,6 +27,7 @@ Example code and guides for building with [E2B's Code Interpreter SDK](https://g
   - **Mistral**
     - Codestral with code interpreter
       - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/codestral-code-interpreter-python)
+      - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/codestral-code-interpreter-js)
   - **Fireworks AI**
     - Firefunction-v2 with code interpreter
       - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/fireworks-code-interpreter-python)

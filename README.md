@@ -20,11 +20,11 @@ Example code and guides for building with [E2B's Code Interpreter SDK](https://g
     - Claude 3 Opus with code interpreter
       - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/claude-code-interpreter-python)
       - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/claude-code-interpreter-js)
-  - **MetaAI**
+  - **Meta**
     - 🦙 Llama 3 with code interpreter
       - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/llama-3-code-interpreter-python)
       - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/llama-3-code-interpreter-js)
-  - **Mistral AI**
+  - **Mistral**
     - Codestral with code interpreter
       - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/codestral-code-interpreter-python)
 

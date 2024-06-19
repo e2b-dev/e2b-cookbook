@@ -27,6 +27,9 @@ Example code and guides for building with [E2B's Code Interpreter SDK](https://g
   - **Mistral**
     - Codestral with code interpreter
       - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/codestral-code-interpreter-python)
+  - **Fireworks AI**
+    - Firefunction-v2 with code interpreter
+      - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/fireworks-code-interpreter-python)
 
 **AI frameworks integrations**
   - **🦜⛓️ LangChain**
@@ -41,7 +44,7 @@ Example code and guides for building with [E2B's Code Interpreter SDK](https://g
   - **▲ Vercel's AI SDK Next.js**
     - [Next.js + AI SDK + Code Interpreter](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/nextjs-code-interpreter)
 
-  - magentic
+  - **magentic**
     - [Code Interpreter with magentic and GPT-4o](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/magentic-code-interpreter/magentic_code_interpreter.ipynb)
 
 

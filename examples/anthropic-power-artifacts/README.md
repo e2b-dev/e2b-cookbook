@@ -3,12 +3,15 @@ This app is an open source version of [Anthropic's Artifacts UI](https://www.ant
 
 This app is using [E2B](https://e2b.dev/docs) for AI code execution. E2B provides a cloud sandbox to run AI-generate code securly and can handle installing libraries, running shell commands, run Python, JavaScript, R, and Nextjs apps and more.
 
+
 ![Preview](preview.png)
 
 ## Features
 - [Anthropic Claude Sonnet 3.5](https://www.anthropic.com/) model for AI code generation
 - [E2B](https://e2b.dev) for AI secure code execution
 - [Vercel AI SDK](https://sdk.vercel.ai/docs/introduction) for tool calling and streaming responses from the model
+- ✅ Currently supports running AI-generated Python
+  - TODO: JavaScript, R, Nextjs apps
 
 ### 1. Install dependencies
 ```sh

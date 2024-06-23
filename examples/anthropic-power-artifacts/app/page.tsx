@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useChat, Message } from 'ai/react'
+import { useChat } from 'ai/react'
 
 import { Chat } from '@/components/chat'
 import { ArtifactView } from '@/components/artifact-view'

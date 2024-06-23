@@ -1,12 +1,11 @@
 import { z } from 'zod'
-import { type CoreMessage, streamText, tool, generateId } from 'ai'
-import { getMutableAIState } from 'ai/rsc'
+import { type CoreMessage, streamText, tool } from 'ai'
 import { anthropic } from '@ai-sdk/anthropic'
 
 import {
-  createOrConnect,
-  runCommand,
-  listFiles,
+  // createOrConnect,
+  // runCommand,
+  // listFiles,
   // runR,
   runPython,
 } from '@/lib/sandbox'

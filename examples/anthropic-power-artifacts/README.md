@@ -8,7 +8,7 @@ This app is using [E2B](https://e2b.dev/docs) for AI code execution. E2B provide
 
 ## Features
 - [Anthropic Claude Sonnet 3.5](https://www.anthropic.com/) model for AI code generation
-- [E2B](https://e2b.dev) for AI secure code execution
+- [Code Interpreter SDK](https://github.com/e2b-dev/code-interpreter) from [E2B](https://e2b.dev) for AI secure code execution using
 - [Vercel AI SDK](https://sdk.vercel.ai/docs/introduction) for tool calling and streaming responses from the model
 - ✅ Currently supports running AI-generated Python
   - TODO: JavaScript, R, Nextjs apps

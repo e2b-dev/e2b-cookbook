@@ -8,6 +8,7 @@ Example code and guides for building with [E2B's Code Interpreter SDK](https://g
 - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/hello-world-python)
 
 **Example use cases**
+  - [Open-source Anthropic's Artifacts UI with AI Code Execution](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/anthropic-power-artifacts)
   - [Upload dataset and analyze it with Llama 3](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/upload-dataset-code-interpreter)
   - [Scrape Airbnb and analyze data with Firecrawl](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/scrape-and-analyze-airbnb-data-with-firecrawl)
 

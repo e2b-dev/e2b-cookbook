@@ -5,10 +5,16 @@ import { useChat } from 'ai/react'
 
 import { Chat } from '@/components/chat'
 
+// Simulate user ID
+const userID = 'dummy-user-id'
+
 export default function Home() {
   const { messages, input, handleInputChange, handleSubmit } = useChat({
     api: '/api/chat',
+    body: { userID },
   })
+  console.log(messages)
+
 
   return (
     <main className="flex min-h-screen max-h-screen">

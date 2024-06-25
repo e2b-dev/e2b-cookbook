@@ -19,10 +19,34 @@ export interface ServerMessage {
 }
 
 export async function POST(req: Request) {
-  const { messages } = await req.json()
+  const { messages, userID } = await req.json()
   const result = await streamText({
     model: anthropic('claude-3-5-sonnet-20240620'),
-    tools: { }, // TODO
+    tools: {
+      runPython: tool({
+        description: 'Runs Python code.',
+        parameters: z.object({
+          title: z.string().describe('Short title (5 words max) of the artifact.'),
+          description: z.string().describe('Short description (10 words max) of the artifact.'),
+          code: z.string().describe('The code to run.'),
+        }),
+        async execute({ code }) {
+          const execOutput = await runPython(userID, code)
+          const stdout = execOutput.logs.stdout
+          const stderr = execOutput.logs.stderr
+          const runtimeError = execOutput.error
+          const results = execOutput.results
+
+          return {
+            stdout,
+            stderr,
+            runtimeError,
+            cellResults: results,
+          }
+        },
+      }),
+    },
+    toolChoice: 'auto',
     system: prompt,
     messages,
   })

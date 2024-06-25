@@ -11,6 +11,7 @@ import { anthropic } from '@ai-sdk/anthropic'
 import {
   runPython,
 } from '@/lib/sandbox'
+import { prompt } from '@/lib/prompt'
 
 export interface ServerMessage {
   role: 'user' | 'assistant' | 'function';
@@ -60,16 +61,7 @@ export async function POST(req: Request) {
       }),
     },
     toolChoice: 'auto',
-    system: `
-    You are a skilled Python developer.
-    One of your expertise is also data science.
-    You can run Python, and bash code. Code for each programming language runs in its own context and reference previous definitions and variables.
-    The code runs inside a Jupyter notebook so we can easily get visualizations.
-    Use seaborn for data visualization.
-
-    Messages inside [] means that it's a UI element or a user event. For example:
-    - "[Chart was generated]" means a chart in a Jupyter notebook was generated and displayed to user.
-    `,
+    system: prompt,
     messages,
   })
 

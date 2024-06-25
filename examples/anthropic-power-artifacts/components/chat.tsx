@@ -3,20 +3,19 @@ import { Terminal } from 'lucide-react'
 import { Message } from 'ai/react'
 
 import { Input } from '@/components/ui/input'
-import { getFileUploadURL } from '@/lib/sandbox'
+
+// simulate simple monte carlo method with 1000 iterations. At each iteration, create a point and check if that point was inside the unit circle. If the point was inside, make it green. At the end show me visualization that shows all the points that you created in every iteration
 
 export function Chat({
   messages,
   input,
   handleInputChange,
   handleSubmit,
-  userID,
 }: {
   messages: Message[],
   input: string,
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void,
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void,
-  userID: string,
 }) {
   return (
     <div className="flex-1 flex flex-col py-4 gap-4 max-h-full max-w-[800px] mx-auto justify-between">

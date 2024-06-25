@@ -32,7 +32,6 @@ export default function Home() {
           input={input}
           handleInputChange={handleInputChange}
           handleSubmit={handleSubmit}
-          userID={userID}
         />
         <SideView toolInvocation={latestToolInvocation} data={data} />
       </div>

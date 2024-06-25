@@ -1,75 +1,34 @@
 import { z } from 'zod'
-import { type CoreMessage, streamText, tool } from 'ai'
+import {
+  type CoreMessage,
+  StreamingTextResponse,
+  StreamData,
+  streamText,
+  tool,
+} from 'ai'
 import { anthropic } from '@ai-sdk/anthropic'
 
 import {
-  // createOrConnect,
-  // runCommand,
-  // listFiles,
-  // runR,
   runPython,
 } from '@/lib/sandbox'
-import { Sandbox } from 'e2b'
 
 export interface ServerMessage {
   role: 'user' | 'assistant' | 'function';
   content: string;
 }
 
+// simulate simple monte carlo method with 1000 iterations. At each iteration, create a point and check if that point was inside the unit circle. If the point was inside, make it green. At the end show me visualization that shows all the points that you created in every iteration
+
 export async function POST(req: Request) {
   const { messages }: { messages: CoreMessage[] } = await req.json()
+  // Simulate user ID
   const userID = 'dummy-user-id'
 
-  console.log('Messages', messages)
-  const allSandboxes = await Sandbox.list()
-  console.log('All sandboxes', allSandboxes)
+  let data: StreamData = new StreamData()
 
   const result = await streamText({
     model: anthropic('claude-3-5-sonnet-20240620'),
     tools: {
-      // writeFile: tool({
-      //   description: 'Writes to a file. If the file does not exists, it gets created. If it does, it gets overwritten.',
-      //   parameters: z.object({
-      //     path: z.string(),
-      //     content: z.string(),
-      //   }),
-      //   // execute:
-      // }),
-      // readFile: tool({
-      //   description: 'Reads the content of a file.',
-      //   parameters: z.object({
-      //     path: z.string(),
-      //   }),
-      //   // execute:
-      // }),
-      // listFiles: tool({
-      //   description: 'Lists all files in the current directory.',
-      //   parameters: z.object({
-      //     path: z.string(),
-      //   }),
-      //   execute: async ({ path }) => {
-      //     console.log('Listing files', path)
-      //     const files = await listFiles(userID, path)
-      //     console.log('Listing files', files)
-      //     return {
-      //       files,
-      //     }
-      //   },
-      // }),
-      // runCommand: tool({
-      //   description: 'Runs a command in the terminal.',
-      //   parameters: z.object({
-      //     command: z.string(),
-      //   }),
-      //   execute: async ({ command }) => {
-      //     const result = await runCommand(userID, command)
-      //     return {
-      //       stdout: result.stdout,
-      //       stderr: result.stderr,
-      //       exitCode: result.exitCode,
-      //     }
-      //   },
-      // }),
       runPython: tool({
         description: 'Runs Python code.',
         parameters: z.object({
@@ -77,12 +36,22 @@ export async function POST(req: Request) {
           description: z.string().describe('Short description (10 words max) of the artifact.'),
           code: z.string().describe('The code to run.'),
         }),
-        execute: async ({ code }) => {
+        async execute({ code }) {
+          data.append({
+            tool: 'runPython',
+            state: 'running',
+          })
+
           const execOutput = await runPython(userID, code)
           const stdout = execOutput.logs.stdout
           const stderr = execOutput.logs.stderr
-          const runtimeError = execOutput.error ?? ''
+          const runtimeError = execOutput.error
           const results = execOutput.results
+
+          data.append({
+            tool: 'runPython',
+            state: 'complete',
+          })
 
           return {
             stdout,
@@ -94,7 +63,6 @@ export async function POST(req: Request) {
       }),
     },
     toolChoice: 'auto',
-    // system: 'You are a skilled frontend developer that is building Nextjs web app. You work in a sandbox environment inside /home/user directory. User sees the app you are building in the browser.',
     system: `
     You are a skilled Python developer.
     One of your expertise is also data science.
@@ -108,5 +76,12 @@ export async function POST(req: Request) {
     messages,
   })
 
-  return result.toAIStreamResponse()
+
+  const stream = result.toAIStream({
+    async onFinal() {
+      await data.close()
+    }
+  })
+
+  return new StreamingTextResponse(stream, {}, data);
 }

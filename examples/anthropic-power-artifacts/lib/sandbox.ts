@@ -27,3 +27,8 @@ export async function runPython(userID: string, code: string) {
   console.log('Command result', result)
   return result
 }
+
+export async function getFileUploadURL(userID: string) {
+  const sbx = await createOrConnect(userID)
+  return sbx.fileURL
+}

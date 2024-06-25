@@ -5,22 +5,21 @@ import { useChat } from 'ai/react'
 
 import { Chat } from '@/components/chat'
 import { SideView } from '@/components/side-view'
-// import { ArtifactView } from '@/components/artifact-view'
 
-
+// Simulate user ID
+const userID = 'dummy-user-id'
 
 export default function Home() {
   const { messages, input, handleInputChange, handleSubmit, data } = useChat({
     api: '/api/chat',
+    body: { userID },
   })
   console.log({ messages, data })
-
 
   // For simplicity, we care only about the latest message that has a tool invocation
   const latestMessageWithToolInvocation = [...messages].reverse().find(message => message.toolInvocations && message.toolInvocations.length > 0)
   // Get the latest tool invocation
   const latestToolInvocation = latestMessageWithToolInvocation?.toolInvocations?.[0]
-
 
   return (
     <main className="flex min-h-screen max-h-screen">
@@ -33,6 +32,7 @@ export default function Home() {
           input={input}
           handleInputChange={handleInputChange}
           handleSubmit={handleSubmit}
+          userID={userID}
         />
         <SideView toolInvocation={latestToolInvocation} data={data} />
       </div>

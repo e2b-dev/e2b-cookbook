@@ -1,20 +1,23 @@
+import { useState, useEffect } from 'react'
 import { Terminal } from 'lucide-react'
 import { Message } from 'ai/react'
-import { Input } from '@/components/ui/input'
 
-export interface Props {
-  messages: Message[],
-  input: string,
-  handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void,
-  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void,
-}
+import { Input } from '@/components/ui/input'
+import { getFileUploadURL } from '@/lib/sandbox'
 
 export function Chat({
   messages,
   input,
   handleInputChange,
   handleSubmit,
-}: Props) {
+  userID,
+}: {
+  messages: Message[],
+  input: string,
+  handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void,
+  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void,
+  userID: string,
+}) {
   return (
     <div className="flex-1 flex flex-col py-4 gap-4 max-h-full max-w-[800px] mx-auto justify-between">
       <div className="flex flex-col gap-2 overflow-y-auto max-h-full px-4 rounded-lg">
@@ -41,7 +44,7 @@ export function Chat({
       </div>
 
       <form onSubmit={handleSubmit}>
-        <Input placeholder="Ask Claude..." value={input} onChange={handleInputChange}/>
+        <Input className="ring-0" placeholder="Ask Claude..." value={input} onChange={handleInputChange}/>
       </form>
     </div>
   )

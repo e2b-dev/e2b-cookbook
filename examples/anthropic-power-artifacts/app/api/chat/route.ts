@@ -20,9 +20,8 @@ export interface ServerMessage {
 // simulate simple monte carlo method with 1000 iterations. At each iteration, create a point and check if that point was inside the unit circle. If the point was inside, make it green. At the end show me visualization that shows all the points that you created in every iteration
 
 export async function POST(req: Request) {
-  const { messages }: { messages: CoreMessage[] } = await req.json()
-  // Simulate user ID
-  const userID = 'dummy-user-id'
+  const { messages, userID }: { messages: CoreMessage[], userID: string } = await req.json()
+  console.log('userID', userID)
 
   let data: StreamData = new StreamData()
 
@@ -75,7 +74,6 @@ export async function POST(req: Request) {
     `,
     messages,
   })
-
 
   const stream = result.toAIStream({
     async onFinal() {

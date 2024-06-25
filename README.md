@@ -11,7 +11,7 @@ Example code and guides for building with [E2B's Code Interpreter SDK](https://g
   - Anthropic's Artifacts UI with AI Code Execution - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/anthropic-power-artifacts)
   - Upload dataset and analyze it with Llama 3 - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/upload-dataset-code-interpreter)
   - Scrape Airbnb and analyze data with Claude 3 Opus and Firecrawl - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/scrape-and-analyze-airbnb-data-with-firecrawl)
-  - Visualize website topics with Claude 3.5 Sonnet and Firecrawl -[Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/claude-visualize-website-topics)
+  - Visualize website topics with Claude 3.5 Sonnet and Firecrawl - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/claude-visualize-website-topics)
 
 **LLM providers**
   - **OpenAI**

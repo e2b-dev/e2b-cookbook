@@ -20,6 +20,9 @@ export interface ServerMessage {
 
 export async function POST(req: Request) {
   const { messages, userID } = await req.json()
+
+  const data = new StreamData()
+
   const result = await streamText({
     model: anthropic('claude-3-5-sonnet-20240620'),
     tools: {
@@ -31,11 +34,21 @@ export async function POST(req: Request) {
           code: z.string().describe('The code to run.'),
         }),
         async execute({ code }) {
+          data.append({
+            tool: 'runPython',
+            state: 'running',
+          })
+
           const execOutput = await runPython(userID, code)
           const stdout = execOutput.logs.stdout
           const stderr = execOutput.logs.stderr
           const runtimeError = execOutput.error
           const results = execOutput.results
+
+          data.append({
+            tool: 'runPython',
+            state: 'complete',
+          })
 
           return {
             stdout,
@@ -51,5 +64,11 @@ export async function POST(req: Request) {
     messages,
   })
 
-  return result.toAIStreamResponse()
+  const stream = result.toAIStream({
+    async onFinal() {
+      await data.close()
+    }
+  })
+
+  return new StreamingTextResponse(stream, {}, data)
 }

@@ -10,11 +10,11 @@ import { SideView } from '@/components/side-view'
 const userID = 'dummy-user-id'
 
 export default function Home() {
-  const { messages, input, handleInputChange, handleSubmit } = useChat({
+  const { messages, input, handleInputChange, handleSubmit, data } = useChat({
     api: '/api/chat',
     body: { userID },
   })
-  console.log(messages)
+  console.log({ messages, data })
 
     // For simplicity, we care only about the latest message that has a tool invocation
     const latestMessageWithToolInvocation = [...messages].reverse().find(message => message.toolInvocations && message.toolInvocations.length > 0)
@@ -33,7 +33,7 @@ export default function Home() {
           handleInputChange={handleInputChange}
           handleSubmit={handleSubmit}
         />
-        <SideView toolInvocation={latestToolInvocation} />
+        <SideView toolInvocation={latestToolInvocation} data={data}/>
       </div>
     </main>
   )

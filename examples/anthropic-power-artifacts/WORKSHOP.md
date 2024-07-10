@@ -1,3 +1,5 @@
+# Workshop: How to add AI code interpreting to your app
+
 ## Resources
 
 - [E2B Docs](https://e2b.dev/docs)

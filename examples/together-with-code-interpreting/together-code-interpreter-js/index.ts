@@ -21,7 +21,15 @@ if (!E2B_API_KEY) {
 console.log('TOGETHER_API_KEY:', TOGETHER_API_KEY ? 'Loaded' : 'Not Loaded')
 console.log('E2B_API_KEY:', E2B_API_KEY ? 'Loaded' : 'Not Loaded')
 
+// Choose from the codegen models:
+
 const MODEL_NAME = 'Qwen/Qwen2-72B-Instruct'
+// const MODEL_NAME = "meta-llama/llama-3-8b-chat-hf"
+// const MODEL_NAME = "deepseek-ai/deepseek-coder-33b-instruct"
+
+// See the complete list of Together AI models here: https://api.together.ai/models.
+
+
 const SYSTEM_PROMPT = `
 You're a python data scientist. You are given tasks to complete and you run Python code to solve them.
 

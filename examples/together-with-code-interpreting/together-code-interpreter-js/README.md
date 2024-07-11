@@ -7,7 +7,7 @@ Read more about Together AI models [here](https://api.together.ai/models).
 The AI agent performs a data analysis task on an uploaded CSV file, executes the AI-generated code in the sandboxed environment by E2B, and returns a chart, saving it as a PNG file.
 
 
-# Installation
+# How to start
 
 ## 1. Install dependencies
 

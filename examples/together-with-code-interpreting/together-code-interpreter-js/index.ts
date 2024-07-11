@@ -24,7 +24,7 @@ console.log('E2B_API_KEY:', E2B_API_KEY ? 'Loaded' : 'Not Loaded')
 // Choose from the codegen models:
 
 const MODEL_NAME = 'Qwen/Qwen2-72B-Instruct'
-// const MODEL_NAME = "meta-llama/llama-3-8b-chat-hf"
+// const MODEL_NAME = "codellama/CodeLlama-70b-Instruct-hf"
 // const MODEL_NAME = "deepseek-ai/deepseek-coder-33b-instruct"
 
 // See the complete list of Together AI models here: https://api.together.ai/models.

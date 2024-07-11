@@ -1,0 +1,2 @@
+together==1.2.1
+e2b-code-interpreter==0.0.10

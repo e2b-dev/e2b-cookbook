@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import { CodeInterpreter, Result, ProcessMessage } from '@e2b/code-interpreter'
 import * as dotenv from 'dotenv'
-import Together from 'together-ai'
+import Together from 'together-ai/index.mjs'
 
 dotenv.config()
 

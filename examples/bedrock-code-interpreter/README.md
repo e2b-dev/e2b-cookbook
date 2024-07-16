@@ -5,7 +5,29 @@ This is an example of running LLM-generated code tasks in a secure and isolated 
 - [E2B Code Interpreter SDK](https://github.com/e2b-dev/code-interpreter) for running the LLM-generated code
 - [Amazon Bedrock](https://aws.amazon.com/bedrock/)
 - [Anthropic AI SDK](https://www.npmjs.com/package/@anthropic-ai/sdk) for using Claude as an LLM
-- JavaScript/TypeScript
+
+
+
+## Working with Amazon Bedrock
+
+### 1. Session token
+You need session token for using the Amazon Bedrock SDK. You can get it up with custom duration:
+`aws sts get-session-token --duration-seconds 129600   `    
+
+### Ensure that credentials are working:
+You need:
+
+- UserId
+- Account
+- Arn.
+  
+Ensure that you have the credentials working correctly:
+`aws sts get-caller-identity`
+
+### List available models
+If you need to verify what models you have access to, check it with this command:
+
+`aws bedrock list-foundation-models --region=eu-west-3 --by-provider anthropic --query "modelSummaries[*].modelId" `
 
 
 ## 1. Prerequisites

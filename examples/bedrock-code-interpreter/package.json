@@ -18,6 +18,7 @@
     "@aws-sdk/client-bedrock-runtime": "^3.577.0",
     "@aws-sdk/client-iam": "^3.583.0",
     "@aws-sdk/client-s3": "^3.577.0",
-    "dotenv": "^16.4.5"
+    "dotenv": "^16.4.5",
+    "moment": "^2.30.1"
   }
 }

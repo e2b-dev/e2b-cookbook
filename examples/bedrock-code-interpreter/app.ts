@@ -2,13 +2,14 @@ import AnthropicBedrock from '@anthropic-ai/bedrock-sdk';
 import dotenv from 'dotenv';
 import { CodeInterpreter, Result } from '@e2b/code-interpreter';
 import fs from 'node:fs';
+import moment from 'moment';
 
 dotenv.config();
 
 const awsAccessKey = process.env.AWS_ACCESS_KEY_ID;
 const awsSecretKey = process.env.AWS_SECRET_ACCESS_KEY;
 const awsSessionToken = process.env.AWS_SESSION_TOKEN;
-const awsRegion = 'eu-west-3';
+const awsRegion = 'us-east-1';
 
 console.log("AWS Access Key:", awsAccessKey);
 console.log("AWS Secret Key:", awsSecretKey ? '***' : 'Not provided');
@@ -19,11 +20,17 @@ if (!awsAccessKey || !awsSecretKey || !awsSessionToken) {
   throw new Error('Missing AWS credentials or session token.');
 }
 
+const date = moment().format('YYYYMMDD');
+const credential = `${awsAccessKey}/${date}/${awsRegion}/bedrock/aws4_request`;
+
+console.log("AWS Credential:", credential);
+
 const client = new AnthropicBedrock({
   awsAccessKey,
   awsSecretKey,
   awsSessionToken,
   awsRegion,
+  // You might need to specify more options if the SDK allows it for better handling of the signature
 });
 
 const tools: Array<CompletionCreateParams.Tool> = [

@@ -4,8 +4,7 @@ This AI data analyst can plot a linear regression chart based on CSV data. It us
 
 Read more about Together AI models [here](https://api.together.ai/models).
 
-The AI agent performs a data analysis task on an uploaded CSV file, executes the AI-generated code in the sandboxed environment by E2B, and returns a chart, saving it as a PNG file.
-
+The AI agent performs a data analysis task on an uploaded CSV file, executes the AI-generated code in the sandboxed environment by E2B, and returns a chart, saving it as a PNG file. The code is processing the data in the CSV file, cleaning the data, and performing the assigned analysis, which includes plotting a chart.
 
 # How to start
 
@@ -23,7 +22,7 @@ Create a `.env` file in the project root directory and add your API keys:
 
 - Copy `.env.template` to `.env`
 - Get the [E2B API KEY](https://e2b.dev/docs/getting-started/api-key)
-- Get the [TOGETHER API KEY](https://api.together.xyz/settings/api-keys)
+- Get the [TOGETHER AI API KEY](https://api.together.xyz/settings/api-keys)
 
 ## 3. Choose your LLM
 

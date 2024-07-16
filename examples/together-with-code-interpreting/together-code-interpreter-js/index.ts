@@ -159,11 +159,10 @@ async function uploadDataset(codeInterpreter: CodeInterpreter): Promise<string> 
         throw new Error('Dataset file not found')
     }
 
-    // Read the file into a buffer
     const fileBuffer = fs.readFileSync(datasetPath)
 
     try {
-        const remotePath = await codeInterpreter.uploadFile(fileBuffer, 'data.csv') // Pass the buffer and filename
+        const remotePath = await codeInterpreter.uploadFile(fileBuffer, 'data.csv')
         if (!remotePath) {
             throw new Error('Failed to upload dataset')
         }

@@ -2,8 +2,6 @@
 
 This AI data analyst can plot a linear regression chart based on CSV data. It uses Together AI LLMs, and the [Code Interpreter SDK](https://github.com/e2b-dev/code-interpreter) by E2B for the code interpreting capabilities. The SDK quickly creates a secure cloud sandbox powered by [Firecracker](https://github.com/firecracker-microvm/firecracker). Inside this sandbox is a running Jupyter server that the LLM can use.
 
-Read more about Together AI models [here](https://api.together.ai/models).
-
 The AI agent performs a data analysis task on an uploaded CSV file, executes the AI-generated code in the sandboxed environment by E2B, and returns a chart, saving it as a PNG file.
 
 
@@ -16,7 +14,16 @@ Add your API keys to the corresponding part of the program.
 - Get the [E2B API KEY](https://e2b.dev/docs/getting-started/api-key)
 - Get the [TOGETHER API KEY](https://api.together.xyz/settings/api-keys)
 
-## 2. Run the program
+## 2. Choose your LLM
+
+In the Python program, uncomment the model of your choice. The recommended code generation models to choose from are:
+- [Qwen 2 Instruct (72B)](https://api.together.ai/playground/chat/Qwen/Qwen2-72B-Instruct) (default option)
+- [Code Llama Instruct (70B)](https://api.together.ai/models/codellama/CodeLlama-70b-Instruct-hf)
+- [DeepSeek Coder Instruct (33B)](https://api.together.ai/playground/chat/deepseek-ai/deepseek-coder-33b-instruct)
+
+See the complete list of Together AI models [here](https://api.together.ai/models).
+
+## 3. Run the program
 
 To work with Python Jupyter Notebooks in VSCode, activate an Anaconda environment or another Python environment in which you've installed the Jupyter package. You can run an individual cell using the Run icon and the output will be displayed below the code cell.
 

@@ -25,7 +25,16 @@ Create a `.env` file in the project root directory and add your API keys:
 - Get the [E2B API KEY](https://e2b.dev/docs/getting-started/api-key)
 - Get the [TOGETHER API KEY](https://api.together.xyz/settings/api-keys)
 
-## 3. Run the program
+## 3. Choose your LLM
+
+In the `index.ts` file, uncomment the model of your choice. The recommended code generation models to choose from are:
+- [Qwen 2 Instruct (72B)](https://api.together.ai/playground/chat/Qwen/Qwen2-72B-Instruct) (default option)
+- [Code Llama Instruct (70B)](https://api.together.ai/models/codellama/CodeLlama-70b-Instruct-hf)
+- [DeepSeek Coder Instruct (33B)](https://api.together.ai/playground/chat/deepseek-ai/deepseek-coder-33b-instruct)
+
+See the complete list of Together AI models [here](https://api.together.ai/models).
+
+## 4. Run the program
 
 ```
 npm run start

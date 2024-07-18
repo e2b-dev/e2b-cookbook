@@ -18,9 +18,6 @@ if (!E2B_API_KEY) {
     process.exit(1)
 }
 
-console.log('TOGETHER_API_KEY:', TOGETHER_API_KEY ? 'Loaded' : 'Not Loaded')
-console.log('E2B_API_KEY:', E2B_API_KEY ? 'Loaded' : 'Not Loaded')
-
 // Choose from the codegen models:
 
 const MODEL_NAME = 'Qwen/Qwen2-72B-Instruct'

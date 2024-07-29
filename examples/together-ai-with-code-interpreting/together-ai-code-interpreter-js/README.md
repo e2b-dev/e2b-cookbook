@@ -27,7 +27,8 @@ Create a `.env` file in the project root directory and add your API keys:
 ## 3. Choose your LLM
 
 In the `index.ts` file, uncomment the model of your choice. The recommended code generation models to choose from are:
-- [Qwen 2 Instruct (72B)](https://api.together.ai/playground/chat/Qwen/Qwen2-72B-Instruct) (default option)
+- [Meta Llama 3.1 8B or 70B or 405B Instruct Turbo](https://api.together.ai/models/meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo)
+- [Qwen 2 Instruct (72B)](https://api.together.ai/playground/chat/Qwen/Qwen2-72B-Instruct)
 - [Code Llama Instruct (70B)](https://api.together.ai/models/codellama/CodeLlama-70b-Instruct-hf)
 - [DeepSeek Coder Instruct (33B)](https://api.together.ai/playground/chat/deepseek-ai/deepseek-coder-33b-instruct)
 

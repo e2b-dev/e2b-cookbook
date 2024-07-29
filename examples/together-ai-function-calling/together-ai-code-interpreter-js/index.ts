@@ -164,7 +164,19 @@ async function chat(codeInterpreter: CodeInterpreter, userMessage: string): Prom
             model: MODEL_NAME,
             messages: messages
         })
-
+                if (response.choices?.[0]?.message) {
+            messages.push({
+              role: response.choices[0].message.role,
+              content: response.choices[0].message.content!,
+            });
+            console.log(response.choices?.[0]?.message?.content);
+            }
+    }
+    catch (error) {
+    console.error('Error during API call:', error)
+    throw error
+}
+}
     // const responseMessage = response.choices[0].message.content
        // const codeBlockMatch = responseMessage.match(/```python\n([\s\S]*?)\n```/)
 
@@ -179,13 +191,12 @@ async function chat(codeInterpreter: CodeInterpreter, userMessage: string): Prom
            // return []
        //  }
     
-       const codeInterpreterResults = await codeInterpret(codeInterpreter, execute_python.parameters['code'])
+    // const codeInterpreterResults = await codeInterpret(codeInterpreter, execute_python.parameters['code'])
 
-    } catch (error) {
-        console.error('Error during API call:', error)
-        throw error
-    }
-}
+    // } catch (error) {
+    //     console.error('Error during API call:', error)
+    //     throw error
+    // }
 
 async function uploadDataset(codeInterpreter: CodeInterpreter): Promise<string> {
     console.log('Uploading dataset to Code Interpreter sandbox...')

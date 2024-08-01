@@ -18,6 +18,8 @@ Example code and guides for building with [E2B's Code Interpreter SDK](https://g
     - Llama 3.1 405B, 70B or 8B with code interpreter & Together AI
       - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/together-ai-with-code-interpreting/together-ai-code-interpreter-python)
       - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/together-ai-with-code-interpreting/together-ai-code-interpreter-js)
+    - Llama 3.1 405B, 70B or 8B with code interpreter & Fireworks
+      - [Python](https://github.com/e2b-dev/e2b-cookbook/blob/fireworks/examples/fireworks-code-interpreter-python/llama_3.1_code_interpreter.ipynb)
     - Llama 3 with code interpreter
       - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/llama-3-code-interpreter-python)
       - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/llama-3-code-interpreter-js)
@@ -41,8 +43,9 @@ Example code and guides for building with [E2B's Code Interpreter SDK](https://g
     - Firefunction-v2 with code interpreter
       - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/fireworks-code-interpreter-python)
   - **Together AI**
-      - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/together-with-code-interpreting/together-code-interpreter-python)
-      - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/together-with-code-interpreting/together-code-interpreter-js)
+      - Code interpreter usable with Meta Llama 3.1 Instruct Turbo (8B or 70B or 405B), Qwen 2 Instruct (72B), Code Llama Instruct (70B), or DeepSeek Coder Instruct (33B)
+        - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/together-ai-with-code-interpreting/together-ai-code-interpreter-python)
+        - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/together-ai-with-code-interpreting/together-ai-code-interpreter-js)
   
 
 **AI frameworks integrations**

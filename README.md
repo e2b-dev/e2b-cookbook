@@ -14,6 +14,13 @@ Example code and guides for building with [E2B's Code Interpreter SDK](https://g
   - Visualize website topics with Claude 3.5 Sonnet and Firecrawl - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/claude-visualize-website-topics)
 
 **LLM providers**
+  - **🦙  Meta**
+    - Llama 3.1 405B, 70B or 8B with code interpreter & Together AI
+      - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/together-ai-with-code-interpreting/together-ai-code-interpreter-python)
+      - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/together-ai-with-code-interpreting/together-ai-code-interpreter-js)
+    - Llama 3 with code interpreter
+      - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/llama-3-code-interpreter-python)
+      - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/llama-3-code-interpreter-js)
   - **OpenAI**
     - GPT-4o with code interpreter and reasoning on image date
       - [Python](https://github.com/e2b-dev/e2b-cookbook/blob/main/examples/gpt-4o-code-interpreter/gpt_4o.ipynb)
@@ -26,10 +33,6 @@ Example code and guides for building with [E2B's Code Interpreter SDK](https://g
     - Anthropic models with Firecrawl
       - Visualize website topics - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/claude-visualize-website-topics)
       - Scrape Airbnb and analyze data - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/scrape-and-analyze-airbnb-data-with-firecrawl)
-  - **Meta**
-    - 🦙 Llama 3 with code interpreter
-      - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/llama-3-code-interpreter-python)
-      - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/llama-3-code-interpreter-js)
   - **Mistral**
     - Codestral with code interpreter
       - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/codestral-code-interpreter-python)

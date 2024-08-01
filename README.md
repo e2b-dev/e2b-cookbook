@@ -40,9 +40,7 @@ Example code and guides for building with [E2B's Code Interpreter SDK](https://g
   - **Together AI**
       - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/together-with-code-interpreting/together-code-interpreter-python)
       - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/together-with-code-interpreting/together-code-interpreter-js)
-
-
-https://github.com/e2b-dev/e2b-cookbook/tree/together/examples/together-with-code-interpreting
+  
 
 **AI frameworks integrations**
   - **🦜⛓️ LangChain**

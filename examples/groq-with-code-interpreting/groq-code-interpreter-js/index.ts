@@ -1,4 +1,4 @@
-import { CodeInterpreter, Result } from '@e2b/code-interpreter'
+import { CodeInterpreter, Result, ProcessMessage } from '@e2b/code-interpreter'
 import { Groq } from 'groq-sdk'
 import CompletionCreateParams from 'groq-sdk'
 import fs from 'node:fs'
@@ -13,135 +13,232 @@ const GROQ_API_KEY = process.env.GROQ_API_KEY
 const E2B_API_KEY = process.env.E2B_API_KEY
 
 // Choose the model
-// You can use 8b or 70b version
-// const MODEL_NAME = "llama3-8b-8192" // GIVING NO CODE RESULTS, trying to read noneistent file
-// const MODEL_NAME = 'llama-3.1-70b-versatile' // WARNING: Doesn't work well with function calling
-const MODEL_NAME = 'llama3-70b-8192'
+
+// const MODEL_NAME = 'llama-3.1-405b-reasoning' // MODEL DOESN'T EXIST OR YOU DON'T HAVE ACCESS TO IT
+// const MODEL_NAME = 'llama-3.1-70b-versatile' // SOMETIMES WORKS, SOMETIMES DOESN'T
+const MODEL_NAME = 'llama-3.1-8b-instant' // SOMETIMES WORKS, SOMETIMES DOESN'T
+// const MODEL_NAME = 'llama3-groq-70b-8192-tool-use-preview' // WORKS
+// const MODEL_NAME = 'llama3-groq-8b-8192-tool-use-preview' // WORKS
+// const MODEL_NAME = 'llama-guard-3-8b' // DOESN't WORK ("Failed to match any Python code in model's response")
+// const MODEL_NAME = 'llama3-70b-8192' // WORKS
+// const MODEL_NAME = 'llama3-8b-8192' // WORKS
+// const MODEL_NAME = 'mixtral-8x7b-32768' // DOESN't WORK (No results)
+// const MODEL_NAME = 'gemma-7b-it' // DOESN't WORK (Errors during API call, fails to read the data)
+// const MODEL_NAME = 'gemma2-9b-it' // WORKS
+// const MODEL_NAME = 'whisper-large-v3' // MODEL DOESN'T SUPPORT CHAT COMPLETIONS
+
+
 
 // Provide system prompt
-const SYSTEM_PROMPT = `you are a python data scientist. you are given tasks to complete and you run python code to solve them.
-- the python code runs in jupyter notebook.
-- every time you call "execute_python" tool, the python code is executed in a separate cell. it's okay to multiple calls to "execute_python".
+const SYSTEM_PROMPT = `
+You're a python data scientist. You are given tasks to complete and you run Python code to solve them.
+
+Information about the csv dataset:
+- It's in the \`/home/user/data.csv\` file
+- The CSV file is using , as the delimiter
+- It has the following columns (examples included):
+    - country: "Argentina", "Australia"
+    - Region: "SouthAmerica", "Oceania"
+    - Surface area (km2): for example, 2780400
+    - Population in thousands (2017): for example, 44271
+    - Population density (per km2, 2017): for example, 16.2
+    - Sex ratio (m per 100 f, 2017): for example, 95.9
+    - GDP: Gross domestic product (million current US$): for example, 632343
+    - GDP growth rate (annual %, const. 2005 prices): for example, 2.4
+    - GDP per capita (current US$): for example, 14564.5
+    - Economy: Agriculture (% of GVA): for example, 10.0
+    - Economy: Industry (% of GVA): for example, 28.1
+    - Economy: Services and other activity (% of GVA): for example, 61.9
+    - Employment: Agriculture (% of employed): for example, 4.8
+    - Employment: Industry (% of employed): for example, 20.6
+    - Employment: Services (% of employed): for example, 74.7
+    - Unemployment (% of labour force): for example, 8.5
+    - Employment: Female (% of employed): for example, 43.7
+    - Employment: Male (% of employed): for example, 56.3
+    - Labour force participation (female %): for example, 48.5
+    - Labour force participation (male %): for example, 71.1
+    - International trade: Imports (million US$): for example, 59253
+    - International trade: Exports (million US$): for example, 57802
+    - International trade: Balance (million US$): for example, -1451
+    - Education: Government expenditure (% of GDP): for example, 5.3
+    - Health: Total expenditure (% of GDP): for example, 8.1
+    - Health: Government expenditure (% of total health expenditure): for example, 69.2
+    - Health: Private expenditure (% of total health expenditure): for example, 30.8
+    - Health: Out-of-pocket expenditure (% of total health expenditure): for example, 20.2
+    - Health: External health expenditure (% of total health expenditure): for example, 0.2
+    - Education: Primary gross enrollment ratio (f/m per 100 pop): for example, 111.5/107.6
+    - Education: Secondary gross enrollment ratio (f/m per 100 pop): for example, 104.7/98.9
+    - Education: Tertiary gross enrollment ratio (f/m per 100 pop): for example, 90.5/72.3
+    - Education: Mean years of schooling (female): for example, 10.4
+    - Education: Mean years of schooling (male): for example, 9.7
+    - Urban population (% of total population): for example, 91.7
+    - Population growth rate (annual %): for example, 0.9
+    - Fertility rate (births per woman): for example, 2.3
+    - Infant mortality rate (per 1,000 live births): for example, 8.9
+    - Life expectancy at birth, female (years): for example, 79.7
+    - Life expectancy at birth, male (years): for example, 72.9
+    - Life expectancy at birth, total (years): for example, 76.4
+    - Military expenditure (% of GDP): for example, 0.9
+    - Population, female: for example, 22572521
+    - Population, male: for example, 21472290
+    - Tax revenue (% of GDP): for example, 11.0
+    - Taxes on income, profits and capital gains (% of revenue): for example, 12.9
+    - Urban population (% of total population): for example, 91.7
+
+Generally, you follow these rules:
+- ALWAYS FORMAT YOUR RESPONSE IN MARKDOWN
+- ALWAYS RESPOND ONLY WITH CODE IN CODE BLOCK LIKE THIS:
+\`\`\`python
+{code}
+\`\`\`
+- the Python code runs in jupyter notebook.
+- every time you generate Python, the code is executed in a separate cell. it's okay to make multiple calls to \`execute_python\`.
 - display visualizations using matplotlib or any other visualization library directly in the notebook. don't worry about saving the visualizations to a file.
 - you have access to the internet and can make api requests.
 - you also have access to the filesystem and can read/write files.
-- you can install any pip package (if it exists) if you need to but the usual packages for data analysis are already preinstalled.
-- you can run any python code you want, everything is running in a secure sandbox environment
+- you can install any pip package (if it exists) if you need to be running \`!pip install {package}\`. The usual packages for data analysis are already preinstalled though.
+- you can run any Python code you want, everything is running in a secure sandbox environment
 `
+
 
 // Define the task, feel free to change it
 const TASK =
-  'Visualize a distribution of height of men based on the latest data you know'
+  'Make a chart showing linear regression of the relationship between GDP per capita and life expectancy from the data. Filter out any missing values or values in wrong format.'
 
 // Define e2b code interpreter as a tool for the model
-const tools: Array<CompletionCreateParams.Tool> = [
-  {
-    type: 'function',
-    function: {
-      name: 'execute_python',
-      description:
-        'Execute python code in a Jupyter notebook cell and returns any result, stdout, stderr, display_data, and error.',
-      parameters: {
-        type: 'object',
-        properties: {
-          code: {
-            type: 'string',
-            description: 'The python code to execute in a single cell.',
-          },
-        },
-        required: ['code'],
-      },
-    },
-  },
-]
+// TBD DELETE:
+
+// const tools: Array<CompletionCreateParams.Tool> = [
+//   {
+//     type: 'function',
+//     function: {
+//       name: 'execute_python',
+//       description:
+//         'Execute python code in a Jupyter notebook cell and returns any result, stdout, stderr, display_data, and error.',
+//       parameters: {
+//         type: 'object',
+//         properties: {
+//           code: {
+//             type: 'string',
+//             description: 'The python code to execute in a single cell.',
+//           },
+//         },
+//         required: ['code'],
+//       },
+//     },
+//   },
+// ]
 
 // Create Groq client
 const client = new Groq({ apiKey: GROQ_API_KEY })
 
-// Here's the main function that use the E2B code interpreter SDK.
-// The function is called from the main function, when the model returns a tool call.
-async function codeInterpret(
-  e2b_code_interpreter: CodeInterpreter,
-  code: string,
-) {
+async function codeInterpret(codeInterpreter: CodeInterpreter, code: string): Promise<Result[]> {
   console.log('Running code interpreter...')
-  const exec = await e2b_code_interpreter.notebook.execCell(code, {
-    onStderr: (stderr) => console.log('[Code Interpreter]', stderr),
-    onStdout: (stdout) => console.log('[Code Interpreter]', stdout),
-    // You can also stream code execution results
-    // on_result=...
+
+  const exec = await codeInterpreter.notebook.execCell(code, {
+      onStderr: (msg: ProcessMessage) => console.log('[Code Interpreter stderr]', msg),
+      onStdout: (stdout: ProcessMessage) => console.log('[Code Interpreter stdout]', stdout)
   })
 
   if (exec.error) {
-    console.log('[Code Interpreter ERROR]', exec.error)
-  } else {
-    return exec.results
+      console.error('[Code Interpreter ERROR]', exec.error)
+      throw new Error(exec.error.value)
+  }
+
+  return exec.results
+}
+
+
+async function chat(codeInterpreter: CodeInterpreter, userMessage: string): Promise<Result[]> {
+  console.log(`\n${'='.repeat(50)}\nUser Message: ${userMessage}\n${'='.repeat(50)}`)
+
+  const messages = [
+      { role: 'system', content: SYSTEM_PROMPT },
+      { role: 'user', content: userMessage }
+  ]
+
+  try {
+        const response = await client.chat.completions.create({
+        model: MODEL_NAME,
+        messages,
+        // tools,
+        max_tokens: 4096,
+       })
+
+      const responseMessage = response.choices[0].message.content
+      const codeBlockMatch = responseMessage ? responseMessage.match(/```python\n([\s\S]*?)\n```/) : null;
+
+      if (codeBlockMatch && codeBlockMatch[1]) {
+          const pythonCode = codeBlockMatch[1]
+          console.log('CODE TO RUN')
+          console.log(pythonCode)
+          const codeInterpreterResults = await codeInterpret(codeInterpreter, pythonCode)
+          return codeInterpreterResults
+      } else {
+          console.error('Failed to match any Python code in model\'s response')
+          return []
+      }
+  } catch (error) {
+      console.error('Error during API call:', error)
+      throw error
   }
 }
 
-// Here's the main function that chat with the model.
-// We parse the response from the model and call the E2B code interpreter tool, when requested.
-async function chatWithLlama(
-  e2b_code_interpreter: CodeInterpreter,
-  user_message: string,
-): Promise<Result[]> {
-  console.log(`\n${'='.repeat(50)}\nUser message: ${user_message}\n${'='.repeat(50)}`)
 
-  const messages = [
-    { role: 'system', content: SYSTEM_PROMPT },
-    { role: 'user', content: user_message },
-  ]
+async function uploadDataset(codeInterpreter: CodeInterpreter): Promise<string> {
+  console.log('Uploading dataset to Code Interpreter sandbox...')
+  const datasetPath = './data.csv'
 
-  const response = await client.chat.completions.create({
-    model: MODEL_NAME,
-    messages,
-    tools,
-    max_tokens: 4096,
-  })
+  if (!fs.existsSync(datasetPath)) {
+      throw new Error('Dataset file not found')
+  }
 
-  const response_message = response.choices[0].message
-  const tool_calls = response_message.tool_calls
+  const fileBuffer = fs.readFileSync(datasetPath)
 
-  if (tool_calls) {
-    const tool_call = tool_calls[0]
-    const function_name = tool_call.function.name
-    const function_args = JSON.parse(tool_call.function.arguments)
-    if (function_name == 'execute_python') {
-      const code = function_args['code']
-      return await codeInterpret(e2b_code_interpreter, code)
-    } else {
-      throw Error(`Unknown tool ${function_name}`)
-    }
-  } else {
-    console.log(`(No tool call in model's response) ${response_message}`)
-    return []
+  try {
+      const remotePath = await codeInterpreter.uploadFile(fileBuffer, 'data.csv')
+      if (!remotePath) {
+          throw new Error('Failed to upload dataset')
+      }
+      console.log('Uploaded at', remotePath)
+      return remotePath
+  } catch (error) {
+      console.error('Error during file upload:', error)
+      throw error
   }
 }
 
 // Putting it together
-// We create the E2B code interpreter which we will use to run the code generated from the model
-const code_interpreter = await CodeInterpreter.create({ apiKey: E2B_API_KEY })
 
-// Now we chat with the model
-const code_results = await chatWithLlama(code_interpreter, TASK)
+async function run() {
+  const codeInterpreter = await CodeInterpreter.create()
 
-// Check if we have any code results
-if (!code_results) {
-  console.log('No code results')
-  process.exit(1)
+  try {
+      const remotePath = await uploadDataset(codeInterpreter)
+      console.log('Remote path of the uploaded dataset:', remotePath)
+
+      const codeInterpreterResults = await chat(
+          codeInterpreter,
+          // Task for the model
+          'Make a chart showing linear regression of the relationship between GDP per capita and life expectancy from the data. Filter out any missing values or values in wrong format.'
+      )
+      console.log('codeInterpreterResults:', codeInterpreterResults)
+
+      const result = codeInterpreterResults[0]
+      console.log('Result object:', result)
+
+      if (result && result.png) {
+          fs.writeFileSync('image_1.png', Buffer.from(result.png, 'base64'))
+          console.log('Success: Image generated and saved as image_1.png')
+      } else {
+          console.error('Error: No PNG data available.')
+      }
+
+  } catch (error) {
+      console.error('An error occurred:', error)
+  } finally {
+      await codeInterpreter.close()
+  }
 }
 
-// We can now access the results from the code interpreter
-const first_result = code_results[0]
-
-// We can access the formats of the result
-console.log('Result has following formats:', first_result.formats())
-
-// E.g we can render the image
-fs.writeFileSync(
-  'height_distribution.png',
-  Buffer.from(first_result.png ?? '', 'base64'),
-)
-
-console.log('Execution completed successfully')
-process.exit(0)
+run()

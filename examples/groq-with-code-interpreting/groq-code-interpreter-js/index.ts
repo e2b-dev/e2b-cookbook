@@ -1,6 +1,6 @@
 import { CodeInterpreter, Result } from '@e2b/code-interpreter'
 import { Groq } from 'groq-sdk'
-import { CompletionCreateParams } from 'groq-sdk/src/resources/chat/completions'
+import CompletionCreateParams from 'groq-sdk'
 import fs from 'node:fs'
 import dotenv from 'dotenv'
 dotenv.config()
@@ -14,8 +14,9 @@ const E2B_API_KEY = process.env.E2B_API_KEY
 
 // Choose the model
 // You can use 8b or 70b version
-// const MODEL_NAME = "llama3-8b-8192"
-const MODEL_NAME = 'llama-3.1-70b-versatile'
+// const MODEL_NAME = "llama3-8b-8192" // GIVING NO CODE RESULTS, trying to read noneistent file
+// const MODEL_NAME = 'llama-3.1-70b-versatile' // WARNING: Doesn't work well with function calling
+const MODEL_NAME = 'llama3-70b-8192'
 
 // Provide system prompt
 const SYSTEM_PROMPT = `you are a python data scientist. you are given tasks to complete and you run python code to solve them.
@@ -84,7 +85,7 @@ async function chatWithLlama(
   e2b_code_interpreter: CodeInterpreter,
   user_message: string,
 ): Promise<Result[]> {
-  console.log(`\n${'=' * 50}\nUser message: ${user_message}\n${'=' * 50}`)
+  console.log(`\n${'='.repeat(50)}\nUser message: ${user_message}\n${'='.repeat(50)}`)
 
   const messages = [
     { role: 'system', content: SYSTEM_PROMPT },
@@ -139,7 +140,7 @@ console.log('Result has following formats:', first_result.formats())
 // E.g we can render the image
 fs.writeFileSync(
   'height_distribution.png',
-  Buffer.from(first_result.png, 'base64'),
+  Buffer.from(first_result.png ?? '', 'base64'),
 )
 
 console.log('Execution completed successfully')

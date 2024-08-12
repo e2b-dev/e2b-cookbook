@@ -1,6 +1,6 @@
-# AI Code Execution with Together AI models
+# AI Code Execution with Groq models
 
-This AI data analyst can plot a linear regression chart based on CSV data. It uses Together AI LLMs, and the [Code Interpreter SDK](https://github.com/e2b-dev/code-interpreter) by E2B for the code interpreting capabilities. The SDK quickly creates a secure cloud sandbox powered by [Firecracker](https://github.com/firecracker-microvm/firecracker). Inside this sandbox is a running Jupyter server that the LLM can use.
+This AI data analyst can plot a linear regression chart based on CSV data. It uses Groq LLMs, and the [Code Interpreter SDK](https://github.com/e2b-dev/code-interpreter) by E2B for the code interpreting capabilities. The SDK quickly creates a secure cloud sandbox powered by [Firecracker](https://github.com/firecracker-microvm/firecracker). Inside this sandbox is a running Jupyter server that the LLM can use.
 
 The AI agent performs a data analysis task on an uploaded CSV file, executes the AI-generated code in the sandboxed environment by E2B, and returns a chart, saving it as a PNG file. The code is processing the data in the CSV file, cleaning the data, and performing the assigned analysis, which includes plotting a chart.
 
@@ -11,17 +11,13 @@ The AI agent performs a data analysis task on an uploaded CSV file, executes the
 Add your API keys to the corresponding part of the notebook.
 
 - Get the [E2B API KEY](https://e2b.dev/docs/getting-started/api-key)
-- Get the [TOGETHER AI API KEY](https://api.together.xyz/settings/api-keys)
+- Get the [GROQ API KEY](https://console.groq.com/keys)
 
 ## 2. Choose your LLM
 
-In the Python notebook, uncomment the model of your choice. The recommended code generation models to choose from are:
-- [Meta Llama 3.1 8B or 70B or 405B Instruct Turbo](https://api.together.ai/models/meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo)
-- [Qwen 2 Instruct (72B)](https://api.together.ai/playground/chat/Qwen/Qwen2-72B-Instruct)
-- [Code Llama Instruct (70B)](https://api.together.ai/models/codellama/CodeLlama-70b-Instruct-hf)
-- [DeepSeek Coder Instruct (33B)](https://api.together.ai/playground/chat/deepseek-ai/deepseek-coder-33b-instruct)
+In the Python notebook, uncomment the model of your choice.
 
-See the complete list of Together AI models [here](https://api.together.ai/models).
+See the complete list of Groq models [here](https://console.groq.com/docs/models).
 
 ## 3. Run the notebook
 

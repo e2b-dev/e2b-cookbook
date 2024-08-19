@@ -1,0 +1,7 @@
+
+
+
+
+
+
+- pip install ollama

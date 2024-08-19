@@ -14,20 +14,12 @@ const E2B_API_KEY = process.env.E2B_API_KEY
 
 // Choose the model
 
-// const MODEL_NAME = 'llama-3.1-405b-reasoning' // MODEL DOESN'T EXIST OR YOU DON'T HAVE ACCESS TO IT
-// const MODEL_NAME = 'llama-3.1-70b-versatile' // SOMETIMES WORKS, SOMETIMES DOESN'T
-const MODEL_NAME = 'llama-3.1-8b-instant' // SOMETIMES WORKS, SOMETIMES DOESN'T
-// const MODEL_NAME = 'llama3-groq-70b-8192-tool-use-preview' // WORKS
-// const MODEL_NAME = 'llama3-groq-8b-8192-tool-use-preview' // WORKS
-// const MODEL_NAME = 'llama-guard-3-8b' // DOESN't WORK ("Failed to match any Python code in model's response")
-// const MODEL_NAME = 'llama3-70b-8192' // WORKS
-// const MODEL_NAME = 'llama3-8b-8192' // WORKS
-// const MODEL_NAME = 'mixtral-8x7b-32768' // DOESN't WORK (No results)
-// const MODEL_NAME = 'gemma-7b-it' // DOESN't WORK (Errors during API call, fails to read the data)
-// const MODEL_NAME = 'gemma2-9b-it' // WORKS
-// const MODEL_NAME = 'whisper-large-v3' // MODEL DOESN'T SUPPORT CHAT COMPLETIONS
-
-
+const MODEL_NAME = 'llama-3.1-70b-versatile'
+// const MODEL_NAME = 'llama-3.1-8b-instant'
+// const MODEL_NAME = 'llama3-groq-70b-8192-tool-use-preview'
+// const MODEL_NAME = 'llama3-groq-8b-8192-tool-use-preview'
+// const MODEL_NAME = 'llama3-70b-8192'
+// const MODEL_NAME = 'gemma2-9b-it'
 
 // Provide system prompt
 const SYSTEM_PROMPT = `

@@ -1,6 +1,6 @@
 # AI Code Execution with Groq
 
-This AI data analyst can plot a linear regression chart based on CSV data. It uses Groq LLMs, and the [Code Interpreter SDK](https://github.com/e2b-dev/code-interpreter) by E2B for the code interpreting capabilities. The SDK quickly creates a secure cloud sandbox powered by [Firecracker](https://github.com/firecracker-microvm/firecracker). Inside this sandbox is a running Jupyter server that the LLM can use.
+This AI data analyst can plot a linear regression chart based on CSV data. It uses [Groq LLMs](https://wow.groq.com/wp-content/uploads/2023/11/Groq_LLMs_OnePager.pdf), and the [Code Interpreter SDK](https://github.com/e2b-dev/code-interpreter) by E2B for the code interpreting capabilities. The SDK quickly creates a secure cloud sandbox powered by [Firecracker](https://github.com/firecracker-microvm/firecracker). Inside this sandbox is a running Jupyter server that the LLM can use.
 
 Read more about Groq models [here](https://console.groq.com/docs/models).
 

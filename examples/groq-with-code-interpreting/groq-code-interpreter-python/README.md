@@ -1,6 +1,6 @@
 # AI Code Execution with Groq models
 
-This AI data analyst can plot a linear regression chart based on CSV data. It uses Groq LLMs, and the [Code Interpreter SDK](https://github.com/e2b-dev/code-interpreter) by E2B for the code interpreting capabilities. The SDK quickly creates a secure cloud sandbox powered by [Firecracker](https://github.com/firecracker-microvm/firecracker). Inside this sandbox is a running Jupyter server that the LLM can use.
+This AI data analyst can plot a linear regression chart based on CSV data. It uses [Groq LLMs](https://wow.groq.com/wp-content/uploads/2023/11/Groq_LLMs_OnePager.pdf), and the [Code Interpreter SDK](https://github.com/e2b-dev/code-interpreter) by E2B for the code interpreting capabilities. The SDK quickly creates a secure cloud sandbox powered by [Firecracker](https://github.com/firecracker-microvm/firecracker). Inside this sandbox is a running Jupyter server that the LLM can use.
 
 The AI agent performs a data analysis task on an uploaded CSV file, executes the AI-generated code in the sandboxed environment by E2B, and returns a chart, saving it as a PNG file. The code is processing the data in the CSV file, cleaning the data, and performing the assigned analysis, which includes plotting a chart.
 
@@ -30,9 +30,9 @@ The script performs the following steps:
 - Saves any generated visualization as a PNG file.
   
 
-After running the notebook, you should get the result of the data analysis task saved in an `image_1.png` file. You should see a plot like this:
+After running the notebook, you should see the result of the data analysis task looking like this:
 
-![Example of the output](image_1.png)
+![Example of the output](image.png)
 
 
 # Connect with E2B & learn more

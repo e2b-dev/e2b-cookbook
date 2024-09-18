@@ -114,7 +114,7 @@ async function chat(codeInterpreter: CodeInterpreter, userMessage: string, base6
                     if (typeof toolCall.function.arguments === 'object' && 'code' in toolCall.function.arguments) {
                         code = (toolCall.function.arguments as { code: string }).code
                     } else {
-                        code = toolCall.function.arguments as string
+                        code = JSON.parse(toolCall.function.arguments).code
                     }
                     console.log('CODE TO RUN') 
                     console.log(code)

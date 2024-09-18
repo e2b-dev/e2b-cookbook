@@ -29,6 +29,7 @@ Example code and guides for building with [E2B's Code Interpreter SDK](https://g
       - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/gpt-4o-code-interpreter-js)
     - o1 with code interpreter performing machine learning on dataset
       - [Python](https://github.com/e2b-dev/e2b-cookbook/blob/main/examples/o1-code-interpreter/o1.ipynb)
+      - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/blob/main/examples/o1-code-interpreter-js)
   - **Anthropic**
     - Claude 3 Opus with code interpreter
       - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/claude-code-interpreter-python)

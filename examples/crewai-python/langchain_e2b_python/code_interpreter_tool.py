@@ -10,7 +10,6 @@ from langchain.agents.output_parsers.tools import (
     ToolAgentAction,
 )
 
-from crewai_tools import BaseTool
 
 class LangchainCodeInterpreterToolInput(BaseModel):
     code: str = Field(description="Python code to execute.")
@@ -79,31 +78,3 @@ class CodeInterpreterFunctionTool:
         )
 
         return new_messages
-
-
-class MyCustomTool(BaseTool):
-    name: str = "code_interpreter"
-    description: str = "Execute Python code in a Jupyter notebook cell and returns any rich data (eg charts), stdout, stderr, and error. Non-standard packages are by appending !pip install [packagenames] and the Python code in one single code block."
-    _code_interpreter_tool: CodeInterpreterFunctionTool | None = None
-
-    def __init__(self, *args, **kwargs):
-        # Call the superclass's init method
-        super().__init__(*args, **kwargs)
-        # Initialize the code interpreter tool and store it in the instance
-        self._code_interpreter_tool = CodeInterpreterFunctionTool()
-
-    def _run(self, code: str) -> str:
-        # Delegate the execution to the CodeInterpreterFunctionTool's langchain_call
-        result = self._code_interpreter_tool.langchain_call(code)
-        content = json.dumps(
-            {
-                k: [str(item) for item in v] if k == "results" else v
-                for k, v in result.items()
-            },
-            indent=2
-        )
-        return content
-
-    def close(self):
-        # Close the interpreter tool when done
-        self._code_interpreter_tool.close()

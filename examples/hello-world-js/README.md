@@ -1,4 +1,4 @@
-# E2B Hello World for TypesSript & JavaScript
+# E2B Hello World for TypeSript & JavaScript
 
 This example shows how to add code interpreting to an LLM using the [Code Interpreter SDK](https://github.com/e2b-dev/code-interpreter).
 

@@ -1,4 +1,5 @@
 import * as fs from 'fs'
+import { Buffer } from 'buffer';
 
 import 'dotenv/config'
 import { CodeInterpreter, Execution } from '@e2b/code-interpreter'
@@ -29,16 +30,17 @@ async function chat(codeInterpreter: CodeInterpreter, userMessage: string): Prom
 
   if (msg.stop_reason === 'tool_use') {
     const toolBlock = msg.content.find((block) => block.type === 'tool_use');
+
+    if (!toolBlock) return;
+
     const toolName = toolBlock.name
-    const toolInput = toolBlock.input
+    const toolInput = <{ code: string }> toolBlock.input
 
     console.log(`\n${'='.repeat(50)}\nUsing tool: ${toolName}\n${'='.repeat(50)}`);
 
     if (toolName === 'execute_python') {
-      const code = toolInput.code
-      return codeInterpret(codeInterpreter, code)
+      return codeInterpret(codeInterpreter, toolInput.code)
     }
-    return undefined
   }
 }
 

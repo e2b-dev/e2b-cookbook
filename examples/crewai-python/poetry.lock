@@ -1746,25 +1746,6 @@ docs = ["Sphinx", "furo"]
 test = ["objgraph", "psutil"]
 
 [[package]]
-name = "groq"
-version = "0.5.0"
-description = "The official Python library for the groq API"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "groq-0.5.0-py3-none-any.whl", hash = "sha256:a7e6be1118bcdfea3ed071ec00f505a34d4e6ec28c435adb5a5afd33545683a1"},
-    {file = "groq-0.5.0.tar.gz", hash = "sha256:d476cdc3383b45d2a4dc1876142a9542e663ea1029f9e07a05de24f895cae48c"},
-]
-
-[package.dependencies]
-anyio = ">=3.5.0,<5"
-distro = ">=1.7.0,<2"
-httpx = ">=0.23.0,<1"
-pydantic = ">=1.9.0,<3"
-sniffio = "*"
-typing-extensions = ">=4.7,<5"
-
-[[package]]
 name = "grpc-google-iam-v1"
 version = "0.13.1"
 description = "IAM API client library"
@@ -2640,21 +2621,6 @@ langchain-community = ">=0.2.16,<0.3.0"
 langchain-core = ">=0.2.38,<0.3.0"
 
 [[package]]
-name = "langchain-groq"
-version = "0.1.10"
-description = "An integration package connecting Groq and LangChain"
-optional = false
-python-versions = "<4.0,>=3.8.1"
-files = [
-    {file = "langchain_groq-0.1.10-py3-none-any.whl", hash = "sha256:ef18331ba31b13ea44b7ac5467ad31b7efdf5bfe7c219cdf585311811b06f6b8"},
-    {file = "langchain_groq-0.1.10.tar.gz", hash = "sha256:a5e69190fd89420ab759845956f64230473c8229446c8e7022b1cbc269a51078"},
-]
-
-[package.dependencies]
-groq = ">=0.4.1,<1"
-langchain-core = ">=0.2.39,<0.3.0"
-
-[[package]]
 name = "langchain-openai"
 version = "0.1.25"
 description = "An integration package connecting OpenAI and LangChain"
@@ -2683,22 +2649,6 @@ files = [
 
 [package.dependencies]
 langchain-core = ">=0.2.38,<0.3.0"
-
-[[package]]
-name = "langchainhub"
-version = "0.1.21"
-description = "The LangChain Hub API client"
-optional = false
-python-versions = "<4.0,>=3.8.1"
-files = [
-    {file = "langchainhub-0.1.21-py3-none-any.whl", hash = "sha256:1cc002dc31e0d132a776afd044361e2b698743df5202618cf2bad399246b895f"},
-    {file = "langchainhub-0.1.21.tar.gz", hash = "sha256:723383b3964a47dbaea6ad5d0ef728accefbc9d2c07480e800bdec43510a8c10"},
-]
-
-[package.dependencies]
-packaging = ">=23.2,<25"
-requests = ">=2,<3"
-types-requests = ">=2.31.0.2,<3.0.0.0"
 
 [[package]]
 name = "langsmith"
@@ -6287,4 +6237,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<=3.13"
-content-hash = "b6481ac119dcffeed638048ae984f60f9941df3b5c81a62aa91ce05c8d6ee4e8"
+content-hash = "d8cec0765a01b25f76d533b879fb7224c77ec3209412237a1a1961c365bf8661"

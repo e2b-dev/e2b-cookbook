@@ -2,8 +2,14 @@ from dotenv import load_dotenv
 from crewai import Agent, Task  
 from crewai_e2b_python.code_interpreter_tool import CodeInterpreterTool
 import json
+import re
 
 load_dotenv()
+
+# Extract code from an LLM output
+def extract_code(text: str) -> dict:
+    result = re.search(r'```.*?\n(.*?)\n```', text, re.DOTALL)
+    return result.group(1) if result else text
 
 def main():
 
@@ -28,7 +34,8 @@ def main():
 
     # Run the agent and print the results
     task_result = agent.execute_task(scrape_hacker_news)
-    print(json.dumps(task_result, indent=2))
+    parsed_result = json.loads(extract_code(task_result))
+    print(json.dumps(parsed_result, indent=2))
 
     # Close the code interpreter
     code_interpreter.close()

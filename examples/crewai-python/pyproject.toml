@@ -7,7 +7,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.11,<=3.13"
-e2b-code-interpreter = "^0.0.3"
+e2b-code-interpreter = "0.0.11b32"
 python-dotenv = "^1.0.1"
 
 crewai = "^0.61.0"

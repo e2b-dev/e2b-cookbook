@@ -45,4 +45,4 @@ class CodeInterpreterTool(BaseTool):
 
     def close(self):
         # Close the interpreter tool when done
-        self._code_interpreter_tool.close()
+        self._code_interpreter_tool.kill()

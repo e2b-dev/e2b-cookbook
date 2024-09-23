@@ -22,7 +22,7 @@ def main():
     # Define the web scraping task
     scrape_hacker_news = Task(
         description='Scrape the Hacker News homepage.',
-        expected_output='list of headlines',
+        expected_output='list of articles as a JSON array like [{"headline","url"},...]',
         agent=agent,
     )
 

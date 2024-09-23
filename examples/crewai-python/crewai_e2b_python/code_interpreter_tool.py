@@ -3,14 +3,26 @@ import json
 from crewai_tools import BaseTool
 from e2b_code_interpreter import CodeInterpreter
 
+from typing import Type
+from pydantic import BaseModel, Field
+
+class CodeInterpreterSchema(BaseModel):
+    """Input schema for the CodeInterpreterTool, used by the agent."""
+
+    code: str = Field(
+        ...,
+        description="Python3 code used to run in the Jupyter notebook cell. Non-standard packages are installed by appending !pip install [packagenames] and the Python code in one single code block.",
+    )
+
 class CodeInterpreterTool(BaseTool):
     """
-    This is a wrapper around E2B's Code Interpreter tool, adapted for CrewAI.
-    It calls arbitrary code against a Python Jupyter notebook.
+    This is a tool that runs arbitrary code in a Python Jupyter notebook.
+    It uses E2B to run the notebook in a secure cloud sandbox.
     It requires an E2B_API_KEY to create a sandbox.
     """
     name: str = "code_interpreter"
-    description: str = "Execute Python code in a Jupyter notebook cell and returns any rich data (eg charts), stdout, stderr, and error. Non-standard packages are installed by appending !pip install [packagenames] and the Python code in one single code block."
+    description: str = "Execute Python code in a Jupyter notebook cell and return any rich data (eg charts), stdout, stderr, and errors."
+    args_schema: Type[BaseModel] = CodeInterpreterSchema
     _code_interpreter_tool: CodeInterpreter | None = None
 
     def __init__(self, *args, **kwargs):

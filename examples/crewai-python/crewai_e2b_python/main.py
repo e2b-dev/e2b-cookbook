@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 from crewai import Agent, Task  
-from crewai_e2b_python.code_interpreter_tool import CodeInterpreterTool
+from crewai_e2b_python.code_interpreter_tool import E2BCodeInterpreterTool
 import json
 
 load_dotenv()
@@ -9,7 +9,7 @@ def main():
 
     # Initialize the code interpreter tool
     # We use result_as_answer=True to prevent the agent from changing the output after the last step
-    code_interpreter = CodeInterpreterTool(result_as_answer=True);
+    code_interpreter = E2BCodeInterpreterTool(result_as_answer=True);
 
     try:
         # Create the CrewAI agent
@@ -18,7 +18,7 @@ def main():
             goal='Assist in interpreting code and performing tasks.',
             backstory='An expert tool handler capable of executing code.',
             tools=[code_interpreter],
-            llm='gpt-4o',
+            llm='gpt-4o-mini',
             verbose=True,
         )
 

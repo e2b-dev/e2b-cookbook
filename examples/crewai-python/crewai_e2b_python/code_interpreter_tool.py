@@ -6,7 +6,7 @@ from e2b_code_interpreter import CodeInterpreter
 from typing import Type
 from pydantic import BaseModel, Field
 
-class CodeInterpreterSchema(BaseModel):
+class E2BCodeInterpreterSchema(BaseModel):
     """Input schema for the CodeInterpreterTool, used by the agent."""
 
     code: str = Field(
@@ -14,7 +14,7 @@ class CodeInterpreterSchema(BaseModel):
         description="Python3 code used to run in the Jupyter notebook cell. Non-standard packages are installed by appending !pip install [packagenames] and the Python code in one single code block.",
     )
 
-class CodeInterpreterTool(BaseTool):
+class E2BCodeInterpreterTool(BaseTool):
     """
     This is a tool that runs arbitrary code in a Python Jupyter notebook.
     It uses E2B to run the notebook in a secure cloud sandbox.
@@ -22,7 +22,7 @@ class CodeInterpreterTool(BaseTool):
     """
     name: str = "code_interpreter"
     description: str = "Execute Python code in a Jupyter notebook cell and return any rich data (eg charts), stdout, stderr, and errors."
-    args_schema: Type[BaseModel] = CodeInterpreterSchema
+    args_schema: Type[BaseModel] = E2BCodeInterpreterSchema
     _code_interpreter_tool: CodeInterpreter | None = None
 
     def __init__(self, *args, **kwargs):

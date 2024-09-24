@@ -45,7 +45,7 @@ async function chat(codeInterpreter: CodeInterpreter, userMessage: string): Prom
 }
 
 async function run() {
-  const userMessage = 'Visualize a distribution of height of men based on the latest data you know. Also print the median value.'
+  const userMessage = 'Estimate a distribution of height of men without using external data sources. Also print the median value.'
 
   const codeInterpreter = await CodeInterpreter.create()
 

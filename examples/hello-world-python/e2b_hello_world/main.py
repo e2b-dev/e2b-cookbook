@@ -35,17 +35,26 @@ def chat(code_interpreter: CodeInterpreter, user_message: str) -> Tuple[List[Res
 
         if tool_name == "execute_python":
             return code_interpret(code_interpreter, tool_input["code"])
-        return []
+    
+    return None, None
 
 def main():
   user_message = "Estimate a distribution of height of men without using external data sources. Also print the median value."
 
   # Create the CodeInterpreter object and save it as code_interpreter
   with CodeInterpreter() as code_interpreter:
-    code_interpreter_results, code_interpreter_logs = chat(
-      code_interpreter,
-      user_message,
-    )
+    retries = 3
+    attempt = 0
+
+    while attempt < retries:
+        code_interpreter_results, code_interpreter_logs = chat(code_interpreter, user_message)
+        if code_interpreter_results is not None:
+            break
+        attempt += 1
+        print(f"Result is None. Retrying... attempt {attempt}/{retries}")
+
+    if code_interpreter_results is None:
+        raise ValueError("Max retries reached and result is still None.")
 
     print(code_interpreter_logs)
 

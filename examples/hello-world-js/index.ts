@@ -1,4 +1,5 @@
 import * as fs from 'fs'
+import { Buffer } from 'buffer';
 
 import 'dotenv/config'
 import { CodeInterpreter, Execution } from '@e2b/code-interpreter'
@@ -29,28 +30,38 @@ async function chat(codeInterpreter: CodeInterpreter, userMessage: string): Prom
 
   if (msg.stop_reason === 'tool_use') {
     const toolBlock = msg.content.find((block) => block.type === 'tool_use');
+
+    if (!toolBlock) return;
+
     const toolName = toolBlock.name
-    const toolInput = toolBlock.input
+    const toolInput = <{ code: string }> toolBlock.input
 
     console.log(`\n${'='.repeat(50)}\nUsing tool: ${toolName}\n${'='.repeat(50)}`);
 
     if (toolName === 'execute_python') {
-      const code = toolInput.code
-      return codeInterpret(codeInterpreter, code)
+      return codeInterpret(codeInterpreter, toolInput.code)
     }
-    return undefined
   }
 }
 
 async function run() {
-  const userMessage = 'Visualize a distribution of height of men based on the latest data you know. Also print the median value.'
+  const userMessage = 'Estimate a distribution of height of men without using external data sources. Also print the median value.'
 
   const codeInterpreter = await CodeInterpreter.create()
 
-  const codeOutput = await chat(codeInterpreter, userMessage)
+  let codeOutput : Execution | undefined;
+  const maxRetries = 3;
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    codeOutput = await chat(codeInterpreter, userMessage);
+    if (codeOutput) {
+      break;
+    }
+    console.log(`No code interpreter output, attempt ${attempt}`);
+  }
+  
   if (!codeOutput) {
-    console.log('No code output')
-    return
+    throw Error('Max retries reached. No code interpreter output.');
   }
 
   const logs = codeOutput.logs

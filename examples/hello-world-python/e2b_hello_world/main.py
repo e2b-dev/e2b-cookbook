@@ -38,7 +38,7 @@ def chat(code_interpreter: CodeInterpreter, user_message: str) -> Tuple[List[Res
         return []
 
 def main():
-  user_message = "Visualize a distribution of height of men based on the latest data you know. Also print the median value."
+  user_message = "Estimate a distribution of height of men without using external data sources. Also print the median value."
 
   # Create the CodeInterpreter object and save it as code_interpreter
   with CodeInterpreter() as code_interpreter:

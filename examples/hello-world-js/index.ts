@@ -49,10 +49,20 @@ async function run() {
 
   const codeInterpreter = await CodeInterpreter.create()
 
-  const codeOutput = await chat(codeInterpreter, userMessage)
+  let codeOutput : Execution | undefined;
+  const maxRetries = 3;
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    codeOutput = await chat(codeInterpreter, userMessage);
+    if (codeOutput) {
+      break;
+    }
+    console.log(`No code interpreter output, attempt ${attempt}`);
+  }
+  
   if (!codeOutput) {
-    console.log('No code output')
-    return
+    console.log('Max retries reached. No code interpreter output.');
+    return;
   }
 
   const logs = codeOutput.logs

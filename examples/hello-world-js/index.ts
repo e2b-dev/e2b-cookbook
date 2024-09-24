@@ -61,8 +61,7 @@ async function run() {
   }
   
   if (!codeOutput) {
-    console.log('Max retries reached. No code interpreter output.');
-    return;
+    throw Error('Max retries reached. No code interpreter output.');
   }
 
   const logs = codeOutput.logs

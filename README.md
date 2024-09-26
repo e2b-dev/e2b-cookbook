@@ -49,6 +49,11 @@ Example code and guides for building with [E2B's Code Interpreter SDK](https://g
       - Code interpreter usable with Meta Llama 3.1 Instruct Turbo (8B or 70B or 405B), Qwen 2 Instruct (72B), Code Llama Instruct (70B), or DeepSeek Coder Instruct (33B)
         - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/together-ai-with-code-interpreting/together-ai-code-interpreter-python)
         - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/together-ai-with-code-interpreting/together-ai-code-interpreter-js)
+   - **Groq**
+      - LLMs powered by Groq with code interpreter
+        - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/groq-code-interpreter-python)
+        - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/groq-code-interpreter-js)
+  
   
 
 **AI frameworks integrations**

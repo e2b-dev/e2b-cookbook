@@ -3,7 +3,6 @@ language js
 
 pattern e2b_v0_to_v1() {
     or {
-    //    `Sandbox.create()` => `Sandbox.create({timeoutMs: 300_000})`,
         `Sandbox.create({$params})` where {
             $params <: contains `template: $name` => ., // `timeoutMs: 300_000`,
             $params <: contains `cwd: $cwd` => .
@@ -14,11 +13,9 @@ pattern e2b_v0_to_v1() {
         `Sandbox.create({$params})` where {
             $params <: contains `cwd: $cwd` => ., // `timeoutMs: 300_000`,
         } => `Sandbox.create({$params}) // TODO: cwd $cwd was removed, it can't be set on sbx anymore`,
-    //    `Sandbox.create({$params})` where {
-    //        $params += `, timeoutMs: 300_000`,
-    //    } => `Sandbox.create({$params})`,
         `$sbx.keepAlive($time)` => `$sbx.setTimeout($time)`,
         `Sandbox.reconnect($x)` => `Sandbox.connect($x)`,
+        `$sbx.filesystem.write($path, $text)` => `$sbx.files.write($path, $text)`,
         `$sbx.uploadFile($file, $path)` => `$sbx.files.write($path, $file)`,
         `$sbx.downloadFile($path)` => `$sbx.files.read($path)`,
         `$sbx.process.startAndWait({$params})` where {
@@ -45,6 +42,7 @@ pattern e2b_v0_to_v1() {
         },
         `$sbx.id` => `$sbx.sandboxId`,
         `$sbx.fileURL` => `$sbx.uploadUrl()`,
+        `$sbx.getHostname` => `$sbx.getHost()`,
         `$sbx.close()` => `$sbx.kill()`,
     }
 }

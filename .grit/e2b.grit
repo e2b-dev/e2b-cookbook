@@ -1,48 +1,50 @@
 engine marzano(0.1)
 language js
 
-or {
-//    `Sandbox.create()` => `Sandbox.create({timeoutMs: 300_000})`,
-    `Sandbox.create({$params})` where {
-        $params <: contains `template: $name` => ., // `timeoutMs: 300_000`,
-        $params <: contains `cwd: $cwd` => .
-    } => `Sandbox.create($name, {$params}) // TODO: cwd $cwd was removed, it can't be set on sbx anymore`,
-    `Sandbox.create({$params})` where {
-        $params <: contains `template: $name` => . // `timeoutMs: 300_000`
-    } => `Sandbox.create($name, {$params})`,
-    `Sandbox.create({$params})` where {
-        $params <: contains `cwd: $cwd` => ., // `timeoutMs: 300_000`,
-    } => `Sandbox.create({$params}) // TODO: cwd $cwd was removed, it can't be set on sbx anymore`,
-//    `Sandbox.create({$params})` where {
-//        $params += `, timeoutMs: 300_000`,
-//    } => `Sandbox.create({$params})`,
-    `$sbx.keepAlive($time)` => `$sbx.setTimeout($time)`,
-    `Sandbox.reconnect($x)` => `Sandbox.connect($x)`,
-    `$sbx.uploadFile($file, $path)` => `$sbx.files.write($path, $file)`,
-    `$sbx.downloadFile($path)` => `$sbx.files.read($path)`,
-    `$sbx.process.startAndWait({$params})` where {
-        $params <: contains `cmd: $cmd` => .,
-     } => `$sbx.commands.run($cmd, {$params)`,
-    `$sbx.process.start({$params})` where {
-        $params <: contains `cmd: $cmd` => .,
-     } => `$sbx.commands.run($cmd, {$params, background: true})`,
-    `const $watcher = $sbx.filesystem.watchDir($path)` => `` where {
-        $program <: contains `$watcher.addEventListener($body)` => .,
-        $program <: contains `await $watcher.start()` => `await $sbx.files.watch($path, $body)`
-    },
-    `let $watcher = $sbx.filesystem.watchDir($path)` => `` where {
-        $program <: contains `$watcher.addEventListener($body)` => .,
-        $program <: contains `await $watcher.start()` => `await $sbx.files.watch($path, $body)`
-    },
-    `var $watcher = $sbx.filesystem.watchDir($path)` => `` where {
-        $program <: contains `$watcher.addEventListener($body)` => .,
-        $program <: contains `await $watcher.start()` => `await $sbx.files.watch($path, $body)`
-    },
-    `$watcher = $sbx.filesystem.watchDir($path)` => `` where {
-        $program <: contains `$watcher.addEventListener($body)` => .,
-        $program <: contains `await $watcher.start()` => `await $sbx.files.watch($path, $body)`
-    },
-    `$sbx.id` => `$sbx.sandboxId`,
-    `$sbx.fileURL` => `$sbx.uploadUrl()`,
-    `$sbx.close()` => `$sbx.kill()`,
+pattern e2b_v0_to_v1() {
+    or {
+    //    `Sandbox.create()` => `Sandbox.create({timeoutMs: 300_000})`,
+        `Sandbox.create({$params})` where {
+            $params <: contains `template: $name` => ., // `timeoutMs: 300_000`,
+            $params <: contains `cwd: $cwd` => .
+        } => `Sandbox.create($name, {$params}) // TODO: cwd $cwd was removed, it can't be set on sbx anymore`,
+        `Sandbox.create({$params})` where {
+            $params <: contains `template: $name` => . // `timeoutMs: 300_000`
+        } => `Sandbox.create($name, {$params})`,
+        `Sandbox.create({$params})` where {
+            $params <: contains `cwd: $cwd` => ., // `timeoutMs: 300_000`,
+        } => `Sandbox.create({$params}) // TODO: cwd $cwd was removed, it can't be set on sbx anymore`,
+    //    `Sandbox.create({$params})` where {
+    //        $params += `, timeoutMs: 300_000`,
+    //    } => `Sandbox.create({$params})`,
+        `$sbx.keepAlive($time)` => `$sbx.setTimeout($time)`,
+        `Sandbox.reconnect($x)` => `Sandbox.connect($x)`,
+        `$sbx.uploadFile($file, $path)` => `$sbx.files.write($path, $file)`,
+        `$sbx.downloadFile($path)` => `$sbx.files.read($path)`,
+        `$sbx.process.startAndWait({$params})` where {
+            $params <: contains `cmd: $cmd` => .,
+        } => `$sbx.commands.run($cmd, {$params)`,
+        `$sbx.process.start({$params})` where {
+            $params <: contains `cmd: $cmd` => .,
+        } => `$sbx.commands.run($cmd, {$params, background: true})`,
+        `const $watcher = $sbx.filesystem.watchDir($path)` => `` where {
+            $program <: contains `$watcher.addEventListener($body)` => .,
+            $program <: contains `await $watcher.start()` => `await $sbx.files.watch($path, $body)`
+        },
+        `let $watcher = $sbx.filesystem.watchDir($path)` => `` where {
+            $program <: contains `$watcher.addEventListener($body)` => .,
+            $program <: contains `await $watcher.start()` => `await $sbx.files.watch($path, $body)`
+        },
+        `var $watcher = $sbx.filesystem.watchDir($path)` => `` where {
+            $program <: contains `$watcher.addEventListener($body)` => .,
+            $program <: contains `await $watcher.start()` => `await $sbx.files.watch($path, $body)`
+        },
+        `$watcher = $sbx.filesystem.watchDir($path)` => `` where {
+            $program <: contains `$watcher.addEventListener($body)` => .,
+            $program <: contains `await $watcher.start()` => `await $sbx.files.watch($path, $body)`
+        },
+        `$sbx.id` => `$sbx.sandboxId`,
+        `$sbx.fileURL` => `$sbx.uploadUrl()`,
+        `$sbx.close()` => `$sbx.kill()`,
+    }
 }

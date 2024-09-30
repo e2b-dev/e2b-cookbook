@@ -1,0 +1,3 @@
+version: 0.0.1
+patterns:
+  - file: ./e2b.grit

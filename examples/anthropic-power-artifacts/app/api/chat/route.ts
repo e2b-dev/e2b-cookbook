@@ -75,7 +75,7 @@ export async function POST(req: Request) {
 
   const stream = result.toAIStream({
     async onFinal() {
-      await data.close()
+      await data.kill()
     }
   })
 

@@ -53,13 +53,13 @@ export async function evaluateCode(
   } finally {
     try {
       // This will ensure the sandbox is not killed after closing the connection in the next 10 minutes.
-      await sandbox.keepAlive(sandboxTimeout);
+      await sandbox.setTimeout(sandboxTimeout);
     } catch {
       // Ignore errors from the keepalive and close the sandbox.
     }
 
     // We disconnect from the sandbox because we are calling this function in a serverless environment and don't want to keep the connection active.
-    await sandbox.close();
+    await sandbox.kill();
   }
 }
 

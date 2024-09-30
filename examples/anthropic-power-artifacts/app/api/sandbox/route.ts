@@ -9,10 +9,10 @@ export async function POST(req: Request) {
   const sbx = await createOrConnect(userID)
 
 
-  const url = `https://${sbx.getHostname()}`
+  const url = `https://${sbx.getHost()()}`
 
-  await sbx.keepAlive(sandboxTimeout)
-  await sbx.close()
+  await sbx.setTimeout(sandboxTimeout)
+  await sbx.kill()
 
   return new Response(JSON.stringify({
     status: 'ok',

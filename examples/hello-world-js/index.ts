@@ -90,7 +90,7 @@ async function run() {
       console.log(`Saved chart to ${filename}`);
   }
 
-  await codeInterpreter.close()
+  await codeInterpreter.kill()
 }
 
 run()

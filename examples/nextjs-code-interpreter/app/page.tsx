@@ -73,7 +73,7 @@ export default function Chat() {
       {messages.length > 0
         ? messages.map((m: Message, i) => (
           <div
-            key={m.id}
+            key={m.sandboxId}
             className="whitespace-pre-wrap"
             style={{ color: roleToColorMap[m.role] }}
           >

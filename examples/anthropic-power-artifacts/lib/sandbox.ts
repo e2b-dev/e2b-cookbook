@@ -30,5 +30,5 @@ export async function runPython(userID: string, code: string) {
 
 export async function getFileUploadURL(userID: string) {
   const sbx = await createOrConnect(userID)
-  return sbx.fileURL
+  return sbx.uploadUrl()
 }

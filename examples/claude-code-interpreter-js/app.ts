@@ -121,7 +121,7 @@ async function run() {
     } catch (error) {
         console.error('An error occurred:', error)
     } finally {
-        await codeInterpreter.close()
+        await codeInterpreter.kill()
     }
 }
 

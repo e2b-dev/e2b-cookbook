@@ -21,7 +21,7 @@ export function Chat({
     <div className="flex-1 flex flex-col py-4 gap-4 max-h-full max-w-[800px] mx-auto justify-between">
       <div className="flex flex-col gap-2 overflow-y-auto max-h-full px-4 rounded-lg">
         {messages.map(message => (
-          <div className={`py-2 px-4 shadow-sm whitespace-pre-wrap ${message.role !== 'user' ? 'bg-white' : 'bg-white/40'} rounded-lg border-b border-[#FFE7CC] font-serif`} key={message.id}>
+          <div className={`py-2 px-4 shadow-sm whitespace-pre-wrap ${message.role !== 'user' ? 'bg-white' : 'bg-white/40'} rounded-lg border-b border-[#FFE7CC] font-serif`} key={message.sandboxId}>
             {message.content}
             {message.toolInvocations && message.toolInvocations.length > 0 &&
               <div className="mt-4 flex justify-start items-start border border-[#FFE7CC] rounded-md">

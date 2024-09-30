@@ -107,7 +107,7 @@ async function uploadDataset(codeInterpreter: CodeInterpreter): Promise<string> 
     const fileBuffer = fs.readFileSync(datasetPath)
 
     try {
-        const remotePath = await codeInterpreter.uploadFile(fileBuffer, 'city_temperature.csv') // Pass the buffer and filename
+        const remotePath = await codeInterpreter.files.write('city_temperature.csv', fileBuffer) // Pass the buffer and filename
         if (!remotePath) {
             throw new Error('Failed to upload dataset')
         }
@@ -145,7 +145,7 @@ async function run() {
     } catch (error) {
         console.error('An error occurred:', error)
     } finally {
-        await codeInterpreter.close()
+        await codeInterpreter.kill()
     }
 }
 

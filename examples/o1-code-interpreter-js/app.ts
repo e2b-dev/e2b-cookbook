@@ -95,11 +95,11 @@ async function uploadDataset(codeInterpreter: CodeInterpreter) {
   );
 
   const testCsv = fs.readFileSync("./test.csv");
-  const testCsvPath = await codeInterpreter.uploadFile(testCsv, "test.csv");
+  const testCsvPath = await codeInterpreter.files.write("test.csv", testCsv);
   console.log("Uploaded test.csv at", testCsvPath);
 
   const trainCsv = fs.readFileSync("./train.csv");
-  const trainCsvPath = await codeInterpreter.uploadFile(trainCsv, "train.csv");
+  const trainCsvPath = await codeInterpreter.files.write("train.csv", trainCsv);
   console.log("Uploaded train.csv at", trainCsvPath);
 }
 
@@ -195,7 +195,7 @@ async function run() {
   } catch (error) {
     console.error("An error occurred:", error);
   } finally {
-    await codeInterpreter.close();
+    await codeInterpreter.kill();
   }
 }
 

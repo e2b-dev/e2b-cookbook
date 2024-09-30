@@ -1,7 +1,7 @@
 engine marzano(0.1)
 language js
 
-pattern e2b_v0_to_v1() {
+pattern e2b_v0_to_v1_js() {
     or {
         `Sandbox.create({$params})` where {
             $params <: contains `template: $name` => ., // `timeoutMs: 300_000`,

@@ -37,7 +37,7 @@ class CodeInterpreterFunctionTool:
         self.code_interpreter = CodeInterpreter()
 
     def close(self):
-        self.code_interpreter.close()
+        self.code_interpreter.kill()
 
     def call(self, parameters: dict, **kwargs: Any):
         # TODO: E2B supports generating and streaming charts and other rich data

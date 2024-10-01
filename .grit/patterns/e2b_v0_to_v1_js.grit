@@ -21,6 +21,7 @@ pattern e2b_v0_to_v1_js() {
         `$sbx.process.startAndWait({$params})` where {
             $params <: contains `cmd: $cmd` => .,
         } => `$sbx.commands.run($cmd, {$params)`,
+        `$sbx.process.startAndWait` => `$sbx.commands.run`,
         `$sbx.process.start({$params})` where {
             $params <: contains `cmd: $cmd` => .,
         } => `$sbx.commands.run($cmd, {$params, background: true})`,

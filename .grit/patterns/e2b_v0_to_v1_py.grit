@@ -21,6 +21,7 @@ pattern e2b_v0_to_v1_py() {
         `$sbx.process.start_and_wait($params)` where {
             $params <: contains `cmd="$cmd"` => .,
         } => `$sbx.commands.run($cmd, $params)`,
+        `$sbx.process.start_and_wait` => `$sbx.commands.run`,
         `$sbx.process.start($params)` where {
             $params <: contains `cmd="$cmd"` => .,
         } => `$sbx.commands.run($cmd, $params, background=True)`,

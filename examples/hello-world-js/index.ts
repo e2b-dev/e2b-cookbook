@@ -34,7 +34,7 @@ async function chat(codeInterpreter: CodeInterpreter, userMessage: string): Prom
     if (!toolBlock) return;
 
     const toolName = toolBlock.name
-    const toolInput = <{ code: string }> toolBlock.input
+    const toolInput = toolBlock.input as { code: string };
 
     console.log(`\n${'='.repeat(50)}\nUsing tool: ${toolName}\n${'='.repeat(50)}`);
 

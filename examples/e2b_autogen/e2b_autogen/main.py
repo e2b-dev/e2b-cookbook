@@ -29,13 +29,13 @@ def execute_code(
     packages: Optional[str] = None,
 ):
     if packages is not None and packages != "":
-        sandbox.process.start_and_wait(f"pip install -qq {packages}")
+        sandbox.commands.run(f"pip install -qq {packages}")
 
     code_hash = md5(code.encode()).hexdigest()
     filename = f"{work_dir}/{code_hash}.py"
     sandbox.files.write(filename, code)
 
-    proc = sandbox.process.start_and_wait(
+    proc = sandbox.commands.run(
         f"python3 {filename}",
         timeout=timeout,
         cwd=work_dir,

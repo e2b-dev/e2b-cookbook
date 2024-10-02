@@ -73,7 +73,7 @@ def main():
     # 4. Invoke the graph
     result = app.invoke([("human", "plot and show sinus")])
 
-    code_interpreter.kill()
+    code_interpreter.close()
 
     print(result)
 

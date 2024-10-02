@@ -72,7 +72,7 @@ def main():
     # 5. Invoke the agent
     result = agent_executor.invoke({"input": "plot and show sinus"})
 
-    code_interpreter.kill()
+    code_interpreter.close()
 
     print(result)
 

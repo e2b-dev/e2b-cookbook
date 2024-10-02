@@ -49,7 +49,7 @@ config_list = config_list_from_json(
     "OAI_CONFIG_LIST",
     filter_dict={
         # Function calling with GPT 3.5 - cheaper/faster but less accurate
-        "model": ["gpt-3.5-turbo-16k-0613"],
+        "model": ["gpt-3.5-turbo"],
 
         # "model": ["gpt-4-1106-preview"],
     },

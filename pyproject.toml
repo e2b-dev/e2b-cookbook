@@ -10,6 +10,7 @@ python = "^3.12"
 jupyter = "^1.1.1"
 nbconvert = "^7.16.4"
 python-dotenv = "^1.0.1"
+pip = "^24.2"
 
 
 [build-system]

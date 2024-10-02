@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import { OpenAI } from 'openai'
 import { CodeInterpreter, Result } from '@e2b/code-interpreter'
-import { ProcessMessage } from '@e2b/code-interpreter'
+import { OutputMessage } from '@e2b/code-interpreter'
 
 import * as dotenv from 'dotenv'
 import { ChatCompletionTool, ChatCompletionMessageParam } from 'openai/resources/index'
@@ -54,8 +54,8 @@ async function codeInterpret(codeInterpreter: CodeInterpreter, code: string): Pr
     console.log('Running code interpreter...')
 
     const exec = await codeInterpreter.notebook.execCell(code, {
-        onStderr: (msg: ProcessMessage) => console.log('[Code Interpreter stderr]', msg),
-        onStdout: (stdout: ProcessMessage) => console.log('[Code Interpreter stdout]', stdout),
+        onStderr: (msg: OutputMessage) => console.log('[Code Interpreter stderr]', msg),
+        onStdout: (stdout: OutputMessage) => console.log('[Code Interpreter stdout]', stdout),
         // You can also stream additional results like charts, images, etc.
     })
 

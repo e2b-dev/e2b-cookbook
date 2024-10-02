@@ -7,7 +7,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-e2b-code-interpreter = "^0.0.3"
+e2b-code-interpreter = "0.0.11b36"
 anthropic = "^0.25.6"
 python-dotenv = "^1.0.1"
 

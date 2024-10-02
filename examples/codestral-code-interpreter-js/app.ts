@@ -1,5 +1,5 @@
 import fs from 'node:fs'
-import { CodeInterpreter, Result, ProcessMessage } from '@e2b/code-interpreter'
+import { CodeInterpreter, Result, OutputMessage } from '@e2b/code-interpreter'
 import * as dotenv from 'dotenv'
 import MistralClient from '@mistralai/mistralai'
 
@@ -50,8 +50,8 @@ async function codeInterpret(codeInterpreter: CodeInterpreter, code: string): Pr
     console.log('Running code interpreter...')
 
     const exec = await codeInterpreter.notebook.execCell(code, {
-        onStderr: (msg: ProcessMessage) => console.log('[Code Interpreter stderr]', msg),
-        onStdout: (stdout: ProcessMessage) => console.log('[Code Interpreter stdout]', stdout),
+        onStderr: (msg: OutputMessage) => console.log('[Code Interpreter stderr]', msg),
+        onStdout: (stdout: OutputMessage) => console.log('[Code Interpreter stdout]', stdout),
     })
 
     if (exec.error) {

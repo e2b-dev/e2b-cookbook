@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import { OpenAI } from "openai";
 import { CodeInterpreter, Result } from "@e2b/code-interpreter";
-import { ProcessMessage } from "@e2b/code-interpreter";
+import { OutputMessage } from "@e2b/code-interpreter";
 import * as dotenv from "dotenv";
 
 dotenv.config({ override: true });
@@ -74,9 +74,9 @@ async function codeInterpret(
   console.log("Running code interpreter...");
 
   const exec = await codeInterpreter.notebook.execCell(code, {
-    onStderr: (msg: ProcessMessage) =>
+    onStderr: (msg: OutputMessage) =>
       console.log("[Code Interpreter stderr]", msg),
-    onStdout: (stdout: ProcessMessage) =>
+    onStdout: (stdout: OutputMessage) =>
       console.log("[Code Interpreter stdout]", stdout),
   });
 

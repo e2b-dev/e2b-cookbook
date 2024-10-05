@@ -1,7 +1,6 @@
 import fs from 'node:fs'
 
 import { Anthropic } from '@anthropic-ai/sdk'
-import { Tool, ToolUseBlock } from '@anthropic-ai/sdk/resources/beta/tools/messages'
 import { CodeInterpreter, Result } from '@e2b/code-interpreter'
 import { OutputMessage } from '@e2b/code-interpreter'
 
@@ -26,7 +25,7 @@ tool response values that have text inside "[]"  mean that a visual element got 
 - "[chart]" means that a chart was generated in the notebook.
 `
 
-const tools: Array<Tool> = [
+const tools: Array<Anthropic.Tool> = [
     {
         name: 'execute_python',
         description: 'Execute python code in a Jupyter notebook cell and returns any result, stdout, stderr, display_data, and error.',
@@ -76,7 +75,7 @@ async function chatWithClaude(codeInterpreter: CodeInterpreter, userMessage: str
     console.log(`\n${'='.repeat(50)}\nUser Message: ${userMessage}\n${'='.repeat(50)}`)
 
     console.log('Waiting for Claude to respond...')
-    const message = await client.beta.tools.messages.create({
+    const message = await client.messages.create({
         model: MODEL_NAME,
         system: SYSTEM_PROMPT,
         max_tokens: 4096,
@@ -87,7 +86,7 @@ async function chatWithClaude(codeInterpreter: CodeInterpreter, userMessage: str
     console.log(`\nInitial Response:\nStop Reason: ${message.stop_reason}`)
 
     if (message.stop_reason === 'tool_use') {
-        const toolUse = message.content.find(block => block.type === 'tool_use') as ToolUseBlock
+        const toolUse = message.content.find(block => block.type === 'tool_use') as Anthropic.ToolUseBlock
         if (!toolUse){
             console.error('Tool use block not found in message content.')
             return []

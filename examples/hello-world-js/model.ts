@@ -1,4 +1,4 @@
-import { Tool } from '@anthropic-ai/sdk/src/resources/beta/tools'
+import { Anthropic } from '@anthropic-ai/sdk'
 
 export const MODEL_NAME = 'claude-3-opus-20240229'
 
@@ -14,7 +14,7 @@ you are a python data scientist. you are given tasks to complete and you run pyt
 - you can run any python code you want, everything is running in a secure sandbox environment.
 `
 
-export const tools: Tool[] = [
+export const tools: Anthropic.Tool[] = [
   {
     name: 'execute_python',
     description: 'Execute python code in a Jupyter notebook cell and returns any result, stdout, stderr, display_data, and error.',

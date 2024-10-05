@@ -17,7 +17,7 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.20.7",
+    "@anthropic-ai/sdk": "^0.28.0",
     "@e2b/code-interpreter": "^0.0.2",
     "@mendable/firecrawl-js": "^0.0.21",
     "buffer": "^6.0.3",

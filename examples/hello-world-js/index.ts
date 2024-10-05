@@ -17,7 +17,7 @@ const anthropic = new Anthropic()
 async function chat(codeInterpreter: CodeInterpreter, userMessage: string): Promise<Execution | undefined> {
   console.log('Waiting for Claude...')
 
-  const msg = await anthropic.beta.tools.messages.create({
+  const msg = await anthropic.messages.create({
     model: MODEL_NAME,
     system: SYSTEM_PROMPT,
     max_tokens: 4096,

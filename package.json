@@ -3,7 +3,7 @@
     "type": "module",
     "version": "1.0.0",
     "scripts": {
-        "test": "jest"
+        "test": "jest --maxConcurrency=20"
     },
     "jest": {
         "preset": "ts-jest",
@@ -19,6 +19,8 @@
         "ts-node": "^10.9.2"
     },
     "dependencies": {
-        "dotenv": "^16.4.5"
+        "dotenv": "^16.4.5",
+        "e2b": "^0.16.2-beta.52",
+        "ignore": "^6.0.2"
     }
 }

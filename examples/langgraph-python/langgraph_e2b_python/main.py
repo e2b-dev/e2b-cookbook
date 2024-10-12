@@ -82,10 +82,15 @@ def main():
         if hasattr(message, "raw_output"):
             if message.raw_output["results"]:
                 rs = message.raw_output["results"]
-                for r in rs:
-                    for format, data in r.raw.items():
-                        if format == "image/png":
-                            with open("image.png", "wb") as f:
-                                f.write(base64.b64decode(data))
-                        else:
-                            print(data)
+                first_result = rs[0]
+
+                # Save the received PNG chart
+                if first_result.png:
+                    # Decode the base64 encoded PNG data
+                    png_data = base64.b64decode(first_result.png)
+
+                    # Save the decoded PNG data to a file
+                    filename = f"chart.png"
+                    with open(filename, "wb") as f:
+                        f.write(png_data)
+                    print(f"Saved chart to {filename}")

@@ -120,8 +120,8 @@ export async function POST(req: Request) {
     onCompletion(completion) {
       console.log('completion', completion);
     },
-    onFinal(completion) {
-      data.close();
+    async onFinal(completion) {
+      await data.close();
     },
   });
 

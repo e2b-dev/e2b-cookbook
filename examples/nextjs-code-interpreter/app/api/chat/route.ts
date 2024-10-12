@@ -74,7 +74,7 @@ export async function POST(req: Request) {
             parameters: {
               code: toolCall.func.arguments.code as string
             },
-            tool_call_id: toolCall.sandboxId,
+            tool_call_id: toolCall.id,
             evaluation: {
               stdout: evaluation.stdout,
               stderr: evaluation.stderr,
@@ -90,7 +90,7 @@ export async function POST(req: Request) {
           });
 
           const msgs = appendToolCallMessage({
-            tool_call_id: toolCall.sandboxId,
+            tool_call_id: toolCall.id,
             function_name: 'execute_python_code',
             tool_call_result: {
               stdout: evaluation.stdout,
@@ -121,7 +121,7 @@ export async function POST(req: Request) {
       console.log('completion', completion);
     },
     onFinal(completion) {
-      data.kill();
+      data.close();
     },
   });
 

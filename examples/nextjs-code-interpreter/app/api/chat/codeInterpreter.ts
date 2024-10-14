@@ -13,13 +13,6 @@ if (!E2B_API_KEY) {
 const sandboxTimeout = 10 * 60 * 1000; // 10 minutes in ms
 
 /**
- * The template to use for the sandbox.
- * If you are using CodeInterpreter it should be a custom template based on the code interpreter template.
- * https://e2b.dev/docs/code-interpreter/template
- */
-const template = 'code-interpreter-stateful';
-
-/**
  * Evaluate the code in the given session.
  *
  * @param sessionID The session ID to evaluate the code in.
@@ -84,7 +77,6 @@ async function getSandbox(sessionID: string) {
       apiKey: E2B_API_KEY,
     })
     : await CodeInterpreter.create({
-      template,
       apiKey: E2B_API_KEY,
       metadata: {
         sessionID,

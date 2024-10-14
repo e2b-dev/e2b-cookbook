@@ -67,7 +67,7 @@ async function getSandbox(sessionID: string) {
   const sandboxes = await CodeInterpreter.list();
 
   // We check if the sandbox is already running for the given session ID.
-  const sandboxID = sandboxes.find(sandbox => sandbox.metadata?.sessionID === sessionID)?.sandboxID;
+  const sandboxID = sandboxes.find(sandbox => sandbox.metadata?.sessionID === sessionID)?.sandboxId;
 
   // If the sandbox is already running, we reconnect to it.
   // https://e2b.dev/docs/sandbox/api/reconnect

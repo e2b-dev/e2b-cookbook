@@ -6,9 +6,9 @@ authors = ["keeganmccallum <keeganmccallum3@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11,<3.12"
-pyautogen = "^0.2.6"
-e2b = "^0.13.15"
+python = ">=3.11,<3.13"
+pyautogen = "^0.3.0"
+e2b = "0.17.2a60"
 python-dotenv = "^1.0.0"
 
 
@@ -20,3 +20,4 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.scripts]
 main = "e2b_autogen.main:main"
 demo = "e2b_autogen.main:demo"
+start = "e2b_autogen.main:demo"

@@ -10,7 +10,6 @@ dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 
 // List of all scripts and their respective interpreters
 const scripts = [
-  // Works:
   { name: 'hello-world-js', interpreter: 'npm', file: './examples/hello-world-js/' },
   { name: 'claude-code-interpreter-js', interpreter: 'npm', file: './examples/claude-code-interpreter-js/' },
   { name: 'scrape-and-analyze-airbnb-data-with-firecrawl', interpreter: 'npm', file: './examples/scrape-and-analyze-airbnb-data-with-firecrawl/' },
@@ -23,23 +22,18 @@ const scripts = [
   { name: 'codestral-code-interpreter-python', interpreter: 'jupyter', file: './examples/codestral-code-interpreter-python/codestral_code_interpreter.ipynb' },
   { name: 'upload-dataset-code-interpreter', interpreter: 'jupyter', file: './examples/upload-dataset-code-interpreter/llama_3_code_interpreter_upload_dataset.ipynb' },
   { name: 'hello-world-python', interpreter: 'poetry', file: './examples/hello-world-python/' },
-
-  // Inconsistent:
-  { name: 'llama-3-code-interpreter-js', interpreter: 'npm', file: './examples/llama-3-code-interpreter-js/' },
   { name: 'o1-code-interpreter-js', interpreter: 'npm', file: './examples/o1-code-interpreter-js/' },
-
-  // Doesn't work:
   { name: 'gpt-4o-code-interpreter', interpreter: 'jupyter', file: './examples/gpt-4o-code-interpreter/gpt_4o.ipynb' },
-  { name: 'claude-code-interpreter-python', interpreter: 'jupyter', file: './examples/claude-code-interpreter-python/claude_code_interpreter.ipynb' },
-  { name: 'claude-visualize-website-topics', interpreter: 'jupyter', file: './examples/claude-visualize-website-topics/claude-visualize-website-topics.ipynb' },
   { name: 'together-ai-with-code-interpreting', interpreter: 'jupyter', file: './examples/together-ai-with-code-interpreting/together-ai-code-interpreter-python/together_with_e2b_code_interpreter.ipynb' },
-  { name: 'e2b_autogen', interpreter: 'poetry', file: './examples/e2b_autogen/' },
   { name: 'langchain-python', interpreter: 'poetry', file: './examples/langchain-python/' },
   { name: 'langgraph-python', interpreter: 'poetry', file: './examples/langgraph-python/' },
-
-  // Untested:
-  //{ name: 'nextjs-code-interpreter', interpreter: 'npm', file: './examples/nextjs-code-interpreter/' }
+  { name: 'llama-3-code-interpreter-js', interpreter: 'npm', file: './examples/llama-3-code-interpreter-js/' },
+  { name: 'claude-code-interpreter-python', interpreter: 'jupyter', file: './examples/claude-code-interpreter-python/claude_code_interpreter.ipynb' },
+  { name: 'claude-visualize-website-topics', interpreter: 'jupyter', file: './examples/claude-visualize-website-topics/claude-visualize-website-topics.ipynb' },
 ];
+
+// We don't have integration tests for NextJS yet:
+//{ name: 'nextjs-code-interpreter', interpreter: 'npm', file: './examples/nextjs-code-interpreter/' }
 
 // Constants for the test process
 const SANDBOX_TEST_DIRECTORY = '/home/user/example';

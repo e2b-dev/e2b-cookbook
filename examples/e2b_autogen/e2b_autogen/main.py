@@ -33,7 +33,7 @@ def execute_code(
 
     code_hash = md5(code.encode()).hexdigest()
     filename = f"{work_dir}/{code_hash}.py"
-    sandbox.filesystem.write(filename, code)
+    sandbox.files.write(filename, code)
 
     proc = sandbox.process.start_and_wait(
         f"python3 {filename}",
@@ -160,7 +160,7 @@ def main():
         print("\n")
         if message in ["exit", "TERMINATE"]:
             print("Exiting...")
-            sandbox.close()
+            sandbox.kill()
             break
 
         user_proxy.initiate_chat(
@@ -181,4 +181,4 @@ def demo():
 
 
     # Close the sandbox once done
-    sandbox.close()
+    sandbox.kill()

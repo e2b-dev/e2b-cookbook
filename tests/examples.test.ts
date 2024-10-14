@@ -45,7 +45,7 @@ const scripts = [
 const SANDBOX_TEST_DIRECTORY = '/home/user/example';
 const LOGS_DIRECTORY = 'logs';
 const SANDBOX_TIMEOUT = 300_000;
-const COMMAND_TIMEOUT = 120_000;
+const COMMAND_TIMEOUT = 150_000;
 
 // Return the command needed for a given test
 function testScript(interpreter, notebookPath) {

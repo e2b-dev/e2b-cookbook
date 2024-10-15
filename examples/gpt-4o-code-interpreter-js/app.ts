@@ -128,6 +128,7 @@ async function chat(codeInterpreter: Sandbox, userMessage: string, base64_image?
         }
       } catch (error) {
         console.error('Error during API call:', error)
+        throw error;
       }
       return []
     }
@@ -170,6 +171,7 @@ async function run() {
         }
     } catch (error) {
         console.error('An error occurred:', error)
+        throw error;
     } finally {
         await codeInterpreter.kill()
     }

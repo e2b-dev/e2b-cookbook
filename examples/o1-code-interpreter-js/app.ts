@@ -160,7 +160,7 @@ async function chat(
     
   } catch (error) {
     console.error("Error when running code interpreter:", error);
-    return [];
+    throw error;
   }
 }
 
@@ -194,6 +194,7 @@ async function run() {
     }
   } catch (error) {
     console.error("An error occurred:", error);
+    throw error;
   } finally {
     await codeInterpreter.kill();
   }

@@ -94,5 +94,6 @@ export async function scrapeAirbnb() {
     return listingsData
   } catch (error) {
     console.error('An error occurred:', error.message)
+    throw error;
   }
 }

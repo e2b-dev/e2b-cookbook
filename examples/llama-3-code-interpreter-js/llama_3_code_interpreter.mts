@@ -1,4 +1,4 @@
-import { CodeInterpreter, Result } from '@e2b/code-interpreter'
+import { Sandbox, Result } from '@e2b/code-interpreter'
 import { Groq } from 'groq-sdk'
 import { CompletionCreateParams } from 'groq-sdk/src/resources/chat/completions'
 import fs from 'node:fs'
@@ -60,11 +60,11 @@ const client = new Groq({ apiKey: GROQ_API_KEY })
 // Here's the main function that use the E2B code interpreter SDK.
 // The function is called from the main function, when the model returns a tool call.
 async function codeInterpret(
-  e2b_code_interpreter: CodeInterpreter,
+  e2b_code_interpreter: Sandbox,
   code: string,
 ) {
   console.log('Running code interpreter...')
-  const exec = await e2b_code_interpreter.notebook.execCell(code, {
+  const exec = await e2b_code_interpreter.runCode(code, {
     onStderr: (stderr) => console.log('[Code Interpreter]', stderr),
     onStdout: (stdout) => console.log('[Code Interpreter]', stdout),
     // You can also stream code execution results
@@ -81,7 +81,7 @@ async function codeInterpret(
 // Here's the main function that chat with the model.
 // We parse the response from the model and call the E2B code interpreter tool, when requested.
 async function chatWithLlama(
-  e2b_code_interpreter: CodeInterpreter,
+  e2b_code_interpreter: Sandbox,
   user_message: string,
 ): Promise<Result[]> {
   console.log(`\n${'=' * 50}\nUser message: ${user_message}\n${'=' * 50}`)
@@ -119,7 +119,7 @@ async function chatWithLlama(
 
 // Putting it together
 // We create the E2B code interpreter which we will use to run the code generated from the model
-const code_interpreter = await CodeInterpreter.create({ apiKey: E2B_API_KEY })
+const code_interpreter = await Sandbox.create({ apiKey: E2B_API_KEY })
 
 // Now we chat with the model
 const code_results = await chatWithLlama(code_interpreter, TASK)

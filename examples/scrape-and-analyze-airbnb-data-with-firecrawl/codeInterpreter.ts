@@ -1,14 +1,14 @@
-import { CodeInterpreter } from '@e2b/code-interpreter'
+import { Sandbox } from '@e2b/code-interpreter'
 
 export async function codeInterpret(
-  codeInterpreter: CodeInterpreter,
+  codeInterpreter: Sandbox,
   code: string
 ) {
   console.log(
     `\n${'='.repeat(50)}\n> Running following AI-generated code:\n${code}\n${'='.repeat(50)}`
   )
 
-  const exec = await codeInterpreter.notebook.execCell(code, {
+  const exec = await codeInterpreter.runCode(code, {
     // You can stream logs from the code interpreter
     // onStderr: (stderr: string) => console.log("\n[Code Interpreter stdout]", stderr),
     // onStdout: (stdout: string) => console.log("\n[Code Interpreter stderr]", stdout),

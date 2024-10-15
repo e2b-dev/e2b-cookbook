@@ -2,7 +2,7 @@ import * as fs from 'fs'
 import { Buffer } from 'buffer';
 
 import 'dotenv/config'
-import { CodeInterpreter, Execution } from '@e2b/code-interpreter'
+import { Sandbox, Execution } from '@e2b/code-interpreter'
 import Anthropic from '@anthropic-ai/sdk'
 
 import {
@@ -14,7 +14,7 @@ import { codeInterpret } from './codeInterpreter'
 
 const anthropic = new Anthropic()
 
-async function chat(codeInterpreter: CodeInterpreter, userMessage: string): Promise<Execution | undefined> {
+async function chat(codeInterpreter: Sandbox, userMessage: string): Promise<Execution | undefined> {
   console.log('Waiting for Claude...')
 
   const msg = await anthropic.messages.create({
@@ -47,7 +47,7 @@ async function chat(codeInterpreter: CodeInterpreter, userMessage: string): Prom
 async function run() {
   const userMessage = 'Estimate a distribution of height of men without using external data sources. Also print the median value.'
 
-  const codeInterpreter = await CodeInterpreter.create()
+  const codeInterpreter = await Sandbox.create()
 
   let codeOutput : Execution | undefined;
   const maxRetries = 3;

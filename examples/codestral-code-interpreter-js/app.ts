@@ -1,5 +1,5 @@
 import fs from 'node:fs'
-import { CodeInterpreter, Result, OutputMessage } from '@e2b/code-interpreter'
+import { Sandbox, Result, OutputMessage } from '@e2b/code-interpreter'
 import * as dotenv from 'dotenv'
 import MistralClient from '@mistralai/mistralai'
 
@@ -46,10 +46,10 @@ Generally, you follow these rules:
 
 const client = new MistralClient()
 
-async function codeInterpret(codeInterpreter: CodeInterpreter, code: string): Promise<Result[]> {
+async function codeInterpret(codeInterpreter: Sandbox, code: string): Promise<Result[]> {
     console.log('Running code interpreter...')
 
-    const exec = await codeInterpreter.notebook.execCell(code, {
+    const exec = await codeInterpreter.runCode(code, {
         onStderr: (msg: OutputMessage) => console.log('[Code Interpreter stderr]', msg),
         onStdout: (stdout: OutputMessage) => console.log('[Code Interpreter stdout]', stdout),
     })
@@ -62,7 +62,7 @@ async function codeInterpret(codeInterpreter: CodeInterpreter, code: string): Pr
     return exec.results
 }
 
-async function chat(codeInterpreter: CodeInterpreter, userMessage: string): Promise<Result[]> {
+async function chat(codeInterpreter: Sandbox, userMessage: string): Promise<Result[]> {
     console.log(`\n${'='.repeat(50)}\nUser Message: ${userMessage}\n${'='.repeat(50)}`)
 
     const messages = [
@@ -95,7 +95,7 @@ async function chat(codeInterpreter: CodeInterpreter, userMessage: string): Prom
     }
 }
 
-async function uploadDataset(codeInterpreter: CodeInterpreter): Promise<string> {
+async function uploadDataset(codeInterpreter: Sandbox): Promise<string> {
     console.log('Uploading dataset to Code Interpreter sandbox...')
     const datasetPath = './city_temperature.csv'
 
@@ -120,7 +120,7 @@ async function uploadDataset(codeInterpreter: CodeInterpreter): Promise<string> 
 }
 
 async function run() {
-    const codeInterpreter = await CodeInterpreter.create()
+    const codeInterpreter = await Sandbox.create()
 
     try {
         const remotePath = await uploadDataset(codeInterpreter)

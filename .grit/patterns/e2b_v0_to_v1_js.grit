@@ -45,6 +45,8 @@ pattern e2b_v0_to_v1_js() {
         `$sbx.fileURL` => `$sbx.uploadUrl()`,
         `$sbx.getHostname` => `$sbx.getHost()`,
         `$sbx.close()` => `$sbx.kill()`,
+        $msg => `Sandbox` where { $msg <: "CodeInterpreter", $msg <: imported_from(`"@e2b/code-interpreter"`) },
+        `$sbx.notebook.execCell($params)` => `$sbx.runCode($params)`,
         `ProcessMessage` => `OutputMessage`,
     }
 }

@@ -4,7 +4,7 @@ import json
 from typing import Any, List
 from langchain_core.tools import Tool
 from pydantic.v1 import BaseModel, Field
-from e2b_code_interpreter import CodeInterpreter
+from e2b_code_interpreter import Sandbox
 from langchain_core.messages import BaseMessage, ToolMessage
 from langchain.agents.output_parsers.tools import (
     ToolAgentAction,
@@ -30,7 +30,7 @@ class CodeInterpreterFunctionTool:
             raise Exception(
                 "Code Interpreter tool called while E2B_API_KEY environment variable is not set. Please get your E2B api key here https://e2b.dev/docs and set the E2B_API_KEY environment variable."
             )
-        self.code_interpreter = CodeInterpreter()
+        self.code_interpreter = Sandbox()
 
     def close(self):
         self.code_interpreter.kill()
@@ -38,7 +38,7 @@ class CodeInterpreterFunctionTool:
     def call(self, parameters: dict, **kwargs: Any):
         code = parameters.get("code", "")
         print(f"***Code Interpreting...\n{code}\n====")
-        execution = self.code_interpreter.notebook.exec_cell(code)
+        execution = self.code_interpreter.run_code(code)
         return {
             "results": execution.results,
             "stdout": execution.logs.stdout,

@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import { OpenAI } from "openai";
-import { CodeInterpreter, Result } from "@e2b/code-interpreter";
+import { Sandbox, Result } from "@e2b/code-interpreter";
 import { OutputMessage } from "@e2b/code-interpreter";
 import * as dotenv from "dotenv";
 
@@ -68,12 +68,12 @@ function matchCodeBlocks(llmResponse: string): string {
 
 // Function to run the Python code using the code interpreter
 async function codeInterpret(
-  codeInterpreter: CodeInterpreter,
+  codeInterpreter: Sandbox,
   code: string,
 ): Promise<Result[]> {
   console.log("Running code interpreter...");
 
-  const exec = await codeInterpreter.notebook.execCell(code, {
+  const exec = await codeInterpreter.runCode(code, {
     onStderr: (msg: OutputMessage) =>
       console.log("[Code Interpreter stderr]", msg),
     onStdout: (stdout: OutputMessage) =>
@@ -89,7 +89,7 @@ async function codeInterpret(
 }
 
 // Function to upload Kaggle dataset files
-async function uploadDataset(codeInterpreter: CodeInterpreter) {
+async function uploadDataset(codeInterpreter: Sandbox) {
   console.log(
     "Uploading testing and training datasets to Code Interpreter sandbox...",
   );
@@ -105,7 +105,7 @@ async function uploadDataset(codeInterpreter: CodeInterpreter) {
 
 // Function to interact with both models: o1 and gpt-4o
 async function chat(
-  codeInterpreter: CodeInterpreter,
+  codeInterpreter: Sandbox,
   userMessage: string,
 ): Promise<Result[]> {
   console.log(
@@ -165,7 +165,7 @@ async function chat(
 }
 
 async function run() {
-  const codeInterpreter = await CodeInterpreter.create();
+  const codeInterpreter = await Sandbox.create();
 
   try {
     // Upload the Titanic dataset to the sandbox

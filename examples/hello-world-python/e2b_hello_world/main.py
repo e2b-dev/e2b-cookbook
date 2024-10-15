@@ -2,7 +2,7 @@ import base64
 from dotenv import load_dotenv
 from anthropic import Anthropic
 from typing import List, Tuple
-from e2b_code_interpreter import CodeInterpreter, Result
+from e2b_code_interpreter import Sandbox, Result
 from e2b_code_interpreter.models import Logs
 
 from e2b_hello_world.model import MODEL_NAME, SYSTEM_PROMPT, tools
@@ -13,7 +13,7 @@ load_dotenv()
 
 client = Anthropic()
 
-def chat(code_interpreter: CodeInterpreter, user_message: str) -> Tuple[List[Result], Logs]:
+def chat(code_interpreter: Sandbox, user_message: str) -> Tuple[List[Result], Logs]:
     print(f"\n{'='*50}\nUser Message: {user_message}\n{'='*50}")
 
     message = client.messages.create(
@@ -35,14 +35,14 @@ def chat(code_interpreter: CodeInterpreter, user_message: str) -> Tuple[List[Res
 
         if tool_name == "execute_python":
             return code_interpret(code_interpreter, tool_input["code"])
-    
+
     return None, None
 
 def main():
   user_message = "Estimate a distribution of height of men without using external data sources. Also print the median value."
 
   # Create the CodeInterpreter object and save it as code_interpreter
-  with CodeInterpreter() as code_interpreter:
+  with Sandbox() as code_interpreter:
     retries = 3
     attempt = 0
 

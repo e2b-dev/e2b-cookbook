@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { CodeInterpreter } from '@e2b/code-interpreter';
+import { Sandbox } from '@e2b/code-interpreter';
 
 const E2B_API_KEY = process.env.E2B_API_KEY;
 if (!E2B_API_KEY) {
@@ -28,7 +28,7 @@ export async function evaluateCode(
 
   // Execute the code in a Jupyter Notebook in the sandbox.
   // https://e2b.dev/docs/code-interpreter/execution
-  const execution = await sandbox.notebook.execCell(code, {
+  const execution = await sandbox.runCode(code, {
     // We can also use callbacks to handle streaming stdout, stderr, and results from the sandbox.
     // This is useful if you want to stream the results to client directly.
     // onStdout,
@@ -52,20 +52,20 @@ export async function evaluateCode(
  * @returns The sandbox for the given session ID.
  */
 async function getSandbox(sessionID: string) {
-  const sandboxes = await CodeInterpreter.list();
+  const sandboxes = await Sandbox.list();
 
   // We check if the sandbox is already running for the given session ID.
   const sandboxID = sandboxes.find(sandbox => sandbox.metadata?.sessionID === sessionID)?.sandboxId;
 
   // If the sandbox is already running, we reconnect to it.
   if (sandboxID) {
-    const sandbox = await CodeInterpreter.connect(sandboxID, {
+    const sandbox = await Sandbox.connect(sandboxID, {
         apiKey: E2B_API_KEY,
       })
     await sandbox.setTimeout(sandboxTimeout);
     return sandbox;
   } else {
-    const sandbox = await CodeInterpreter.create({
+    const sandbox = await Sandbox.create({
         apiKey: E2B_API_KEY,
         metadata: {
           sessionID,

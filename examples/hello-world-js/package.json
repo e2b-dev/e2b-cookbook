@@ -19,7 +19,7 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "@e2b/code-interpreter": "^0.0.9-beta.61",
+    "@e2b/code-interpreter": "^1.0.1",
     "@anthropic-ai/sdk": "^0.28.0",
     "dotenv": "^16.4.5"
   }

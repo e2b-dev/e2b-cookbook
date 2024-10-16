@@ -1,8 +1,8 @@
 import fs from 'node:fs'
 
 import { Anthropic } from '@anthropic-ai/sdk'
-import { CodeInterpreter, Result } from '@e2b/code-interpreter'
-import { ProcessMessage } from '@e2b/code-interpreter'
+import { Sandbox, Result } from '@e2b/code-interpreter'
+import { OutputMessage } from '@e2b/code-interpreter'
 
 import * as dotenv from 'dotenv'
 
@@ -43,12 +43,12 @@ const tools: Array<Anthropic.Tool> = [
 ]
 
 
-async function codeInterpret(codeInterpreter: CodeInterpreter, code: string): Promise<Result[]> {
+async function codeInterpret(codeInterpreter: Sandbox, code: string): Promise<Result[]> {
     console.log('Running code interpreter...')
 
-    const exec = await codeInterpreter.notebook.execCell(code, {
-        onStderr: (msg: ProcessMessage) => console.log('[Code Interpreter stderr]', msg),
-        onStdout: (stdout: ProcessMessage) => console.log('[Code Interpreter stdout]', stdout),
+    const exec = await codeInterpreter.runCode(code, {
+        onStderr: (msg: OutputMessage) => console.log('[Code Interpreter stderr]', msg),
+        onStdout: (stdout: OutputMessage) => console.log('[Code Interpreter stdout]', stdout),
         // You can also stream additional results like charts, images, etc.
         // onResult: ...
     })
@@ -64,14 +64,14 @@ async function codeInterpret(codeInterpreter: CodeInterpreter, code: string): Pr
 
 const client = new Anthropic()
 
-async function processToolCall(codeInterpreter: CodeInterpreter, toolName: string, toolInput: any): Promise<Result[]> {
+async function processToolCall(codeInterpreter: Sandbox, toolName: string, toolInput: any): Promise<Result[]> {
     if (toolName === 'execute_python') {
         return await codeInterpret(codeInterpreter, toolInput['code'])
     }
     return []
 }
 
-async function chatWithClaude(codeInterpreter: CodeInterpreter, userMessage: string): Promise<Result[]> {
+async function chatWithClaude(codeInterpreter: Sandbox, userMessage: string): Promise<Result[]> {
     console.log(`\n${'='.repeat(50)}\nUser Message: ${userMessage}\n${'='.repeat(50)}`)
 
     console.log('Waiting for Claude to respond...')
@@ -106,7 +106,7 @@ async function chatWithClaude(codeInterpreter: CodeInterpreter, userMessage: str
 
 
 async function run() {
-    const codeInterpreter = await CodeInterpreter.create()
+    const codeInterpreter = await Sandbox.create()
 
     try {
         const codeInterpreterResults = await chatWithClaude(
@@ -120,8 +120,9 @@ async function run() {
         }
     } catch (error) {
         console.error('An error occurred:', error)
+        throw error;
     } finally {
-        await codeInterpreter.close()
+        await codeInterpreter.kill()
     }
 }
 

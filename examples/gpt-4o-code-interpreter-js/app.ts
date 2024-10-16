@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import { OpenAI } from 'openai'
-import { CodeInterpreter, Result } from '@e2b/code-interpreter'
-import { ProcessMessage } from '@e2b/code-interpreter'
+import { Sandbox, Result } from '@e2b/code-interpreter'
+import { OutputMessage } from '@e2b/code-interpreter'
 
 import * as dotenv from 'dotenv'
 import { ChatCompletionTool, ChatCompletionMessageParam } from 'openai/resources/index'
@@ -50,12 +50,12 @@ const tools: Array<ChatCompletionTool> = [
 
 
 // Definine the function to execute code, using the E2B Code Interpreter SDK as a tool
-async function codeInterpret(codeInterpreter: CodeInterpreter, code: string): Promise<Result[]> {
+async function codeInterpret(codeInterpreter: Sandbox, code: string): Promise<Result[]> {
     console.log('Running code interpreter...')
 
-    const exec = await codeInterpreter.notebook.execCell(code, {
-        onStderr: (msg: ProcessMessage) => console.log('[Code Interpreter stderr]', msg),
-        onStdout: (stdout: ProcessMessage) => console.log('[Code Interpreter stdout]', stdout),
+    const exec = await codeInterpreter.runCode(code, {
+        onStderr: (msg: OutputMessage) => console.log('[Code Interpreter stderr]', msg),
+        onStdout: (stdout: OutputMessage) => console.log('[Code Interpreter stdout]', stdout),
         // You can also stream additional results like charts, images, etc.
     })
 
@@ -69,7 +69,7 @@ async function codeInterpret(codeInterpreter: CodeInterpreter, code: string): Pr
 const openai = new OpenAI() // Initialize openai client
 
 // Define function to chat with the model
-async function chat(codeInterpreter: CodeInterpreter, userMessage: string, base64_image?: string): Promise<Result[]> {
+async function chat(codeInterpreter: Sandbox, userMessage: string, base64_image?: string): Promise<Result[]> {
     console.log(`\n${'='.repeat(50)}\nUser Message: ${userMessage}\n${'='.repeat(50)}`)
     const messages: Array<ChatCompletionMessageParam> = [
         {
@@ -128,13 +128,14 @@ async function chat(codeInterpreter: CodeInterpreter, userMessage: string, base6
         }
       } catch (error) {
         console.error('Error during API call:', error)
+        throw error;
       }
       return []
     }
 
 
 async function run() {
-    const codeInterpreter = await CodeInterpreter.create()
+    const codeInterpreter = await Sandbox.create()
     // Let the model do the task
     try {
         const codeInterpreterResults = await chat(
@@ -170,8 +171,9 @@ async function run() {
         }
     } catch (error) {
         console.error('An error occurred:', error)
+        throw error;
     } finally {
-        await codeInterpreter.close()
+        await codeInterpreter.kill()
     }
 
 }

@@ -2,7 +2,7 @@ import * as fs from 'fs'
 import { Buffer } from 'buffer';
 
 import 'dotenv/config'
-import { CodeInterpreter, Execution } from '@e2b/code-interpreter'
+import { Sandbox, Execution } from '@e2b/code-interpreter'
 import Anthropic from '@anthropic-ai/sdk'
 
 import {
@@ -14,7 +14,7 @@ import { codeInterpret } from './codeInterpreter'
 
 const anthropic = new Anthropic()
 
-async function chat(codeInterpreter: CodeInterpreter, userMessage: string): Promise<Execution | undefined> {
+async function chat(codeInterpreter: Sandbox, userMessage: string): Promise<Execution | undefined> {
   console.log('Waiting for Claude...')
 
   const msg = await anthropic.messages.create({
@@ -34,7 +34,7 @@ async function chat(codeInterpreter: CodeInterpreter, userMessage: string): Prom
     if (!toolBlock) return;
 
     const toolName = toolBlock.name
-    const toolInput = <{ code: string }> toolBlock.input
+    const toolInput = toolBlock.input as { code: string };
 
     console.log(`\n${'='.repeat(50)}\nUsing tool: ${toolName}\n${'='.repeat(50)}`);
 
@@ -47,7 +47,7 @@ async function chat(codeInterpreter: CodeInterpreter, userMessage: string): Prom
 async function run() {
   const userMessage = 'Estimate a distribution of height of men without using external data sources. Also print the median value.'
 
-  const codeInterpreter = await CodeInterpreter.create()
+  const codeInterpreter = await Sandbox.create()
 
   let codeOutput : Execution | undefined;
   const maxRetries = 3;
@@ -90,7 +90,7 @@ async function run() {
       console.log(`Saved chart to ${filename}`);
   }
 
-  await codeInterpreter.close()
+  await codeInterpreter.kill()
 }
 
 run()

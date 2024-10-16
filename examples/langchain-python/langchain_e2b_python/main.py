@@ -79,10 +79,13 @@ def main():
     # Each intermediate step is a Tuple[ToolAgentAction, dict]
     r: Result = result["intermediate_steps"][0][1]["results"][0]
 
-    # Save the chart image
-    for format, data in r.raw.items():
-        if format == "image/png":
-            with open("image.png", "wb") as f:
-                f.write(base64.b64decode(data))
-        else:
-            print(data)
+    # Save the PNG chart that was received
+    if r.png:
+        # Decode the base64 encoded PNG data
+        png_data = base64.b64decode(r.png)
+
+        # Save the decoded PNG data to a file
+        filename = f"chart.png"
+        with open(filename, "wb") as f:
+            f.write(png_data)
+        print(f"Saved chart to {filename}")

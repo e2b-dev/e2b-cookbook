@@ -2,7 +2,7 @@
 import * as fs from 'fs'
 
 import 'dotenv/config'
-import { CodeInterpreter, Execution } from '@e2b/code-interpreter'
+import { Sandbox, Execution } from '@e2b/code-interpreter'
 import Anthropic from '@anthropic-ai/sdk'
 import { Buffer } from 'buffer'
 
@@ -14,7 +14,7 @@ import { scrapeAirbnb } from './scraping'
 const anthropic = new Anthropic()
 
 async function chat(
-  codeInterpreter: CodeInterpreter,
+  codeInterpreter: Sandbox,
   userMessage: string
 ): Promise<Execution | undefined> {
   console.log('Waiting for Claude...')
@@ -87,7 +87,7 @@ async function run() {
   Load the Airbnb prices data from the airbnb listing below and visualize the distribution of prices with a histogram. Listing data: ${pricesList}
 `
 
-  const codeInterpreter = await CodeInterpreter.create()
+  const codeInterpreter = await Sandbox.create()
   const codeOutput = await chat(codeInterpreter, userMessage)
   if (!codeOutput) {
     console.log('No code output')
@@ -112,7 +112,7 @@ async function run() {
     console.log(`✅ Saved chart to ${filename}`)
   }
 
-  await codeInterpreter.close()
+  await codeInterpreter.kill()
 }
 
 run()

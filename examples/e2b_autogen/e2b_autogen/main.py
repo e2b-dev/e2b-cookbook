@@ -29,13 +29,13 @@ def execute_code(
     packages: Optional[str] = None,
 ):
     if packages is not None and packages != "":
-        sandbox.process.start_and_wait(f"pip install -qq {packages}")
+        sandbox.commands.run(f"pip install -qq {packages}")
 
     code_hash = md5(code.encode()).hexdigest()
     filename = f"{work_dir}/{code_hash}.py"
-    sandbox.filesystem.write(filename, code)
+    sandbox.files.write(filename, code)
 
-    proc = sandbox.process.start_and_wait(
+    proc = sandbox.commands.run(
         f"python3 {filename}",
         timeout=timeout,
         cwd=work_dir,
@@ -49,7 +49,7 @@ config_list = config_list_from_json(
     "OAI_CONFIG_LIST",
     filter_dict={
         # Function calling with GPT 3.5 - cheaper/faster but less accurate
-        "model": ["gpt-3.5-turbo-16k-0613"],
+        "model": ["gpt-3.5-turbo"],
 
         # "model": ["gpt-4-1106-preview"],
     },
@@ -160,7 +160,7 @@ def main():
         print("\n")
         if message in ["exit", "TERMINATE"]:
             print("Exiting...")
-            sandbox.close()
+            sandbox.kill()
             break
 
         user_proxy.initiate_chat(
@@ -181,4 +181,4 @@ def demo():
 
 
     # Close the sandbox once done
-    sandbox.close()
+    sandbox.kill()

@@ -3,3 +3,6 @@
 .venv
 __pycache__
 node_modules
+/logs
+.next
+next-env.d.ts

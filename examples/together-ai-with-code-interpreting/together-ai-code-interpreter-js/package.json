@@ -19,7 +19,7 @@
         "typescript-eslint": "^7.16.1"
     },
     "dependencies": {
-        "@e2b/code-interpreter": "^0.0.5",
+        "@e2b/code-interpreter": "^1.0.1",
         "dotenv": "^16.4.5",
         "together-ai": "^0.6.0-alpha.4",
         "update": "^0.7.4"

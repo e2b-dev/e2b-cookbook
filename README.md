@@ -1,5 +1,7 @@
 # ✴️ E2B Cookbook
-Example code and guides for building with [E2B's Code Interpreter SDK](https://github.com/e2b-dev/code-interpreter).
+Example code and guides for building with [E2B SDK](https://github.com/e2b-dev/e2b).
+
+Read more about E2B on the [E2B website](https://e2b.dev) and the official [E2B documentation](https://e2b.dev/docs).
 
 ## Examples
 
@@ -64,21 +66,3 @@ Example code and guides for building with [E2B's Code Interpreter SDK](https://g
   - **▲ Vercel AI SDK**
     - Vercel AI SDK's Next.js + AI SDK + Code Interpreter - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/nextjs-code-interpreter)
     -  Anthropic's Artifacts UI with Vercel AI SDK - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/anthropic-power-artifacts)
-  - **magentic**
-    - Code Interpreter with magentic and GPT-4o - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/magentic-code-interpreter/magentic_code_interpreter.ipynb)
-
-
-## Getting started with E2B
-
-### 1. Get API key
-[Sign up](https://e2b.dev/docs/sign-in?view=sign-up) and [get your E2B API key](https://e2b.dev/docs/getting-started/api-key).
-
-### 2. Install code interpreter SDK
-We have built a [dedicated SDK](https://github.com/e2b-dev/code-interpreter) for adding code interpreting to your AI apps.
-
-### 3. Check out Hello World example
-Check out the [TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/hello-world-js) and [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/hello-world-python) hello world examples.
-
-### 4. Explore documentation
-Visit our docs at [e2b.dev/docs](https://e2b.dev/docs).
-

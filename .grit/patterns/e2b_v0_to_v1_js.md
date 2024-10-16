@@ -1,6 +1,10 @@
-# Upgrade e2b SDK from v0 to v1
+---
+tags: [e2b, javascript, sdk, upgrade]
+---
 
-This pattern upgrades e2b JavaScript SDK from v0 to v1.
+# Upgrade E2B JavaScript SDK from v0 to v1
+
+This pattern upgrades the [E2B JavaScript SDK from v0 to v1](https://e2b.dev/docs/quickstart/migrating-from-v0).
 
 ```grit
 engine marzano(0.1)

@@ -27,19 +27,19 @@ pattern e2b_v0_to_v1_js() {
         } => `$sbx.commands.run($cmd, {$params})` where $params += `backgrund: true`,
         `const $watcher = $sbx.filesystem.watchDir($path)` => `` where {
             $program <: contains `$watcher.addEventListener($body)` => .,
-            $program <: contains `await $watcher.start()` => `await $sbx.files.watch($path, $body)`
+            $program <: contains `await $watcher.start()` => `await $sbx.files.watch_dir($path, $body)`
         },
         `let $watcher = $sbx.filesystem.watchDir($path)` => `` where {
             $program <: contains `$watcher.addEventListener($body)` => .,
-            $program <: contains `await $watcher.start()` => `await $sbx.files.watch($path, $body)`
+            $program <: contains `await $watcher.start()` => `await $sbx.files.watch_dir($path, $body)`
         },
         `var $watcher = $sbx.filesystem.watchDir($path)` => `` where {
             $program <: contains `$watcher.addEventListener($body)` => .,
-            $program <: contains `await $watcher.start()` => `await $sbx.files.watch($path, $body)`
+            $program <: contains `await $watcher.start()` => `await $sbx.files.watch_dir($path, $body)`
         },
         `$watcher = $sbx.filesystem.watchDir($path)` => `` where {
             $program <: contains `$watcher.addEventListener($body)` => .,
-            $program <: contains `await $watcher.start()` => `await $sbx.files.watch($path, $body)`
+            $program <: contains `await $watcher.start()` => `await $sbx.files.watch_dir($path, $body)`
         },
         `$sbx.id` => `$sbx.sandboxId`,
         `$sbx.fileURL` => `$sbx.uploadUrl()`,

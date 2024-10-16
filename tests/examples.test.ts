@@ -129,7 +129,7 @@ describe('Integration test for multiple scripts in e2b sandbox', () => {
       });
 
       // Kill the sandbox
-      sandbox.kill();
+      await sandbox.kill();
 
       // Check the exit code to see if the test passed
       if (result.exitCode !== 0) {

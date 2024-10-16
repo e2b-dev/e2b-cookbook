@@ -1,7 +1,7 @@
 # ✴️ E2B Cookbook
 Example code and guides for building with [E2B SDK](https://github.com/e2b-dev/e2b).
 
-Read more about E2B at [https://e2b.dev](https://e2b.dev) and on the official [documentation](https://e2b.dev/docs)
+Read more about E2B on the [E2B website](https://e2b.dev) and the official [E2B documentation](https://e2b.dev/docs).
 
 ## Examples
 

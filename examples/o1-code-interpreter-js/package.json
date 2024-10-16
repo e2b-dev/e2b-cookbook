@@ -17,7 +17,7 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "@e2b/code-interpreter": "1.0.0",
+    "@e2b/code-interpreter": "^1.0.1",
     "dotenv": "^16.4.5",
     "openai": "^4.46.1"
   }

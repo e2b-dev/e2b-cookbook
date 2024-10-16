@@ -8,7 +8,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11"
 langgraph = "0.2.32"
-e2b-code-interpreter = "0.0.11b36"
+e2b-code-interpreter = "^1.0.1"
 langchain = "0.3.1"
 python-dotenv = "^1.0.1"
 langchain-groq = "0.2.0"

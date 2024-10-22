@@ -143,7 +143,12 @@ describe('Integration test for multiple scripts in e2b sandbox', () => {
           if (result.exitCode !== 0) {
             await fs.appendFile(logFilePath, `Attempt ${attempts}: Test for ${name} failed with exit code ${result.exitCode}\n`);
             await fs.appendFile(logFilePath, `stderr for ${name}: ${stderrData}\n`);
-            console.log(`Attempt ${attempts}: Test for ${name} failed.`);
+            if (stderrData.includes("exceeded your rate limit")) {
+              console.log("Attempt ${attempts}: Test for ${name} exceeded rate limit, waiting 10 seconds...");
+              await new Promise((resolve) => setTimeout(resolve, 10000));
+            } else {
+              console.log(`Attempt ${attempts}: Test for ${name} failed.`);
+            }
           } else {
             // The test succeeded
             success = true;

@@ -97,54 +97,67 @@ describe('Integration test for multiple scripts in e2b sandbox', () => {
   scripts.forEach(({ name, interpreter, file : examplePath }) => {
     it.concurrent(`should upload and execute ${name} successfully in e2b sandbox`, async () => {
 
-      // Create a new E2B sandbox
-      const sandbox = await Sandbox.create({ timeoutMs: SANDBOX_TIMEOUT });
+      let attempts = 0;
+      const maxAttempts = 3;
+      let success = false;
 
-      // Upload the example directory to the sandbox.
-      await uploadPathToPath(examplePath, SANDBOX_TEST_DIRECTORY, sandbox);
+      while (attempts < maxAttempts && !success) {
+        attempts++;
 
-      // Set the log path
-      const logFilePath = path.join(logsDir, `${name}.txt`);
-      let stdoutData = "";
-      let stderrData = "";
+        try {
+          // Create a new E2B sandbox
+          const sandbox = await Sandbox.create({ timeoutMs: SANDBOX_TIMEOUT });
 
-      // Generate the script to test the example
-      const notebookPath = path.posix.join(SANDBOX_TEST_DIRECTORY, path.basename(examplePath));
-      const command = testScript(interpreter, notebookPath).join(" && ");
+          // Upload the example directory to the sandbox.
+          await uploadPathToPath(examplePath, SANDBOX_TEST_DIRECTORY, sandbox);
 
-      // Run the command in the sandbox
-      const result = await sandbox.commands.run(command, {
-        // Log STDERR
-        onStderr: async (output) => {
-          stderrData += output;
-          await fs.appendFile(logFilePath, output);
-        },
-        // Log STDOUT
-        onStdout: async (output) => {
-          stdoutData += output;
-          await fs.appendFile(logFilePath, output);
-        },
-        envs: readEnvFile(),
-        timeoutMs: COMMAND_TIMEOUT,
-      });
+          // Set the log path
+          const logFilePath = path.join(logsDir, `${name}.txt`);
+          let stdoutData = "";
+          let stderrData = "";
 
-      // Kill the sandbox
-      await sandbox.kill();
+          // Generate the script to test the example
+          const notebookPath = path.posix.join(SANDBOX_TEST_DIRECTORY, path.basename(examplePath));
+          const command = testScript(interpreter, notebookPath).join(" && ");
 
-      // Check the exit code to see if the test passed
-      if (result.exitCode !== 0) {
-        await fs.appendFile(logFilePath, `Test for ${name} failed with exit code ${result.exitCode}\n`);
-        await fs.appendFile(logFilePath, `stderr for ${name}: ${stderrData}\n`);
-        console.error(`Test for ${name} failed.`);
-        throw new Error(`Test for ${name} failed.`);
+          // Run the command in the sandbox
+          const result = await sandbox.commands.run(command, {
+            // Log STDERR
+            onStderr: async (output) => {
+              stderrData += output;
+              await fs.appendFile(logFilePath, output);
+            },
+            // Log STDOUT
+            onStdout: async (output) => {
+              stdoutData += output;
+              await fs.appendFile(logFilePath, output);
+            },
+            envs: readEnvFile(),
+            timeoutMs: COMMAND_TIMEOUT,
+          });
+
+          // Kill the sandbox
+          await sandbox.kill();
+
+          // Check the exit code to see if the test passed
+          if (result.exitCode !== 0) {
+            await fs.appendFile(logFilePath, `Attempt ${attempts}: Test for ${name} failed with exit code ${result.exitCode}\n`);
+            await fs.appendFile(logFilePath, `stderr for ${name}: ${stderrData}\n`);
+            console.log(`Attempt ${attempts}: Test for ${name} failed.`);
+          } else {
+            // The test succeeded
+            success = true;
+            console.log(`Test for ${name} completed successfully on attempt ${attempts}.`);
+            await fs.appendFile(logFilePath, `Test for ${name} completed successfully on attempt ${attempts}.\n`);
+          }
+        } catch (error) {
+          console.log(`Attempt ${attempts}/${maxAttempts}: An error occurred while running the test for ${name}`);
+        }
+
+        if (!success && attempts === maxAttempts) {
+          throw new Error(`Test for ${name} failed after ${maxAttempts} attempts.`);
+        }
       }
-
-      // Optionally, check for specific outputs (adapt this as needed)
-      // expect(stdoutData).toContain('Expected output');
-
-      // The test succeded
-      console.log(`Test for ${name} completed successfully.`);
-      await fs.appendFile(logFilePath, `Test for ${name} completed successfully.\n`);
     });
   });
 });

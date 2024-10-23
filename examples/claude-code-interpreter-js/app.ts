@@ -8,7 +8,9 @@ import * as dotenv from 'dotenv'
 
 dotenv.config()
 
-const MODEL_NAME = 'claude-3-opus-20240229'
+//const MODEL_NAME = 'claude-3-opus-20240229'
+const MODEL_NAME = 'claude-3-5-sonnet-20241022'
+
 const SYSTEM_PROMPT = `
 ## your job & context
 you are a python data scientist. you are given tasks to complete and you run python code to solve them.

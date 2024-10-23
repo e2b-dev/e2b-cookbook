@@ -1,6 +1,7 @@
 import { Tool } from '@anthropic-ai/sdk/src/resources/beta/tools'
 
-export const MODEL_NAME = 'claude-3-opus-20240229'
+export const MODEL_NAME = 'claude-3-5-sonnet-20241022'
+// export const MODEL_NAME = 'claude-3-opus-20240229' 
 
 export const SYSTEM_PROMPT = `
 ## your job & context

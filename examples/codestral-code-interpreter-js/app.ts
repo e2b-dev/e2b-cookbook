@@ -5,13 +5,6 @@ import MistralClient from '@mistralai/mistralai'
 
 dotenv.config()
 
-const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY || ''
-const E2B_API_KEY = process.env.E2B_API_KEY || ''
-
-// Remove this later, it's just for my debugging
-console.log('MISTRAL_API_KEY:', MISTRAL_API_KEY ? 'Loaded' : 'Not Loaded')
-console.log('E2B_API_KEY:', E2B_API_KEY ? 'Loaded' : 'Not Loaded')
-
 const MODEL_NAME = 'codestral-latest'
 const SYSTEM_PROMPT = `
 You're a python data scientist that is analyzing daily temperature of major cities. You are given tasks to complete and you run Python code to solve them.

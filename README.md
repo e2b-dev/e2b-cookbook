@@ -5,6 +5,11 @@ Read more about E2B on the [E2B website](https://e2b.dev) and the official [E2B 
 
 ## Examples
 
+**Open-source apps**
+- [E2B AI Analyst](https://github.com/e2b-dev/ai-analyst) - analyze your data & create interactive charts
+- [E2B Fragments](https://github.com/e2b-dev/fragments) - prompt different LLMS to generate apps with UI
+
+
 **Hello World guide**
 - [TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/hello-world-js)
 - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/hello-world-python)

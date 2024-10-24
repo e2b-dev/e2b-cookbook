@@ -3,10 +3,17 @@ import path from 'path';
 import dotenv from 'dotenv';
 import ignore, { Ignore } from 'ignore';
 
-// Read and parse a .env file
-export function readEnvFile(filePath: string = '.env'): Record<string, string> {
-  const envPath = path.resolve(process.cwd(), filePath);
-  return dotenv.parse(readFileSync(envPath, 'utf-8'));
+export function getApiKeys(): Record<string, string> {
+  return {
+    E2B_API_KEY: process.env.E2B_API_KEY || '',
+    OPENAI_API_KEY: process.env.OPENAI_API_KEY || '',
+    ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY || '',
+    MISTRAL_API_KEY: process.env.MISTRAL_API_KEY || '',
+    FIREWORKS_API_KEY: process.env.FIREWORKS_API_KEY || '',
+    FIRECRAWL_API_KEY: process.env.FIRECRAWL_API_KEY || '',
+    GROQ_API_KEY: process.env.GROQ_API_KEY || '',
+    TOGETHER_API_KEY: process.env.TOGETHER_API_KEY || '',
+  };
 }
 
 // Read and parse a .gitignore file

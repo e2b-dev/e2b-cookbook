@@ -3,7 +3,7 @@ import path from 'path';
 import dotenv from 'dotenv';
 import Sandbox from 'e2b';
 
-import { uploadPathToPath, readEnvFile } from "./utils"
+import { uploadPathToPath, getApiKeys } from "./utils"
 
 // Read the E2B API key
 dotenv.config({ path: path.resolve(process.cwd(), ".env") });
@@ -95,7 +95,7 @@ describe('Integration test for multiple scripts in e2b sandbox', () => {
   });
 
   scripts.forEach(({ name, interpreter, file : examplePath }) => {
-    it.concurrent(`should upload and execute ${name} successfully in e2b sandbox`, async () => {
+    it.concurrent(name, async () => {
 
       let attempts = 0;
       const maxAttempts = 3;
@@ -104,9 +104,10 @@ describe('Integration test for multiple scripts in e2b sandbox', () => {
       while (attempts < maxAttempts && !success) {
         attempts++;
 
+        // Create a new E2B sandbox
+        const sandbox = await Sandbox.create({ timeoutMs: SANDBOX_TIMEOUT });
+
         try {
-          // Create a new E2B sandbox
-          const sandbox = await Sandbox.create({ timeoutMs: SANDBOX_TIMEOUT });
 
           // Upload the example directory to the sandbox.
           await uploadPathToPath(examplePath, SANDBOX_TEST_DIRECTORY, sandbox);
@@ -132,12 +133,9 @@ describe('Integration test for multiple scripts in e2b sandbox', () => {
               stdoutData += output;
               await fs.appendFile(logFilePath, output);
             },
-            envs: readEnvFile(),
+            envs: getApiKeys(),
             timeoutMs: COMMAND_TIMEOUT,
           });
-
-          // Kill the sandbox
-          await sandbox.kill();
 
           // Check the exit code to see if the test passed
           if (result.exitCode !== 0) {
@@ -156,7 +154,10 @@ describe('Integration test for multiple scripts in e2b sandbox', () => {
             await fs.appendFile(logFilePath, `Test for ${name} completed successfully on attempt ${attempts}.\n`);
           }
         } catch (error) {
-          console.log(`Attempt ${attempts}/${maxAttempts}: An error occurred while running the test for ${name}`);
+          console.log(`Attempt ${attempts}/${maxAttempts}: An error occurred while running the test for ${name}`, error);
+        } finally {
+          // Kill the sandbox
+          await sandbox.kill();
         }
 
         if (!success && attempts === maxAttempts) {

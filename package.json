@@ -3,7 +3,7 @@
     "type": "module",
     "version": "1.0.0",
     "scripts": {
-        "test": "jest --maxConcurrency=20"
+        "test": "jest --maxConcurrency=5"
     },
     "jest": {
         "preset": "ts-jest",

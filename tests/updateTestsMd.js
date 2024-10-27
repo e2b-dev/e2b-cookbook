@@ -8,19 +8,14 @@ const __dirname = path.dirname(__filename);
 
 // Define paths for the results and markdown files
 const resultsPath = path.join(__dirname, 'results.json');
-const markdownPath = path.join(__dirname, 'Tests.md');
+const markdownPath = path.join(__dirname, 'Tests.txt');
 
 // Read the Jest results
 fs.readFile(resultsPath, 'utf8')
     .then((data) => {
         const results = JSON.parse(data);
 
-        // Start constructing the Markdown table
-        let markdownContent = `# Test Results\n\n`;
-        markdownContent += `| Test Name | Status |\n`;
-        markdownContent += `|-----------|--------|\n`;
-
-        // Iterate through each test result and populate the Markdown table
+        // Iterate through each test result and populate the table
         results.testResults.forEach((test) => {
             const testName = test.assertionResults[0].fullName;
             const status = test.status === 'passed' ? '✅ Passed' : '❌ Failed';

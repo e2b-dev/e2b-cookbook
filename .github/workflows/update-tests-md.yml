@@ -53,4 +53,22 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: test-results-md
-        path: ./tests/Tests.md
+        path: ./tests/Tests.txt
+
+    - name: Read Tests.txt for Slack message
+      id: read_tests
+      run: |
+        TESTS_CONTENT=$(cat ./tests/Tests.txt)
+        echo "TESTS_CONTENT<<EOF" >> $GITHUB_ENV
+        echo "$TESTS_CONTENT" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
+
+    - name: Notify Slack with test results
+      uses: rtCamp/action-slack-notify@v2
+      env:
+        SLACK_COLOR: "#36a64f"
+        SLACK_MESSAGE: |
+          *Test Results:*
+          ${{ env.TESTS_CONTENT }}
+        SLACK_TITLE: Test Results Update
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}

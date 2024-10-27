@@ -13,6 +13,7 @@ const markdownPath = path.join(__dirname, 'Tests.txt');
 // Read the Jest results
 fs.readFile(resultsPath, 'utf8')
     .then((data) => {
+        var markdownContent = ""
         const results = JSON.parse(data);
 
         // Iterate through each test result and populate the table

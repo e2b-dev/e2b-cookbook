@@ -1,13 +1,9 @@
 name: Update Tests Results
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
   workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 1'  # Runs every Monday at 00:00 UTC
 
 jobs:
   run_tests_and_update_markdown:

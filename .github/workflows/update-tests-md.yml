@@ -1,0 +1,70 @@
+name: Update Tests Results
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 1'  # Runs every Monday at 00:00 UTC
+
+jobs:
+  run_tests_and_update_markdown:
+    runs-on: ubuntu-latest
+
+    env:
+      E2B_API_KEY: ${{ secrets.E2B_API_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+      FIREWORKS_API_KEY: ${{ secrets.FIREWORKS_API_KEY }}
+      FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
+      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+      TOGETHER_API_KEY: ${{ secrets.TOGETHER_API_KEY }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '20'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run Jest tests and save results
+      run: |
+        npm test -- --json --outputFile=./tests/results.json
+      continue-on-error: true  # Ensures the job continues even if tests fail
+
+    - name: Upload test results as an artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results
+        path: ./tests/results.json
+
+    - name: Update Tests.md with test results
+      run: node ./tests/updateTestsMd.js  # Your custom script to update Tests.md with test results
+
+    - name: Upload markdown report as an artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results-md
+        path: ./tests/Tests.txt
+
+    - name: Read Tests.txt for Slack message
+      id: read_tests
+      run: |
+        TESTS_CONTENT=$(cat ./tests/Tests.txt)
+        echo "TESTS_CONTENT<<EOF" >> $GITHUB_ENV
+        echo "$TESTS_CONTENT" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
+
+    - name: Notify Slack with test results
+      uses: rtCamp/action-slack-notify@v2
+      env:
+        SLACK_COLOR: "#36a64f"
+        SLACK_MESSAGE: |
+          *Test Results:*
+          ${{ env.TESTS_CONTENT }}
+        SLACK_TITLE: Test Results Update
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}

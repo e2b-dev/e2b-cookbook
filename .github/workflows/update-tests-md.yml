@@ -37,14 +37,14 @@ jobs:
 
     - name: Run Jest tests and save results
       run: |
-        npm test -- --json --outputFile=./results.json
+        npm test -- --json --outputFile=./tests/results.json
       continue-on-error: true  # Ensures the job continues even if tests fail
 
     - name: Upload test results as an artifact
       uses: actions/upload-artifact@v3
       with:
         name: test-results
-        path: ./results.json
+        path: ./tests/results.json
 
     - name: Update Tests.md with test results
       run: node ./tests/updateTestsMd.js  # Your custom script to update Tests.md with test results

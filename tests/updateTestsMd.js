@@ -18,10 +18,12 @@ fs.readFile(resultsPath, 'utf8')
 
         // Iterate through each test result and populate the table
         results.testResults.forEach((test) => {
-            const testName = test.assertionResults[0].fullName;
-            const status = test.status === 'passed' ? '✅ Passed' : '❌ Failed';
-            markdownContent += `| ${testName} | ${status} |\n`;
-        });
+            test.assertionResults.forEach((assertion) => {
+                const testName = assertion.title;
+                const status = assertion.status === 'passed' ? '✅ Passed' : '❌ Failed';
+                markdownContent += `| ${testName} | ${status} |\n`;
+            });
+        });        
 
         // Write the Markdown content to Tests.md
         console.log(markdownContent)

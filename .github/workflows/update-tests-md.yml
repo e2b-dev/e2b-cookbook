@@ -68,3 +68,4 @@ jobs:
           ${{ env.TESTS_CONTENT }}
         SLACK_TITLE: Test Results Update
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_CHANNEL: ${{ vars.SLACK_CHANNEL }}

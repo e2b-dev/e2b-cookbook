@@ -1,6 +1,6 @@
 import { Result } from "@e2b/code-interpreter";
 import { useState } from "react";
-import { ToolResult } from "../lib/types";
+import { ToolResult } from "../../api/lib/types";
 import { RenderResult } from "./charts";
 import { AlertTriangle, ChartNoAxesCombined } from "lucide-react";
 

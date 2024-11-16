@@ -4,7 +4,7 @@ import Markdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { ToolOutput } from "./tooloutput";
-import { ToolResult } from "../lib/types";
+import { ToolResult } from "../../api/lib/types";
 
 // Simplified Message type since we only handle assistant messages
 type Message = {

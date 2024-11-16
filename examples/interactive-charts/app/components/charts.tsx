@@ -1,5 +1,6 @@
 import { ChartTypes, Result } from "@e2b/code-interpreter";
-import ReactECharts, { EChartsOption } from "echarts-for-react";
+import ReactECharts, { EChartsOption } from 'echarts-for-react';
+import React from 'react';
 
 export function RenderResult({
   result,

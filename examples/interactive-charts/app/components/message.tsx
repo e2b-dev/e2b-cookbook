@@ -10,7 +10,8 @@ import { ToolResult } from "../lib/types";
 type Message = {
   id: string;
   content: string;
-  toolInvocations?: ToolResult;
+  role: string;
+  toolInvocations?: ToolResult[];
 };
 
 export function MessageComponent({ message }: { message: Message }) {

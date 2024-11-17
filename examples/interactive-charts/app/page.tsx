@@ -11,6 +11,15 @@ export default function Home() {
     messages,
     setMessages,
   } = useChat({
+    api: "/api/chat",  // Add this
+    initialMessages: [{  // Use initialMessages instead of setMessages in useEffect
+      id: "1",
+      content: "Please generate random dataset and visualize it with a bar chart",
+      role: "user"  // Changed from assistant to user
+    }],
+    onMessage: (message) => {  // Optionally add this to see streaming messages
+      console.log("Received message:", message);
+    },
     onFinish: async (message) => {
       const code = extractCodeFromText(message.content);
       if (code) {
@@ -42,15 +51,7 @@ export default function Home() {
     },
   });
 
-  // Auto-trigger on page load
-  useEffect(() => {
-    setIsLoading(true);
-    setMessages([{
-      id: "1",
-      content: "Please generate random dataset and visualize it with a bar chart",
-      role: "assistant"
-    }]);
-  }, []);
+  // Remove the useEffect since we're using initialMessages in useChat
 
   return (
     <div className="flex flex-col min-h-screen max-h-screen">

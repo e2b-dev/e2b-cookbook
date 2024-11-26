@@ -6,6 +6,7 @@ import { extractCodeFromText } from "./lib/code";
 import { useEffect, useState } from "react";
 
 export default function Home() {
+  const [hasInitialized, setHasInitialized] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -42,11 +43,14 @@ export default function Home() {
   });
 
   useEffect(() => {
-    append({
-      content: "Please generate random dataset and visualize it with a bar chart",
-      role: "user"
-    });
-  }, [append]);
+    if (!hasInitialized) {
+      append({
+        content: "Please generate random dataset and visualize it with a bar chart",
+        role: "user"
+      });
+      setHasInitialized(true);
+    }
+  }, [append, hasInitialized]);
 
   return (
     <div className="flex flex-col min-h-screen max-h-screen">

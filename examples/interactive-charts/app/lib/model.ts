@@ -1,10 +1,12 @@
-// model.ts
 import { createOpenAI } from "@ai-sdk/openai";
 import { LanguageModelV1 } from "ai";
 
 export function getModel(): LanguageModelV1 {
   return createOpenAI({
-    apiKey: process.env.TOGETHER_AI_API_KEY,
-    baseURL: "https://api.together.xyz/v1",
-  })("meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo");
+    apiKey: process.env.OPENAI_API_KEY,
+    baseURL: "https://api.fireworks.ai/inference/v1",
+    headers: {
+      "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
+    }
+  })("accounts/fireworks/models/llama-v3p1-405b-instruct");
 }

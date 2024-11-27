@@ -22,6 +22,7 @@ Your task is to:
 
 export async function POST(req: Request) {
   const { messages } = await req.json();
+  console.log("Received messages:", messages); // Log incoming messages
   
   const filteredMessages = messages.map((message) => {
     if (message.toolInvocations) {
@@ -32,12 +33,19 @@ export async function POST(req: Request) {
     }
     return message;
   });
+  console.log("Filtered messages:", filteredMessages); // Log filtered messages
 
-  const result = await streamText({
-    system: SYSTEM_PROMPT,
-    model: getModel(),
-    messages: convertToCoreMessages(filteredMessages),
-  });
+  try {
+    const result = await streamText({
+      system: SYSTEM_PROMPT,
+      model: getModel(),
+      messages: convertToCoreMessages(filteredMessages),
+    });
+    console.log("Stream created successfully"); // Log successful stream creation
 
-  return result.toDataStreamResponse();
+    return result.toDataStreamResponse();
+  } catch (error) {
+    console.error("Error in chat route:", error); // Log any errors
+    throw error;
+  }
 }

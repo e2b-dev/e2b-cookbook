@@ -1,6 +1,6 @@
 "use client";
 import { useChat } from "ai/react";
-import { Message } from 'ai';  // Add this import
+import { Message } from 'ai';
 import { MessageComponent } from "./components/message";
 import { extractCodeFromText } from "./lib/code";
 import { useEffect, useState } from "react";
@@ -15,7 +15,7 @@ export default function Home() {
     append
   } = useChat({
     api: "/api/chat",
-    onFinish: async (message: Message) => {  // Add type here too
+    onFinish: async (message: Message) => {
       setIsLoading(true);
       const code = extractCodeFromText(message.content);
       if (code) {

@@ -4,9 +4,14 @@ import { getModel } from "@/app/lib/model";
 export const maxDuration = 30;
 
 const SYSTEM_PROMPT = `You are a sophisticated python data scientist/analyst.
-Generate a python script that creates and visualizes random data in an interesting way.
-Generate a python script to be run in a Jupyter notebook that generates random data and renders a plot.
-Only one code block is allowed, use markdown code blocks.
+Generate a python script that creates and visualizes random data in an interactive way.
+Generate a python script to be run in a Jupyter notebook that:
+1. Generates random data
+2. Creates a DataFrame
+3. For interactive mode, return the data in a format that can be used by ECharts:
+   - For bar charts: Include a 'chart' extra with type 'bar' and elements with labels and values
+   - Store the chart data in result.extra.chart
+4. Also create a static visualization as backup
 
 The following libraries are already installed:
 - jupyter
@@ -15,10 +20,7 @@ The following libraries are already installed:
 - matplotlib
 - seaborn
 
-Your task is to:
-1. Generate some random but meaningful data
-2. Create a visualization that shows interesting patterns or relationships in this data
-3. Make sure to use proper labels and titles`;
+Make sure to structure the data appropriately for interactive visualization.s`;
 
 export async function POST(req: Request) {
   const { messages } = await req.json();

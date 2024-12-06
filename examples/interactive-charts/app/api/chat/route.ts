@@ -24,8 +24,13 @@ Make sure to structure the data appropriately for interactive visualization.s`;
 
 export async function POST(req: Request) {
   const { messages } = await req.json();
-  console.log("Received messages:", messages); // Log incoming messages
+  console.log("Received messages:", messages);
   
+  console.log("LLM Request:", {
+    system: SYSTEM_PROMPT,
+    messages: messages
+  });
+
   const filteredMessages = messages.map((message) => {
     if (message.toolInvocations) {
       return {
@@ -35,19 +40,21 @@ export async function POST(req: Request) {
     }
     return message;
   });
-  console.log("Filtered messages:", filteredMessages); // Log filtered messages
 
   try {
-    const result = await streamText({
+    const response = await streamText({
       system: SYSTEM_PROMPT,
       model: getModel(),
       messages: convertToCoreMessages(filteredMessages),
     });
-    console.log("Stream created successfully"); // Log successful stream creation
-
-    return result.toDataStreamResponse();
+    
+    console.log("LLM Stream created");
+    const result = response.toDataStreamResponse();
+    console.log("Response transformed to stream");
+    
+    return result;
   } catch (error) {
-    console.error("Error in chat route:", error); // Log any errors
+    console.error("Chat route error:", error);
     throw error;
   }
 }

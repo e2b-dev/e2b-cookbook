@@ -99,33 +99,26 @@ export function Chart({ chart }: { chart: ChartTypes }) {
   }
 
   if (chart.type === "bar") {
-    const data = Object.groupBy(chart.elements, ({ group }) => group);
-
-    const series = Object.entries(data).map(([group, elements]) => ({
-      name: group,
-      type: "bar",
-      stack: "total",
-      data: elements?.map((e) => [e.label, e.value]),
-    }));
-
     const options: EChartsOption = {
       ...sharedOptions,
       xAxis: {
         type: "category",
-        name: chart.x_label,
-        nameLocation: "middle",
+        data: chart.elements.map(e => e.label),
+        axisLabel: { rotate: 45 }
       },
-      yAxis: {
-        name: chart.y_label,
-        nameLocation: "middle",
-      },
-      series,
+      yAxis: { type: "value" },
+      series: chart.elements[0].values.map((_, index) => ({
+        type: "bar",
+        data: chart.elements.map(e => e.values[index]),
+        label: { show: true }
+      })),
       tooltip: {
         trigger: "axis",
-      },
+        axisPointer: { type: 'shadow' }
+      }
     };
-
-    return <ReactECharts option={options} />;
+  
+    return <ReactECharts option={options} style={{ height: '400px' }} />;
   }
 
   if (chart.type === "pie") {

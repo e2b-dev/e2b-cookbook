@@ -118,8 +118,8 @@ export function Chart({ chart }: { chart: ChartTypes }) {
       }
     };
   
-    return <ReactECharts option={options} style={{ height: '400px' }} />;
-  }
+    return <ReactECharts option={options} style={{ height: '400px' }} />; // Add this line
+}
 
   if (chart.type === "pie") {
     const options: EChartsOption = {

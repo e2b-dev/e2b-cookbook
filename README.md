@@ -49,6 +49,9 @@ Read more about E2B on the [E2B website](https://e2b.dev) and the official [E2B 
     - Codestral with code interpreter
       - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/codestral-code-interpreter-python)
       - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/codestral-code-interpreter-js)
+  -   **Groq**
+        - Llama 3 hosted on Groq + function calling + E2B Code interpreter
+          - [Python](https://github.com/e2b-dev/e2b-cookbook/blob/main/examples/llama-3-code-interpreter-python/llama_3_code_interpreter_groq.ipynb)
   - **Fireworks AI**
     - Firefunction-v2 with code interpreter - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/fireworks-code-interpreter-python)
     - Qwen2.5-Coder-32B-Instruct with code interpreter - [Python](https://github.com/e2b-dev/e2b-cookbook/blob/main/examples/fireworks-code-interpreter-python/qwen_code_interpreter.ipynb)

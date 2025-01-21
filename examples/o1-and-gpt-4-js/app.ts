@@ -6,6 +6,26 @@ import * as dotenv from "dotenv";
 
 dotenv.config({ override: true });
 
+const tools: Array<ChatCompletionTool> = [
+  {
+    'type': 'function',
+    'function': {
+      'name': 'execute_python',
+      'description': 'Execute python code in a Jupyter notebook cell and returns any result, stdout, stderr, display_data, and error.',
+      'parameters': {
+        'type': 'object',
+        'properties': {
+          'code': {
+            'type': 'string',
+            'description': 'The python code to execute in a single cell.',
+          },
+        },
+        'required': ['code'],
+      },
+    }
+  }
+]
+
 const O1_PROMPT = `
 You're a data scientist analyzing survival data from the Titanic Disaster. You are given tasks to complete and you run Python code to solve them.
 
@@ -116,17 +136,45 @@ async function chat(
   // First, get the plan from o1-mini
   try {
     const responseO1 = await openai.chat.completions.create({
-      model: "o1-mini", // Assuming this model is accessible
+      model: "o1-mini",
       messages: [
-        { role: "user", content: O1_PROMPT },
-        { role: "user", content: userMessage },
+          { role: "user", content: "Formatting re-enabled\n\n" + O1_PROMPT },
+          { role: "user", content: userMessage },
       ],
+      tools: tools,
+      tool_choice: 'auto',
+      // max_tokens: 25000 
     });
-    const contentO1 = responseO1.choices[0].message.content;
 
-    if (contentO1 === null) {
-      throw Error(`Chat content is null.`);
-    }
+    const choiceO1 = responseO1.choices[0].message;
+
+    if (choiceO1.tool_calls && choiceO1.tool_calls.length > 0) {
+      for (const toolCall of choiceO1.tool_calls) {
+          if (toolCall.function.name === 'execute_python') {
+              let code: string;
+              if (typeof toolCall.function.arguments === 'object' && 'code' in toolCall.function.arguments) {
+                  code = (toolCall.function.arguments as { code: string }).code;
+              } else {
+                  code = JSON.parse(toolCall.function.arguments).code;
+              }
+              console.log('CODE TO RUN FROM O1:') 
+              console.log(code);
+              return await codeInterpret(codeInterpreter, code);
+          }
+      }
+  }
+
+const contentO1 = choiceO1.content;
+if (contentO1 === null) {
+    throw Error(`Chat content is null.`);
+}
+
+
+
+
+
+
+
 
     // Then, use gpt-4o to extract code
     const response4o = await openai.chat.completions.create({

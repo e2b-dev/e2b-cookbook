@@ -4,7 +4,7 @@ import { Sandbox, Result } from '@e2b/code-interpreter'
 import { OutputMessage } from '@e2b/code-interpreter'
 
 import * as dotenv from 'dotenv'
-import { ChatCompletionTool, ChatCompletionMessageParam } from 'openai/resources/index'
+import { ChatCompletionTool, ChatCompletionMessageParam } from 'openai/resources'
 import { buffer } from 'stream/consumers'
 dotenv.config()
 

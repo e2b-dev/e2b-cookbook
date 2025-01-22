@@ -1,5 +1,5 @@
 {
-  "name": "o1-code-interpreter-js",
+  "name": "o1-js",
   "version": "1.0.0",
   "description": "This is an example of running LLM-generated code tasks in a secure and isolated cloud environment using the E2B Code Interpreter SDK.",
   "type": "module",

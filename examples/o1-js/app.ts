@@ -1,208 +1,121 @@
-import fs from "node:fs";
-import { OpenAI } from "openai";
-import { Sandbox, Result } from "@e2b/code-interpreter";
-import { OutputMessage } from "@e2b/code-interpreter";
-import * as dotenv from "dotenv";
+import fs from 'node:fs'
+import OpenAI from 'openai'
+import { Sandbox, Result } from '@e2b/code-interpreter'
+import { OutputMessage } from '@e2b/code-interpreter'
+import * as dotenv from 'dotenv'
 
-dotenv.config({ override: true });
+dotenv.config()
 
-const tools: Array<ChatCompletionTool> = [
-  {
-    'type': 'function',
-    'function': {
-      'name': 'execute_python',
-      'description': 'Execute python code in a Jupyter notebook cell and returns any result, stdout, stderr, display_data, and error.',
-      'parameters': {
-        'type': 'object',
-        'properties': {
-          'code': {
-            'type': 'string',
-            'description': 'The python code to execute in a single cell.',
-          },
-        },
-        'required': ['code'],
-      },
+const MODEL_NAME = 'gpt-4-1106-preview'
+
+const SYSTEM_PROMPT = `
+## your job & context
+you are a python data scientist. you are given tasks to complete and you run python code to solve them.
+- the python code runs in jupyter notebook.
+- every time you call \`execute_python\` tool, the python code is executed in a separate cell. it's okay to multiple calls to \`execute_python\`.
+- display visualizations using matplotlib or any other visualization library directly in the notebook. don't worry about saving the visualizations to a file.
+- you have access to the internet and can make api requests.
+- you also have access to the filesystem and can read/write files.
+- you can install any pip package (if it exists) if you need to but the usual packages for data analysis are already preinstalled.
+- you can run any python code you want, everything is running in a secure sandbox environment.
+
+## style guide
+tool response values that have text inside "[]"  mean that a visual element got rendered in the notebook. for example:
+- "[chart]" means that a chart was generated in the notebook.
+`
+
+const tools = [
+    {
+        type: 'function',
+        function: {
+            name: 'execute_python',
+            description: 'Execute python code in a Jupyter notebook cell and returns any result, stdout, stderr, display_data, and error.',
+            parameters: {
+                type: 'object',
+                properties: {
+                    code: {
+                        type: 'string',
+                        description: 'The python code to execute in a single cell.'
+                    }
+                },
+                required: ['code']
+            }
+        }
     }
-  }
 ]
 
-const O1_PROMPT = `
-You're a data scientist analyzing survival data from the Titanic Disaster. You are given tasks to complete and you run Python code to solve them.
+async function codeInterpret(codeInterpreter: Sandbox, code: string): Promise<Result[]> {
+    console.log('Running code interpreter...')
 
-Information about the Titanic dataset:
-- It's in the \`/home/user/train.csv\` and \`/home/user/test.csv\` files
-- The CSV files are using \`,\` as the delimiter
-- They have following columns:
-  - PassengerId: Unique passenger ID
-  - Pclass: 1st, 2nd, 3rd (Ticket class)
-  - Name: Passenger name
-  - Sex: Gender
-  - Age: Age in years
-  - SibSp: Number of siblings/spouses aboard
-  - Parch: Number of parents/children aboard
-  - Ticket: Ticket number
-  - Fare: Passenger fare
-  - Cabin: Cabin number
-  - Embarked: Port of Embarkation (C = Cherbourg, Q = Queenstown, S = Southampton)
+    const exec = await codeInterpreter.runCode(code, {
+        onStderr: (msg: OutputMessage) => console.log('[Code Interpreter stderr]', msg),
+        onStdout: (stdout: OutputMessage) => console.log('[Code Interpreter stdout]', stdout),
+    })
 
-Respond only with Python code to solve the given task.
-`;
-
-const openai = new OpenAI();
-
-// Function to extract code blocks from a response
-function matchCodeBlocks(llmResponse: string): string {
-  const regex = /```python\n([\s\S]*?)```/g;
-  let matches: string[] = [];
-  let match: RegExpExecArray | null;
-  while ((match = regex.exec(llmResponse)) !== null) {
-    if (match[1]) {
-      matches.push(match[1]);
+    if (exec.error) {
+        console.log('[Code Interpreter ERROR]', exec.error)
+        throw new Error(exec.error.value)
     }
-  }
-
-  if (matches.length > 0) {
-    const code = matches.join("\n");
-    console.log("> LLM-generated code:");
-    console.log(code);
-    return code;
-  }
-  return "";
+    return exec.results
 }
 
-// Function to run the Python code using the code interpreter
-async function codeInterpret(
-  codeInterpreter: Sandbox,
-  code: string,
-): Promise<Result[]> {
-  console.log("Running code interpreter...");
+const client = new OpenAI()
 
-  const exec = await codeInterpreter.runCode(code, {
-    onStderr: (msg: OutputMessage) =>
-      console.log("[Code Interpreter stderr]", msg),
-    onStdout: (stdout: OutputMessage) =>
-      console.log("[Code Interpreter stdout]", stdout),
-  });
-
-  if (exec.error) {
-    console.log("[Code Interpreter ERROR]", exec.error);
-    throw new Error(exec.error.value);
-  }
-
-  return exec.results;
+async function processToolCall(codeInterpreter: Sandbox, toolCall: any): Promise<Result[]> {
+    if (toolCall.function.name === 'execute_python') {
+        const toolInput = JSON.parse(toolCall.function.arguments)
+        return await codeInterpret(codeInterpreter, toolInput.code)
+    }
+    return []
 }
 
-// Function to upload Kaggle dataset files
-async function uploadDataset(codeInterpreter: Sandbox) {
-  console.log(
-    "Uploading testing and training datasets to Code Interpreter sandbox..."
-  );
+async function chatWithGPT(codeInterpreter: Sandbox, userMessage: string): Promise<Result[]> {
+    console.log(`\n${'='.repeat(50)}\nUser Message: ${userMessage}\n${'='.repeat(50)}`)
 
-  const testCsv = fs.readFileSync("./test.csv");
-  const testCsvPath = await codeInterpreter.files.write("test.csv", testCsv);
-  console.log("Uploaded test.csv at", testCsvPath);
+    console.log('Waiting for GPT to respond...')
+    const completion = await client.chat.completions.create({
+        model: MODEL_NAME,
+        messages: [
+            { role: 'system', content: SYSTEM_PROMPT },
+            { role: 'user', content: userMessage }
+        ],
+        tools: tools,
+        tool_choice: 'auto'
+    })
 
-  const trainCsv = fs.readFileSync("./train.csv");
-  const trainCsvPath = await codeInterpreter.files.write("train.csv", trainCsv);
-  console.log("Uploaded train.csv at", trainCsvPath);
-}
+    const message = completion.choices[0].message
+    console.log('\nInitial Response:', message)
 
-// Function to interact with the O1 model
-async function chat(
-  codeInterpreter: Sandbox,
-  userMessage: string,
-): Promise<Result[]> {
-  console.log(
-    `\n${"=".repeat(50)}\nUser Message: ${userMessage}\n${"=".repeat(50)}`
-  );
+    if (message.tool_calls) {
+        const toolCall = message.tool_calls[0]
+        console.log(`\nTool Used: ${toolCall.function.name}\nTool Input: ${toolCall.function.arguments}`)
 
-  try {
-    // Get response from the O1 model
-    const responseO1 = await openai.chat.completions.create({
-      model: "o1",
-      messages: [
-        { role: "user", content: O1_PROMPT + "\n\nTask: " + userMessage },
-      ],
-      tools: tools,
-      tool_choice: 'auto',
-    });
-
-    const choiceO1 = responseO1.choices[0].message;
-
-    if (choiceO1.tool_calls && choiceO1.tool_calls.length > 0) {
-      for (const toolCall of choiceO1.tool_calls) {
-        if (toolCall.function.name === 'execute_python') {
-          let code: string;
-          if (typeof toolCall.function.arguments === 'object' && 'code' in toolCall.function.arguments) {
-            code = (toolCall.function.arguments as { code: string }).code;
-          } else {
-            code = JSON.parse(toolCall.function.arguments).code;
-          }
-          console.log('CODE TO RUN FROM O1:');
-          console.log(code);
-          return await codeInterpret(codeInterpreter, code);
-        }
-      }
+        const codeInterpreterResults = await processToolCall(codeInterpreter, toolCall)
+        console.log(`Tool Result: ${codeInterpreterResults}`)
+        return codeInterpreterResults
     }
-
-    // If no tool calls, fallback to the previous approach
-    const contentO1 = choiceO1.content;
-    if (contentO1 === null) {
-      throw Error(`Chat content is null.`);
-    }
-
-    const pythonCode = matchCodeBlocks(contentO1);
-
-    if (pythonCode === "") {
-      throw Error(`Failed to match any Python code in model's response:\n${contentO1}`);
-    }
-
-    // Run the Python code using the code interpreter
-    const codeInterpreterResults = await codeInterpret(
-      codeInterpreter,
-      pythonCode
-    );
-    return codeInterpreterResults;
-  } catch (error) {
-    console.error("Error when running code interpreter:", error);
-    throw error;
-  }
+    throw new Error('Tool calls not found in message content.')
 }
 
 async function run() {
-  const codeInterpreter = await Sandbox.create();
+    const codeInterpreter = await Sandbox.create()
 
-  try {
-    // Upload the Titanic dataset to the sandbox
-    await uploadDataset(codeInterpreter);
-
-    // Let the model analyze the dataset
-    const codeInterpreterResults = await chat(
-      codeInterpreter,
-      "Clean the data, train a decision tree to predict the survival of passengers, and visualize the learning curve. Then run the model on the test dataset and print the results."
-    );
-
-    console.log("codeInterpreterResults:", codeInterpreterResults);
-
-    if (codeInterpreterResults.length > 0) {
-      const result = codeInterpreterResults[0];
-      console.log("Result object:", result);
-
-      // Handle the result, e.g., save any generated images
-      if (result && result.png) {
-        fs.writeFileSync("result.png", Buffer.from(result.png, "base64"));
-      } else {
-        console.log("No image data available.");
-      }
-    } else {
-      console.log("No results returned.");
+    try {
+        const codeInterpreterResults = await chatWithGPT(
+            codeInterpreter,
+            'Calculate value of pi using monte carlo method. Use 1000 iterations. Visualize all point of all iterations on a single plot, a point inside the unit circle should be orange, other points should be grey.'
+        )
+        const result = codeInterpreterResults[0]
+        console.log('Result:', result)
+        if (result.png) {
+            fs.writeFileSync('image.png', Buffer.from(result.png, 'base64'))
+        }
+    } catch (error) {
+        console.error('An error occurred:', error)
+        throw error;
+    } finally {
+        await codeInterpreter.kill()
     }
-  } catch (error) {
-    console.error("An error occurred:", error);
-    throw error;
-  } finally {
-    await codeInterpreter.kill();
-  }
 }
 
-run();
+run()

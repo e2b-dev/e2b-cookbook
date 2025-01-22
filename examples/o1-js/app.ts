@@ -6,11 +6,25 @@ import * as dotenv from 'dotenv'
 
 dotenv.config()
 
-const MODEL_NAME = 'gpt-4-1106-preview'
+const MODEL_NAME = 'o1'
 
 const SYSTEM_PROMPT = `
 ## your job & context
 you are a python data scientist. you are given tasks to complete and you run python code to solve them.
+
+Information about the temperature dataset:
+- It's in the \`/home/user/city_temperature.csv\` file
+- The CSV file is using \`,\` as the delimiter
+- It has following columns (examples included):
+  - \`Region\`: "North America", "Europe"
+  - \`Country\`: "Iceland"
+  - \`State\`: for example "Texas" but can also be null
+  - \`City\`: "Prague"
+  - \`Month\`: "June"
+  - \`Day\`: 1-31
+  - \`Year\`: 2002
+  - \`AvgTemperature\`: temperature in Celsius, for example 24
+
 - the python code runs in jupyter notebook.
 - every time you call \`execute_python\` tool, the python code is executed in a separate cell. it's okay to multiple calls to \`execute_python\`.
 - display visualizations using matplotlib or any other visualization library directly in the notebook. don't worry about saving the visualizations to a file.
@@ -18,10 +32,6 @@ you are a python data scientist. you are given tasks to complete and you run pyt
 - you also have access to the filesystem and can read/write files.
 - you can install any pip package (if it exists) if you need to but the usual packages for data analysis are already preinstalled.
 - you can run any python code you want, everything is running in a secure sandbox environment.
-
-## style guide
-tool response values that have text inside "[]"  mean that a visual element got rendered in the notebook. for example:
-- "[chart]" means that a chart was generated in the notebook.
 `
 
 const tools = [
@@ -69,10 +79,10 @@ async function processToolCall(codeInterpreter: Sandbox, toolCall: any): Promise
     return []
 }
 
-async function chatWithGPT(codeInterpreter: Sandbox, userMessage: string): Promise<Result[]> {
+async function chatWithLLM(codeInterpreter: Sandbox, userMessage: string): Promise<Result[]> {
     console.log(`\n${'='.repeat(50)}\nUser Message: ${userMessage}\n${'='.repeat(50)}`)
 
-    console.log('Waiting for GPT to respond...')
+    console.log('Waiting for the LLM to respond...')
     const completion = await client.chat.completions.create({
         model: MODEL_NAME,
         messages: [
@@ -97,18 +107,46 @@ async function chatWithGPT(codeInterpreter: Sandbox, userMessage: string): Promi
     throw new Error('Tool calls not found in message content.')
 }
 
+async function uploadDataset(codeInterpreter: Sandbox): Promise<string> {
+    console.log('Uploading dataset to Code Interpreter sandbox...')
+    const datasetPath = './city_temperature.csv'
+
+    if (!fs.existsSync(datasetPath)) {
+        throw new Error('Dataset file not found')
+    }
+
+    const fileBuffer = fs.readFileSync(datasetPath)
+
+    try {
+        const remotePath = await codeInterpreter.files.write('city_temperature.csv', fileBuffer)
+        if (!remotePath) {
+            throw new Error('Failed to upload dataset')
+        }
+        console.log('Uploaded at', remotePath)
+        return remotePath
+    } catch (error) {
+        console.error('Error during file upload:', error)
+        throw error
+    }
+}
+
 async function run() {
     const codeInterpreter = await Sandbox.create()
 
     try {
-        const codeInterpreterResults = await chatWithGPT(
+        // First upload the dataset
+        const remotePath = await uploadDataset(codeInterpreter)
+        console.log('Remote path of the uploaded dataset:', remotePath)
+
+        // Then execute your analysis
+        const codeInterpreterResults = await chatWithLLM(
             codeInterpreter,
-            'Calculate value of pi using monte carlo method. Use 1000 iterations. Visualize all point of all iterations on a single plot, a point inside the unit circle should be orange, other points should be grey.'
+            'Analyze the temperature data for the top 5 hottest cities globally. Create a visualization showing their average temperatures over the years.'
         )
         const result = codeInterpreterResults[0]
         console.log('Result:', result)
         if (result.png) {
-            fs.writeFileSync('image.png', Buffer.from(result.png, 'base64'))
+            fs.writeFileSync('temperature_analysis.png', Buffer.from(result.png, 'base64'))
         }
     } catch (error) {
         console.error('An error occurred:', error)

@@ -116,7 +116,8 @@ async function chat(
   // First, get the plan from o1-mini
   try {
     const responseO1 = await openai.chat.completions.create({
-      model: "o1-mini", // Assuming this model is accessible
+      model: "o3-mini", // Choose different model by uncommenting
+      //model: "o1-mini",
       messages: [
         { role: "user", content: O1_PROMPT },
         { role: "user", content: userMessage },

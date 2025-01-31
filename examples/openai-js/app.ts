@@ -6,7 +6,8 @@ import * as dotenv from 'dotenv'
 
 dotenv.config()
 
-const MODEL_NAME = 'o1'
+const MODEL_NAME = 'o3-mini' // Choose different model by uncommenting. You can choose from models with function-calling support, such as o1 or o3-mini.
+// const MODEL_NAME = 'o1'
 
 const SYSTEM_PROMPT = `
 ## your job & context

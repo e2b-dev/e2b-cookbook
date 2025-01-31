@@ -31,13 +31,13 @@ Read more about E2B on the [E2B website](https://e2b.dev) and the official [E2B 
       - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/llama-3-code-interpreter-python)
       - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/llama-3-code-interpreter-js)
   - **OpenAI**
-    - o1 with data analysis and visualization of a csv file
-      - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/o1-python)
-      - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/o1-js)
+    - o1 (or o3-mini) with data analysis and visualization of a csv file
+      - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/openai-python)
+      - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/openai-js)
     - GPT-4o with code interpreter and reasoning on image data
       - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/gpt-4o-python)
       - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/gpt-4o-js)
-    - o1 and GPT-4 with code interpreter performing machine learning on dataset
+    - o1 (or o3-mini) and GPT-4 with code interpreter performing machine learning on dataset
       - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/o1-and-gpt-4-python)
       - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/o1-and-gpt-4-js)
   - **Anthropic**

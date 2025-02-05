@@ -14,7 +14,7 @@ const scripts = [
   { name: 'claude-code-interpreter-js', interpreter: 'npm', file: './examples/claude-code-interpreter-js/' },
   { name: 'scrape-and-analyze-airbnb-data-with-firecrawl', interpreter: 'npm', file: './examples/scrape-and-analyze-airbnb-data-with-firecrawl/' },
   { name: 'together-ai-with-code-interpreting-js', interpreter: 'npm', file: './examples/together-ai-with-code-interpreting/together-ai-code-interpreter-js' },
-  { name: 'fireworks-code-interpreter-python', interpreter: 'jupyter', file: './examples/fireworks-code-interpreter-python/fireworks_code_interpreter.ipynb' },
+  { name: 'fireworks-code-interpreter-python', interpreter: 'jupyter', file: './examples/fireworks-code-interpreter-python/qwen_code_interpreter.ipynb' },
   { name: 'llama-3-code-interpreter-python', interpreter: 'jupyter', file: './examples/llama-3-code-interpreter-python/llama_3_code_interpreter.ipynb' },
   { name: 'o1-code-interpreter-python', interpreter: 'jupyter', file: './examples/o1-and-gpt-4-python/o1.ipynb' },
   { name: 'codestral-code-interpreter-js', interpreter: 'npm', file: './examples/codestral-code-interpreter-js/' },

@@ -43,7 +43,7 @@ print(result.stdout)
 sbx.kill()
 ```
 
-## How to build your own sandbox that supports running Docker inside
+## How to build your own sandbox that supports running Docker
 
 1. Run `npm i -g @e2b/cli@latest` to install the latest version of the E2B CLI.
 1. Run `e2b template init` in your project directory.

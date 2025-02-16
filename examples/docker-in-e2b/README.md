@@ -52,7 +52,6 @@ sbx.kill()
 1. Start the sandbox either via our SDK or the E2B CLI like this `e2b sandbox spawn <sandbox-template-id>`
 
 
-<Note>
-If you want to use the code interpreting features (https://github.com/e2b-dev/code-interpreter)
+> [!WARNING]
+> If you want to use the code interpreting features (https://github.com/e2b-dev/code-interpreter)
 you can use the `e2bdev/code-interpreter` base image instead of the default `ubuntu:20.04` one in the `e2b.Dockerfile`.
-</Note>

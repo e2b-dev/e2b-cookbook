@@ -45,11 +45,11 @@ sbx.kill()
 
 ## How to build your own sandbox that supports running Docker inside
 
-1. Run `npm i -g @e2b/cli@latest` to install the latest version of the E2B CLI
-1. Run `e2b template init` in the same directory as your `package.json`
-1. Copy the [e2b.Dockerfile](./e2b.Dockerfile) into your project
-1. Run `e2b template build` to build your sandbox
-1. Start the sandbox either via our SDK or the E2B CLI like this `e2b sandbox spawn <sandbox-template-id>`
+1. Run `npm i -g @e2b/cli@latest` to install the latest version of the E2B CLI.
+1. Run `e2b template init` in your project directory.
+1. Copy the [e2b.Dockerfile](./e2b.Dockerfile) into your project.
+1. Run `e2b template build` to build your sandbox.
+1. Start the sandbox either via our SDK or the E2B CLI like this `e2b sandbox spawn <sandbox-template-id>`.
 
 
 > [!WARNING]

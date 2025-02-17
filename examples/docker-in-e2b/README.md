@@ -53,4 +53,4 @@ sbx.kill()
 
 
 > [!WARNING]
-> If you want to use the code interpreting features (https://github.com/e2b-dev/code-interpreter) you can use the `e2bdev/code-interpreter` base image instead of the default `ubuntu:20.04` one in the `e2b.Dockerfile`.
+> If you want to use the [code interpreting features](https://github.com/e2b-dev/code-interpreter) you can use the `e2bdev/code-interpreter` base image instead of the default `ubuntu:20.04` one in the `e2b.Dockerfile` and then follow the [sandbox customization guide](https://e2b.dev/docs/sandbox-template).

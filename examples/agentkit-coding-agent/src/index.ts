@@ -1,6 +1,7 @@
 /* eslint-disable */
 import "dotenv/config";
 
+import fs from "fs";
 import { z } from "zod";
 import {
   createAgent,
@@ -9,7 +10,11 @@ import {
   anthropic,
 } from "@inngest/agent-kit";
 
-import { getSandbox, lastAssistantTextMessageContent } from "./utils.js";
+import {
+  getSandbox,
+  lastAssistantTextMessageContent,
+  prettyPrintLastAssistantMessage,
+} from "./utils.js";
 
 async function main() {
   const agent = createAgent({
@@ -85,7 +90,9 @@ async function main() {
             for (const file of files) {
               await sandbox.files.write(file.path, file.content);
             }
-            return `Files created or updated: ${files.map((f) => f.path).join(", ")}`;
+            return `Files created or updated: ${files
+              .map((f) => f.path)
+              .join(", ")}`;
           } catch (e) {
             console.error("error", e);
             return "Error: " + e;
@@ -140,9 +147,11 @@ async function main() {
     ],
     lifecycle: {
       onResponse: async ({ result, network }) => {
+        prettyPrintLastAssistantMessage(result);
+
         const lastAssistantMessageText =
           lastAssistantTextMessageContent(result);
-        console.log("Agent response >", lastAssistantMessageText);
+
         if (lastAssistantMessageText) {
           if (lastAssistantMessageText.includes("<task_summary>")) {
             network?.state.kv.set("task_summary", lastAssistantMessageText);
@@ -157,6 +166,7 @@ async function main() {
   const network = createNetwork({
     name: "coding-agent-network",
     agents: [agent],
+    maxIter: 15,
     defaultRouter: ({ network, callCount }) => {
       console.log(` --- Iteration #${callCount} ---`);
       if (network?.state.kv.has("task_summary")) {
@@ -172,7 +182,27 @@ async function main() {
   console.log(result.state.kv.get("task_summary"));
 
   const sandbox = await getSandbox(result);
-  await sandbox?.kill();
+
+  if (sandbox) {
+    console.log("------------------------------------");
+    console.log("Downloading artifact...");
+    await sandbox.commands.run(
+      "touch artifact.tar.gz && tar --exclude=artifact.tar.gz --exclude=node_modules --exclude=.npm --exclude=.env --exclude=.bashrc --exclude=.profile  --exclude=.bash_logout --exclude=.env* -zcvf artifact.tar.gz ."
+    );
+    const artifact = await sandbox.files.read("artifact.tar.gz", {
+      format: "blob",
+    });
+    // convert blob to arraybuffer
+    const arrayBuffer = await artifact.arrayBuffer();
+    fs.writeFileSync("artifact.tar.gz", Buffer.from(arrayBuffer));
+    console.log("Artifact downloaded in artifact.tar.gz");
+    console.log(
+      "Extract artifact by running: `mkdir artifact && tar -xvzf artifact.tar.gz -C artifact`"
+    );
+    console.log("------------------------------------");
+
+    await sandbox.kill();
+  }
 }
 
 main();

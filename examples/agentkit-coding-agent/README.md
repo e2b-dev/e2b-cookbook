@@ -20,7 +20,7 @@ ANTHROPIC_API_KEY=your_anthropic_api_key # Get one at https://console.anthropic.
 3. Start the development server:
 
 ```bash
-pnpm run start "Create a Next.js TodoList demo and its associated unit tests. Finally run the tests with coverage"
+npm run start "Create a Next.js TodoList demo and its associated unit tests. Finally run the tests with coverage"
 ```
 
 ## Features

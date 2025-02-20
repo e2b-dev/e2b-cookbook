@@ -30,6 +30,7 @@ const scripts = [
   { name: 'llama-3-code-interpreter-js', interpreter: 'npm', file: './examples/llama-3-code-interpreter-js/' },
   { name: 'claude-code-interpreter-python', interpreter: 'jupyter', file: './examples/claude-code-interpreter-python/claude_code_interpreter.ipynb' },
   { name: 'claude-visualize-website-topics', interpreter: 'jupyter', file: './examples/claude-visualize-website-topics/claude-visualize-website-topics.ipynb' },
+  { name: 'watsonx-ai-code-interpreter-python', interpreter: 'jupyter', file: './examples/watsonx-ai-code-interpreter-python/granite_code_interpreter.ipynb' },
 ];
 
 // We don't have integration tests for NextJS yet:

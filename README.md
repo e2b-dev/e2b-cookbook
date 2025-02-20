@@ -65,6 +65,9 @@ Read more about E2B on the [E2B website](https://e2b.dev) and the official [E2B 
   - Code interpreter usable with Meta Llama 3.1 Instruct Turbo (8B or 70B or 405B), Qwen 2 Instruct (72B), Code Llama Instruct (70B), or DeepSeek Coder Instruct (33B)
     - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/together-ai-with-code-interpreting/together-ai-code-interpreter-python)
     - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/together-ai-with-code-interpreting/together-ai-code-interpreter-js)
+- **WatsonX AI**
+  - Code interpreter usable with IBM Graphite, Llama or Mistral
+    - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/watsonx-ai-code-interpreter-python/granite_code_interpreter.ipynb)
 
 **AI frameworks integrations**
 

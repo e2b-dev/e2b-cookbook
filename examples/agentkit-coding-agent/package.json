@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@e2b/code-interpreter": "^1.0.4",
-    "@inngest/agent-kit": "^0.2.2",
+    "@inngest/agent-kit": "^0.3.0",
     "dotenv": "^16.4.7",
     "nodemon": "^3.0.0",
     "tsx": "^4.7.0",

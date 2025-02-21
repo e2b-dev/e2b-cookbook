@@ -2,6 +2,8 @@
 
 This example demonstrates how to build an AI coding agent using AgentKit and E2B Code Interpreter. The agent can execute code and help with programming tasks.
 
+https://github.com/user-attachments/assets/4aaf784a-f6da-4327-b3f6-01573b57f1a0
+
 ## Setup
 
 1. Install dependencies:

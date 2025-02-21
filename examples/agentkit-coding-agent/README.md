@@ -33,7 +33,7 @@ npx inngest-cli@latest dev
 
 5. Open the Inngest Dev Server at [http://127.0.0.1:8288/functions](http://127.0.0.1:8288/functions)
 
-![Inngest Dev Server](./readme-assets/inngest-functions-list.png)
+<img src="./readme-assets/inngest-functions-list.png" height="250">
 
 6. Trigger the Coding Agent with the following input:
 
@@ -45,11 +45,11 @@ npx inngest-cli@latest dev
 }
 ```
 
-![Inngest Dev Server](./readme-assets/inngest-trigger-coding-agent.png)
+<img src="./readme-assets/inngest-trigger-coding-agent.png" height="300">
 
 7. The agent will start executing the task and you will see the output in the Inngest Dev Server.
 
-![Inngest Dev Server](./readme-assets/inngest-coding-agent-run.png)
+<img src="./readme-assets/inngest-coding-agent-run.png" height="450">
 
 ## Features
 

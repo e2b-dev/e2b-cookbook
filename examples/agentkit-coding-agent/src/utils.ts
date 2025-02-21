@@ -1,28 +1,6 @@
 /* eslint-disable */
 import { Sandbox } from "@e2b/code-interpreter";
-import {
-  InferenceResult,
-  Message,
-  Network,
-  NetworkRun,
-  TextMessage,
-} from "@inngest/agent-kit";
-
-export function prettyPrintLastAssistantMessage(result: InferenceResult) {
-  const lastAssistantMessageIndex = result.output.findLastIndex(
-    (message) => message.role === "assistant"
-  );
-  const message = result.output[lastAssistantMessageIndex] as
-    | Message
-    | undefined;
-  if (message) {
-    if (message.type === "tool_call") {
-      console.log("Agent response > ", `tool call (${message.tools[0].name})`);
-    } else if (message.type === "text" && message.content) {
-      console.log("Agent response > ", message.content);
-    }
-  }
-}
+import { InferenceResult, NetworkRun, TextMessage } from "@inngest/agent-kit";
 
 export function lastAssistantTextMessageContent(result: InferenceResult) {
   const lastAssistantMessageIndex = result.output.findLastIndex(
@@ -38,12 +16,8 @@ export function lastAssistantTextMessageContent(result: InferenceResult) {
     : undefined;
 }
 
-export async function getSandbox(network?: NetworkRun) {
-  let sandbox = network?.state.kv.get("sandbox") as Sandbox;
-  if (!sandbox) {
-    sandbox = await Sandbox.create();
-  }
+export async function getSandbox(sandboxId: string) {
+  const sandbox = await Sandbox.connect(sandboxId);
   await sandbox.setTimeout(5 * 60_000);
-  network?.state.kv.set("sandbox", sandbox);
   return sandbox;
 }

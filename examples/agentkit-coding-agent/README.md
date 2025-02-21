@@ -17,11 +17,37 @@ E2B_API_KEY=your_e2b_api_key # Get one at https://e2b.dev/docs
 ANTHROPIC_API_KEY=your_anthropic_api_key # Get one at https://console.anthropic.com/settings/keys
 ```
 
-3. Start the development server:
+3. Start the program:
 
 ```bash
-npm run start "Create a Next.js TodoList demo and its associated unit tests. Finally run the tests with coverage"
+npm run start
 ```
+
+4. Start the Inngest Dev Server:
+
+```bash
+npx inngest-cli@latest dev
+```
+
+5. Open the Inngest Dev Server at [http://127.0.0.1:8288/functions](http://127.0.0.1:8288/functions)
+
+![Inngest Dev Server](./readme-assets/inngest-functions-list.png)
+
+6. Trigger the Coding Agent with the following input:
+
+```json
+{
+  "data": {
+    "input": "Create a Next.js TodoList demo and its associated unit tests. Finally run the tests with coverage"
+  }
+}
+```
+
+![Inngest Dev Server](./readme-assets/inngest-trigger-coding-agent.png)
+
+7. The agent will start executing the task and you will see the output in the Inngest Dev Server.
+
+![Inngest Dev Server](./readme-assets/inngest-coding-agent-run.png)
 
 ## Features
 
@@ -29,6 +55,7 @@ npm run start "Create a Next.js TodoList demo and its associated unit tests. Fin
 - Built with AgentKit for robust agent capabilities
 - TypeScript support
 - Hot reloading during development
+- Durable execution (retries on rate limits, etc) with Inngest
 
 ## Project Structure
 

@@ -1,7 +1,7 @@
 import os
 import json
-from e2b_code_interpreter import CodeInterpreter
 from crewai.tools import BaseTool
+from e2b_code_interpreter import Sandbox
 
 from typing import Type
 from pydantic import BaseModel, Field
@@ -23,7 +23,7 @@ class E2BCodeInterpreterTool(BaseTool):
     name: str = "code_interpreter"
     description: str = "Execute Python code in a Jupyter notebook cell and return any rich data (eg charts), stdout, stderr, and errors."
     args_schema: Type[BaseModel] = E2BCodeInterpreterSchema
-    _code_interpreter_tool: CodeInterpreter | None = None
+    _code_interpreter_tool: Sandbox | None = None
 
     def __init__(self, *args, **kwargs):
         # Call the superclass's init method
@@ -36,12 +36,12 @@ class E2BCodeInterpreterTool(BaseTool):
             )
 
         # Initialize the code interpreter tool
-        self._code_interpreter_tool = CodeInterpreter()
+        self._code_interpreter_tool = Sandbox()
 
     def _run(self, code: str) -> str:
         # Execute the code using the code interpreter
-        execution = self._code_interpreter_tool.notebook.exec_cell(code)
         print(code)
+        execution = self._code_interpreter_tool.run_code(code)
         
         # Extract relevant execution details
         result = {

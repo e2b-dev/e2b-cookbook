@@ -6,13 +6,12 @@ authors = ["Vasek Mlejnsky <vasek@e2b.dev>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.11,<=3.13"
-e2b-code-interpreter = "0.0.11b32"
-python-dotenv = "^1.0.1"
+python = ">=3.11,<=3.12"
+e2b-code-interpreter = "1.0.5"
+python-dotenv = "1.0.1"
 
-crewai = "^0.61.0"
-crewai-tools = "^0.12.1"
-pydantic = "^2.9.2"
+crewai = "0.105.0"
+pydantic = "2.10.6"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

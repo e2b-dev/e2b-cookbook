@@ -1,7 +1,7 @@
 import os
 import json
-from crewai_tools import BaseTool
 from e2b_code_interpreter import CodeInterpreter
+from crewai.tools import BaseTool
 
 from typing import Type
 from pydantic import BaseModel, Field

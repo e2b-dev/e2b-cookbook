@@ -67,8 +67,9 @@ Read more about E2B on the [E2B website](https://e2b.dev) and the official [E2B 
     - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/together-ai-with-code-interpreting/together-ai-code-interpreter-js)
 - **WatsonX AI**
   - Code interpreter usable with IBM Graphite, Llama or Mistral
-    - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/watsonx-ai-code-interpreter-python/granite_code_interpreter.ipynb)
-
+    - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/watsonx-ai-code-interpreter/granite_code_interpreter_py.ipynb)
+    - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/watsonx-ai-code-interpreter/granite_code_interpreter_ts.ipynb)
+      
 **AI frameworks integrations**
 
 - **🦜⛓️ LangChain**

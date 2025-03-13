@@ -41,6 +41,7 @@ class E2BCodeInterpreterTool(BaseTool):
     def _run(self, code: str) -> str:
         # Execute the code using the code interpreter
         execution = self._code_interpreter_tool.notebook.exec_cell(code)
+        print(code)
         
         # Extract relevant execution details
         result = {

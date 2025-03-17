@@ -10,6 +10,7 @@ Read more about E2B on the [E2B website](https://e2b.dev) and the official [E2B 
 
 - [E2B AI Analyst](https://github.com/e2b-dev/ai-analyst) - analyze your data & create interactive charts
 - [E2B Fragments](https://github.com/e2b-dev/fragments) - prompt different LLMS to generate apps with UI
+- [E2B Surf](https://github.com/e2b-dev/surf) - computer use AI agent powered by OpenAI
 
 **Hello World guide**
 

@@ -6,23 +6,16 @@ Read more about E2B on the [E2B website](https://e2b.dev) and the official [E2B 
 
 ## Examples
 
-**Open-source apps**
-
-- [E2B AI Analyst](https://github.com/e2b-dev/ai-analyst) - analyze your data & create interactive charts
-- [E2B Fragments](https://github.com/e2b-dev/fragments) - prompt different LLMS to generate apps with UI
-- [E2B Surf](https://github.com/e2b-dev/surf) - computer use AI agent powered by OpenAI
-
 **Hello World guide**
 
 - [TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/hello-world-js)
 - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/hello-world-python)
 
-**Example use cases**
+**Open-source apps**
 
-- Anthropic's Artifacts UI with AI Code Execution - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/anthropic-power-artifacts)
-- Upload dataset and analyze it with Llama 3 - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/upload-dataset-code-interpreter)
-- Scrape Airbnb and analyze data with Claude 3 Opus and Firecrawl - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/scrape-and-analyze-airbnb-data-with-firecrawl)
-- Visualize website topics with Claude 3.5 Sonnet and Firecrawl - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/claude-visualize-website-topics)
+- [E2B AI Analyst](https://github.com/e2b-dev/ai-analyst) - analyze your data & create interactive charts
+- [E2B Fragments](https://github.com/e2b-dev/fragments) - prompt different LLMS to generate apps with UI
+- [E2B Surf](https://github.com/e2b-dev/surf) - computer use AI agent powered by OpenAI
 
 **LLM providers**
 
@@ -150,3 +143,10 @@ Read more about E2B on the [E2B website](https://e2b.dev) and the official [E2B 
     </tr>
   </tbody>
 </table>
+
+**Example use cases**
+
+- Anthropic's Artifacts UI with AI Code Execution - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/anthropic-power-artifacts)
+- Upload dataset and analyze it with Llama 3 - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/upload-dataset-code-interpreter)
+- Scrape Airbnb and analyze data with Claude 3 Opus and Firecrawl - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/scrape-and-analyze-airbnb-data-with-firecrawl)
+- Visualize website topics with Claude 3.5 Sonnet and Firecrawl - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/claude-visualize-website-topics)

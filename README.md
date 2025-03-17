@@ -109,18 +109,44 @@ Read more about E2B on the [E2B website](https://e2b.dev) and the official [E2B 
 
 **AI frameworks integrations**
 
-- **🦜⛓️ LangChain**
-
-  - LangChain with Code Interpreter - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/langchain-python)
-
-- **🦜🕸️ LangGraph**
-
-  - LangGraph with code interpreter - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/langgraph-python)
-
-- **Autogen**
-
-  - Autogen with secure sandboxed for code interpreting - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/e2b_autogen)
-
-- **▲ Vercel AI SDK**
-  - Vercel AI SDK's Next.js + AI SDK + Code Interpreter - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/nextjs-code-interpreter)
-  - Anthropic's Artifacts UI with Vercel AI SDK - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/anthropic-power-artifacts)
+<table>
+  <thead>
+    <tr>
+      <th>Framework</th>
+      <th>Description</th>
+      <th>Python</th>
+      <th>TypeScript</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>🦜⛓️ LangChain</td>
+      <td>LangChain with Code Interpreter</td>
+      <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/langchain-python">Python</a></td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>🦜🕸️ LangGraph</td>
+      <td>LangGraph with code interpreter</td>
+      <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/langgraph-python">Python</a></td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>Autogen</td>
+      <td>Autogen with secure sandboxed for code interpreting</td>
+      <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/e2b_autogen">Python</a></td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td rowspan="2">▲ Vercel AI SDK</td>
+      <td>Next.js + AI SDK + Code Interpreter</td>
+      <td>-</td>
+      <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/nextjs-code-interpreter">TypeScript</a></td>
+    </tr>
+    <tr>
+      <td>Anthropic's Artifacts UI with Vercel AI SDK</td>
+      <td>-</td>
+      <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/anthropic-power-artifacts">TypeScript</a></td>
+    </tr>
+  </tbody>
+</table>

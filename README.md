@@ -136,17 +136,11 @@ Read more about E2B on the [E2B website](https://e2b.dev) and the official [E2B 
       <td>-</td>
       <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/nextjs-code-interpreter">TypeScript</a></td>
     </tr>
-    <tr>
-      <td>Anthropic's Artifacts UI with Vercel AI SDK</td>
-      <td>-</td>
-      <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/anthropic-power-artifacts">TypeScript</a></td>
-    </tr>
   </tbody>
 </table>
 
 **Example use cases**
 
-- Anthropic's Artifacts UI with AI Code Execution - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/anthropic-power-artifacts)
 - Upload dataset and analyze it with Llama 3 - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/upload-dataset-code-interpreter)
 - Scrape Airbnb and analyze data with Claude 3 Opus and Firecrawl - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/scrape-and-analyze-airbnb-data-with-firecrawl)
 - Visualize website topics with Claude 3.5 Sonnet and Firecrawl - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/claude-visualize-website-topics)

@@ -67,8 +67,8 @@ Read more about E2B on the [E2B website](https://e2b.dev) and the official [E2B 
       <td>Groq</td>
       <td>Llama 3</td>
       <td>Code interpreter via function calling</td>
-      <td><a href="https://github.com/e2b-dev/e2b-cookbook/blob/main/examples/llama-3-code-interpreter-python/llama_3_code_interpreter_groq.ipynb">Python</a></td>
-      <td>-</td>
+      <td><a href="https://github.com/e2b-dev/e2b-cookbook/blob/main/examples/groq-code-interpreter-python/llama_3_code_interpreter.ipynb">Python</a></td>
+      <td><a href="https://github.com/e2b-dev/e2b-cookbook/blob/main/examples/groq-code-interpreter-js">TypeScript</a></td>
     </tr>
     <tr>
       <td rowspan="2">Fireworks AI</td>
@@ -87,8 +87,8 @@ Read more about E2B on the [E2B website](https://e2b.dev) and the official [E2B 
       <td>Together AI</td>
       <td>Llama 3.1, Qwen 2, Code Llama, DeepSeek Coder</td>
       <td>Code interpreter</td>
-      <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/together-ai-with-code-interpreting/together-ai-code-interpreter-python">Python</a></td>
-      <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/together-ai-with-code-interpreting/together-ai-code-interpreter-js">TypeScript</a></td>
+      <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/together-ai-code-interpreter-python">Python</a></td>
+      <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/together-ai-code-interpreter-js">TypeScript</a></td>
     </tr>
     <tr>
       <td>WatsonX AI</td>
@@ -127,7 +127,7 @@ Read more about E2B on the [E2B website](https://e2b.dev) and the official [E2B 
     <tr>
       <td>Autogen</td>
       <td>Autogen with secure sandboxed for code interpreting</td>
-      <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/e2b_autogen">Python</a></td>
+      <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/autogen-python">Python</a></td>
       <td>-</td>
     </tr>
     <tr>
@@ -148,7 +148,7 @@ Read more about E2B on the [E2B website](https://e2b.dev) and the official [E2B 
 **Example use cases**
 
 - Upload dataset and analyze it with Llama 3 - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/upload-dataset-code-interpreter)
-- Scrape Airbnb and analyze data with Claude 3 Opus and Firecrawl - [TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/scrape-and-analyze-airbnb-data-with-firecrawl)
+- Scrape Airbnb and analyze data with Claude 3 Opus and Firecrawl - [TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/firecrawl-scrape-and-analyze-airbnb-data)
 - Visualize website topics with Claude 3.5 Sonnet and Firecrawl - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/claude-visualize-website-topics)
 - Next.js app with LLM + Code Interpreter and streaming - [TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/nextjs-code-interpreter)
 - How to run a Docker container in E2B - [Python/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/docker-in-e2b)

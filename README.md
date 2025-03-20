@@ -131,10 +131,16 @@ Read more about E2B on the [E2B website](https://e2b.dev) and the official [E2B 
       <td>-</td>
     </tr>
     <tr>
-      <td rowspan="2">▲ Vercel AI SDK</td>
+    <td>▲ Vercel AI SDK</td>
       <td>Next.js + AI SDK + Code Interpreter</td>
       <td>-</td>
       <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/nextjs-code-interpreter">TypeScript</a></td>
+    </tr>
+    <tr>
+    <td>AgentKit</td>
+      <td>AgentKit Coding Agent</td>
+      <td>-</td>
+      <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/agentkit-coding-agent">TypeScript</a></td>
     </tr>
   </tbody>
 </table>
@@ -142,5 +148,8 @@ Read more about E2B on the [E2B website](https://e2b.dev) and the official [E2B 
 **Example use cases**
 
 - Upload dataset and analyze it with Llama 3 - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/upload-dataset-code-interpreter)
-- Scrape Airbnb and analyze data with Claude 3 Opus and Firecrawl - [JavaScript/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/scrape-and-analyze-airbnb-data-with-firecrawl)
+- Scrape Airbnb and analyze data with Claude 3 Opus and Firecrawl - [TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/scrape-and-analyze-airbnb-data-with-firecrawl)
 - Visualize website topics with Claude 3.5 Sonnet and Firecrawl - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/claude-visualize-website-topics)
+- Next.js app with LLM + Code Interpreter and streaming - [TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/nextjs-code-interpreter)
+- How to run a Docker container in E2B - [Python/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/docker-in-e2b)
+

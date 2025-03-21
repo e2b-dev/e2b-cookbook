@@ -1,10 +1,6 @@
 # E2B Hello World for TypeScript & JavaScript
 
-This example shows how to add code interpreting to an LLM using the [Code Interpreter SDK](https://github.com/e2b-dev/code-interpreter).
-
-## Official guide
-Visit the [official guide](https://e2b.dev/docs/hello-world/js) related to this example.
-
+This example shows the minimal code for starting an [E2B Sandbox](https://e2b.dev/docs/quickstart), executing Python inside it and listing all files inside the root directory.
 
 ## Setup & run
 ### 1. Install dependencies
@@ -16,7 +12,6 @@ npm install
 
 1. Copy `.env.template` to `.env`
 1. Get [E2B API key](https://e2b.dev/docs/getting-started/api-key)
-1. Get [Cohere API key](https://anthropic.com)
 
 ### 3. Run the example
 ```

@@ -1,3 +1,6 @@
+![E2B Cookbook Preview Light](/readme-assets/cookbook-light.png#gh-light-mode-only)
+![E2B Cookbook Preview Dark](/readme-assets/cookbook-dark.png#gh-dark-mode-only)
+
 # ✴️ E2B Cookbook
 
 Example code and guides for building with [E2B SDK](https://github.com/e2b-dev/e2b).

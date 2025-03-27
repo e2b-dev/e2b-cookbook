@@ -97,8 +97,8 @@ Read more about E2B on the [E2B website](https://e2b.dev) and the official [E2B 
       <td>WatsonX AI</td>
       <td>IBM Graphite, Llama, Mistral</td>
       <td>Code interpreter</td>
-      <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/watsonx-ai-code-interpreter/granite_code_interpreter_py.ipynb">Python</a></td>
-      <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/watsonx-ai-code-interpreter/granite_code_interpreter_ts.ipynb">TypeScript</a></td>
+      <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/watsonx-ai-code-interpreter-python">Python</a></td>
+      <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/watsonx-ai-code-interpreter-js">TypeScript</a></td>
     </tr>
   </tbody>
 </table>

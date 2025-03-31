@@ -155,4 +155,5 @@ Read more about E2B on the [E2B website](https://e2b.dev) and the official [E2B 
 - Visualize website topics with Claude 3.5 Sonnet and Firecrawl - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/claude-visualize-website-topics)
 - Next.js app with LLM + Code Interpreter and streaming - [TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/nextjs-code-interpreter)
 - How to run a Docker container in E2B - [Python/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/docker-in-e2b)
+- How to run Playwright in E2B - [TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/playwright-in-e2b)
 

@@ -4,19 +4,19 @@ This example shows how to run OpenAI's [Codex](https://github.com/openai/codex) 
 
 ## How to run
 
-0. Set up E2B_API_KEY environment variable in `.env` file.
+1. Set up E2B_API_KEY environment variable in `.env` file.
 
-1. Initialize the virtual environment
+2. Initialize the virtual environment
 `uv venv`
 
-2. Activate the virtual environment
+3. Activate the virtual environment
 `source .venv/bin/activate`  # On Unix/macOS
 # or
 `.venv\Scripts\activate`  # On Windows
 
-3. Install the dependencies
+4. Install the dependencies
 `uv pip install`
 
-4. Run the script
+5. Run the script
 `uv run src/openai_codex_in_sandbox_python/main.py`
 

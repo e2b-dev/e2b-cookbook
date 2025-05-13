@@ -5,7 +5,7 @@ load_dotenv()
 
 template_name = 'openai-codex'
 sbx = Sandbox(template_name)
-print("Sandbox created", sbx.id)
+print("Sandbox created", sbx.sandbox_id)
 
 result = sbx.commands.run('codex --help')
 print(result.stdout)

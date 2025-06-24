@@ -7,6 +7,8 @@ Example code and guides for building with [E2B SDK](https://github.com/e2b-dev/e
 
 Read more about E2B on the [E2B website](https://e2b.dev) and the official [E2B documentation](https://e2b.dev/docs).
 
+E2B works with any LLM that supports tool use. You can connect providers like OpenAI, Anthropic, Mistral, Groq, or custom OpenAI-compatible APIs such as the [AI/ML API](https://aimlapi.com/app/?utm_source=e2b&utm_medium=github&utm_campaign=integration).
+
 ## Examples
 
 **Hello World guide**
@@ -99,6 +101,13 @@ Read more about E2B on the [E2B website](https://e2b.dev) and the official [E2B 
       <td>Code interpreter</td>
       <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/watsonx-ai-code-interpreter-python">Python</a></td>
       <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/watsonx-ai-code-interpreter-js">TypeScript</a></td>
+    </tr>
+    <tr>
+      <td>AI/ML API</td>
+      <td> 300+ models</td>
+      <td>OpenAI-compatible API</td>
+      <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/aimlapi-python">Python</a></td>
+      <td>-</td>
     </tr>
   </tbody>
 </table>

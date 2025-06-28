@@ -8,7 +8,7 @@ We prepared a sandbox template with Codex already installed. You can create a sa
 ```python
 from e2b import Sandbox
 
-sbx = Sandbox.create("openai-codex", timeout=60 * 5) # Timeout set to 5 minutes, you can customize it as needed.
+sbx = Sandbox("openai-codex", timeout=60 * 5) # Timeout set to 5 minutes, you can customize it as needed.
 
 result = sbx.commands.run("codex --help")
 print(result.stdout)

@@ -514,14 +514,14 @@ files = [
 ]
 
 [[package]]
-name = "pyautogen"
+name = "ag2"
 version = "0.3.0"
 description = "A programming framework for agentic AI"
 optional = false
 python-versions = "<3.13,>=3.8"
 files = [
-    {file = "pyautogen-0.3.0-py3-none-any.whl", hash = "sha256:af5677de9216823b05f52fd1e6d359ddb332dcb68cdf58acf3b0f4a9a796d302"},
-    {file = "pyautogen-0.3.0.tar.gz", hash = "sha256:dcd8239ed33d7a698a6bb2ed71a631fded4b4f6bd861a5cd854ab960f91bdabe"},
+    {file = "ag2-0.3.0-py3-none-any.whl", hash = "sha256:af5677de9216823b05f52fd1e6d359ddb332dcb68cdf58acf3b0f4a9a796d302"},
+    {file = "ag2-0.3.0.tar.gz", hash = "sha256:dcd8239ed33d7a698a6bb2ed71a631fded4b4f6bd861a5cd854ab960f91bdabe"},
 ]
 
 [package.dependencies]

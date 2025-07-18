@@ -7,7 +7,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.13"
-pyautogen = "^0.3.0"
+ag2 = "^0.3.0"
 e2b = "0.17.2a60"
 python-dotenv = "^1.0.0"
 

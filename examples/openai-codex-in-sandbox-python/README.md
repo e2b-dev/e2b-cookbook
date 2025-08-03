@@ -46,6 +46,10 @@ Windows
 .venv\Scripts\activate
 ```
 
+**4. Run the example**
 
+```
+uv run src/openai_codex_in_sandbox_python/main.py
+```
 
 

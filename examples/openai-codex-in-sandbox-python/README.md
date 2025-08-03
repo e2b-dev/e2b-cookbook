@@ -49,7 +49,7 @@ Windows
 **4. Install the dependencies**
 
 ```
-uv pip install e2b
+uv pip install
 ```
 
 **5. Run the script**

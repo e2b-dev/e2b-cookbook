@@ -46,16 +46,6 @@ Windows
 .venv\Scripts\activate
 ```
 
-**4. Install the dependencies**
 
-```
-uv pip install
-```
-
-**5. Run the script**
-
-```
-uv run src/openai_codex_in_sandbox_python/main.py
-```
 
 

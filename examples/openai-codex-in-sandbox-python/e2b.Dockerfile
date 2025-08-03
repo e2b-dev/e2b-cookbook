@@ -6,7 +6,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Install Node.js 24.0
 
 # update and install curl in a single RUN command to reduce layers
-RUN apt-get update && apt-get install -y curl git-all
+RUN apt-get update && apt-get install -y curl git-all ripgrep
 
 # get install script and pass it to execute, then install nodejs in a single RUN command
 RUN curl -sL https://deb.nodesource.com/setup_24.x | bash - && apt-get install -y nodejs

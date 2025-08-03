@@ -18,20 +18,44 @@ print(result.stdout)
 
 ## How to run example
 
-**1. Set up E2B_API_KEY environment variable in `.env` file.**
+**1. Set API key E2B_API_KEY**
+
+Set the `E2B_API_KEY`  in `.env`. You can get the API key at [https://e2b.dev/dashboard](https://e2b.dev/dashboard)
+```
+E2B_API_KEY="..."
+```
+
 
 **2. Initialize the virtual environment**
-`uv venv`
+
+```
+uv venv
+```
 
 **3. Activate the virtual environment**
-`source .venv/bin/activate`  # On Unix/macOS
-or
 
-`.venv\Scripts\activate`  # On Windows
+macOS/Unix
+
+```
+source .venv/bin/activate
+```
+
+Windows
+
+```
+.venv\Scripts\activate
+```
 
 **4. Install the dependencies**
-`uv pip install`
+
+```
+uv pip install e2b
+```
 
 **5. Run the script**
-`uv run src/openai_codex_in_sandbox_python/main.py`
+
+```
+uv run src/openai_codex_in_sandbox_python/main.py
+```
+
 

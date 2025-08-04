@@ -2,7 +2,7 @@
 
 This example shows how to run Anthropic's [Claude Code](https://github.com/anthropics/claude-code) in E2B Sandbox.
 
-## How to create sandbox with Claude
+## How to create sandbox with Claude Code
 
 We prepared a sandbox template with Claude Code already installed. You can create a sandbox with Claude by running the following code:
 

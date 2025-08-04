@@ -9,10 +9,22 @@ We prepared a sandbox template with Claude Code already installed. You can creat
 ```python
 from e2b import Sandbox
 
-sbx = Sandbox("anthropic-claude-code", timeout=60 * 5) # Timeout set to 5 minutes, you can customize it as needed.
+sbx = Sandbox(
+    "anthropic-claude-code",
+    envs={
+        'ANTHROPIC_API_KEY': '<your api key>',
+    },
+    timeout=60 * 5,
+) # Timeout set to 5 minutes, you can customize it as needed.
 
-result = sbx.commands.run("claude --help")
+# Run a prompt with Claude Code
+result = sbx.commands.run(
+    "echo 'Create a hello world index.html' | claude -p --dangerously-skip-permissions",
+    timeout=0, # Claude Code can run for a long time, so we need to set the timeout to 0.
+)
 print(result.stdout)
+
+sbx.kill()
 ```
 
 ---
@@ -27,13 +39,17 @@ Set the `E2B_API_KEY` in `.env`. You can get the API key at [https://e2b.dev/das
 E2B_API_KEY="..."
 ```
 
-**2. Initialize the virtual environment**
+**2. Change ANTHROPIC_API_KEY in the code**
+
+Replace `<your api key>` in the code with your actual Anthropic API key.
+
+**3. Initialize the virtual environment**
 
 ```
-uv venv
+python -m venv .venv
 ```
 
-**3. Activate the virtual environment**
+**4. Activate the virtual environment**
 
 macOS/Unix
 
@@ -47,8 +63,14 @@ Windows
 .venv\Scripts\activate
 ```
 
-**4. Run the example**
+**5. Install dependencies**
 
 ```
-uv run src/anthropic_claude_code_in_sandbox_python/main.py
+pip install -e .
+```
+
+**6. Run the example**
+
+```
+python anthropic_claude_code_in_sandbox/main.py
 ```

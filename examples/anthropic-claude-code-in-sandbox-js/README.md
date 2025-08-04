@@ -1,16 +1,19 @@
-# OpenAI Codex in E2B Sandbox (JavaScript)
+# Anthropic Claude Code in E2B Sandbox (JavaScript)
 
-This example shows how to run OpenAI's [Codex](https://github.com/openai/codex) in E2B Sandbox.
+This example shows how to run Anthropic's [Claude Code](https://github.com/anthropics/claude-code) in E2B Sandbox.
 
-## How to create sandbox with Codex
+## How to create sandbox with Claude
+
 We prepared a sandbox template with Codex already installed. You can create a sandbox with Codex by running the following code:
 
 ```javascript
-const { Sandbox } = require('e2b')
+const { Sandbox } = require("e2b");
 
-const sbx = await Sandbox.create('openai-codex', { timeoutMs: 60 * 5 * 1000 }) // Timeout set to 5 minutes, you can customize it as needed.
-const result = await sbx.commands.run('codex --help')
-console.log(result.stdout)
+const sbx = await Sandbox.create("anthropic-claude-code", {
+  timeoutMs: 60 * 5 * 1000,
+}); // Timeout set to 5 minutes, you can customize it as needed.
+const result = await sbx.commands.run("claude --help");
+console.log(result.stdout);
 ```
 
 ---

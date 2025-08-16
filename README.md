@@ -28,7 +28,7 @@ E2B works with any LLM that supports tool use. You can connect providers like Op
   <thead>
     <tr>
       <th>Provider</th>
-      <th>Model(s)</th>
+      <th>Topic(s)</th>
       <th>Example</th>
       <th>Python</th>
       <th>TypeScript</th>
@@ -36,7 +36,7 @@ E2B works with any LLM that supports tool use. You can connect providers like Op
   </thead>
   <tbody>
     <tr>
-      <td rowspan="3">OpenAI</td>
+      <td rowspan="4">OpenAI</td>
       <td>o1, o3-mini</td>
       <td>Data analysis and visualization of a CSV</td>
       <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/openai-python">Python</a></td>
@@ -55,11 +55,23 @@ E2B works with any LLM that supports tool use. You can connect providers like Op
       <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/o1-and-gpt-4-js">TypeScript</a></td>
     </tr>
     <tr>
-      <td>Anthropic</td>
+      <td>Codex CLI</td>
+      <td>OpenAI Codex, running inside a Sandbox</td>
+      <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/openai-codex-in-sandbox-python">Python</a></td>
+      <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/openai-codex-in-sandbox-js">TypeScript</a></td>
+    </tr>
+    <tr>
+      <td rowspan="2">Anthropic</td>
       <td>Claude 3 Opus</td>
       <td>Code interpreter</td>
       <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/claude-code-interpreter-python">Python</a></td>
       <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/claude-code-interpreter-js">TypeScript</a></td>
+    </tr>
+    <tr>
+      <td>Claude Code</td>
+      <td>Claude Code, running inside a Sandbox</td>
+      <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/anthropic-claude-code-in-sandbox-python">Python</a></td>
+      <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/anthropic-claude-code-in-sandbox-js">TypeScript</a></td>
     </tr>
     <tr>
       <td>Mistral</td>
@@ -165,4 +177,3 @@ E2B works with any LLM that supports tool use. You can connect providers like Op
 - Next.js app with LLM + Code Interpreter and streaming - [TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/nextjs-code-interpreter)
 - How to run a Docker container in E2B - [Python/TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/docker-in-e2b)
 - How to run Playwright in E2B - [TypeScript](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/playwright-in-e2b)
-

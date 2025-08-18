@@ -24,8 +24,8 @@ cp .env.template .env
 
 Then set your:
 
-* `AIML_API_KEY`: Get it at [https://aimlapi.com/app/](https://aimlapi.com/app/?utm_source=e2b&utm_medium=github&utm_campaign=integration)
-* `E2B_API_KEY`: Get it at https://e2b.dev/docs/getting-started/api-key
+* `AIML_API_KEY`: Get it at [https://aimlapi.com/app/keys](https://aimlapi.com/app/keys/?utm_source=e2b&utm_medium=github&utm_campaign=integration)
+* `E2B_API_KEY`: Get it at [https://e2b.dev/docs/getting-started/api-key](https://e2b.dev/docs/getting-started/api-key)
 
 ### 3. Run
 
@@ -46,12 +46,17 @@ You will see:
 
 ## 🤖 Models
 
-This uses any OpenAI-compatible model available on AI/ML API, such as:
+This example defaults to **`openai/gpt-4o`** via AI/ML API.
+You can switch to any OpenAI-compatible model available on AI/ML API (see the Models Directory in their docs).
 
-* `gpt-3.5-turbo`
-* `deepseek-coder`
-* `gemini-pro`
-* and [many more](https://aimlapi.com/models/?utm_source=e2b&utm_medium=github&utm_campaign=integration)
+**Examples:**
+
+* `openai/gpt-4o`
+* `google/gemini-1.5-flash`
+* `deepseek/deepseek-chat`
+* and many more
+
+> Ensure your API key has access to the chosen model.
 
 ---
 

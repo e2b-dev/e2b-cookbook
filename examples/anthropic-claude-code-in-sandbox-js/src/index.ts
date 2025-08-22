@@ -20,7 +20,7 @@ console.log('Sandbox created', sbx.sandboxId)
 // Run a prompt with Claude Code
 const result = await sbx.commands.run(
   `echo 'Create a hello world index.html' | claude -p --dangerously-skip-permissions`,
-  { timeoutMs: 0 }
+  { timeoutMs: 0 } // Claude Code can run for a long time, so we need to set the timeoutMs to 0.
 )
 
 console.log(result.stdout)

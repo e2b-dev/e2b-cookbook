@@ -11,16 +11,23 @@ from e2b import Sandbox
 
 sbx = Sandbox(
     "anthropic-claude-code",
+    # You can get your API key from Anthropic Console.
     envs={
         'ANTHROPIC_API_KEY': '<your api key>',
     },
+    # Timeout set to 5 minutes, you can customize it as needed.
     timeout=60 * 5,
-) # Timeout set to 5 minutes, you can customize it as needed.
+)
+
+# Print help for Claude Code
+# result = sbx.commands.run('claude --help')
+# print(result.stdout)
 
 # Run a prompt with Claude Code
 result = sbx.commands.run(
     "echo 'Create a hello world index.html' | claude -p --dangerously-skip-permissions",
-    timeout=0, # Claude Code can run for a long time, so we need to set the timeout to 0.
+    # Claude Code can run for a long time, so we need to set the timeout to 0.
+    timeout=0,
 )
 print(result.stdout)
 

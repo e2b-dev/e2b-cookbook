@@ -105,28 +105,13 @@ async function requestCode(systemPrompt: string, userPrompt: string): Promise<st
 async function runCodeInSandbox(code: string): Promise<{ results: Result[]; text: string; png?: Buffer }> {
   const sandbox = await Sandbox.create()
   try {
-    let stdoutBuf = ''
-    let stderrBuf = ''
-
-    const exec = await sandbox.runCode(code, {
-      onStdout: (msg: OutputMessage) => {
-        const s = typeof msg === 'string' ? msg : JSON.stringify(msg)
-        stdoutBuf += s
-      },
-      onStderr: (msg: OutputMessage) => {
-        const s = typeof msg === 'string' ? msg : JSON.stringify(msg)
-        stderrBuf += s
-      },
-    })
-
+    const exec = await sandbox.runCode(code)
     if (exec.error) throw new Error(exec.error.value)
 
-    const first = (exec.results?.[0] ?? {}) as any
-    const text =
-      (first?.text ? String(first.text).trim() : '') ||
-      stdoutBuf.trim() ||
-      stderrBuf.trim() ||
-      ''
+    const results = exec.results ?? []
+    const first = (results[0] ?? {}) as any
+
+    const text = String(first?.text ?? '').trim()
 
     let png: Buffer | undefined
     if (first?.png) {
@@ -135,7 +120,7 @@ async function runCodeInSandbox(code: string): Promise<{ results: Result[]; text
       } catch {}
     }
 
-    return { results: exec.results ?? [], text, png }
+    return { results, text, png }
   } finally {
     await sandbox.kill()
   }
@@ -169,28 +154,11 @@ export async function testLinearRegression(imageOut = 'image_1.png'): Promise<st
       console.warn('⚠️ data.csv not found next to aimlapi.ts — running anyway, code may fail if it expects the file.')
     }
 
-    let stdoutBuf = ''
-    let stderrBuf = ''
-
-    const exec = await sandbox.runCode(code, {
-      onStdout: (msg: OutputMessage) => {
-        const s = typeof msg === 'string' ? msg : JSON.stringify(msg)
-        stdoutBuf += s
-      },
-      onStderr: (msg: OutputMessage) => {
-        const s = typeof msg === 'string' ? msg : JSON.stringify(msg)
-        stderrBuf += s
-      },
-    })
-
+    const exec = await sandbox.runCode(code)
     if (exec.error) throw new Error(exec.error.value)
 
     const first = (exec.results?.[0] ?? {}) as any
-    const text =
-      (first?.text ? String(first.text).trim() : '') ||
-      stdoutBuf.trim() ||
-      stderrBuf.trim() ||
-      ''
+    const text = String(first?.text ?? '').trim()
 
     if (first?.png) {
       try {

@@ -119,7 +119,7 @@ E2B works with any LLM that supports tool use. You can connect providers like Op
       <td> 300+ models</td>
       <td>OpenAI-compatible API</td>
       <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/aimlapi-python">Python</a></td>
-      <td>-</td>
+      <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/aimlapi-js">TypeScript</a></td>
     </tr>
   </tbody>
 </table>

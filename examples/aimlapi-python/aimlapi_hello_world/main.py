@@ -94,28 +94,19 @@ def run_code_in_sandbox(code: str) -> Tuple[str, bytes | None]:
     with Sandbox() as sandbox:
         execution = sandbox.run_code(code)
 
-        # Prefer consolidated text provided by the SDK
+        # Text output
         text = (execution.text or "").strip()
-
-        # If empty, try to collate text from individual results
         if not text and execution.results:
-            parts = []
-            for r in execution.results:
-                t = getattr(r, "text", None)
-                if t:
-                    parts.append(str(t).strip())
-            text = "\n".join(p for p in parts if p).strip()
+            first = execution.results[0]
+            text = str(getattr(first, "text", "") or "").strip()
 
         # Image (first result png if available)
         png_bytes: bytes | None = None
-        try:
-            first = (execution.results or [None])[0]
-            if first and getattr(first, "png", None):
+        if execution.results:
+            first = execution.results[0]
+            if getattr(first, "png", None):
                 import base64
-                png_b64 = first.png  # base64-encoded PNG
-                png_bytes = base64.b64decode(png_b64)
-        except Exception:
-            pass
+                png_bytes = base64.b64decode(first.png)
 
         return text, png_bytes
 
@@ -146,7 +137,6 @@ def test_linear_regression(image_out: str = "image_1.png") -> str:
     # Get code first to avoid leaving sandbox running on LLM failure
     code = llm_python_code(SYSTEM_LINEAR, PROMPT_LINEAR)
 
-    # Run with dataset present if available
     with Sandbox() as sandbox:
         uploaded = upload_dataset_if_exists(sandbox, "./data.csv", "data.csv")
         if not uploaded:
@@ -154,32 +144,28 @@ def test_linear_regression(image_out: str = "image_1.png") -> str:
 
         execution = sandbox.run_code(code)
 
-        # Text output from execution
+        # Text output
         text = (execution.text or "").strip()
         if not text and execution.results:
-            parts = []
-            for r in execution.results:
-                t = getattr(r, "text", None)
-                if t:
-                    parts.append(str(t).strip())
-            text = "\n".join(p for p in parts if p).strip()
+            first = execution.results[0]
+            text = str(getattr(first, "text", "") or "").strip()
 
-        # try to save image if present
-        try:
-            first = (execution.results or [None])[0]
-            if first and getattr(first, "png", None):
+        # Image save (if returned)
+        if execution.results:
+            first = execution.results[0]
+            if getattr(first, "png", None):
                 import base64
-                png_b64 = first.png
-                png_bytes = base64.b64decode(png_b64)
-                with open(image_out, "wb") as f:
-                    f.write(png_bytes)
-                print(f"✅ Image saved as {image_out}")
+                try:
+                    png_bytes = base64.b64decode(first.png)
+                    with open(image_out, "wb") as f:
+                        f.write(png_bytes)
+                    print(f"✅ Image saved as {image_out}")
+                except Exception as e:
+                    print(f"⚠️ Could not save image: {e}")
             else:
-                print("⚠️  No image result returned.")
-        except Exception as e:
-            print(f"⚠️  Could not save image: {e}")
+                print("⚠️ No image result returned.")
 
-    return text
+        return text
 
 
 # ---------- Entry ----------

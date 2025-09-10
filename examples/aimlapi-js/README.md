@@ -46,11 +46,12 @@ You will see:
 
 ## 🤖 Models
 
-This example defaults to **`openai/gpt-4o`** via AI/ML API.
+This example defaults to **`openai/gpt-5-chat-latest`** via AI/ML API.
 You can switch to any OpenAI-compatible model available on AI/ML API (see the Models Directory in their docs).
 
 **Examples:**
 
+* `openai/gpt-5-chat-latest`
 * `openai/gpt-4o`
 * `google/gemini-1.5-flash`
 * `deepseek/deepseek-chat`

@@ -31,4 +31,4 @@ python aimlapi_hello_world/main.py
 
 ### Models
 
-The example uses **`openai/gpt-4o`** by default. You can switch to any OpenAI-compatible model available via AI/ML API (make sure your key has access).
+The example uses **`openai/gpt-5-chat-latest`** by default. You can switch to any OpenAI-compatible model available via AI/ML API (make sure your key has access).

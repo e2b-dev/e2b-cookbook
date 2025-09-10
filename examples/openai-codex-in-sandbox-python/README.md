@@ -8,9 +8,26 @@ We prepared a sandbox template with Codex already installed. You can create a sa
 ```python
 from e2b import Sandbox
 
-sbx = Sandbox("openai-codex", timeout=60 * 5) # Timeout set to 5 minutes, you can customize it as needed.
+sbx = Sandbox(
+    "openai-codex",
+    envs={
+        # You can get your API key from OpenAI Console.
+        "OPENAI_API_KEY": "<your api key>",
+    },
+    # Timeout set to 5 minutes, you can customize it as needed.
+    timeout=60 * 5,
+)
 
-result = sbx.commands.run("codex --help")
+# Print help for Codex
+# result = sbx.commands.run('codex --help', request_timeout=0, timeout=0)
+# print(result.stdout)
+
+# Run a prompt with Codex
+result = sbx.commands.run(
+    "codex exec --skip-git-repo-check --dangerously-bypass-approvals-and-sandbox 'Create a hello world index.html'",
+    # Codex can run for a long time, so we need to set the timeout to 0.
+    timeout=0,
+)
 print(result.stdout)
 ```
 

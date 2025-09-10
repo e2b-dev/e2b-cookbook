@@ -8,8 +8,23 @@ We prepared a sandbox template with Codex already installed. You can create a sa
 ```javascript
 const { Sandbox } = require('e2b')
 
-const sbx = await Sandbox.create('openai-codex', { timeoutMs: 60 * 5 * 1000 }) // Timeout set to 5 minutes, you can customize it as needed.
-const result = await sbx.commands.run('codex --help')
+const sbx = await Sandbox.create('openai-codex', {
+  envs: {
+    // You can get your API key from OpenAI Console.
+    OPENAI_API_KEY: '<your api key>',
+  },
+})
+
+// Print help for Codex
+// const result = await sbx.commands.run('codex --help')
+// console.log(result.stdout)
+
+// Run a prompt with Codex
+const result = await sbx.commands.run(
+  `codex exec --skip-git-repo-check --dangerously-bypass-approvals-and-sandbox "Create a hello world index.html"`,
+  { timeoutMs: 0 } // Codex can run for a long time, so we need to set the timeoutMs to 0.
+)
+
 console.log(result.stdout)
 ```
 

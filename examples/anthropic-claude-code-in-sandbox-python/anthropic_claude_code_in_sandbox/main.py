@@ -1,13 +1,16 @@
+import os
+
 from dotenv import load_dotenv
 from e2b import Sandbox
 
+from anthropic_claude_code_in_sandbox.template import template_name
+
 load_dotenv()
 
-template_name = 'anthropic-claude-code'
-sbx = Sandbox(
-    template_name,
+sbx = Sandbox.create(
+    f"{template_name}-dev",
     envs={
-        'ANTHROPIC_API_KEY': '<your api key>',
+        'ANTHROPIC_API_KEY': os.getenv("ANTHROPIC_API_KEY"),
     },
 )
 print("Sandbox created", sbx.sandbox_id)

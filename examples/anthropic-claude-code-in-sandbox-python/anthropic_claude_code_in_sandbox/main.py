@@ -8,7 +8,7 @@ from anthropic_claude_code_in_sandbox.template import template_name
 load_dotenv()
 
 sbx = Sandbox.create(
-    f"{template_name}-dev",
+    template_name,
     envs={
         'ANTHROPIC_API_KEY': os.getenv("ANTHROPIC_API_KEY"),
     },

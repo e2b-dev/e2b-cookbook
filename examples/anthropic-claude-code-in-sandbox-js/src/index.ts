@@ -1,13 +1,12 @@
 import dotenv from 'dotenv'
 import { Sandbox } from 'e2b'
+import { templateName } from "./template";
 
 dotenv.config()
 
-const templateName = 'anthropic-claude-code'
-
 const sbx = await Sandbox.create(templateName, {
   envs: {
-    ANTHROPIC_API_KEY: '<your api key>',
+    ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
   },
 })
 
@@ -25,4 +24,4 @@ const result = await sbx.commands.run(
 
 console.log(result.stdout)
 
-sbx.kill()
+await sbx.kill()

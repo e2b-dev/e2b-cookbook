@@ -11,7 +11,7 @@
   "description": "This is an example of running a Playwright script in a secure and isolated cloud environment using the E2B Code Interpreter SDK.",
   "dependencies": {
     "dotenv": "^16.4.7",
-    "e2b": "^1.2.1",
+    "e2b": "^2.2.0",
     "fs": "^0.0.1-security",
     "ibm-cloud-sdk-core": "^5.3.2"
   },

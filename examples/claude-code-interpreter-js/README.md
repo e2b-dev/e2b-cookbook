@@ -1,8 +1,8 @@
 # Claude Code Interpreter in JS/TS
-This is an example of running LLM-generated code tasks in a secure and isolated cloud environment using the E2B Code Interpreter SDK.
+This is an example of running LLM-generated code tasks in a secure and isolated cloud environment using the E2B Templates SDK.
 
 ## Techstack
-- [E2B Code Interpreter SDK](https://github.com/e2b-dev/code-interpreter) for running the LLM-generated code
+- [E2B Templates SDK](https://github.com/e2b-dev/E2B) for running the LLM-generated code
 - [Anthropic AI SDK](https://www.npmjs.com/package/@anthropic-ai/sdk) for using Claude as an LLM
 - JavaScript/TypeScript
 
@@ -15,7 +15,7 @@ This is an example of running LLM-generated code tasks in a secure and isolated 
 
 ### 2. Install packages
 
-Install the E2B Code Interpreter SDK and the Anthropic AI SDK.
+Install the E2B Templates SDK and the Anthropic AI SDK.
 
 ```
 npm i

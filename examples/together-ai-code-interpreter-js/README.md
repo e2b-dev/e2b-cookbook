@@ -1,6 +1,6 @@
 # AI Code Execution with Together AI models
 
-This AI data analyst can plot a linear regression chart based on CSV data. It uses Together AI LLMs, and the [Code Interpreter SDK](https://github.com/e2b-dev/code-interpreter) by E2B for the code interpreting capabilities. The SDK quickly creates a secure cloud sandbox powered by [Firecracker](https://github.com/firecracker-microvm/firecracker). Inside this sandbox is a running Jupyter server that the LLM can use.
+This AI data analyst can plot a linear regression chart based on CSV data. It uses Together AI LLMs, and the [E2B Templates SDK](https://github.com/e2b-dev/E2B) by E2B for the code interpreting capabilities. The SDK quickly creates a secure cloud sandbox powered by [Firecracker](https://github.com/firecracker-microvm/firecracker). Inside this sandbox is a running Jupyter server that the LLM can use.
 
 Read more about Together AI models [here](https://api.together.ai/models).
 
@@ -45,7 +45,7 @@ The script performs the following steps:
 - Loads the API keys from the environment variables.
 - Uploads the CSV dataset to the E2B sandboxed cloud environment.
 - Sends a prompt to the model to generate Python code for analyzing the dataset.
-- Executes the generated Python code using the E2B Code Interpreter SDK.
+- Executes the generated Python code using the E2B Templates SDK.
 - Saves any generated visualization as a PNG file.
   
 
@@ -57,4 +57,4 @@ After running the program, you should get the result of the data analysis task s
 # Connect with E2B & learn more
 If you encounter any problems, please let us know at our [Discord](https://discord.com/invite/U7KEcGErtQ).
 
-Check the [E2B documentation](https://e2b.dev/docs) to learn more about how to use the Code Interpreter SDK.
+Check the [E2B documentation](https://e2b.dev/docs) to learn more about how to use the E2B Templates SDK.

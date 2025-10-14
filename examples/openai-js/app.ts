@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import OpenAI from 'openai'
-import { Sandbox, Result } from '@e2b/code-interpreter'
-import { OutputMessage } from '@e2b/code-interpreter'
+import { Sandbox, Result } from 'e2b'
+import { OutputMessage } from 'e2b'
 import * as dotenv from 'dotenv'
 
 dotenv.config()
@@ -132,7 +132,7 @@ async function uploadDataset(codeInterpreter: Sandbox): Promise<string> {
 }
 
 async function run() {
-    const codeInterpreter = await Sandbox.create()
+    const codeInterpreter = await Sandbox.create('code-interpreter')
 
     try {
         // First upload the dataset

@@ -1,5 +1,5 @@
 import fs from 'node:fs'
-import { Sandbox, Result, OutputMessage } from '@e2b/code-interpreter'
+import { Sandbox, Result, OutputMessage } from 'e2b'
 import * as dotenv from 'dotenv'
 import Together from 'together-ai/index.mjs'
 
@@ -175,7 +175,7 @@ async function uploadDataset(codeInterpreter: Sandbox): Promise<string> {
 }
 
 async function run() {
-    const codeInterpreter = await Sandbox.create()
+    const codeInterpreter = await Sandbox.create('code-interpreter')
 
     try {
         const remotePath = await uploadDataset(codeInterpreter)

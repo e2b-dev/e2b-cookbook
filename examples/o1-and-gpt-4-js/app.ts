@@ -1,7 +1,6 @@
 import fs from "node:fs";
 import { OpenAI } from "openai";
-import { Sandbox, Result } from "@e2b/code-interpreter";
-import { OutputMessage } from "@e2b/code-interpreter";
+import { Sandbox, Result, OutputMessage } from "e2b";
 import * as dotenv from "dotenv";
 
 dotenv.config({ override: true });
@@ -166,7 +165,7 @@ async function chat(
 }
 
 async function run() {
-  const codeInterpreter = await Sandbox.create();
+  const codeInterpreter = await Sandbox.create('code-interpreter');
 
   try {
     // Upload the Titanic dataset to the sandbox

@@ -1,8 +1,8 @@
 import 'dotenv/config'
-import { Sandbox } from '@e2b/code-interpreter'
+import { Sandbox } from 'e2b'
 
 async function run() {
-  const sbx = await Sandbox.create() // By default the sandbox is alive for 5 minutes
+  const sbx = await Sandbox.create('code-interpreter') // Use the code-interpreter template
   const execution = await sbx.runCode('print("hello world")') // Execute Python inside the sandbox
   console.log(execution.logs)
 

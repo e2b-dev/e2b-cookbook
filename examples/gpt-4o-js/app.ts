@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import { OpenAI } from 'openai'
-import { Sandbox, Result } from '@e2b/code-interpreter'
-import { OutputMessage } from '@e2b/code-interpreter'
+import { Sandbox, Result } from 'e2b'
+import { OutputMessage } from 'e2b'
 
 import * as dotenv from 'dotenv'
 import { ChatCompletionTool, ChatCompletionMessageParam } from 'openai/resources'
@@ -135,7 +135,7 @@ async function chat(codeInterpreter: Sandbox, userMessage: string, base64_image?
 
 
 async function run() {
-    const codeInterpreter = await Sandbox.create()
+    const codeInterpreter = await Sandbox.create('code-interpreter')
     // Let the model do the task
     try {
         const codeInterpreterResults = await chat(

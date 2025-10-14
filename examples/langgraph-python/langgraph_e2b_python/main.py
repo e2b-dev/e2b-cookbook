@@ -9,7 +9,7 @@ from langgraph_e2b_python.code_interpreter_tool import (
 )
 from langchain_openai import ChatOpenAI
 from langgraph.graph import END, MessageGraph
-from e2b_code_interpreter import Result
+from e2b import Result
 
 load_dotenv()
 

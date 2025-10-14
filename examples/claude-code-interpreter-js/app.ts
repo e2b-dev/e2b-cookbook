@@ -1,8 +1,8 @@
 import fs from 'node:fs'
 
 import { Anthropic } from '@anthropic-ai/sdk'
-import { Sandbox, Result } from '@e2b/code-interpreter'
-import { OutputMessage } from '@e2b/code-interpreter'
+import { Sandbox, Result } from 'e2b'
+import { OutputMessage } from 'e2b'
 
 import * as dotenv from 'dotenv'
 
@@ -108,7 +108,7 @@ async function chatWithClaude(codeInterpreter: Sandbox, userMessage: string): Pr
 
 
 async function run() {
-    const codeInterpreter = await Sandbox.create()
+    const codeInterpreter = await Sandbox.create('code-interpreter')
 
     try {
         const codeInterpreterResults = await chatWithClaude(

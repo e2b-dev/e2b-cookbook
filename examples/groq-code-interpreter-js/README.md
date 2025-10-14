@@ -1,13 +1,13 @@
 # Llama 3 + function calling + E2B Code interpreter        
-**Powered by open-source [Code Interpreter SDK](https://github.com/e2b-dev/code-interpreter) by [E2B](https://e2b.dev/docs)**
+**Powered by open-source [E2B Templates SDK](https://github.com/e2b-dev/E2B) by [E2B](https://e2b.dev/docs)**
 
-E2B's code interpreter SDK quickly creates a secure cloud sandbox powered by [Firecracker](https://github.com/firecracker-microvm/firecracker).
+E2B's Templates SDK quickly creates a secure cloud sandbox powered by [Firecracker](https://github.com/firecracker-microvm/firecracker).
 
 Inside this sandbox is a running Jupyter server that the LLM can use.
 
 ### Step 1: Install dependencies
 
-We start by installing the [E2B Code Interpreter SDK](https://github.com/e2b-dev/code-interpreter) and [Groq's JS SDK](https://github.com/groq/groq-typescript).
+We start by installing the [E2B Templates SDK](https://github.com/e2b-dev/E2B) and [Groq's JS SDK](https://github.com/groq/groq-typescript).
 
 You can do that by simply calling
 ```bash

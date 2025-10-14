@@ -8,7 +8,7 @@
 import { config } from "dotenv";
 import { WatsonXAI } from "@ibm-cloud/watsonx-ai";
 import { IamAuthenticator } from "ibm-cloud-sdk-core";
-import { Sandbox } from "@e2b/code-interpreter";
+import { Sandbox } from "e2b";
 import fs from "fs";
 
 // Load environment variables from .env file
@@ -84,7 +84,7 @@ console.log(`${"=".repeat(50)}\n${codeBlock}\n${"=".repeat(50)}`);
 // We run the AI-generated code in a secure E2B sandbox environment, capturing its output, errors, and runtime exceptions.
 
 // Run the code in an E2B code interpreter
-const codeInterpreter = await Sandbox.create();
+const codeInterpreter = await Sandbox.create('code-interpreter');
 const execution = await codeInterpreter.runCode(codeBlock);
 
 console.log("Stdout:", execution.logs.stdout);

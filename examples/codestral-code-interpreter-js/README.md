@@ -1,6 +1,6 @@
 # AI Code Execution with Mistral's Codestral
 
-This project tests the capabilities of the new Mistral's model on data analysis tasks, using the [Code Interpreter SDK](https://github.com/e2b-dev/code-interpreter) by E2B. Codestral doesn't support using tools yet, so in this Python example, we added the code interpreting capabilities.
+This project tests the capabilities of the new Mistral's model on data analysis tasks, using the [E2B Templates SDK](https://github.com/e2b-dev/E2B) by E2B. Codestral doesn't support using tools yet, so in this Python example, we added the code interpreting capabilities.
 
 We are going to build an AI assistant that performs data analysis on a CSV file. It is prompted to plot the average temperature over the years in Algeria,
 
@@ -34,7 +34,7 @@ The script performs the following steps:
 - Loads the API keys from the environment variables.
 - Uploads the `city_temperature.csv` dataset to the E2B sandboxed cloud environment.
 - Sends a prompt to the Codestal model to generate Python code for analyzing the dataset.
-- Executes the generated Python code using the E2B Code Interpreter SDK.
+- Executes the generated Python code using the E2B Templates SDK.
 - Saves any generated visualization as PNG file.
   
 

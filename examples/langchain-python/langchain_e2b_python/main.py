@@ -13,7 +13,7 @@ from langchain.agents.output_parsers.tools import (
     ToolAgentAction,
     ToolsAgentOutputParser,
 )
-from e2b_code_interpreter import Result
+from e2b import Result
 
 
 load_dotenv()

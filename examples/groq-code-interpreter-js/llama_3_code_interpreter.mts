@@ -1,4 +1,4 @@
-import { Sandbox, Result } from '@e2b/code-interpreter'
+import { Sandbox, Result } from 'e2b'
 import { Groq } from 'groq-sdk'
 import { CompletionCreateParams } from 'groq-sdk/src/resources/chat/completions'
 import fs from 'node:fs'
@@ -119,7 +119,7 @@ async function chatWithLlama(
 
 // Putting it together
 // We create the E2B code interpreter which we will use to run the code generated from the model
-const code_interpreter = await Sandbox.create({ apiKey: E2B_API_KEY })
+const code_interpreter = await Sandbox.create('code-interpreter', { apiKey: E2B_API_KEY })
 
 // Now we chat with the model
 const code_results = await chatWithLlama(code_interpreter, TASK)

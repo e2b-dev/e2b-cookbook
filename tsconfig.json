@@ -2,6 +2,6 @@
   "compilerOptions": {
     "module": "commonjs",
     "esModuleInterop": true,
-    "target": "es6"
+    "target": "esnext"
   }
 }

@@ -4,7 +4,9 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "start": "tsx index.ts"
+    "start": "tsx index.ts",
+    "e2b:build:dev": "npx tsx template/build.dev.ts",
+    "e2b:build:prod": "npx tsx template/deploy.dev.ts"
   },
   "keywords": [],
   "author": "",

@@ -4,7 +4,9 @@
   "main": "app.ts",
   "type": "module",
   "scripts": {
-    "start": "tsx app.ts"
+    "start": "tsx app.ts",
+    "e2b:build:dev": "npx tsx template/build.dev.ts",
+    "e2b:build:prod": "npx tsx template/deploy.dev.ts"
   },
   "author": "",
   "license": "ISC",

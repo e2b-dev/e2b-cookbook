@@ -20,5 +20,5 @@ template = (
     #
     #####
     # Install OpenAI Codex
-    .npm_install("@openai/codex")
+    .npm_install("@openai/codex", g=True)
 )

@@ -6,7 +6,7 @@
   "scripts": {
     "start": "tsx index.ts",
     "e2b:build:dev": "npx tsx template/build.dev.ts",
-    "e2b:build:prod": "npx tsx template/deploy.dev.ts"
+    "e2b:build:prod": "npx tsx template/build.prod.ts"
   },
   "keywords": [],
   "author": "",

@@ -10,7 +10,7 @@ load_dotenv()
 sbx = Sandbox.create(
     template_name,
     envs={
-        'ANTHROPIC_API_KEY': os.getenv("ANTHROPIC_API_KEY"),
+        "ANTHROPIC_API_KEY": os.getenv("ANTHROPIC_API_KEY"),
     },
 )
 print("Sandbox created", sbx.sandbox_id)

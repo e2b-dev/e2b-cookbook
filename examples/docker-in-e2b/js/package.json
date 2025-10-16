@@ -4,7 +4,9 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "start": "tsx index.ts"
+    "start": "tsx index.ts",
+    "e2b:build:dev": "npx tsx template/build.dev.ts",
+    "e2b:build:prod": "npx tsx template/build.prod.ts"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +18,6 @@
   },
   "dependencies": {
     "dotenv": "^16.4.7",
-    "e2b": "^1.0.7"
+    "e2b": "^2.3.0"
   }
 }

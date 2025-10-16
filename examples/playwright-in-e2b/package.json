@@ -4,14 +4,16 @@
   "main": "app.ts",
   "type": "module",
   "scripts": {
-    "start": "tsx app.ts"
+    "start": "tsx app.ts",
+    "e2b:build:dev": "npx tsx template/build.dev.ts",
+    "e2b:build:prod": "npx tsx template/build.prod.ts"
   },
   "author": "",
   "license": "ISC",
   "description": "This is an example of running a Playwright script in a secure and isolated cloud environment using the E2B Code Interpreter SDK.",
   "dependencies": {
     "dotenv": "^16.4.7",
-    "e2b": "^1.2.1",
+    "e2b": "^2.3.0",
     "fs": "^0.0.1-security",
     "ibm-cloud-sdk-core": "^5.3.2"
   },

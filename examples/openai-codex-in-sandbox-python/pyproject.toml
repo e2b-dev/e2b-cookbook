@@ -5,7 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "e2b",
+    "e2b>=2.3.0",
     "python-dotenv",
 ]
 

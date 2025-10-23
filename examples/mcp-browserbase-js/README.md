@@ -50,5 +50,5 @@ The example creates an E2B sandbox with the Browserbase MCP server, connects an 
 ## Learn more
 
 - [E2B Documentation](https://e2b.dev/docs)
-- [Browserbase Documentation](https://browserbase.com/docs)
+- [Browserbase Documentation](https://browserbase.com)
 - [OpenAI Agents Documentation](https://platform.openai.com/docs/agents)

@@ -13,8 +13,8 @@ This example demonstrates how to use the Browserbase MCP server with E2B to crea
 
 - E2B API key
 - Browserbase API key
-- Gemini API key (for Browserbase)
 - Browserbase project ID
+- Gemini API key (for Browserbase)
 - OpenAI API key
 
 ## Setup

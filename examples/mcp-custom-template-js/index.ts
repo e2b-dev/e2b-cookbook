@@ -1,14 +1,12 @@
 import 'dotenv/config';
-import { Sandbox } from "e2b";
+import Sandbox from 'e2b';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
-import { alias } from "./template";
+import { alias } from './template';
 
-async function runSandboxExample() {
-  console.log('Creating sandbox from custom template and testing MCP servers...');
-  
-  
+async function runSandboxExample() {  
   // Create sandbox from custom template
+  // Make sure the template is built first by running `npm run build`
   console.log('Creating sandbox from custom template...');
   const sandbox = await Sandbox.create(alias, {
     mcp: {
@@ -69,11 +67,12 @@ async function runSandboxExample() {
   console.log(`\nTotal tools available: ${tools.tools.length}`);
 
   // Cleanup
-  if (sandbox) {
-    console.log('\nCleaning up sandbox...');
-    await sandbox.kill();
-    console.log('Sandbox closed successfully');
-  }
+  console.log('\nCleaning up sandbox...');
+  await sandbox.kill();
+  console.log('Sandbox closed successfully');
 }
 
-runSandboxExample();
+runSandboxExample().catch((error) => {
+  console.error('Failed to run example:', error);
+  process.exit(1);
+});

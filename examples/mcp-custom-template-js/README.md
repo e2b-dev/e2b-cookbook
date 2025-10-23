@@ -12,11 +12,12 @@ Creates a custom E2B template with pre-installed MCP servers for faster startup.
    BROWSERBASE_PROJECT_ID=your_browserbase_project_id
    GEMINI_API_KEY=your_gemini_api_key
    ```
-3. Run: `npm run start`
+3. Build the template: `npm run build`
+4. Run: `npm run start`
 
 ## What it does
 
 - Creates custom E2B template with pre-installed MCP servers
-- Builds template with Browserbase and E2B MCP servers cached
+- Builds template with Browserbase and E2B MCP servers
 - Creates sandbox from custom template
 - Lists available tools from pre-installed servers

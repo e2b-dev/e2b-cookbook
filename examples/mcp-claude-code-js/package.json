@@ -8,7 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": ["e2b", "mcp", "claude", "cli", "anthropic"],
-  "author": "",
+  "author": "Foundry Labs",
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^20.16.6",

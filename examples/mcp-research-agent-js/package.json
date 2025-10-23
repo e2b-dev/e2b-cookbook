@@ -8,8 +8,12 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": ["e2b", "mcp", "openai", "agent", "research", "arxiv", "duckduckgo"],
-  "author": "Foundry Labs",
   "license": "MIT",
+  "author": {
+    "name": "FoundryLabs, Inc.",
+    "email": "hello@e2b.dev",
+    "url": "https://e2b.dev"
+  },
   "devDependencies": {
     "@types/node": "^20.16.6",
     "tsx": "^4.7.3",

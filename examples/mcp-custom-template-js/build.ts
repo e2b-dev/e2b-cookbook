@@ -1,4 +1,4 @@
-import { Template } from 'e2b';
+import { Template, defaultBuildLogger } from 'e2b';
 import { template, alias } from './template';
 
 async function buildTemplate() {
@@ -8,7 +8,7 @@ async function buildTemplate() {
     alias,
     cpuCount: 8,
     memoryMB: 8192,
-    onBuildLogs: console.log,
+    onBuildLogs: defaultBuildLogger(),
   });
 
   console.log('Custom template built successfully');

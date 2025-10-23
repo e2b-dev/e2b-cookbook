@@ -4,7 +4,9 @@
   "description": "Custom E2B template with pre-installed MCP servers",
   "main": "index.ts",
   "scripts": {
-    "start": "tsx index.ts",
+    "build-template": "tsx template.ts",
+    "build": "tsx build.ts",
+    "start": "tsx build.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": ["e2b", "mcp", "template", "custom", "browserbase"],

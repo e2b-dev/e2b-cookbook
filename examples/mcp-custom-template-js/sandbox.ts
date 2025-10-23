@@ -2,7 +2,7 @@ import 'dotenv/config';
 import { Sandbox } from "e2b";
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
-import { alias } from "./template.js";
+import { alias } from "./template";
 
 async function runSandboxExample() {
   console.log('Creating sandbox from custom template and testing MCP servers...');

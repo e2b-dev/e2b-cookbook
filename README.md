@@ -196,6 +196,16 @@ Read more about E2B on the [E2B website](https://e2b.dev) and the official [E2B 
       <td>Claude Code Interpreter with MCP integration</td>
       <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/mcp-claude-code-js">TypeScript</a></td>
     </tr>
+    <tr>
+      <td>MCP Browserbase</td>
+      <td>Web automation agent using Browserbase MCP server</td>
+      <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/mcp-browserbase-js">TypeScript</a></td>
+    </tr>
+    <tr>
+      <td>MCP Groq Exa</td>
+      <td>AI research using Groq with Exa MCP server</td>
+      <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/mcp-groq-exa-js">TypeScript</a></td>
+    </tr>
   </tbody>
 </table>
 

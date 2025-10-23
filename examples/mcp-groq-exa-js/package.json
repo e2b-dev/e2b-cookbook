@@ -1,0 +1,31 @@
+{
+  "name": "mcp-groq-exa-js",
+  "version": "1.0.0",
+  "description": "Groq with Exa and Notion MCP servers example",
+  "main": "index.ts",
+  "scripts": {
+    "start": "tsx index.ts",
+    "build": "tsc",
+    "dev": "tsx watch index.ts"
+  },
+  "dependencies": {
+    "e2b": "^2.3.4",
+    "openai": "^4.67.0",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.16.6",
+    "tsx": "^4.7.3",
+    "typescript": "^5.4.5"
+  },
+  "keywords": [
+    "e2b",
+    "mcp",
+    "groq",
+    "exa",
+    "notion",
+    "research"
+  ],
+  "author": "E2B",
+  "license": "MIT"
+}

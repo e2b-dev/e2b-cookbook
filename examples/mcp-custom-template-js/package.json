@@ -1,0 +1,28 @@
+{
+  "name": "mcp-custom-template-js",
+  "version": "1.0.0",
+  "description": "Custom E2B template with pre-installed MCP servers",
+  "main": "index.ts",
+  "scripts": {
+    "build": "tsx build.ts",
+    "start": "tsx index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["e2b", "mcp", "template", "custom", "browserbase"],
+  "license": "MIT",
+  "author": {
+    "name": "FoundryLabs, Inc.",
+    "email": "hello@e2b.dev",
+    "url": "https://e2b.dev"
+  },
+  "devDependencies": {
+    "@types/node": "^20.16.6",
+    "tsx": "^4.7.3",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.19.1",
+    "e2b": "^2.3.4",
+    "dotenv": "^16.4.5"
+  }
+}

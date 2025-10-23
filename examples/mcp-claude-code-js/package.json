@@ -1,0 +1,26 @@
+{
+  "name": "mcp-claude-code-js",
+  "version": "1.0.0",
+  "description": "Claude Code CLI integration with MCP servers",
+  "main": "index.ts",
+  "scripts": {
+    "start": "tsx index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["e2b", "mcp", "claude", "cli", "anthropic"],
+  "license": "MIT",
+  "author": {
+    "name": "FoundryLabs, Inc.",
+    "email": "hello@e2b.dev",
+    "url": "https://e2b.dev"
+  },
+  "devDependencies": {
+    "@types/node": "^20.16.6",
+    "tsx": "^4.7.3",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "e2b": "^2.3.4",
+    "dotenv": "^16.4.5"
+  }
+}

@@ -6,12 +6,12 @@
   "scripts": {
     "build-template": "tsx template.ts",
     "build": "tsx build.ts",
-    "start": "tsx build.ts",
+    "start": "tsx sandbox.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": ["e2b", "mcp", "template", "custom", "browserbase"],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.16.6",
     "tsx": "^4.7.3",

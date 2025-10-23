@@ -9,7 +9,7 @@
   },
   "keywords": ["e2b", "mcp", "filesystem", "custom-server", "github"],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.16.6",
     "tsx": "^4.7.3",

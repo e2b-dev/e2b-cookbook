@@ -28,8 +28,8 @@ This example demonstrates how to use the Browserbase MCP server with E2B to crea
    ```
    E2B_API_KEY=your_e2b_api_key
    BROWSERBASE_API_KEY=your_browserbase_api_key
-   GEMINI_API_KEY=your_gemini_api_key
    BROWSERBASE_PROJECT_ID=your_browserbase_project_id
+   GEMINI_API_KEY=your_gemini_api_key
    OPENAI_API_KEY=your_openai_api_key
    ```
 

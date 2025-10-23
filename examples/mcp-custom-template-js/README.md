@@ -6,10 +6,12 @@ Creates a custom E2B template with pre-installed MCP servers for faster startup.
 
 1. Install dependencies: `npm install`
 2. Set environment variables in `.env`:
-   - `E2B_API_KEY` - Get from [e2b.dev](https://e2b.dev/docs/getting-started/api-key)
-   - `BROWSERBASE_API_KEY` - Get from [browserbase.com](https://browserbase.com/)
-   - `GEMINI_API_KEY` - Get from [ai.google.dev](https://ai.google.dev/)
-   - `BROWSERBASE_PROJECT_ID` - Get from [browserbase.com](https://browserbase.com/)
+   ```
+   E2B_API_KEY=your_e2b_api_key
+   BROWSERBASE_API_KEY=your_browserbase_api_key
+   BROWSERBASE_PROJECT_ID=your_browserbase_project_id
+   GEMINI_API_KEY=your_gemini_api_key
+   ```
 3. Run: `npm run start`
 
 ## What it does

@@ -6,8 +6,10 @@ OpenAI agent that uses arXiv and DuckDuckGo MCP servers for research tasks.
 
 1. Install dependencies: `npm install`
 2. Set environment variables in `.env`:
-   - `E2B_API_KEY` - Get from [e2b.dev](https://e2b.dev/docs/getting-started/api-key)
-   - `OPENAI_API_KEY` - Get from [OpenAI](https://platform.openai.com/settings)
+   ```
+   E2B_API_KEY=your_e2b_api_key
+   OPENAI_API_KEY=your_openai_api_key
+   ```
 3. Run: `npm run start`
 
 ## What it does

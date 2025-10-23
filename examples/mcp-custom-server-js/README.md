@@ -6,7 +6,9 @@ Uses a custom filesystem MCP server from GitHub in an E2B sandbox.
 
 1. Install dependencies: `npm install`
 2. Set environment variables in `.env`:
-   - `E2B_API_KEY` - Get from [e2b.dev](https://e2b.dev/docs/getting-started/api-key)
+   ```
+   E2B_API_KEY=your_e2b_api_key
+   ```
 3. Run: `npm run start`
 
 ## What it does

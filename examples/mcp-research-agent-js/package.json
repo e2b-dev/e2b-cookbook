@@ -1,0 +1,23 @@
+{
+  "name": "mcp-research-agent-js",
+  "version": "1.0.0",
+  "description": "OpenAI agent with arXiv and DuckDuckGo MCP servers for research",
+  "main": "index.ts",
+  "scripts": {
+    "start": "tsx index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["e2b", "mcp", "openai", "agent", "research", "arxiv", "duckduckgo"],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.16.6",
+    "tsx": "^4.7.3",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "@openai/agents": "^0.1.9",
+    "e2b": "^2.3.4",
+    "dotenv": "^16.4.5"
+  }
+}

@@ -160,6 +160,45 @@ Read more about E2B on the [E2B website](https://e2b.dev) and the official [E2B 
   </tbody>
 </table>
 
+**Model Context Protocol (MCP)**
+
+<table>
+  <thead>
+    <tr>
+      <th>Example</th>
+      <th>Description</th>
+      <th>TypeScript</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>MCP Client</td>
+      <td>Basic MCP client connection to E2B sandbox</td>
+      <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/mcp-client-js">TypeScript</a></td>
+    </tr>
+    <tr>
+      <td>MCP Custom Server</td>
+      <td>Connect to custom filesystem MCP server from GitHub</td>
+      <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/mcp-custom-server-js">TypeScript</a></td>
+    </tr>
+    <tr>
+      <td>MCP Custom Template</td>
+      <td>Create custom E2B template with pre-installed MCP servers</td>
+      <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/mcp-custom-template-js">TypeScript</a></td>
+    </tr>
+    <tr>
+      <td>MCP Research Agent</td>
+      <td>Research agent using arXiv and DuckDuckGo MCP servers</td>
+      <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/mcp-research-agent-js">TypeScript</a></td>
+    </tr>
+    <tr>
+      <td>MCP Claude Code</td>
+      <td>Claude Code Interpreter with MCP integration</td>
+      <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/mcp-claude-code-js">TypeScript</a></td>
+    </tr>
+  </tbody>
+</table>
+
 **Example use cases**
 
 - Upload dataset and analyze it with Llama 3 - [Python](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/upload-dataset-code-interpreter)

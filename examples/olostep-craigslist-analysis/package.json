@@ -1,0 +1,37 @@
+{
+    "name": "craigslist-olostep-analysis",
+    "version": "1.0.0",
+    "description": "Scrape and analyze Craigslist housing data using Olostep and E2B Code Interpreter with Gemini AI",
+    "main": "index.ts",
+    "scripts": {
+      "start": "tsx index.ts",
+      "dev": "tsx watch index.ts",
+      "build": "tsc",
+      "clean": "rm -f *.png *.json"
+    },
+    "keywords": [
+      "web-scraping",
+      "olostep",
+      "craigslist",
+      "housing-data",
+      "e2b",
+      "gemini",
+      "data-analysis",
+      "real-estate"
+    ],
+    "author": "Team Olostep",
+    "license": "MIT",
+    "dependencies": {
+      "@e2b/code-interpreter": "^1.0.1",
+      "dotenv": "^16.3.1",
+      "buffer": "^6.0.3"
+    },
+    "devDependencies": {
+      "@types/node": "^20.8.0",
+      "tsx": "^4.0.0",
+      "typescript": "^5.2.2"
+    },
+    "engines": {
+      "node": ">=18.0.0"
+    }
+  }

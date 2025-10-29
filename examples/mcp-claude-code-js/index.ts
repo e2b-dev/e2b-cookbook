@@ -61,10 +61,6 @@ async function runClaudeCodeExample() {
   console.log(`Visit the research results at: http://${webserverUrl}/index.html`);
   console.log(`The page contains the paper summary and author information`);
 
-  // Cleanup
-  console.log('\nCleaning up sandbox...');
-  await sandbox.kill();
-  console.log('Sandbox closed successfully');
 }
 
 // Run the Claude Code example

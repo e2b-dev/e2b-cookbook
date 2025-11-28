@@ -93,7 +93,14 @@ llm_config = {
 
 
 def define_function(name, description, arguments, packages, code):
-    json_args = json.loads(arguments)
+    # Handle both JSON with double quotes and Python dict with single quotes
+    try:
+        json_args = json.loads(arguments)
+    except json.JSONDecodeError:
+        # If JSON parsing fails, try replacing single quotes with double quotes
+        arguments_fixed = arguments.replace("'", '"')
+        json_args = json.loads(arguments_fixed)
+
     function_config = {
         "name": name,
         "description": description,

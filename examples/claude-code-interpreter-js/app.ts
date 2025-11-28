@@ -9,7 +9,7 @@ import * as dotenv from 'dotenv'
 dotenv.config()
 
 //const MODEL_NAME = 'claude-3-opus-20240229'
-const MODEL_NAME = 'claude-3-5-sonnet-20241022'
+const MODEL_NAME = 'claude-haiku-4-5-20251001'
 
 const SYSTEM_PROMPT = `
 ## your job & context
@@ -76,34 +76,57 @@ async function processToolCall(codeInterpreter: Sandbox, toolName: string, toolI
 async function chatWithClaude(codeInterpreter: Sandbox, userMessage: string): Promise<Result[]> {
     console.log(`\n${'='.repeat(50)}\nUser Message: ${userMessage}\n${'='.repeat(50)}`)
 
-    console.log('Waiting for Claude to respond...')
-    const message = await client.messages.create({
-        model: MODEL_NAME,
-        system: SYSTEM_PROMPT,
-        max_tokens: 4096,
-        messages: [{ role: 'user', content: userMessage }],
-        tools: tools,
-    })
+    const messages: Anthropic.MessageParam[] = [{ role: 'user', content: userMessage }]
+    let allResults: Result[] = []
 
-    console.log(`\nInitial Response:\nStop Reason: ${message.stop_reason}`)
+    while (true) {
+        console.log('Waiting for Claude to respond...')
+        const message = await client.messages.create({
+            model: MODEL_NAME,
+            system: SYSTEM_PROMPT,
+            max_tokens: 4096,
+            messages: messages,
+            tools: tools,
+        })
 
-    if (message.stop_reason === 'tool_use') {
-        const toolUse = message.content.find(block => block.type === 'tool_use') as Anthropic.ToolUseBlock
-        if (!toolUse){
-            console.error('Tool use block not found in message content.')
-            return []
+        console.log(`\nResponse:\nStop Reason: ${message.stop_reason}`)
+
+        if (message.stop_reason === 'tool_use') {
+            const toolUse = message.content.find(block => block.type === 'tool_use') as Anthropic.ToolUseBlock
+            if (!toolUse){
+                console.error('Tool use block not found in message content.')
+                break
+            }
+
+            const toolName = toolUse.name
+            const toolInput = toolUse.input
+
+            console.log(`\nTool Used: ${toolName}\nTool Input: ${JSON.stringify(toolInput, null, 2)}`)
+
+            const codeInterpreterResults = await processToolCall(codeInterpreter, toolName, toolInput)
+            console.log(`Tool Result: ${codeInterpreterResults.length} results`)
+            allResults.push(...codeInterpreterResults)
+
+            // Add assistant message and tool result to conversation
+            messages.push({ role: 'assistant', content: message.content })
+            messages.push({
+                role: 'user',
+                content: [{
+                    type: 'tool_result',
+                    tool_use_id: toolUse.id,
+                    content: JSON.stringify(codeInterpreterResults)
+                }]
+            })
+
+            // Continue loop to get next response from Claude
+        } else {
+            // Conversation ended
+            console.log('Conversation ended')
+            break
         }
-
-        const toolName = toolUse.name
-        const toolInput = toolUse.input
-
-        console.log(`\nTool Used: ${toolName}\nTool Input: ${JSON.stringify(toolInput)}`)
-
-        const codeInterpreterResults = await processToolCall(codeInterpreter, toolName, toolInput)
-        console.log(`Tool Result: ${codeInterpreterResults}`)
-        return codeInterpreterResults
     }
-    throw new Error('Tool use block not found in message content.')
+
+    return allResults
 }
 
 
@@ -115,10 +138,18 @@ async function run() {
             codeInterpreter,
             'Calculate value of pi using monte carlo method. Use 1000 iterations. Visualize all point of all iterations on a single plot, a point inside the unit circle should be orange, other points should be grey.'
         )
-        const result = codeInterpreterResults[0]
-        console.log('Result:', result)
-        if (result.png) {
-            fs.writeFileSync('image.png', Buffer.from(result.png, 'base64'))
+        console.log('Results:', codeInterpreterResults)
+        if (codeInterpreterResults && codeInterpreterResults.length > 0) {
+            const result = codeInterpreterResults[0]
+            console.log('Result:', result)
+            if (result && result.png) {
+                fs.writeFileSync('image.png', Buffer.from(result.png, 'base64'))
+                console.log('Image saved to image.png')
+            } else {
+                console.log('No PNG image in results')
+            }
+        } else {
+            console.log('No results returned from code interpreter')
         }
     } catch (error) {
         console.error('An error occurred:', error)

@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import { Sandbox, Result, OutputMessage } from '@e2b/code-interpreter'
 import * as dotenv from 'dotenv'
-import MistralClient from '@mistralai/mistralai'
+import { Mistral } from '@mistralai/mistralai'
 
 dotenv.config()
 
@@ -37,7 +37,9 @@ Generally, you follow these rules:
 - you can run any python code you want, everything is running in a secure sandbox environment
 `
 
-const client = new MistralClient()
+const client = new Mistral({
+    apiKey: process.env.MISTRAL_API_KEY
+})
 
 async function codeInterpret(codeInterpreter: Sandbox, code: string): Promise<Result[]> {
     console.log('Running code interpreter...')
@@ -59,17 +61,18 @@ async function chat(codeInterpreter: Sandbox, userMessage: string): Promise<Resu
     console.log(`\n${'='.repeat(50)}\nUser Message: ${userMessage}\n${'='.repeat(50)}`)
 
     const messages = [
-        { role: 'system', content: SYSTEM_PROMPT },
-        { role: 'user', content: userMessage }
+        { role: 'system' as const, content: SYSTEM_PROMPT },
+        { role: 'user' as const, content: userMessage }
     ]
 
     try {
-        const response = await client.chat({
+        const response = await client.chat.complete({
             model: MODEL_NAME,
             messages: messages,
         })
 
-        const responseMessage = response.choices[0].message.content
+        const messageContent = response.choices[0].message.content
+        const responseMessage = typeof messageContent === 'string' ? messageContent : ''
         const codeBlockMatch = responseMessage.match(/```python\n([\s\S]*?)\n```/)
 
         if (codeBlockMatch && codeBlockMatch[1]) {

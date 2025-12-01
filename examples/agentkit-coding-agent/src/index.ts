@@ -67,7 +67,9 @@ Brief summary of what was accomplished
 `,
       model: anthropic({
         model: modelName,
-        max_tokens: 4096,
+        defaultParameters: {
+          max_tokens: 4096,
+        },
       }),
       tools: [
         // terminal use

@@ -54,7 +54,9 @@ def code_interpret(e2b_code_interpreter, code):
 
     if exec_result.error:
         print("[Code Interpreter ERROR]", exec_result.error)
-        return []
+        # Return error information so Claude can see what went wrong and fix it
+        error_msg = f"ERROR: {exec_result.error.name}: {exec_result.error.value}\n\nTraceback:\n{exec_result.error.traceback}"
+        return [{"error": error_msg}]
     else:
         return exec_result.results
 
@@ -123,10 +125,10 @@ def chat_with_claude(e2b_code_interpreter, user_message):
 
 
 def main():
-    with Sandbox(api_key=E2B_API_KEY) as code_interpreter:
+    with Sandbox.create() as code_interpreter:
         code_interpreter_results = chat_with_claude(
             code_interpreter,
-            "Calculate value of pi using monte carlo method. Use 1000 iterations. Visualize all point of all iterations on a single plot, a point inside the unit circle should be orange, other points should be grey.",
+            "Calculate value of pi using monte carlo method. Use 1000 iterations. Generate random points with x and y coordinates in the range [-1, 1]. Visualize all points on a single plot with x-axis from -1 to 1 and y-axis from -1 to 1. Points inside the unit circle (distance from origin <= 1) should be orange, other points should be grey.",
         )
 
         print(f"\nResults: {len(code_interpreter_results)} results")

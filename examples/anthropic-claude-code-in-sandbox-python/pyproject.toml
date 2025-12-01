@@ -1,11 +1,11 @@
 [project]
 name = "anthropic-claude-code-in-sandbox"
 version = "0.1.0"
-description = "Add your description here"
+description = "E2B cookbook example"
 readme = "README.md"
 requires-python = ">=3.9,<4.0"
 dependencies = [
-    "e2b>=2.3.0",
+    "e2b>=2.8.0",
     "python-dotenv",
 ]
 

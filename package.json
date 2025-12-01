@@ -13,14 +13,14 @@
         ]
     },
     "devDependencies": {
-        "@types/jest": "^29.0.0",
-        "jest": "^29.7.0",
-        "ts-jest": "^29.0.0",
+        "@types/jest": "^30.0.0",
+        "jest": "^30.2.0",
+        "ts-jest": "^29.4.5",
         "ts-node": "^10.9.2"
     },
     "dependencies": {
         "@e2b/code-interpreter": "^2.3.1",
-        "dotenv": "^16.4.5",
-        "ignore": "^6.0.2"
+        "dotenv": "^17.2.3",
+        "ignore": "^7.0.5"
     }
 }

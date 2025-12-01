@@ -61,6 +61,7 @@ python -m venv .venv
 macOS/Unix
 
 ```
+python -m venv .venv
 source .venv/bin/activate
 ```
 
@@ -79,5 +80,5 @@ pip install -e .
 **6. Run the example**
 
 ```
-python anthropic_claude_code_in_sandbox/main.py
+python app/main.py
 ```

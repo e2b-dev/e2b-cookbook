@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
-import Sandbox from 'e2b';
+import { Sandbox } from '@e2b/code-interpreter';
 
 import { uploadPathToPath, getApiKeys } from "./utils"
 
@@ -124,7 +124,7 @@ describe('Integration test for multiple scripts in e2b sandbox', () => {
           const logFilePath = path.join(logsDir, `${name}.txt`);
           let stdoutData = "";
           let stderrData = "";
-
+          
           // Generate the script to test the example
           const notebookPath = path.posix.join(SANDBOX_TEST_DIRECTORY, path.basename(examplePath));
           const command = testScript(interpreter, notebookPath).join(" && ");

@@ -5,7 +5,7 @@ from hashlib import md5
 from typing import Optional
 
 # Import E2B
-from e2b import Sandbox
+from e2b_code_interpreter import Sandbox
 
 # Import autogen
 from autogen import AssistantAgent, UserProxyAgent, config_list_from_json
@@ -15,35 +15,15 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# Suppress verbose HTTP logs from external libraries
+logging.getLogger('httpx').setLevel(logging.WARNING)
+logging.getLogger('httpcore').setLevel(logging.WARNING)
+logging.getLogger('openai').setLevel(logging.WARNING)
+logging.getLogger('e2b').setLevel(logging.WARNING)
+
 # Get your Sandbox session
-sandbox = Sandbox(template="base")
+sandbox = Sandbox.create()
 
-logger = logging.getLogger(__name__)
-
-
-def execute_code(
-    code: str,
-    sandbox: Sandbox,
-    timeout: Optional[int] = None,
-    work_dir: Optional[str] = "/home/user",  # default to e2b default cwd
-    packages: Optional[str] = None,
-):
-    if packages is not None and packages != "":
-        sandbox.commands.run(f"pip install -qq {packages}")
-
-    code_hash = md5(code.encode()).hexdigest()
-    filename = f"{work_dir}/{code_hash}.py"
-    sandbox.files.write(filename, code)
-
-    proc = sandbox.commands.run(
-        f"python3 {filename}",
-        timeout=timeout,
-        cwd=work_dir,
-    )
-
-    if proc.exit_code > 0:
-        raise Exception(proc.stderr)
-    return proc.stdout
 
 config_list = config_list_from_json(
     "OAI_CONFIG_LIST",
@@ -73,7 +53,7 @@ llm_config = {
                     },
                     "arguments": {
                         "type": "string",
-                        "description": "JSON schema of arguments encoded as a string. For example: { \"url\": { \"type\": \"string\", \"description\": \"The URL\", }}",
+                        "description": "JSON schema of arguments encoded as a string. For example: { \"url\": { \"type\": \"string\", \"description\": \"The URL\" }}. For arrays, include 'items': { \"url\": { \"type\": \"array\", \"items\": { \"type\": \"number\" }, \"description\": \"Array of numbers\" }}",
                     },
                     "packages": {
                         "type": "string",
@@ -91,7 +71,6 @@ llm_config = {
     "config_list": config_list,
 }
 
-
 def define_function(name, description, arguments, packages, code):
     # Handle both JSON with double quotes and Python dict with single quotes
     try:
@@ -100,6 +79,12 @@ def define_function(name, description, arguments, packages, code):
         # If JSON parsing fails, try replacing single quotes with double quotes
         arguments_fixed = arguments.replace("'", '"')
         json_args = json.loads(arguments_fixed)
+
+    # Fix array types that are missing 'items' field
+    for _, arg_schema in json_args.items():
+        if arg_schema.get("type") == "array" and "items" not in arg_schema:
+            # Add default items schema for arrays (assuming number type)
+            arg_schema["items"] = {"type": "number"}
 
     function_config = {
         "name": name,
@@ -114,17 +99,36 @@ def define_function(name, description, arguments, packages, code):
 
 
 def execute_func(name, packages, code, **args):
-    str = f"""
-print("Result of {name} function execution:")
+    code_str = f"""
 {code}
 args={args}
 result={name}(**args)
 if result is not None: print(result)
 """
-    print(f"execute_code:\n{str}")
-    result = execute_code(str, sandbox=sandbox, timeout=120, packages=packages)
-    print(f"Result: {result}")
-    return result
+
+    # Install packages if needed (skip empty string, "-", or None)
+    if packages and packages not in ["", "-"]:
+        exec_result = sandbox.run_code(f"!pip install -qq {packages}")
+        if exec_result.error:
+            return f"Error installing packages: {exec_result.error}"
+
+    # Execute the code
+    exec_result = sandbox.run_code(code_str)
+
+    if exec_result.error:
+        return f"Error: {exec_result.error}"
+
+    # Get stdout from logs (this contains the result)
+    output = ""
+    for row in exec_result.logs.stdout:
+        output += row
+
+    # Check stderr for any warnings
+    if exec_result.logs.stderr:
+        for row in exec_result.logs.stderr:
+            output += row
+
+    return output if output else str(exec_result.results)
 
 
 def _is_termination_msg(message):
@@ -142,6 +146,10 @@ assistant = AssistantAgent(
         The user will ask a question.
         You may use the provided functions before providing a final answer.
         Only use the functions you were provided.
+        The "arguments" field must be STRICT valid JSON.
+        Always wrap keys and strings in double quotes.
+        Never use single quotes.
+        Never omit quotes around keys.
         When the answer has been provided, reply TERMINATE.""",
     llm_config=llm_config,
 )
@@ -175,17 +183,24 @@ def main():
 
 def demo():
     user_proxy.initiate_chat(
-        assistant, message="What functions do you know about?")
+        assistant,
+        message="Define a function called 'fetch_url' that takes a URL as a parameter, fetches the URL using the requests library, and returns the response body as text. Reply TERMINATE when done.",
+        max_turns=3)
 
     user_proxy.initiate_chat(
-        assistant, message="Define a function that gets a URL, then prints the response body.\nReply TERMINATE when the function is defined.")
+        assistant,
+        message="Use the fetch_url function to get the response from https://echo.free.beeceptor.com/. Reply TERMINATE when done.",
+        max_turns=5)
 
-    user_proxy.initiate_chat(
-        assistant, message="List functions do you know about.")
-
-    user_proxy.initiate_chat(
-        assistant, message="Print the response body of https://echo.free.beeceptor.com/ \nUse the functions you know about.")
-
-
+    user_proxy.initiate_chat( 
+        assistant, 
+        message="Define a function called 'calculate_sum' that takes an array of numbers and returns their sum. Reply TERMINATE when done.", 
+        max_turns=3)
+    
+    user_proxy.initiate_chat( 
+        assistant, 
+        message="Use the calculate_sum function to add these numbers: [10, 20, 30, 40]. Reply TERMINATE when done.", 
+        max_turns=5)
+    
     # Close the sandbox once done
     sandbox.kill()

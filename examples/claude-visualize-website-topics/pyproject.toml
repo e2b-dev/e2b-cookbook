@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "claude-visualize-website-topics"
+version = "0.1.0"
+description = "Scrape a website with Firecrawl and plot the most common topics using Claude and E2B Code Interpreter"
+authors = ["tomas.beran@e2b.dev"]
+readme = "README.md"
+packages = [{include = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+e2b-code-interpreter = "^2.4.1"
+anthropic = "^0.75.0"
+firecrawl-py = "*"
+python-dotenv = "^1.2.1"
+
+[tool.poetry.scripts]
+main = "src.main:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

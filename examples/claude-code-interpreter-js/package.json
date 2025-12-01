@@ -9,14 +9,14 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^20.12.11",
+    "@types/node": "^24.10.1",
     "ts-node": "^10.9.2",
-    "tsx": "^4.9.3",
-    "typescript": "^5.4.5"
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@e2b/code-interpreter": "^1.0.1",
-    "@anthropic-ai/sdk": "^0.28.0",
-    "dotenv": "^16.4.5"
+    "@e2b/code-interpreter": "^2.3.1",
+    "@anthropic-ai/sdk": "^0.71.0",
+    "dotenv": "^17.2.3"
   }
 }

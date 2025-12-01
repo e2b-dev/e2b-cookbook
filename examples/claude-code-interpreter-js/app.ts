@@ -136,7 +136,7 @@ async function run() {
     try {
         const codeInterpreterResults = await chatWithClaude(
             codeInterpreter,
-            'Calculate value of pi using monte carlo method. Use 1000 iterations. Visualize all point of all iterations on a single plot, a point inside the unit circle should be orange, other points should be grey.'
+            'Calculate value of pi using monte carlo method. Use 1000 iterations. Generate random points with x and y coordinates in the range [-1, 1]. Visualize all points on a single plot with x-axis from -1 to 1 and y-axis from -1 to 1. Points inside the unit circle (distance from origin <= 1) should be orange, other points should be grey.'
         )
         console.log('Results:', codeInterpreterResults)
         if (codeInterpreterResults && codeInterpreterResults.length > 0) {

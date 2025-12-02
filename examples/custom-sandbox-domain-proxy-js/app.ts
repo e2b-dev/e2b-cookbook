@@ -5,6 +5,10 @@ import open from 'open'
 import { uniqueNamesGenerator, adjectives, colors, animals } from 'unique-names-generator'
 import 'dotenv/config'
 
+// Configuration from environment variables
+const PORT_IN_SANDBOX = process.env.PORT_IN_SANDBOX ? parseInt(process.env.PORT_IN_SANDBOX) : 8000
+const PROXY_PORT = process.env.PORT ? parseInt(process.env.PORT) : 80
+
 // Start sandbox
 const sandbox = await Sandbox.create({
     apiKey: process.env.E2B_API_KEY,
@@ -13,7 +17,6 @@ console.log(`Sandbox created: ${sandbox.sandboxId}`)
 
 
 // Start python file serving server inside of the sandbox
-const PORT_IN_SANDBOX = 8000
 await sandbox.commands.run(
     `python3 -m http.server ${PORT_IN_SANDBOX}`,
     { background: true, cwd: '/', user: 'root' }
@@ -33,7 +36,6 @@ const sandboxCustomSubdomains: Record<string, string> = {
 }
 
 const app = express()
-const PROXY_PORT = process.env.PORT ? parseInt(process.env.PORT) : 80
 
 // Proxy middleware that maps custom subdomains to sandbox IDs
 app.use((req, res, next) => {

@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "custom-sandbox-domain-proxy-python"
+version = "0.1.0"
+description = "E2B sandbox proxy with custom subdomain support"
+authors = ["Your Name <your.email@example.com>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.9"
+e2b-code-interpreter = "^1.0.0"
+flask = "^3.0.0"
+requests = "^2.31.0"
+python-dotenv = "^1.0.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+start = "main:main"

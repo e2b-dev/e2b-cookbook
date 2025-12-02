@@ -11,18 +11,18 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/express": "^5.0.3",
-    "@types/node": "^20.12.11",
+    "@types/express": "^5.0.6",
+    "@types/node": "^24.10.1",
     "ts-node": "^10.9.2",
-    "tsx": "^4.9.3",
-    "typescript": "^5.4.5"
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@e2b/code-interpreter": "^2.0.0",
-    "dotenv": "^16.4.5",
-    "express": "^5.1.0",
+    "@e2b/code-interpreter": "^2.3.1",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
     "http-proxy-middleware": "^3.0.5",
-    "open": "^10.2.0",
+    "open": "^11.0.0",
     "unique-names-generator": "^4.7.1"
   }
 }

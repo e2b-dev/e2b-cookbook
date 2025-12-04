@@ -1,9 +1,9 @@
 import { Sandbox } from "e2b";
-import * as dotenv from "dotenv";
+import "dotenv/config";
 
-dotenv.config();
-
-const sbx = await Sandbox.create("e2b-with-docker");
+// Use the dev template that you built with `npm run e2b:build:dev`
+// For production, use "e2b-with-docker" and build with `npm run e2b:build:prod`
+const sbx = await Sandbox.create("e2b-with-docker-dev");
 
 // Run the command verifying that Docker is installed
 let result = await sbx.commands.run("docker --version");

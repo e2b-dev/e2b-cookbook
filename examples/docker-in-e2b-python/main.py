@@ -3,7 +3,9 @@ from e2b import Sandbox
 
 load_dotenv()
 
-sbx = Sandbox.create("e2b-with-docker")
+# Use the dev template that you built with `poetry run python -m template.build_dev`
+# For production, use "e2b-with-docker" and build with `poetry run python -m template.build_prod`
+sbx = Sandbox.create("e2b-with-docker-dev")
 
 # Run the command verifying that Docker is installed
 result = sbx.commands.run("docker --version")

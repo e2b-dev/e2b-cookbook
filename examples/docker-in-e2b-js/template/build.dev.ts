@@ -1,4 +1,5 @@
 import { Template, defaultBuildLogger } from "e2b";
+import "dotenv/config";
 import { template } from "./template";
 
 async function main() {

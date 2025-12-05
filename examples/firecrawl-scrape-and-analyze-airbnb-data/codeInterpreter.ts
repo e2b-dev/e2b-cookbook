@@ -10,8 +10,8 @@ export async function codeInterpret(
 
   const exec = await codeInterpreter.runCode(code, {
     // You can stream logs from the code interpreter
-    // onStderr: (stderr: string) => console.log("\n[Code Interpreter stdout]", stderr),
-    // onStdout: (stdout: string) => console.log("\n[Code Interpreter stderr]", stdout),
+    onStderr: (stderr) => console.log("\n[Code Interpreter stderr]", stderr),
+    onStdout: (stdout) => console.log("\n[Code Interpreter stdout]", stdout),
     //
     // You can also stream additional results like charts, images, etc.
     // onResult: ...

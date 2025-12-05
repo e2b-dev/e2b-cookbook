@@ -1,7 +1,8 @@
-import { Anthropic } from '@anthropic-ai/sdk'
+import Anthropic from '@anthropic-ai/sdk'
 
+export const MODEL_NAME = 'claude-sonnet-4-5-20250929'
+// export const MODEL_NAME = 'claude-3-5-sonnet-20241022'
 // export const MODEL_NAME = 'claude-3-opus-20240229'
-export const MODEL_NAME = 'claude-3-5-sonnet-20241022'
 
 export const SYSTEM_PROMPT = `
 ## your job & context

@@ -1,11 +1,7 @@
-//@ts-ignore
 import * as fs from 'fs'
 import FirecrawlApp from '@mendable/firecrawl-js'
 import 'dotenv/config'
-import { config } from 'dotenv'
 import { z } from 'zod'
-
-config()
 
 export async function scrapeAirbnb() {
   try {
@@ -72,7 +68,7 @@ export async function scrapeAirbnb() {
     }
 
     // Function to scrape a single URL
-    const scrapeListings = async (url) => {
+    const scrapeListings = async (url: string) => {
       const result = await app.scrapeUrl(url, params)
       return result.data['llm_extraction'].listings
     }

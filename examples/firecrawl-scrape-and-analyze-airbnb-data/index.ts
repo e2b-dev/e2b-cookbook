@@ -1,6 +1,4 @@
-// @ts-ignore
 import * as fs from 'fs'
-
 import 'dotenv/config'
 import { Sandbox, Execution } from '@e2b/code-interpreter'
 import Anthropic from '@anthropic-ai/sdk'
@@ -34,18 +32,19 @@ async function chat(
 
   if (msg.stop_reason === 'tool_use') {
     const toolBlock = msg.content.find((block) => block.type === 'tool_use')
-    // @ts-ignore
-    const toolName = toolBlock?.name ?? ''
-    // @ts-ignore
-    const toolInput = toolBlock?.input ?? ''
 
-    console.log(
-      `\n${'='.repeat(50)}\nUsing tool: ${toolName}\n${'='.repeat(50)}`
-    )
+    if (toolBlock && toolBlock.type === 'tool_use') {
+      const toolName = toolBlock.name
+      const toolInput = toolBlock.input as { code: string }
 
-    if (toolName === 'execute_python') {
-      const code = toolInput.code
-      return codeInterpret(codeInterpreter, code)
+      console.log(
+        `\n${'='.repeat(50)}\nUsing tool: ${toolName}\n${'='.repeat(50)}`
+      )
+
+      if (toolName === 'execute_python') {
+        const code = toolInput.code
+        return codeInterpret(codeInterpreter, code)
+      }
     }
     return undefined
   }
@@ -112,7 +111,7 @@ async function run() {
     console.log(`✅ Saved chart to ${filename}`)
   }
 
-  await codeInterpreter.kill()
+  await codeInterpreter.close()
 }
 
 run()

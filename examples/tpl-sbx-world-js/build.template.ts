@@ -1,4 +1,6 @@
 import { Template, defaultBuildLogger } from 'e2b'
+import dotenv from 'dotenv'
+import path from 'node:path'
 import { template } from './template'
 
 function getArg(name: string) {
@@ -8,6 +10,7 @@ function getArg(name: string) {
 }
 
 async function main() {
+  dotenv.config({ override: true, path: path.resolve(process.cwd(), '.env') })
   const alias = getArg('alias')
   if (!alias) {
     process.stderr.write('alias is required. usage: npm run e2b:build:template -- --alias=<name>\n')

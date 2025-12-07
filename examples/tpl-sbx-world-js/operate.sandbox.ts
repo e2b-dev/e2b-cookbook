@@ -1,4 +1,6 @@
-import { Sandbox } from 'e2b'
+import { Sandbox, ApiClient, ConnectionConfig } from 'e2b'
+import dotenv from 'dotenv'
+import path from 'node:path'
 
 function getArg(name: string) {
   const prefix = `--${name}=`
@@ -39,6 +41,7 @@ function getMinutes(): number | undefined {
 }
 
 async function main() {
+  dotenv.config({ override: true, path: path.resolve(process.cwd(), '.env') })
   if (!process.env.E2B_API_KEY) {
     process.stderr.write('E2B_API_KEY not set\n')
     process.exit(1)

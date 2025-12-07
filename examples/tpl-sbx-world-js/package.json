@@ -10,6 +10,7 @@
     "e2b:connect:sandbox": "npx tsx operate.sandbox.ts --connect --shell"
   },
   "dependencies": {
-    "e2b": "^2.7.0"
+    "e2b": "^2.7.0",
+    "dotenv": "^16.4.5"
   }
 }

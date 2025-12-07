@@ -47,6 +47,81 @@ async function main() {
     process.exit(1)
   }
 
+  const client = new ApiClient(new ConnectionConfig(), { requireApiKey: true })
+
+  if (hasFlag('list-templates')) {
+    const res = await client.api.GET('/templates')
+    if (res.error) {
+      const status = res.response?.status
+      const content = typeof res.error === 'string' ? res.error : res.error?.message
+      const msg = status === 401
+        ? `Authentication failed: invalid E2B_API_KEY or domain${content ? ` - ${content}` : ''}`
+        : `${status ?? ''}: ${content ?? 'API error'}`
+      process.stderr.write(msg + '\n')
+      process.exit(1)
+    }
+    const items = res.data || []
+    if (!items.length) {
+      process.stdout.write('No templates found\n')
+      return
+    }
+    const rows = items.map((t) => ({
+      id: t.templateID,
+      aliases: (t.aliases || []).join(','),
+      status: t.buildStatus,
+      builds: String(t.buildCount ?? ''),
+      createdAt: formatDate(new Date(t.createdAt)),
+      updatedAt: formatDate(new Date(t.updatedAt)),
+      lastUsedAt: t.lastSpawnedAt ? formatDate(new Date(t.lastSpawnedAt)) : '',
+    }))
+    const wId = Math.max('TEMPLATE ID'.length, ...rows.map((r) => r.id.length))
+    const wAliases = Math.max('ALIASES'.length, ...rows.map((r) => r.aliases.length))
+    const wStatus = Math.max('STATUS'.length, ...rows.map((r) => r.status.length))
+    const wBuilds = Math.max('BUILDS'.length, ...rows.map((r) => r.builds.length))
+    const wCreated = Math.max('CREATED AT'.length, ...rows.map((r) => r.createdAt.length))
+    const wUpdated = Math.max('UPDATED AT'.length, ...rows.map((r) => r.updatedAt.length))
+    const wLast = Math.max('LAST USED AT'.length, ...rows.map((r) => r.lastUsedAt.length))
+    process.stdout.write(
+      `${padEnd('TEMPLATE ID', wId)}  ${padEnd('ALIASES', wAliases)}  ${padEnd('STATUS', wStatus)}  ${padEnd('BUILDS', wBuilds)}  ${padEnd('CREATED AT', wCreated)}  ${padEnd('UPDATED AT', wUpdated)}  ${padEnd('LAST USED AT', wLast)}\n`
+    )
+    process.stdout.write(
+      `${'-'.repeat(wId)}  ${'-'.repeat(wAliases)}  ${'-'.repeat(wStatus)}  ${'-'.repeat(wBuilds)}  ${'-'.repeat(wCreated)}  ${'-'.repeat(wUpdated)}  ${'-'.repeat(wLast)}\n`
+    )
+    for (const r of rows) {
+      process.stdout.write(
+        `${padEnd(r.id, wId)}  ${padEnd(r.aliases, wAliases)}  ${padEnd(r.status, wStatus)}  ${padEnd(r.builds, wBuilds)}  ${padEnd(r.createdAt, wCreated)}  ${padEnd(r.updatedAt, wUpdated)}  ${padEnd(r.lastUsedAt, wLast)}\n`
+      )
+    }
+    return
+  }
+
+  const deleteTemplateId = hasFlag('delete-template') ? getArg('id') || getArg('template-id') || getArg('alias') : undefined
+  if (deleteTemplateId) {
+    let id = deleteTemplateId
+    // resolve alias to templateID if alias provided
+    if (!/^\w/.test(id) || id.includes('-') || id.length < 10) {
+      const res = await client.api.GET('/templates')
+      if (res.error) {
+        const status = res.response?.status
+        const content = typeof res.error === 'string' ? res.error : res.error?.message
+        const msg = status === 401
+          ? `Authentication failed: invalid E2B_API_KEY or domain${content ? ` - ${content}` : ''}`
+          : `${status ?? ''}: ${content ?? 'API error'}`
+        process.stderr.write(msg + '\n')
+        process.exit(1)
+      }
+      const match = (res.data || []).find((t) => t.aliases && t.aliases.includes(id))
+      if (match) id = match.templateID
+    }
+    const del = await client.api.DELETE('/templates/{templateID}', { params: { path: { templateID: id } } })
+    if (del.error) {
+      process.stderr.write(`DELETE FAILED: ${id}\n`)
+      process.exit(1)
+    }
+    process.stdout.write(`DELETED TEMPLATE: ${id}\n`)
+    return
+  }
+
   if (hasFlag('connect')) {
     const id = getArg('id') || getArg('sandbox-id')
     if (!id) {

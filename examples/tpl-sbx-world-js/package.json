@@ -7,7 +7,9 @@
     "e2b:info:sandbox": "npx tsx operate.sandbox.ts --info",
     "e2b:pause:sandbox": "npx tsx operate.sandbox.ts --pause",
     "e2b:resume:sandbox": "npx tsx operate.sandbox.ts --resume",
-    "e2b:connect:sandbox": "npx tsx operate.sandbox.ts --connect --shell"
+    "e2b:connect:sandbox": "npx tsx operate.sandbox.ts --connect --shell",
+    "e2b:list:template": "npx tsx operate.sandbox.ts --list-templates",
+    "e2b:delete:template": "npx tsx operate.sandbox.ts --delete-template"
   },
   "dependencies": {
     "e2b": "^2.7.0",

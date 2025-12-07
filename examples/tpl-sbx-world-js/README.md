@@ -11,13 +11,12 @@ Before you begin, make sure you have:
 
 ## Configuration
 
-1. Set environment variables (examples):
+1. Copy `.env.example` and fill values:
    ```
-   export E2B_API_KEY=your_api_key_here
-   export E2B_DOMAIN=your.domain.tld
-   # Testing only (self-signed certs)
-   export NODE_TLS_REJECT_UNAUTHORIZED=0
+   cp .env.example .env
+   # edit .env to set E2B_API_KEY, E2B_DOMAIN, etc.
    ```
+   The CLI auto-loads `.env` via `dotenv`, no need to `export`.
 
 ### Private Deployment
 
@@ -26,22 +25,12 @@ For private/self-hosted E2B deployments, configure these environment variables:
 ```
 # Authentication
 E2B_API_KEY=your_api_key_here
-# or
-E2B_ACCESS_TOKEN=your_access_token_here
 
-# Domain and URLs
+# Domain
 E2B_DOMAIN=your.domain.tld
-E2B_API_URL=https://api.your.domain.tld
-E2B_SANDBOX_URL=https://$PORT-$SANDBOX_ID.your.domain.tld
 ```
 
-- Example shell exports:
-```
-export E2B_API_KEY=your_api_key_here
-export E2B_DOMAIN=your.domain.tld
-# Testing only (self-signed certs):
-export NODE_TLS_REJECT_UNAUTHORIZED=0
-```
+You can also export variables in your shell if you prefer, but using `.env` is recommended.
 
 - Do not disable TLS verification (NODE_TLS_REJECT_UNAUTHORIZED=0) in production. Use valid certificates for your domain.
 - You can also pass these via CLI options where supported, but environment variables are recommended.
@@ -49,7 +38,7 @@ export NODE_TLS_REJECT_UNAUTHORIZED=0
 ## Installing Dependencies
 
 ```bash
-npm install e2b
+npm install
 ```
 
 ## Building the Template
@@ -115,6 +104,19 @@ npm run e2b:pause:sandbox -- --id=<sandboxID>
 npm run e2b:resume:sandbox -- --id=<sandboxID>
 ```
 
+### Templates
+
+```
+# List templates (ID, ALIASES, STATUS, BUILDS, CREATED/UPDATED/LAST USED)
+npm run e2b:list:template
+
+# Delete template by ID
+npm run e2b:delete:template -- --id=<templateID>
+
+# Delete template by alias (auto resolves to ID)
+npm run e2b:delete:template -- --alias=<alias>
+```
+
 ## Template Structure
 
 - `template.ts` - Defines the sandbox template configuration
@@ -129,7 +131,7 @@ This repository is a demonstration program using the E2B JavaScript SDK to opera
 - Enter interactive shells
 - List, inspect, pause, resume, and kill sandboxes
 
-For private deployments, ensure environment variables are set as described above (e.g., `E2B_DOMAIN`, `E2B_API_URL`). For testing with self-signed certificates, you may temporarily use `NODE_TLS_REJECT_UNAUTHORIZED=0`.
+For private deployments, ensure environment variables are set as described above (e.g., `E2B_DOMAIN`). For testing with self-signed certificates, you may temporarily use `NODE_TLS_REJECT_UNAUTHORIZED=0`.
 For official E2B SaaS, you only need `E2B_API_KEY`.
 
 ## Next Steps
@@ -138,4 +140,4 @@ For official E2B SaaS, you only need `E2B_API_KEY`.
 2. Build the template using one of the methods above
 3. Use the template in your E2B sandbox code
 4. Check out the [E2B documentation](https://e2b.dev/docs) for more advanced usage
-5. For private deployments, ensure E2B_DOMAIN, E2B_API_URL, and E2B_SANDBOX_URL are correctly set and certificates are trusted
+5. For private deployments, ensure E2B_DOMAIN is correctly set and certificates are trusted

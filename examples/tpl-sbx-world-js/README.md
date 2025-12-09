@@ -1,6 +1,8 @@
-# my-template - E2B Sandbox Template
+# E2B Sandbox Template (Code and Base Modes)
 
-This is an E2B sandbox template that allows you to run code in a controlled environment.
+This example provides two sandbox template modes for E2B:
+- Code Execution mode: based on `e2bdev/code-interpreter`, suitable for Python code execution via Jupyter.
+- Base mode: based on `e2bdev/base`, suitable for general-purpose shell and tooling.
 
 ## Prerequisites
 
@@ -14,9 +16,13 @@ Before you begin, make sure you have:
 1. Copy `.env.example` and fill values:
    ```
    cp .env.example .env
-   # edit .env to set E2B_API_KEY, E2B_DOMAIN, etc.
    ```
-   The CLI auto-loads `.env` via `dotenv`, no need to `export`.
+   Recommended variables:
+   - `E2B_API_KEY` (required)
+   - `E2B_DOMAIN` (optional, for private/self-hosted deployments)
+   - `SANDBOX_MINUTES` (optional, TTL for sandbox sessions)
+   - `SANDBOX_MODE` (optional, `code` or `base`, default `code`)
+   - `E2B_IMAGE_REGISTRY` (optional, image registry prefix like `192.168.123.81:5000`)
 
 ### Private Deployment
 
@@ -32,31 +38,38 @@ E2B_DOMAIN=your.domain.tld
 
 You can also export variables in your shell if you prefer, but using `.env` is recommended.
 
-- Do not disable TLS verification (NODE_TLS_REJECT_UNAUTHORIZED=0) in production. Use valid certificates for your domain.
-- You can also pass these via CLI options where supported, but environment variables are recommended.
-
-## Installing Dependencies
+## Install Dependencies
 
 ```bash
 npm install
 ```
 
-## Building the Template
+## Build Template
+
+Choose the mode via CLI or environment variables.
 
 ```bash
-# Build (alias is required; no default)
-npm run e2b:build:template -- --alias=<template_alias>
+# Code Execution mode (Jupyter & Code Interpreter)
+npm run e2b:build:template -- --alias=my-code --mode=code
+
+# Base mode (general-purpose shell)
+npm run e2b:build:template -- --alias=my-base --mode=base
+
+# With private image registry
+npm run e2b:build:template -- --alias=my-code --mode=code --registry=192.168.123.81:5000
 ```
 
-## Using the Template in a Sandbox
+Environment alternatives:
+- `SANDBOX_MODE=code|base`
+- `E2B_IMAGE_REGISTRY=<host:port>`
 
-Once your template is built, you can use it in your E2B sandbox:
+## Use the Template
 
-```typescript
+```ts
 import { Sandbox } from 'e2b'
 
 // Create a new sandbox instance
-const sandbox = await Sandbox.create('my-template')
+const sandbox = await Sandbox.create('my-base')
 
 // Your sandbox is ready to use!
 console.log('Sandbox created successfully')
@@ -80,10 +93,6 @@ npm run e2b:create:sandbox -- --alias=<template_alias> --shell
 # Optionally set runtime in minutes
 npm run e2b:create:sandbox -- --minutes=10
 ```
-
-Notes:
-- Alias is required for build and for creating a sandbox.
-- You can optionally set `--minutes` for TTL; shell mode works without it.
 
 ### List / Info / Kill / Pause / Resume
 
@@ -119,25 +128,20 @@ npm run e2b:delete:template -- --alias=<alias>
 
 ## Template Structure
 
-- `template.ts` - Defines the sandbox template configuration
-- `build.template.ts` - Builds the template
-- `operate.sandbox.ts` - CLI script for create/connect/shell/list/info/kill/pause/resume
+- `template.ts` – template factory supporting `code` and `base` modes
+- `build.template.ts` – build script with `--mode` and `--registry` support
+- `operate.sandbox.ts` – CLI for create/connect/shell/list/info/kill/pause/resume
 
-## Purpose
+## Code Interpreter Demo (Code Mode)
 
-This repository is a demonstration program using the E2B JavaScript SDK to operate sandboxes on private deployments or the official E2B platform. It focuses on:
-- Build a template with a user-provided alias
-- Create and connect to sandboxes
-- Enter interactive shells
-- List, inspect, pause, resume, and kill sandboxes
+Run a quick Python snippet via Code Interpreter (only in `code` mode):
 
-For private deployments, ensure environment variables are set as described above (e.g., `E2B_DOMAIN`). For testing with self-signed certificates, you may temporarily use `NODE_TLS_REJECT_UNAUTHORIZED=0`.
-For official E2B SaaS, you only need `E2B_API_KEY`.
+```
+npm run e2b:run:code -- --alias=my-code --code="print('hello')"
+```
 
-## Next Steps
+## Notes
 
-1. Customize the template in `template.ts` to fit your needs
-2. Build the template using one of the methods above
-3. Use the template in your E2B sandbox code
-4. Check out the [E2B documentation](https://e2b.dev/docs) for more advanced usage
-5. For private deployments, ensure E2B_DOMAIN is correctly set and certificates are trusted
+- For private deployments, set `E2B_DOMAIN` and ensure certificates are trusted.
+- The `code` mode waits for Jupyter health at `http://localhost:49999/health`.
+- The `base` mode starts with `sudo /bin/bash` and is ready for shell commands.

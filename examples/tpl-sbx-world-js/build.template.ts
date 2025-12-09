@@ -1,7 +1,7 @@
 import { Template, defaultBuildLogger } from 'e2b'
 import dotenv from 'dotenv'
 import path from 'node:path'
-import { template } from './template'
+import { createTemplate } from './template'
 
 function getArg(name: string) {
   const prefix = `--${name}=`
@@ -16,7 +16,10 @@ async function main() {
     process.stderr.write('alias is required. usage: npm run e2b:build:template -- --alias=<name>\n')
     process.exit(1)
   }
-  await Template.build(template, {
+  const modeArg = (getArg('mode') as 'code' | 'base' | undefined) || (process.env.SANDBOX_MODE as 'code' | 'base' | undefined) || 'code'
+  const registry = getArg('registry') || process.env.E2B_IMAGE_REGISTRY
+  const tpl = createTemplate(modeArg, registry)
+  await Template.build(tpl, {
     alias,
     cpuCount: 1,
     memoryMB: 512,

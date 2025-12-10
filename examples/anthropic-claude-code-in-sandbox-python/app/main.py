@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 from e2b import Sandbox
 
-from anthropic_claude_code_in_sandbox.template import template_name
+from app.template import template_name
 
 load_dotenv()
 
@@ -25,5 +25,10 @@ result = sbx.commands.run(
     timeout=0,
 )
 print(result.stdout)
+
+content = sbx.files.read('/home/user/index.html')
+# Write file to local filesystem
+with open('./index.html', 'w') as file:
+  file.write(content)
 
 sbx.kill()

@@ -1,14 +1,16 @@
-[project]
+[tool.poetry]
 name = "anthropic-claude-code-in-sandbox"
 version = "0.1.0"
-description = "Add your description here"
+description = "E2B cookbook example"
 readme = "README.md"
-requires-python = ">=3.9,<4.0"
-dependencies = [
-    "e2b>=2.3.0",
-    "python-dotenv",
-]
+authors = []
+packages = [{include = "app"}]
+
+[tool.poetry.dependencies]
+python = ">=3.9,<4.0"
+e2b = ">=2.8.0"
+python-dotenv = "*"
 
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

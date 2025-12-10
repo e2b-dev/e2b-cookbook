@@ -102,14 +102,3 @@ export const CONTEXT_CONFIG = {
   KEEP_RECENT_MESSAGES: 6,
 };
 ```
-
-## Error Handling
-
-### Model Validation
-The agent validates the Claude model name on startup and provides helpful error messages if an invalid model is specified. Valid models are defined in `src/contextManager.ts`.
-
-### API Error Messages
-Enhanced error messages for common issues:
-- **Token limit exceeded**: Provides troubleshooting steps
-- **Invalid model**: Lists all valid Claude models
-- **General API errors**: Includes context about the failure

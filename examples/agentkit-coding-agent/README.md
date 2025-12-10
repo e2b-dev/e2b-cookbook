@@ -76,18 +76,12 @@ The project uses TypeScript and is set up with the following key dependencies:
 
 ## Context Window Management
 
-This agent includes smart context management to handle long conversations without exceeding Claude's 200k token limit:
+This agent includes automatic output truncation to prevent large outputs from bloating the conversation context:
 
 ### Automatic Output Truncation
 - **Terminal commands**: Output truncated to 15,000 characters
 - **File reads**: Individual files limited to 20,000 characters, batch reads to 50,000 characters
 - **Code execution**: Output truncated to 10,000 characters
-
-### Conversation Summarization
-- Monitors token usage after each agent response
-- Automatically summarizes older messages when approaching 180k tokens
-- Keeps recent messages (last 6) in full detail
-- Logs warnings when approaching token limits
 
 ### Configuration
 Adjust limits in `src/contextManager.ts`:
@@ -97,8 +91,5 @@ export const CONTEXT_CONFIG = {
   MAX_FILE_CONTENT: 20000,
   MAX_TOTAL_FILE_CONTENT: 50000,
   MAX_CODE_OUTPUT: 10000,
-  CONVERSATION_TOKEN_LIMIT: 150000,
-  HARD_TOKEN_LIMIT: 180000,
-  KEEP_RECENT_MESSAGES: 6,
 };
 ```

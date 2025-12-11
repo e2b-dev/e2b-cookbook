@@ -155,9 +155,7 @@ Brief summary of what was accomplished
                   let content = await sandbox.files.read(file);
 
                   // Truncate individual files if too large
-                  if (content.length > CONTEXT_CONFIG.MAX_FILE_CONTENT) {
-                    content = truncateText(content, CONTEXT_CONFIG.MAX_FILE_CONTENT);
-                  }
+                  content = truncateText(content, CONTEXT_CONFIG.MAX_FILE_CONTENT);
 
                   contents.push({ path: file, content });
                   totalLength += content.length;

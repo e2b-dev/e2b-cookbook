@@ -1,8 +1,7 @@
-import dotenv from "dotenv";
+import fs from 'fs'
+import "dotenv/config";
 import { Sandbox } from "e2b";
 import { templateName } from "./template";
-
-dotenv.config();
 
 const sbx = await Sandbox.create(templateName, {
   envs: {
@@ -23,5 +22,9 @@ const result = await sbx.commands.run(
 );
 
 console.log(result.stdout);
+
+const content = await sbx.files.read('/home/user/index.html')
+// Write file to local filesystem
+fs.writeFileSync('./index.html', content)
 
 await sbx.kill();

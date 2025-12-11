@@ -71,5 +71,5 @@ poetry install
 **5. Run the example**
 
 ```
-poetry run python app/main.py
+poetry run start
 ```

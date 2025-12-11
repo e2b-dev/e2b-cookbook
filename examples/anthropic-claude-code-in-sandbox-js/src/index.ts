@@ -1,9 +1,7 @@
 import fs from 'fs'
-import dotenv from "dotenv";
-import { Sandbox } from "@e2b/code-interpreter";
+import "dotenv/config";
+import { Sandbox } from "e2b";
 import { templateName } from "./template";
-
-dotenv.config();
 
 const sbx = await Sandbox.create(templateName, {
   envs: {

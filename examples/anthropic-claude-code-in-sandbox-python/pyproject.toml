@@ -11,6 +11,9 @@ python = ">=3.9,<4.0"
 e2b = ">=2.8.0"
 python-dotenv = "*"
 
+[tool.poetry.scripts]
+start = "app.main:main"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

@@ -65,7 +65,7 @@ def get_args():
     parser.add_argument(
         '--registry',
         default=None,
-        help='Image registry prefix, e.g., 192.168.123.81:5000. Priority: CLI args > env E2B_IMAGE_REGISTRY'
+        help='Image registry prefix. Priority: CLI args > env E2B_IMAGE_REGISTRY'
     )
     return parser.parse_args()
 

@@ -55,8 +55,19 @@ pip install -r requirements.txt
 ## Build the Template
 
 ```bash
-# Build (requires alias)
+# 1. Build (requires alias)
 python build_template.py --alias=<template_alias>
+
+# 2. Specify mode (optional, default is 'code')
+python build_template.py --alias=my-base-template --mode=base
+
+# 3. Specify image registry (optional)
+python build_template.py --alias=my-template --registry=hub.registry.com
+
+# 4. Read configuration from environment variables (set them in the .env file)
+# SANDBOX_MODE=base
+# E2B_IMAGE_REGISTRY=hub.registry.com
+python build_template.py --alias=my-template
 ```
 
 ## Use the Template in a Sandbox

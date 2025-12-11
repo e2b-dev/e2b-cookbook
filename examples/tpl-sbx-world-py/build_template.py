@@ -7,13 +7,13 @@ from dotenv import load_dotenv
 env_path = Path.cwd() / '.env'
 load_dotenv(dotenv_path=env_path, override=True)
 
-# If it's a private deployment, apply necessary patches before importing e2b
+# For private deployments, apply necessary patches before importing e2b
 if os.getenv('E2B_DOMAIN'):
     import ssl
     import socket
     import httpcore._backends.sync
 
-    # Create unverified SSL context function
+    # Create SSL context function that doesn't verify certificates
     def create_unverified_context(*args, **kwargs):
         context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
         context.check_hostname = False
@@ -44,7 +44,7 @@ if os.getenv('E2B_DOMAIN'):
 
 import argparse
 from e2b import Template, default_build_logger
-from template import template
+from template import create_template
 
 # Disable SSL warnings
 if os.getenv('E2B_DOMAIN'):
@@ -56,15 +56,29 @@ def get_args():
     """Parse command line arguments"""
     parser = argparse.ArgumentParser(description='Build E2B template')
     parser.add_argument('--alias', required=True, help='Template alias (required)')
+    parser.add_argument(
+        '--mode',
+        choices=['code', 'base'],
+        default=None,
+        help='Sandbox mode: code (Code Interpreter) or base (base image). Priority: CLI args > env SANDBOX_MODE > default "code"'
+    )
+    parser.add_argument(
+        '--registry',
+        default=None,
+        help='Image registry prefix, e.g., 192.168.123.81:5000. Priority: CLI args > env E2B_IMAGE_REGISTRY'
+    )
     return parser.parse_args()
 
 
 def main():
     args = get_args()
 
-    if not args.alias:
-        print('alias is required. Usage: python build_template.py --alias=<name>', file=sys.stderr)
-        sys.exit(1)
+    # Parameter priority: CLI args > environment variables > default values
+    mode = args.mode or os.getenv('SANDBOX_MODE') or 'code'
+    registry = args.registry or os.getenv('E2B_IMAGE_REGISTRY') or None
+
+    # Create template
+    template = create_template(mode=mode, registry=registry)
 
     # Build template
     Template.build(
@@ -75,7 +89,7 @@ def main():
         on_build_logs=default_build_logger(),
     )
 
-    print(f'Template built successfully, alias: {args.alias}')
+    print(f'✅ Template built successfully: alias={args.alias}, mode={mode}, registry={registry or "default"}')
 
 
 if __name__ == '__main__':

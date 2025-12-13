@@ -1,0 +1,20 @@
+{
+  "scripts": {
+    "e2b:build:template": "npx tsx build.template.ts",
+    "e2b:create:sandbox": "npx tsx operate.sandbox.ts",
+    "e2b:list:sandbox": "npx tsx operate.sandbox.ts --list",
+    "e2b:kill:sandbox": "npx tsx operate.sandbox.ts --kill",
+    "e2b:info:sandbox": "npx tsx operate.sandbox.ts --info",
+    "e2b:pause:sandbox": "npx tsx operate.sandbox.ts --pause",
+    "e2b:resume:sandbox": "npx tsx operate.sandbox.ts --resume",
+    "e2b:connect:sandbox": "npx tsx operate.sandbox.ts --connect --shell",
+    "e2b:list:template": "npx tsx operate.sandbox.ts --list-templates",
+    "e2b:delete:template": "npx tsx operate.sandbox.ts --delete-template",
+    "e2b:run:code": "npx tsx run.code-interpreter.ts"
+  },
+  "dependencies": {
+    "e2b": "^2.7.0",
+    "dotenv": "^16.4.5",
+    "@e2b/code-interpreter": "^2.3.1"
+  }
+}

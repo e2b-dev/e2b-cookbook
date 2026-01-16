@@ -112,6 +112,13 @@ Read more about E2B on the [E2B website](https://e2b.dev) and the official [E2B 
       <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/watsonx-ai-code-interpreter-python">Python</a></td>
       <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/watsonx-ai-code-interpreter-js">TypeScript</a></td>
     </tr>
+    <tr>
+      <td>Google</td>
+      <td>Gemini 3.0 Flash</td>
+      <td>Data analysis and visualization</td>
+      <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/gemini-data-analysis-python">Python</a></td>
+      <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/gemini-data-analysis-js">TypeScript</a></td>
+    </tr>
   </tbody>
 </table>
 

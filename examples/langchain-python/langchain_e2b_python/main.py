@@ -1,91 +1,45 @@
 import base64
 
-from typing import List, Sequence, Tuple
 from dotenv import load_dotenv
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_groq import ChatGroq
-from langchain_e2b_python.code_interpreter_tool import CodeInterpreterFunctionTool
-from langchain.agents import AgentExecutor
+from langchain.agents import create_agent
 from langchain_openai import ChatOpenAI
-from langchain_core.messages import BaseMessage
-from langchain_core.runnables import RunnablePassthrough
-from langchain.agents.output_parsers.tools import (
-    ToolAgentAction,
-    ToolsAgentOutputParser,
-)
-from e2b_code_interpreter import Result
 
+from langchain_e2b_python.code_interpreter_tool import (
+    CodeInterpreterTool,
+    create_code_interpreter_tool,
+)
 
 load_dotenv()
 
 
-def format_to_tool_messages(
-    intermediate_steps: Sequence[Tuple[ToolAgentAction, dict]],
-) -> List[BaseMessage]:
-    messages = []
-    for agent_action, observation in intermediate_steps:
-        if agent_action.tool == CodeInterpreterFunctionTool.tool_name:
-            new_messages = CodeInterpreterFunctionTool.format_to_tool_message(
-                agent_action,
-                observation,
-            )
-            messages.extend([new for new in new_messages if new not in messages])
-        else:
-            # Handle other tools
-            print("Not handling tool: ", agent_action.tool)
-
-    return messages
-
-
 def main():
-    # 1. Pick your favorite llm
-    llm = ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0)
-    # llm = ChatGroq(temperature=0, model_name="llama3-70b-8192")
+    # Pick your favourite LLM
+    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 
-    # 2. Initialize the code interpreter tool
-    code_interpreter = CodeInterpreterFunctionTool()
-    code_interpreter_tool = code_interpreter.to_langchain_tool()
-    tools = [code_interpreter_tool]
-
-    # 3. Define the prompt
-    prompt = ChatPromptTemplate.from_messages(
-        [("human", "{input}"), ("placeholder", "{agent_scratchpad}")]
-    )
-
-    # 4. Define the agent
-    agent = (
-        RunnablePassthrough.assign(
-            agent_scratchpad=lambda x: format_to_tool_messages(x["intermediate_steps"])
+    # Initialize CodeInterpreterTool - defined in code_interpreter_tool.py
+    with CodeInterpreterTool() as interpreter:
+        # Create agent from LangChain
+        agent = create_agent(
+            model=llm,
+            tools=[create_code_interpreter_tool(interpreter)],
+            system_prompt="You are a helpful assistant that can execute Python code to help answer questions.",
         )
-        | prompt
-        | llm.bind_tools(tools)
-        | ToolsAgentOutputParser()
-    )
 
-    agent_executor = AgentExecutor(
-        agent=agent,
-        tools=tools,
-        verbose=True,
-        return_intermediate_steps=True,
-    )
+        # Invoke agent to plot and show sinus
+        result = agent.invoke(
+            {"messages": [{"role": "user", "content": "plot and show sinus"}]}
+        )
+        print(result)
 
-    # 5. Invoke the agent
-    result = agent_executor.invoke({"input": "plot and show sinus"})
+        # Save PNG chart
+        for r in interpreter.last_results:
+            if hasattr(r, "png") and r.png:
+                png_data = base64.b64decode(r.png)
+                with open("chart.png", "wb") as f:
+                    f.write(png_data)
+                print("Saved chart to chart.png")
+                break
 
-    code_interpreter.close()
 
-    print(result)
-
-    # Each intermediate step is a Tuple[ToolAgentAction, dict]
-    r: Result = result["intermediate_steps"][0][1]["results"][0]
-
-    # Save the PNG chart that was received
-    if r.png:
-        # Decode the base64 encoded PNG data
-        png_data = base64.b64decode(r.png)
-
-        # Save the decoded PNG data to a file
-        filename = f"chart.png"
-        with open(filename, "wb") as f:
-            f.write(png_data)
-        print(f"Saved chart to {filename}")
+if __name__ == "__main__":
+    main()

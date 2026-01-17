@@ -15,7 +15,7 @@ class CodeInterpreterTool:
         if "E2B_API_KEY" not in os.environ:
             raise Exception(
                 "Code Interpreter tool called while E2B_API_KEY environment variable is not set. "
-                "Please get your E2B api key here https://e2b.dev/docs and set the E2B_API_KEY environment variable."
+                "Please get your E2B api key here https://e2b.dev/dashboard?tab=keys and set the E2B_API_KEY environment variable."
             )
         self.sandbox = Sandbox.create()
         self.last_results = []

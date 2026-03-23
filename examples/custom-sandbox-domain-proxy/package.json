@@ -18,7 +18,7 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "@e2b/code-interpreter": "^2.0.0",
+    "e2b": "^2.0.0",
     "dotenv": "^16.4.5",
     "express": "^5.1.0",
     "http-proxy-middleware": "^3.0.5",

@@ -3,7 +3,7 @@
 Example of mapping custom subdomains to your E2B sandboxes. Access sandboxes at `my-app.yourdomain.com` instead of default URLs.
 
 ## Tech Stack
-- [E2B Code Interpreter SDK](https://github.com/e2b-dev/code-interpreter)
+- [E2B SDK](https://github.com/e2b-dev/e2b)
 - Express.js
 
 ## How It Works

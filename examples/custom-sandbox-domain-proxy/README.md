@@ -18,7 +18,7 @@ Example of mapping custom subdomains to your E2B sandboxes. Access sandboxes at 
 - Copy `.env.template` to `.env`
 - Get your [E2B API KEY](https://e2b.dev/docs/getting-started/api-key) and add it to `.env`
 
-### 2. Install packagesInstall the E2B Code Interpreter SDK and other dependencies
+### 2. Install packages
 
 ```bash
 npm i

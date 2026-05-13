@@ -69,12 +69,13 @@ Run any of them with `npm run example:<name>` (see `package.json`).
 
 ## How healing actually works
 
-The non-obvious bit is what we feed back to the LLM after a failure. From `src/healer.ts`:
+The non-obvious bit is what we feed back to the LLM after a failure:
 
-1. **System rules** tell the LLM to dump `await page.content()` to `/app/failure.html` before throwing on any test failure. Without this, healing degrades to guessing from `stderr` alone.
+1. **The runner injects a `test.afterEach` capture hook** into the generated test before each attempt (sentinel-bracketed, stripped and reattached on every heal). On any failed test it writes `await page.content()` to a known path inside the sandbox. The LLM never has to remember to do this — see "Battle-tested patterns" below for why that matters.
 2. **The runner** reads that snapshot off the sandbox filesystem after the failed run.
-3. **The heal prompt** includes the previous code, the truncated stdout/stderr, and the page snapshot, with an explicit instruction to prefer role / accessible-name / data-testid selectors over brittle CSS paths.
-4. **Each retry** spins up a fresh sandbox, so failures don't compound.
+3. **The healer classifies the failure** (`strict_mode_violation`, `locator_not_found`, `timeout`, `assertion_failed`, `unknown`) and steers the prompt accordingly. Strict-mode violations in particular get a dedicated hint pointing at three concrete fix patterns instead of letting the LLM re-emit equivalent fragile locators.
+4. **The heal prompt** includes the previous code, the truncated stdout/stderr, the page snapshot, and the failure-type-specific hint.
+5. **Each retry** spins up a fresh sandbox, so failures don't compound.
 
 `HEAL_MAX_ATTEMPTS` caps the loop (default `3`).
 
@@ -96,6 +97,38 @@ Attempts: 2
 ```
 
 Each attempt spins up a fresh sandbox — failures from attempt 1 can't contaminate attempt 2.
+
+## Battle-tested patterns
+
+The first cut of this example trusted the LLM to do more of the wiring. Three problems showed up in production at [qualitymax.io](https://qualitymax.io) and got rolled back into the code here. If you copy this pattern into your own agent, these are the ones worth keeping:
+
+### 1. Inject the page-snapshot hook yourself; don't ask the LLM to write it
+
+Original approach: tell the LLM to call `fs.writeFileSync(somePath, await page.content())` in its own `afterEach`. Three failure modes, none loud:
+
+- LLM omits the hook in the heal pass → no snapshot → healing degrades to guessing from `stderr`.
+- LLM writes to a root-owned path (`/app/...`) → `EACCES` → silent, the test still fails for the original reason but you have no DOM.
+- LLM duplicates `import fs from 'fs'` on heal → `SyntaxError`, every retry now fails before the test runs.
+
+Fix: `src/runner.ts` injects a controlled `test.afterEach` block between sentinels (`// --- begin self-healing capture hook ---` / `// --- end ---`) and strip-and-reattaches it on every heal. The hook uses `require('fs')` inline instead of a top-level import so a duplicated injection can't break the file.
+
+### 2. Classify the failure before prompting
+
+`src/runner.ts → classifyFailure()` buckets failures into one of five types. The healer only injects the strict-mode hint when `strict_mode_violation` matched. Without classification, the strict-mode guidance pollutes prompts for unrelated failures (timeouts, assertion mismatches) and pushes the LLM toward "fixing" non-issues.
+
+Strict-mode-violation handling is the highest-leverage instance: without the explicit hint, the LLM kept swapping `.first()` in or trying a different `[class*=…]` matcher and burning the whole heal budget on the same failure. With the hint pointing at "anchor by unique text and walk up" / "scope by parent role" / "use the exact `data-test` from the snapshot", it usually heals in one extra attempt.
+
+### 3. Sentinel-based progress, not log scraping
+
+`src/runner.ts` emits `QMAX_PHASE:<phase>` markers at known points in the in-sandbox command and forwards them via the optional `onProgress` callback. A grep for a sentinel survives the npm/Playwright version bump that would break a regex over their normal log output. The pattern reads from `commands.run({ onStdout, onStderr })` rather than waiting for the run to finish, so UI consumers see progress in real time.
+
+```ts
+const result = await runInSandbox(generated, {
+  onProgress: (phase) => console.log(`[${phase}]`),
+});
+```
+
+If you want a *live browser feed* on top of progress markers (watch the test drive Chromium while it runs), see the [playwright-live-vnc-feed](../playwright-live-vnc-feed) example.
 
 ## Why multi-model fallback matters
 

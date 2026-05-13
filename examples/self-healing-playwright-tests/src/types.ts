@@ -11,6 +11,32 @@
 
 export type ProviderName = 'anthropic' | 'openai' | 'google';
 
+/**
+ * Coarse classification of the failure so the healer can steer the next
+ * prompt. Battle-tested at qualitymax.io: without this, the healer treats
+ * "selector matches 4 elements" and "selector matches 0 elements" the
+ * same way and keeps emitting equivalent locators.
+ */
+export type FailureType =
+  | 'strict_mode_violation'
+  | 'locator_not_found'
+  | 'timeout'
+  | 'assertion_failed'
+  | 'unknown';
+
+/**
+ * Sentinel phase emitted by the in-sandbox runner script. Surfaced via
+ * the optional `onProgress` callback on `runInSandbox` so callers driving
+ * a UI / CI can show real progress instead of an opaque "running…".
+ */
+export type RunPhase =
+  | 'sandbox_starting'
+  | 'project_uploaded'
+  | 'deps_installed'
+  | 'test_started'
+  | 'test_finished'
+  | 'artifacts_collected';
+
 export interface TestSpec {
   /** Natural-language description of what the test should do. */
   description: string;
@@ -36,6 +62,8 @@ export interface RunResult {
   stderr: string;
   /** Snapshot of the failing page (HTML), if the runner managed to capture one. */
   failureSnapshot?: string;
+  /** Coarse classification of the failure, populated when !passed. */
+  failureType?: FailureType;
 }
 
 export interface HealAttempt {

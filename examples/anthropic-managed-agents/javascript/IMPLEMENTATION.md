@@ -162,7 +162,24 @@ const event = client.beta.webhooks.unwrap(body, {
 
 Also implement `/health` so setup can confirm the webhook sandbox is serving HTTP.
 
-## 9. Send a Session Message
+## 9. App-Owned Webhook Routing
+
+Implement `app-webhook-server.ts` when webhooks should land on your application instead of inside
+an E2B sandbox.
+
+It should:
+
+1. Receive `POST /webhook` in the app process.
+2. Verify the raw Anthropic webhook payload with `client.beta.webhooks.unwrap(...)`.
+3. Retrieve the Anthropic environment metadata.
+4. Read `e2b_worker_sandbox_id`.
+5. Reconnect to that sandbox and start the worker if needed, or create a fresh worker sandbox when
+   the metadata is missing or stale.
+
+This keeps webhook policy, routing, observability, and sandbox replacement under app control while
+still using the same E2B worker runtime.
+
+## 10. Send a Session Message
 
 Implement `streamMessage({ apiKey, agentId, environmentId, message })`.
 
@@ -174,7 +191,7 @@ It should:
 4. Print streamed events.
 5. Stop when the stream reaches `session.status_idle` with `stop_reason.type === "end_turn"`.
 
-## 10. Upload Files into the E2B Worker Sandbox
+## 11. Upload Files into the E2B Worker Sandbox
 
 Anthropic session `resources` are not available for self-hosted environments. For this E2B pattern,
 upload files through E2B before sending the session message:
@@ -203,7 +220,7 @@ export async function uploadFileToSandbox({
 Then ask the agent to read the remote path, for example
 `/mnt/session/uploads/example-input.txt`.
 
-## 11. Look Up and Clean Up Sandbox Metadata
+## 12. Look Up and Clean Up Sandbox Metadata
 
 Implement:
 

@@ -85,12 +85,29 @@ function workerEnv(settings: Settings, options: WorkerOptions) {
   };
 }
 
-export async function startWorkerSandbox(settings: Settings, options: WorkerOptions = {}) {
-  requireSetting(settings.anthropicEnvironmentId, "ANTHROPIC_ENVIRONMENT_ID");
-  requireSetting(settings.anthropicEnvironmentKey, "ANTHROPIC_ENVIRONMENT_KEY");
+export async function workerProcessIsRunning(sandbox: Sandbox) {
+  const check = `
+    set -eu
+    test -f ${REMOTE_PID}
+    pid="$(cat ${REMOTE_PID})"
+    test -n "$pid"
+    kill -0 "$pid"
+  `;
+  const result = await sandbox.commands.run(`bash -lc ${JSON.stringify(check)}`, {
+    timeoutMs: 5_000,
+  });
+  return result.exitCode === 0;
+}
 
-  const sandbox = await createOrConnectWorkerSandbox(settings, options);
+export async function ensureWorkerProcess(
+  sandbox: Sandbox,
+  settings: Settings,
+  options: WorkerOptions = {},
+) {
   await uploadRuntime(sandbox);
+  if (await workerProcessIsRunning(sandbox)) {
+    return;
+  }
   const handle = await sandbox.commands.run(`bash -lc ${JSON.stringify(`exec ${REMOTE_TSX} ${REMOTE_WORKER} >> ${REMOTE_LOG} 2>&1`)}`, {
     background: true,
     cwd: REMOTE_WORKDIR,
@@ -98,6 +115,14 @@ export async function startWorkerSandbox(settings: Settings, options: WorkerOpti
   });
   await sandbox.files.write(REMOTE_PID, `${handle.pid}\n`);
   await handle.disconnect();
+}
+
+export async function startWorkerSandbox(settings: Settings, options: WorkerOptions = {}) {
+  requireSetting(settings.anthropicEnvironmentId, "ANTHROPIC_ENVIRONMENT_ID");
+  requireSetting(settings.anthropicEnvironmentKey, "ANTHROPIC_ENVIRONMENT_KEY");
+
+  const sandbox = await createOrConnectWorkerSandbox(settings, options);
+  await ensureWorkerProcess(sandbox, settings, options);
   if (settings.anthropicApiKey) {
     await updateEnvironmentMetadata({
       apiKey: settings.anthropicApiKey,
@@ -107,6 +132,17 @@ export async function startWorkerSandbox(settings: Settings, options: WorkerOpti
   }
 
   return sandbox;
+}
+
+export async function ensureWorkerSandbox(settings: Settings, options: WorkerOptions = {}) {
+  try {
+    return await startWorkerSandbox(settings, options);
+  } catch (error) {
+    if (!options.sandboxId) {
+      throw error;
+    }
+    return startWorkerSandbox(settings, { ...options, sandboxId: undefined });
+  }
 }
 
 export async function startWebhookServerSandbox(settings: Settings, options: WebhookOptions = {}) {

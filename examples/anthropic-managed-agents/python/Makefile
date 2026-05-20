@@ -1,4 +1,4 @@
-.PHONY: install check build-template show-environment start-worker start-webhook-server stop-worker send upload-file
+.PHONY: install check build-template show-environment start-worker start-webhook-server start-app-webhook-server stop-worker send upload-file
 
 install:
 	python3.12 -m venv .venv
@@ -18,6 +18,9 @@ start-worker:
 
 start-webhook-server:
 	.venv/bin/anthropic-managed-agents-start-webhook-server
+
+start-app-webhook-server:
+	.venv/bin/anthropic-managed-agents-start-app-webhook-server
 
 stop-worker:
 	.venv/bin/anthropic-managed-agents-stop-worker $(SANDBOX_ID)

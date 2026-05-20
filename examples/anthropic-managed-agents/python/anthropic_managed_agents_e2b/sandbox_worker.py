@@ -91,6 +91,36 @@ def start_worker_process(
         raise RuntimeError(f"worker start failed:\n{result.stdout}\n{result.stderr}")
 
 
+def worker_process_is_running(sandbox: Sandbox) -> bool:
+    check = f"""
+    set -eu
+    test -f {shlex.quote(REMOTE_PID)}
+    pid="$(cat {shlex.quote(REMOTE_PID)})"
+    test -n "$pid"
+    kill -0 "$pid"
+    """
+    result = sandbox.commands.run(f"bash -lc {shlex.quote(check)}", timeout=5)
+    return result.exit_code == 0
+
+
+def ensure_worker_process(
+    sandbox: Sandbox,
+    settings: Settings,
+    *,
+    worker_max_idle_seconds: float | None,
+    log_level: str,
+) -> None:
+    upload_worker(sandbox)
+    if worker_process_is_running(sandbox):
+        return
+    start_worker_process(
+        sandbox,
+        settings,
+        worker_max_idle_seconds=worker_max_idle_seconds,
+        log_level=log_level,
+    )
+
+
 def start_worker_sandbox(
     settings: Settings,
     *,
@@ -108,8 +138,7 @@ def start_worker_sandbox(
         timeout_seconds=timeout_seconds,
         sandbox_id=sandbox_id,
     )
-    upload_worker(sandbox)
-    start_worker_process(
+    ensure_worker_process(
         sandbox,
         settings,
         worker_max_idle_seconds=worker_max_idle_seconds,
@@ -122,6 +151,36 @@ def start_worker_sandbox(
             metadata={WORKER_SANDBOX_METADATA_KEY: sandbox.sandbox_id},
         )
     return sandbox
+
+
+def ensure_worker_sandbox(
+    settings: Settings,
+    *,
+    template_name: str,
+    timeout_seconds: int,
+    worker_max_idle_seconds: float | None,
+    log_level: str,
+    sandbox_id: str | None = None,
+) -> Sandbox:
+    try:
+        return start_worker_sandbox(
+            settings,
+            template_name=template_name,
+            timeout_seconds=timeout_seconds,
+            worker_max_idle_seconds=worker_max_idle_seconds,
+            log_level=log_level,
+            sandbox_id=sandbox_id,
+        )
+    except Exception:
+        if sandbox_id is None:
+            raise
+        return start_worker_sandbox(
+            settings,
+            template_name=template_name,
+            timeout_seconds=timeout_seconds,
+            worker_max_idle_seconds=worker_max_idle_seconds,
+            log_level=log_level,
+        )
 
 
 def start_webhook_server_process(

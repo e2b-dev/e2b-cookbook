@@ -3,12 +3,13 @@
 Run [Anthropic Managed Agents](https://platform.claude.com/docs/en/managed-agents/overview)
 self-hosted environment workers from E2B sandboxes.
 
-This directory contains the shared Python package and two runnable use-case folders:
+This directory contains the shared Python package and three runnable use-case folders:
 
 | Folder | Use case |
 | --- | --- |
 | [`orchestrator/`](./orchestrator/) | Your app or CLI starts and manages a long-running E2B worker sandbox. |
 | [`webhooks/`](./webhooks/) | Anthropic webhooks wake an auto-resumable E2B sandbox, which starts the worker on demand. |
+| [`app-webhooks/`](./app-webhooks/) | Your app receives Anthropic webhooks, then starts or reconnects the E2B worker sandbox. |
 
 The implementation lives in [`anthropic_managed_agents_e2b/`](./anthropic_managed_agents_e2b/).
 The E2B template bakes in that package, Anthropic's SDK, FastAPI/Uvicorn for the webhook receiver,
@@ -18,6 +19,7 @@ shell tools, and a writable `/mnt/session` workdir.
 flowchart LR
     session["Managed Agents session"] --> env["Anthropic self-hosted environment"]
     orchestrator["orchestrator/"] --> worker["E2B worker sandbox"]
+    appwebhooks["app-webhooks/"] --> worker
     webhooks["webhooks/"] --> receiver["E2B auto-resume webhook sandbox"]
     receiver --> worker
     worker --> env

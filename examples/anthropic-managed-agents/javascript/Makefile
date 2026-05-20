@@ -1,4 +1,4 @@
-.PHONY: install check build-template show-environment start-worker start-webhook-server stop-worker send upload-file
+.PHONY: install check build-template show-environment start-worker start-webhook-server start-app-webhook-server stop-worker send upload-file
 
 install:
 	npm install
@@ -17,6 +17,9 @@ start-worker:
 
 start-webhook-server:
 	npm run start-webhook-server
+
+start-app-webhook-server:
+	npm run start-app-webhook-server
 
 stop-worker:
 	npm run stop-worker -- $(SANDBOX_ID)

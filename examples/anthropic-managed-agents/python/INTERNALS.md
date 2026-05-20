@@ -6,6 +6,7 @@ The repo-facing examples are split by use case:
 
 - `orchestrator/` documents the direct worker lifecycle where your app starts and stops E2B worker sandboxes.
 - `webhooks/` documents the auto-resume webhook receiver that starts the worker when Anthropic sends `session.status_run_started`.
+- `app-webhooks/` documents the app-owned webhook receiver that routes webhooks to an E2B worker sandbox from your application.
 
 ## Runtime Flow
 
@@ -16,6 +17,7 @@ anthropic-managed-agents-build-template      -> builds the E2B worker template
 anthropic-managed-agents-show-environment    -> prints environment metadata with E2B sandbox IDs
 anthropic-managed-agents-start-worker        -> starts one E2B sandbox and launches the worker
 anthropic-managed-agents-start-webhook-server -> starts an auto-resumable webhook receiver sandbox
+anthropic-managed-agents-start-app-webhook-server -> starts an app-owned webhook receiver locally
 anthropic-managed-agents-send-message        -> creates a session and streams events
 anthropic-managed-agents-stop-worker         -> kills the sandbox and clears matching metadata
 ```
@@ -39,6 +41,7 @@ connected to that environment and executes the tools under `/mnt/session`.
 | `anthropic_managed_agents_e2b/sandbox_worker.py` | Creates or reconnects an E2B sandbox, uploads worker code, and starts it with the environment key. |
 | `anthropic_managed_agents_e2b/worker_runtime.py` | Runs Anthropic's async `EnvironmentWorker` inside the E2B sandbox. |
 | `anthropic_managed_agents_e2b/webhook_runtime.py` | Verifies Anthropic webhooks and starts the worker on `session.status_run_started`. |
+| `anthropic_managed_agents_e2b/app_webhook_server.py` | Runs an app-owned webhook server that verifies webhooks and routes work to an E2B worker sandbox. |
 | `anthropic_managed_agents_e2b/session.py` | Creates a session and sends one user message for smoke testing. |
 | `anthropic_managed_agents_e2b/cli.py` | Parses CLI arguments and wires settings into the package modules. |
 
@@ -133,11 +136,25 @@ Starts `worker.py` in the background inside the sandbox with:
 
 It redirects worker output to `/opt/anthropic-managed-agents/worker.log` and writes the background process id to `/opt/anthropic-managed-agents/worker.pid`.
 
+`worker_process_is_running(sandbox)`
+
+Checks the worker pid file inside the sandbox and uses `kill -0` to determine whether the process
+is still alive.
+
+`ensure_worker_process(sandbox, settings, worker_max_idle_seconds, log_level)`
+
+Uploads the runtime and starts the worker only when no live worker process is found.
+
 `start_worker_sandbox(settings, template_name, timeout_seconds, worker_max_idle_seconds, log_level, sandbox_id)`
 
 Creates a new E2B sandbox from the requested template, or reconnects to `--sandbox-id`. Then it uploads and starts the worker. It prints the worker sandbox ID for later cleanup.
 When `ANTHROPIC_API_KEY` is configured, it also updates Anthropic environment metadata:
 `e2b_worker_sandbox_id=<sandbox id>`.
+
+`ensure_worker_sandbox(settings, template_name, timeout_seconds, worker_max_idle_seconds, log_level, sandbox_id)`
+
+Reconnects to a stored worker sandbox id when possible. If the stored id is stale, it creates a
+fresh worker sandbox and updates Anthropic environment metadata.
 
 `start_webhook_server_sandbox(settings, template_name, timeout_seconds, worker_max_idle_seconds, log_level, port, sandbox_id)`
 
@@ -190,6 +207,15 @@ returns `204`.
 `health()`
 
 Returns a small health response with whether the worker process is currently running.
+
+### `app_webhook_server.py`
+
+`webhook(request)`
+
+Verifies Anthropic webhook deliveries in the app process. On `session.status_run_started`, it reads
+`e2b_worker_sandbox_id` from Anthropic environment metadata, reconnects to that E2B sandbox when
+possible, starts the worker process if needed, or creates a replacement worker sandbox when the
+stored id is missing or stale.
 
 ### `session.py`
 

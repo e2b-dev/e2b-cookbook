@@ -10,6 +10,7 @@
     "create-environment": "tsx src/cli.ts create-environment",
     "send": "tsx src/cli.ts send",
     "show-environment": "tsx src/cli.ts show-environment",
+    "start-app-webhook-server": "tsx src/app-webhook-server.ts",
     "start-webhook-server": "tsx src/cli.ts start-webhook-server",
     "start-worker": "tsx src/cli.ts start-worker",
     "stop-worker": "tsx src/cli.ts stop-worker",

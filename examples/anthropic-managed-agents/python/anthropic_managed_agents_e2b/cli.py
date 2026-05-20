@@ -146,6 +146,24 @@ def start_webhook_server_main() -> None:
     print(f"Worker log: {REMOTE_LOG}")
 
 
+def start_app_webhook_server_main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Start an app-owned webhook server that routes work to an E2B worker sandbox."
+    )
+    parser.add_argument("--host", default="0.0.0.0")
+    parser.add_argument("--port", type=int, default=8000)
+    args = parser.parse_args()
+
+    load_settings()
+    import uvicorn
+
+    uvicorn.run(
+        "anthropic_managed_agents_e2b.app_webhook_server:app",
+        host=args.host,
+        port=args.port,
+    )
+
+
 def stop_worker_main() -> None:
     parser = argparse.ArgumentParser(description="Stop an E2B Managed Agents worker sandbox.")
     parser.add_argument("sandbox_id")

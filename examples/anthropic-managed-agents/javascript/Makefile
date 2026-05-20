@@ -1,4 +1,4 @@
-.PHONY: install check build-template show-environment start-worker start-webhook-server stop-worker send
+.PHONY: install check build-template show-environment start-worker start-webhook-server stop-worker send upload-file
 
 install:
 	npm install
@@ -23,3 +23,6 @@ stop-worker:
 
 send:
 	npm run send -- "Run pwd, then echo hello from E2B"
+
+upload-file:
+	npm run upload-file -- $(SANDBOX_ID) $(FILE) $(REMOTE_PATH)

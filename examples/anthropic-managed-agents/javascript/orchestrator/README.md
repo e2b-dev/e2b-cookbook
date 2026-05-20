@@ -85,7 +85,20 @@ make stop-worker SANDBOX_ID=<E2B_WORKER_SANDBOX_ID>
 
 If the stopped sandbox ID matches `e2b_worker_sandbox_id`, the stop command clears that metadata key.
 
+To upload a local file into the running E2B worker sandbox:
+
+```bash
+make upload-file \
+  SANDBOX_ID="<sandbox-id>" \
+  FILE=/tmp/example-input.txt \
+  REMOTE_PATH=/mnt/session/uploads/example-input.txt
+```
+
+Then ask the agent to read `/mnt/session/uploads/example-input.txt`. Anthropic session `resources`
+are not supported for self-hosted environments, so this example uploads files through E2B.
+
 The worker uses `/mnt/session` as this example's E2B workdir and writes generated artifacts
 under `/mnt/session/outputs` when useful.
 
 For a concrete event-by-event walkthrough, see [../EXAMPLE_USAGE.md](../EXAMPLE_USAGE.md).
+For a complete code-level implementation, see [IMPLEMENTATION.md](./IMPLEMENTATION.md).

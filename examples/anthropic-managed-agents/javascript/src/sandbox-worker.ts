@@ -175,3 +175,19 @@ export async function stopWorkerSandbox(settings: Settings, sandboxId: string) {
     });
   }
 }
+
+export async function uploadFileToSandbox({
+  sandboxId,
+  localPath,
+  remotePath,
+}: {
+  sandboxId: string;
+  localPath: string;
+  remotePath: string;
+}) {
+  const sandbox = await Sandbox.connect(sandboxId);
+  const data = await readFile(localPath);
+  const arrayBuffer = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
+  await sandbox.files.write(remotePath, arrayBuffer);
+  return remotePath;
+}

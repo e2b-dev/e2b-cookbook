@@ -174,13 +174,43 @@ It should:
 4. Print streamed events.
 5. Stop when the stream reaches `session.status_idle` with `stop_reason.type === "end_turn"`.
 
-## 10. Look Up and Clean Up Sandbox Metadata
+## 10. Upload Files into the E2B Worker Sandbox
+
+Anthropic session `resources` are not available for self-hosted environments. For this E2B pattern,
+upload files through E2B before sending the session message:
+
+```ts
+import { readFile } from "node:fs/promises";
+import { Sandbox } from "e2b";
+
+export async function uploadFileToSandbox({
+  sandboxId,
+  localPath,
+  remotePath,
+}: {
+  sandboxId: string;
+  localPath: string;
+  remotePath: string;
+}) {
+  const sandbox = await Sandbox.connect(sandboxId);
+  const data = await readFile(localPath);
+  const arrayBuffer = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
+  await sandbox.files.write(remotePath, arrayBuffer);
+  return remotePath;
+}
+```
+
+Then ask the agent to read the remote path, for example
+`/mnt/session/uploads/example-input.txt`.
+
+## 11. Look Up and Clean Up Sandbox Metadata
 
 Implement:
 
 - `retrieveEnvironment({ apiKey, environmentId })`
 - `updateEnvironmentMetadata({ apiKey, environmentId, metadata })`
 - `clearMatchingSandboxMetadata({ apiKey, environmentId, sandboxId })`
+- `uploadFileToSandbox({ sandboxId, localPath, remotePath })`
 - `show-environment`
 
 `show-environment` should print:

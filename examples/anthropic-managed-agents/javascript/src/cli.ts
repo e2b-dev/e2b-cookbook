@@ -22,6 +22,7 @@ import {
   startWebhookServerSandbox,
   startWorkerSandbox,
   stopWorkerSandbox,
+  uploadFileToSandbox,
 } from "./sandbox-worker.js";
 
 function optionValue(args: string[], name: string, fallback?: string) {
@@ -48,7 +49,8 @@ function usage() {
   npm run start-worker -- [--sandbox-id <id>] [--template-name <name>]
   npm run start-webhook-server -- [--sandbox-id <id>] [--template-name <name>] [--port <port>]
   npm run stop-worker -- <sandbox-id>
-  npm run send -- <message>`);
+  npm run send -- <message>
+  npm run upload-file -- <sandbox-id> <file> [remote-path]`);
 }
 
 async function main() {
@@ -159,6 +161,19 @@ async function main() {
       environmentId: requireSetting(settings.anthropicEnvironmentId, "ANTHROPIC_ENVIRONMENT_ID"),
       message,
     });
+    return;
+  }
+
+  if (command === "upload-file") {
+    const [sandboxId, localPath, remotePath = "/mnt/session/uploads/example-input.txt"] = args;
+    if (!sandboxId) {
+      throw new Error("sandbox id is required");
+    }
+    if (!localPath) {
+      throw new Error("file path is required");
+    }
+    const uploadedPath = await uploadFileToSandbox({ sandboxId, localPath, remotePath });
+    console.log(`uploaded ${localPath} to ${uploadedPath}`);
     return;
   }
 

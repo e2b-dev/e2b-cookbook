@@ -12,7 +12,8 @@
     "show-environment": "tsx src/cli.ts show-environment",
     "start-webhook-server": "tsx src/cli.ts start-webhook-server",
     "start-worker": "tsx src/cli.ts start-worker",
-    "stop-worker": "tsx src/cli.ts stop-worker"
+    "stop-worker": "tsx src/cli.ts stop-worker",
+    "upload-file": "tsx src/cli.ts upload-file"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.97.1",

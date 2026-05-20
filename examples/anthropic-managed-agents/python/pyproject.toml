@@ -1,0 +1,35 @@
+[project]
+name = "anthropic-managed-agents-e2b-worker"
+version = "0.1.0"
+description = "Run Anthropic Managed Agents self-hosted workers inside E2B sandboxes"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "anthropic>=0.103.0",
+    "e2b>=2.21.0",
+    "python-dotenv>=1.0.0",
+]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.hatch.build.targets.wheel]
+only-include = [
+    "build_template.py",
+    "config.py",
+    "create_agent.py",
+    "create_environment.py",
+    "send_message.py",
+    "start_worker.py",
+    "stop_worker.py",
+    "template.py",
+    "worker.py",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+

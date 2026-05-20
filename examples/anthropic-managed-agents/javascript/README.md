@@ -60,3 +60,4 @@ npm run check
 ```
 
 For a concrete event-by-event walkthrough, see [EXAMPLE_USAGE.md](./EXAMPLE_USAGE.md).
+For the functions to implement when porting this pattern, see [IMPLEMENTATION.md](./IMPLEMENTATION.md).

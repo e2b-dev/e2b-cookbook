@@ -7,8 +7,19 @@ requires-python = ">=3.12"
 dependencies = [
     "anthropic>=0.103.0",
     "e2b>=2.21.0",
+    "fastapi>=0.116.0",
     "python-dotenv>=1.0.0",
+    "uvicorn>=0.35.0",
 ]
+
+[project.scripts]
+anthropic-managed-agents-build-template = "anthropic_managed_agents_e2b.cli:build_template_main"
+anthropic-managed-agents-create-agent = "anthropic_managed_agents_e2b.cli:create_agent_main"
+anthropic-managed-agents-create-environment = "anthropic_managed_agents_e2b.cli:create_environment_main"
+anthropic-managed-agents-send-message = "anthropic_managed_agents_e2b.cli:send_message_main"
+anthropic-managed-agents-start-webhook-server = "anthropic_managed_agents_e2b.cli:start_webhook_server_main"
+anthropic-managed-agents-start-worker = "anthropic_managed_agents_e2b.cli:start_worker_main"
+anthropic-managed-agents-stop-worker = "anthropic_managed_agents_e2b.cli:stop_worker_main"
 
 [tool.ruff]
 line-length = 100
@@ -17,19 +28,8 @@ line-length = 100
 select = ["E", "F", "I", "UP"]
 
 [tool.hatch.build.targets.wheel]
-only-include = [
-    "build_template.py",
-    "config.py",
-    "create_agent.py",
-    "create_environment.py",
-    "send_message.py",
-    "start_worker.py",
-    "stop_worker.py",
-    "template.py",
-    "worker.py",
-]
+packages = ["anthropic_managed_agents_e2b"]
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
-

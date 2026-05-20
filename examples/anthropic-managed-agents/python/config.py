@@ -1,33 +1,39 @@
 from __future__ import annotations
 
-import os
-from pathlib import Path
+from anthropic_managed_agents_e2b.settings import (
+    DEFAULT_LOG_LEVEL,
+    DEFAULT_SANDBOX_TIMEOUT_SECONDS,
+    DEFAULT_TEMPLATE_NAME,
+    DEFAULT_WORKER_MAX_IDLE_SECONDS,
+    load_settings,
+    require_env,
+)
 
-import dotenv
+settings = load_settings()
 
-ROOT = Path(__file__).resolve().parent
-REPO_ROOT = ROOT.parents[2]
+ANTHROPIC_API_KEY = settings.anthropic_api_key
+ANTHROPIC_AGENT_ID = settings.anthropic_agent_id
+ANTHROPIC_ENVIRONMENT_ID = settings.anthropic_environment_id
+ANTHROPIC_ENVIRONMENT_KEY = settings.anthropic_environment_key
+ANTHROPIC_WEBHOOK_SIGNING_KEY = settings.anthropic_webhook_signing_key
 
-dotenv.load_dotenv(REPO_ROOT / ".env", override=False)
-dotenv.load_dotenv(ROOT / ".env", override=True)
+E2B_TEMPLATE_NAME = DEFAULT_TEMPLATE_NAME
+E2B_WORKER_SANDBOX_ID = None
 
+WORKER_MAX_IDLE_SECONDS = DEFAULT_WORKER_MAX_IDLE_SECONDS
+SANDBOX_TIMEOUT_SECONDS = DEFAULT_SANDBOX_TIMEOUT_SECONDS
+LOG_LEVEL = DEFAULT_LOG_LEVEL
 
-def require_env(name: str) -> str:
-    value = os.environ.get(name)
-    if value is None or value == "":
-        raise RuntimeError(f"missing required environment variable: {name}")
-    return value
-
-
-ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
-ANTHROPIC_AGENT_ID = os.environ.get("ANTHROPIC_AGENT_ID")
-ANTHROPIC_ENVIRONMENT_ID = os.environ.get("ANTHROPIC_ENVIRONMENT_ID")
-ANTHROPIC_ENVIRONMENT_KEY = os.environ.get("ANTHROPIC_ENVIRONMENT_KEY")
-
-E2B_TEMPLATE_NAME = os.environ.get("E2B_TEMPLATE_NAME", "anthropic-managed-agents")
-E2B_WORKER_SANDBOX_ID = os.environ.get("E2B_WORKER_SANDBOX_ID")
-
-WORKER_MAX_IDLE_SECONDS = float(os.environ.get("WORKER_MAX_IDLE_SECONDS", "300"))
-SANDBOX_TIMEOUT_SECONDS = int(os.environ.get("SANDBOX_TIMEOUT_SECONDS", "3600"))
-LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO").upper()
-
+__all__ = [
+    "ANTHROPIC_AGENT_ID",
+    "ANTHROPIC_API_KEY",
+    "ANTHROPIC_ENVIRONMENT_ID",
+    "ANTHROPIC_ENVIRONMENT_KEY",
+    "ANTHROPIC_WEBHOOK_SIGNING_KEY",
+    "E2B_TEMPLATE_NAME",
+    "E2B_WORKER_SANDBOX_ID",
+    "LOG_LEVEL",
+    "SANDBOX_TIMEOUT_SECONDS",
+    "WORKER_MAX_IDLE_SECONDS",
+    "require_env",
+]

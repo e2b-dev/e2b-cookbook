@@ -42,6 +42,9 @@ Fill in `.env`:
 make build-template
 ```
 
+The reusable public template name for this flow is `E2B/claude-managed-agents-webhooks`. See
+[PUBLIC_TEMPLATE.md](./PUBLIC_TEMPLATE.md) for the minimal SDK usage shape.
+
 ## Start Once to Get the Webhook URL
 
 You can start the webhook sandbox before creating the Anthropic webhook endpoint:
@@ -69,8 +72,9 @@ Create an Anthropic webhook endpoint in the [Anthropic Agents workspace](https:/
 `session.status_run_started`. For signing details, see Anthropic's
 [Managed Agents webhook docs](https://platform.claude.com/docs/en/managed-agents/webhooks).
 
-Save the generated signing key as `ANTHROPIC_WEBHOOK_SIGNING_KEY` in `../.env`, then restart
-the same webhook sandbox so the public URL stays unchanged:
+Save the generated signing key as `ANTHROPIC_WEBHOOK_SIGNING_KEY` in `../.env`, then run the
+command again with the same sandbox ID. The helper writes the signing key into the sandbox so the
+public URL stays unchanged:
 
 ```bash
 make start-webhook-server SANDBOX_ID=<E2B_WEBHOOK_SANDBOX_ID>

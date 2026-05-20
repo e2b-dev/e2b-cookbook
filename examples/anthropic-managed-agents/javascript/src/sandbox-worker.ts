@@ -15,6 +15,7 @@ import {
   REMOTE_WEBHOOK,
   REMOTE_WEBHOOK_LOG,
   REMOTE_WEBHOOK_PID,
+  REMOTE_WEBHOOK_SIGNING_KEY,
   REMOTE_WORKDIR,
   REMOTE_WORKER,
 } from "./constants.js";
@@ -174,6 +175,13 @@ export async function startWebhookServerSandbox(settings: Settings, options: Web
     ? await Sandbox.connect(options.sandboxId, { timeoutMs })
     : await Sandbox.create(options.templateName ?? DEFAULT_TEMPLATE_NAME, {
         timeoutMs,
+        envs: {
+          ...workerEnv(settings, options),
+          WEBHOOK_PORT: String(options.port ?? DEFAULT_WEBHOOK_PORT),
+          ...(settings.anthropicWebhookSigningKey
+            ? { ANTHROPIC_WEBHOOK_SIGNING_KEY: settings.anthropicWebhookSigningKey }
+            : {}),
+        },
         lifecycle: { onTimeout: "pause", autoResume: true },
         metadata: {
           managed_by: "anthropic-managed-agents-e2b-js-webhook",
@@ -182,6 +190,10 @@ export async function startWebhookServerSandbox(settings: Settings, options: Web
       });
 
   await uploadRuntime(sandbox);
+  if (settings.anthropicWebhookSigningKey) {
+    await sandbox.files.write(REMOTE_WEBHOOK_SIGNING_KEY, `${settings.anthropicWebhookSigningKey}\n`);
+  }
+
   const envs: Record<string, string> = {
     ...workerEnv(settings, options),
     WEBHOOK_PORT: String(options.port ?? DEFAULT_WEBHOOK_PORT),
@@ -191,17 +203,29 @@ export async function startWebhookServerSandbox(settings: Settings, options: Web
   }
 
   const healthUrl = `http://127.0.0.1:${options.port ?? DEFAULT_WEBHOOK_PORT}/health`;
-  const attempts = Array.from({ length: 30 }, (_, index) => index + 1).join(" ");
-  const handle = await sandbox.commands.run(
-    `bash -lc ${JSON.stringify(`exec ${REMOTE_TSX} ${REMOTE_WEBHOOK} >> ${REMOTE_WEBHOOK_LOG} 2>&1`)}`,
-    {
-      background: true,
-      cwd: REMOTE_WORKDIR,
-      envs,
-    },
-  );
-  await sandbox.files.write(REMOTE_WEBHOOK_PID, `${handle.pid}\n`);
-  await handle.disconnect();
+  let webhookServerReady = false;
+  try {
+    await sandbox.commands.run(`curl --fail --silent --show-error ${healthUrl}`, {
+      timeoutMs: 5_000,
+    });
+    webhookServerReady = true;
+  } catch {
+    // Older/local templates do not have a start command; start the server below.
+  }
+
+  if (!webhookServerReady) {
+    const handle = await sandbox.commands.run(
+      `bash -lc ${JSON.stringify(`exec ${REMOTE_TSX} ${REMOTE_WEBHOOK} >> ${REMOTE_WEBHOOK_LOG} 2>&1`)}`,
+      {
+        background: true,
+        cwd: REMOTE_WORKDIR,
+        envs,
+      },
+    );
+    await sandbox.files.write(REMOTE_WEBHOOK_PID, `${handle.pid}\n`);
+    await handle.disconnect();
+  }
+
   if (settings.anthropicApiKey) {
     await addSandboxToMetadataStore({
       apiKey: settings.anthropicApiKey,
@@ -212,6 +236,11 @@ export async function startWebhookServerSandbox(settings: Settings, options: Web
     });
   }
 
+  if (webhookServerReady) {
+    return sandbox;
+  }
+
+  const attempts = Array.from({ length: 30 }, (_, index) => index + 1).join(" ");
   const healthCheck =
     `for i in ${attempts}; do ` +
     `curl --fail --silent --show-error ${healthUrl} && exit 0; ` +

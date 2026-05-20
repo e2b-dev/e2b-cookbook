@@ -25,7 +25,7 @@ export async function startWebhookSandbox({
   environmentId,
   environmentKey,
   webhookSigningKey,
-  templateName = "anthropic-managed-agents-js",
+  templateName = "claude-managed-agents-webhooks",
   port = 8000,
 }: {
   anthropicApiKey: string;

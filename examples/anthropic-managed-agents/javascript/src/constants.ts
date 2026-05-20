@@ -1,4 +1,4 @@
-export const DEFAULT_TEMPLATE_NAME = "anthropic-managed-agents-js";
+export const DEFAULT_TEMPLATE_NAME = "claude-managed-agents-webhooks";
 export const DEFAULT_WORKER_MAX_IDLE_SECONDS = 300;
 export const DEFAULT_SANDBOX_TIMEOUT_SECONDS = 3600;
 export const DEFAULT_WEBHOOK_PORT = 8000;
@@ -14,6 +14,7 @@ export const REMOTE_LOG = `${REMOTE_DIR}/worker.log`;
 export const REMOTE_WEBHOOK_PID = `${REMOTE_DIR}/webhook.pid`;
 export const REMOTE_WEBHOOK_LOG = `${REMOTE_DIR}/webhook.log`;
 export const REMOTE_TSX = `${REMOTE_DIR}/node_modules/.bin/tsx`;
+export const REMOTE_WEBHOOK_SIGNING_KEY = `${REMOTE_WORKDIR}/.anthropic-webhook-signing-key`;
 
 export const SANDBOX_TOOLS = ["bash", "read", "write", "edit", "glob", "grep"] as const;
 export const WEB_TOOLS = ["web_fetch", "web_search"] as const;

@@ -9,6 +9,7 @@ const REMOTE_TSX = `${REMOTE_DIR}/node_modules/.bin/tsx`;
 const REMOTE_WORKER = `${REMOTE_DIR}/src/worker-runtime.ts`;
 const REMOTE_PID = `${REMOTE_DIR}/worker.pid`;
 const REMOTE_LOG = `${REMOTE_DIR}/worker.log`;
+const REMOTE_WEBHOOK_SIGNING_KEY = `${REMOTE_WORKDIR}/.anthropic-webhook-signing-key`;
 const MAX_WEBHOOK_BODY_BYTES = 1_048_576;
 
 const client = new Anthropic({ apiKey: "not-needed" });
@@ -53,6 +54,19 @@ function startWorkerIfNeeded() {
   writeFileSync(REMOTE_PID, `${child.pid}\n`);
 }
 
+function webhookSigningKey() {
+  if (process.env.ANTHROPIC_WEBHOOK_SIGNING_KEY) {
+    return process.env.ANTHROPIC_WEBHOOK_SIGNING_KEY;
+  }
+
+  const keyPath = process.env.ANTHROPIC_WEBHOOK_SIGNING_KEY_FILE ?? REMOTE_WEBHOOK_SIGNING_KEY;
+  if (existsSync(keyPath)) {
+    return readFileSync(keyPath, "utf8").trim();
+  }
+
+  return undefined;
+}
+
 async function readBody(request: IncomingMessage, maxBytes: number) {
   const contentLength = request.headers["content-length"];
   if (contentLength && Number(contentLength) > maxBytes) {
@@ -78,7 +92,7 @@ function writeJson(response: ServerResponse, statusCode: number, body: unknown) 
 }
 
 async function handleWebhook(request: IncomingMessage, response: ServerResponse) {
-  const signingKey = process.env.ANTHROPIC_WEBHOOK_SIGNING_KEY;
+  const signingKey = webhookSigningKey();
   if (!signingKey) {
     response.writeHead(503, { "content-type": "text/plain" });
     response.end("ANTHROPIC_WEBHOOK_SIGNING_KEY is required");

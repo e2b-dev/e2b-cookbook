@@ -5,21 +5,21 @@ This example is intentionally small: the E2B-specific code starts a sandbox and 
 ## Runtime Flow
 
 ```text
-create_environment.py  -> creates Anthropic self-hosted environment
-create_agent.py        -> creates a Claude Managed Agent with sandbox tools
-build_template.py      -> builds the E2B worker template
-start_worker.py        -> starts one E2B sandbox and launches worker.py inside it
-start_webhook_server.py -> starts an auto-resumable webhook receiver sandbox
-worker.py              -> runs EnvironmentWorker.run() inside the sandbox
-send_message.py        -> creates a session and streams events
-stop_worker.py         -> kills the worker sandbox
+anthropic-managed-agents-create-environment  -> creates Anthropic self-hosted environment
+anthropic-managed-agents-create-agent        -> creates a Claude Managed Agent with sandbox tools
+anthropic-managed-agents-build-template      -> builds the E2B worker template
+anthropic-managed-agents-start-worker        -> starts one E2B sandbox and launches the worker
+anthropic-managed-agents-start-webhook-server -> starts an auto-resumable webhook receiver sandbox
+anthropic-managed-agents-send-message        -> creates a session and streams events
+anthropic-managed-agents-stop-worker         -> kills the worker sandbox
 ```
 
-The top-level scripts are compatibility wrappers. The implementation lives in the
-`anthropic_managed_agents_e2b` package so the example can be imported, packaged, and exposed through
-console scripts.
+The implementation lives in the `anthropic_managed_agents_e2b` package. `pyproject.toml` exposes
+the command-line entrypoints.
 
-When `send_message.py` creates a session with `environment_id`, Claude routes tool calls for that session to the self-hosted environment. The E2B sandbox worker is already connected to that environment and executes the tools under `/mnt/session`.
+When `anthropic-managed-agents-send-message` creates a session with `environment_id`, Claude routes
+tool calls for that session to the self-hosted environment. The E2B sandbox worker is already
+connected to that environment and executes the tools under `/mnt/session`.
 
 ## File Map
 
@@ -35,7 +35,6 @@ When `send_message.py` creates a session with `environment_id`, Claude routes to
 | `anthropic_managed_agents_e2b/webhook_runtime.py` | Verifies Anthropic webhooks and starts the worker on `session.status_run_started`. |
 | `anthropic_managed_agents_e2b/session.py` | Creates a session and sends one user message for smoke testing. |
 | `anthropic_managed_agents_e2b/cli.py` | Parses CLI arguments and wires settings into the package modules. |
-| `*.py` at the example root | Thin compatibility wrappers for the original command names. |
 
 ## Functions
 
@@ -51,10 +50,6 @@ credentials and resource IDs.
 
 Returns a required setting or raises a clear `RuntimeError`. The commands use these for values that
 must exist before making API calls.
-
-`require_env(name)`
-
-Compatibility helper for older imports from the root `config.py` wrapper.
 
 ### `environment.py`
 
@@ -126,8 +121,8 @@ Starts `worker.py` in the background inside the sandbox with:
 
 - `ANTHROPIC_ENVIRONMENT_ID`
 - `ANTHROPIC_ENVIRONMENT_KEY`
-- worker max-idle value from `start_worker.py --max-idle`
-- log level from `start_worker.py --log-level`
+- worker max-idle value from `anthropic-managed-agents-start-worker --max-idle`
+- log level from `anthropic-managed-agents-start-worker --log-level`
 
 It redirects worker output to `/opt/anthropic-managed-agents/worker.log` and writes the background process id to `/opt/anthropic-managed-agents/worker.pid`.
 

@@ -65,10 +65,3 @@ def load_settings() -> Settings:
         anthropic_environment_key=_optional("ANTHROPIC_ENVIRONMENT_KEY"),
         anthropic_webhook_signing_key=_optional("ANTHROPIC_WEBHOOK_SIGNING_KEY"),
     )
-
-
-def require_env(name: str) -> str:
-    value = os.environ.get(name)
-    if value is None or value == "":
-        raise RuntimeError(f"missing required environment variable: {name}")
-    return value

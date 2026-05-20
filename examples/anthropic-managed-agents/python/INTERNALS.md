@@ -2,6 +2,11 @@
 
 This example is intentionally small: the E2B-specific code starts a sandbox and runs Anthropic's SDK worker inside it. Anthropic's SDK owns the managed-agents queue loop.
 
+The repo-facing examples are split by use case:
+
+- `orchestrator/` documents the direct worker lifecycle where your app starts and stops E2B worker sandboxes.
+- `webhooks/` documents the auto-resume webhook receiver that starts the worker when Anthropic sends `session.status_run_started`.
+
 ## Runtime Flow
 
 ```text

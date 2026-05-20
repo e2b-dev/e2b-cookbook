@@ -1,0 +1,83 @@
+# Managed Agents Webhook Worker
+
+Run the Anthropic webhook receiver inside an auto-resumable E2B sandbox.
+
+This flow is useful when you want Anthropic to wake your E2B worker on demand. Anthropic sends a
+`session.status_run_started` webhook, E2B auto-resumes the webhook sandbox, and the webhook handler
+starts `EnvironmentWorker.run()` if it is not already running.
+
+```mermaid
+flowchart LR
+    session["Managed Agents session"] --> webhook["Anthropic webhook"]
+    webhook --> receiver["E2B auto-resume webhook sandbox"]
+    receiver --> worker["EnvironmentWorker.run()"]
+    worker --> env["Anthropic self-hosted environment"]
+    worker --> workdir["/mnt/session"]
+```
+
+## Setup
+
+Run these commands from this directory. The Python package and `.env` live one level up.
+
+```bash
+uv sync --project ..
+cp ../.env.template ../.env
+```
+
+Fill in `../.env`:
+
+| Variable | Notes |
+| --- | --- |
+| `E2B_API_KEY` | Required to start the webhook sandbox. |
+| `E2B_ACCESS_TOKEN` | Required to build the E2B template. |
+| `ANTHROPIC_ENVIRONMENT_ID` | Anthropic self-hosted environment id. |
+| `ANTHROPIC_ENVIRONMENT_KEY` | Anthropic self-hosted environment key. |
+| `ANTHROPIC_WEBHOOK_SIGNING_KEY` | Required for real webhook deliveries. Start once without it to get the URL, then add it. |
+
+## Build the E2B Template
+
+```bash
+make build-template
+```
+
+This bakes the Python package, Anthropic SDK, FastAPI, Uvicorn, shell tools, and `/mnt/session`
+workdir into the `anthropic-managed-agents` E2B template.
+
+## Start the Webhook Sandbox
+
+```bash
+make start-webhook-server
+```
+
+The command creates an E2B sandbox with:
+
+```python
+lifecycle={"on_timeout": "pause", "auto_resume": True}
+```
+
+It prints:
+
+```text
+E2B_WEBHOOK_SANDBOX_ID=...
+Anthropic webhook URL: https://.../webhook
+```
+
+Create an Anthropic webhook endpoint with the printed URL and subscribe it to
+`session.status_run_started`. Copy the generated `whsec_...` signing key into
+`ANTHROPIC_WEBHOOK_SIGNING_KEY` in `../.env`, then restart the webhook sandbox.
+
+The server can start without `ANTHROPIC_WEBHOOK_SIGNING_KEY` so you can get the public E2B URL first.
+Until the key is configured, `/webhook` returns `503`.
+
+## Stop the Webhook Sandbox
+
+```bash
+make stop-worker SANDBOX_ID="<sandbox-id>"
+```
+
+## Notes
+
+- The webhook server is only the event-driven entrypoint. It still starts the same Anthropic
+  `EnvironmentWorker.run()` inside E2B.
+- Tool calls execute inside the E2B sandbox under `/mnt/session`.
+- Secrets and Anthropic resource IDs stay runtime-only in `../.env`; they are not baked into the E2B template.

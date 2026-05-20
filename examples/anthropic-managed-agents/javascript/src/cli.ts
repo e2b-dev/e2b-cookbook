@@ -10,10 +10,13 @@ import {
 import { createAgent } from "./agent.js";
 import {
   WEBHOOK_SANDBOX_METADATA_KEY,
+  WEBHOOK_SANDBOX_STORE_METADATA_KEY,
   WORKER_SANDBOX_METADATA_KEY,
+  WORKER_SANDBOX_STORE_METADATA_KEY,
   consoleUrl,
   createSelfHostedEnvironment,
   retrieveEnvironment,
+  sandboxStore,
 } from "./environment.js";
 import { streamMessage } from "./session.js";
 import { loadSettings, requireSetting } from "./settings.js";
@@ -98,7 +101,21 @@ async function main() {
       `${WORKER_SANDBOX_METADATA_KEY}=${environment.metadata[WORKER_SANDBOX_METADATA_KEY] ?? ""}`,
     );
     console.log(
+      `${WORKER_SANDBOX_STORE_METADATA_KEY}=${sandboxStore({
+        metadata: environment.metadata,
+        storeKey: WORKER_SANDBOX_STORE_METADATA_KEY,
+        legacyKey: WORKER_SANDBOX_METADATA_KEY,
+      }).join(",")}`,
+    );
+    console.log(
       `${WEBHOOK_SANDBOX_METADATA_KEY}=${environment.metadata[WEBHOOK_SANDBOX_METADATA_KEY] ?? ""}`,
+    );
+    console.log(
+      `${WEBHOOK_SANDBOX_STORE_METADATA_KEY}=${sandboxStore({
+        metadata: environment.metadata,
+        storeKey: WEBHOOK_SANDBOX_STORE_METADATA_KEY,
+        legacyKey: WEBHOOK_SANDBOX_METADATA_KEY,
+      }).join(",")}`,
     );
     return;
   }

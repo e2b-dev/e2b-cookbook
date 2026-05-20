@@ -20,10 +20,13 @@ import {
 } from "./constants.js";
 import {
   WEBHOOK_SANDBOX_METADATA_KEY,
+  WEBHOOK_SANDBOX_STORE_METADATA_KEY,
   WORKER_SANDBOX_METADATA_KEY,
+  WORKER_SANDBOX_STORE_METADATA_KEY,
+  addSandboxToMetadataStore,
   clearMatchingSandboxMetadata,
-  updateEnvironmentMetadata,
 } from "./environment.js";
+import { JsonSandboxStore } from "./app-sandbox-store.js";
 import { exampleRoot, requireSetting, type Settings } from "./settings.js";
 
 export type WorkerOptions = {
@@ -32,6 +35,7 @@ export type WorkerOptions = {
   workerMaxIdleSeconds?: number | null;
   logLevel?: string;
   sandboxId?: string;
+  sandboxIds?: string[];
 };
 
 export type WebhookOptions = WorkerOptions & {
@@ -124,10 +128,12 @@ export async function startWorkerSandbox(settings: Settings, options: WorkerOpti
   const sandbox = await createOrConnectWorkerSandbox(settings, options);
   await ensureWorkerProcess(sandbox, settings, options);
   if (settings.anthropicApiKey) {
-    await updateEnvironmentMetadata({
+    await addSandboxToMetadataStore({
       apiKey: settings.anthropicApiKey,
       environmentId: requireSetting(settings.anthropicEnvironmentId, "ANTHROPIC_ENVIRONMENT_ID"),
-      metadata: { [WORKER_SANDBOX_METADATA_KEY]: sandbox.sandboxId },
+      legacyKey: WORKER_SANDBOX_METADATA_KEY,
+      storeKey: WORKER_SANDBOX_STORE_METADATA_KEY,
+      sandboxId: sandbox.sandboxId,
     });
   }
 
@@ -135,6 +141,17 @@ export async function startWorkerSandbox(settings: Settings, options: WorkerOpti
 }
 
 export async function ensureWorkerSandbox(settings: Settings, options: WorkerOptions = {}) {
+  const candidateIds = [
+    ...new Set([...(options.sandboxIds ?? []), options.sandboxId].filter((item): item is string => Boolean(item))),
+  ];
+  for (const candidateId of candidateIds) {
+    try {
+      return await startWorkerSandbox(settings, { ...options, sandboxId: candidateId });
+    } catch {
+      // Try the next stored sandbox id before creating a replacement.
+    }
+  }
+
   try {
     return await startWorkerSandbox(settings, options);
   } catch (error) {
@@ -181,10 +198,12 @@ export async function startWebhookServerSandbox(settings: Settings, options: Web
   await sandbox.files.write(REMOTE_WEBHOOK_PID, `${handle.pid}\n`);
   await handle.disconnect();
   if (settings.anthropicApiKey) {
-    await updateEnvironmentMetadata({
+    await addSandboxToMetadataStore({
       apiKey: settings.anthropicApiKey,
       environmentId: requireSetting(settings.anthropicEnvironmentId, "ANTHROPIC_ENVIRONMENT_ID"),
-      metadata: { [WEBHOOK_SANDBOX_METADATA_KEY]: sandbox.sandboxId },
+      legacyKey: WEBHOOK_SANDBOX_METADATA_KEY,
+      storeKey: WEBHOOK_SANDBOX_STORE_METADATA_KEY,
+      sandboxId: sandbox.sandboxId,
     });
   }
 
@@ -203,6 +222,7 @@ export async function startWebhookServerSandbox(settings: Settings, options: Web
 export async function stopWorkerSandbox(settings: Settings, sandboxId: string) {
   const sandbox = await Sandbox.connect(sandboxId);
   await sandbox.kill();
+  await new JsonSandboxStore().removeSandbox(sandboxId);
   if (settings.anthropicApiKey && settings.anthropicEnvironmentId) {
     await clearMatchingSandboxMetadata({
       apiKey: settings.anthropicApiKey,

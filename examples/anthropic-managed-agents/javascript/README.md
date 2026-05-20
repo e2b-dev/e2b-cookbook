@@ -52,8 +52,13 @@ environment metadata. Use `npm run show-environment` to inspect:
 
 | Metadata key | Set by |
 | --- | --- |
-| `e2b_worker_sandbox_id` | [`orchestrator/`](./orchestrator/) |
-| `e2b_webhook_sandbox_id` | [`webhooks/`](./webhooks/) |
+| `e2b_worker_sandbox_id` | Last worker sandbox, kept for compatibility. |
+| `e2b_worker_sandbox_ids` | JSON list of known worker sandboxes. |
+| `e2b_webhook_sandbox_id` | Last webhook sandbox, kept for compatibility. |
+| `e2b_webhook_sandbox_ids` | JSON list of known webhook sandboxes. |
+
+The [`app-webhooks/`](./app-webhooks/) flow also keeps an app-owned
+session-to-sandbox store so multiple Managed Agents sessions can map to different E2B sandboxes.
 
 ## Validation
 

@@ -6,10 +6,13 @@ from pathlib import Path
 from anthropic_managed_agents_e2b.agent import DEFAULT_MODEL, create_agent
 from anthropic_managed_agents_e2b.environment import (
     WEBHOOK_SANDBOX_METADATA_KEY,
+    WEBHOOK_SANDBOX_STORE_METADATA_KEY,
     WORKER_SANDBOX_METADATA_KEY,
+    WORKER_SANDBOX_STORE_METADATA_KEY,
     console_url,
     create_self_hosted_environment,
     retrieve_environment,
+    sandbox_store,
 )
 from anthropic_managed_agents_e2b.sandbox_worker import (
     REMOTE_LOG,
@@ -66,7 +69,25 @@ def show_environment_main() -> None:
     print(f"ANTHROPIC_ENVIRONMENT_ID={env.id}")
     print(f"name={env.name}")
     print(f"{WORKER_SANDBOX_METADATA_KEY}={env.metadata.get(WORKER_SANDBOX_METADATA_KEY, '')}")
+    worker_sandbox_ids = sandbox_store(
+        env.metadata,
+        store_key=WORKER_SANDBOX_STORE_METADATA_KEY,
+        legacy_key=WORKER_SANDBOX_METADATA_KEY,
+    )
+    print(
+        f"{WORKER_SANDBOX_STORE_METADATA_KEY}="
+        f"{','.join(worker_sandbox_ids)}"
+    )
     print(f"{WEBHOOK_SANDBOX_METADATA_KEY}={env.metadata.get(WEBHOOK_SANDBOX_METADATA_KEY, '')}")
+    webhook_sandbox_ids = sandbox_store(
+        env.metadata,
+        store_key=WEBHOOK_SANDBOX_STORE_METADATA_KEY,
+        legacy_key=WEBHOOK_SANDBOX_METADATA_KEY,
+    )
+    print(
+        f"{WEBHOOK_SANDBOX_STORE_METADATA_KEY}="
+        f"{','.join(webhook_sandbox_ids)}"
+    )
 
 
 def create_agent_main() -> None:

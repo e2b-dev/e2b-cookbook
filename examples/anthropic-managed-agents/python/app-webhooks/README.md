@@ -34,6 +34,7 @@ Fill in `../.env`:
 | `ANTHROPIC_ENVIRONMENT_ID` | Anthropic self-hosted environment id. |
 | `ANTHROPIC_ENVIRONMENT_KEY` | Anthropic self-hosted environment key from the [Anthropic Environments workspace](https://platform.claude.com/workspaces/default/environments). |
 | `ANTHROPIC_WEBHOOK_SIGNING_KEY` | Required for real webhook deliveries. |
+| `APP_SANDBOX_STORE_PATH` | Optional path for the app-owned session-to-sandbox JSON store. Defaults to `../.managed-agent-sandbox-store.json`. |
 
 ## Build the E2B Template
 
@@ -56,10 +57,16 @@ to `session.status_run_started`.
 When Anthropic sends a run-started webhook, the app:
 
 1. Verifies the raw payload with `ANTHROPIC_WEBHOOK_SIGNING_KEY`.
-2. Retrieves the Anthropic environment metadata.
-3. Reads `e2b_worker_sandbox_id` if one exists.
-4. Reconnects to that sandbox and starts the worker if needed.
-5. Creates a fresh E2B sandbox and writes new metadata if the stored sandbox id is missing or stale.
+2. Reads `event.data.id` as the Managed Agents session id.
+3. Looks up that session id in the app-owned sandbox store.
+4. Reconnects to that session's sandbox and starts the worker if needed.
+5. Creates a fresh E2B sandbox and writes a new store assignment if the session is new or stale.
+
+Inspect the app-owned assignments:
+
+```bash
+curl http://127.0.0.1:8000/sandboxes
+```
 
 ## Stop
 

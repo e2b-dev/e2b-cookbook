@@ -5,11 +5,14 @@ from pathlib import Path
 
 from e2b import Sandbox
 
+from anthropic_managed_agents_e2b.app_sandbox_store import JsonSandboxStore
 from anthropic_managed_agents_e2b.environment import (
     WEBHOOK_SANDBOX_METADATA_KEY,
+    WEBHOOK_SANDBOX_STORE_METADATA_KEY,
     WORKER_SANDBOX_METADATA_KEY,
+    WORKER_SANDBOX_STORE_METADATA_KEY,
+    add_sandbox_to_metadata_store,
     clear_matching_sandbox_metadata,
-    update_environment_metadata,
 )
 from anthropic_managed_agents_e2b.settings import PACKAGE_ROOT, Settings
 
@@ -145,10 +148,12 @@ def start_worker_sandbox(
         log_level=log_level,
     )
     if settings.anthropic_api_key:
-        update_environment_metadata(
+        add_sandbox_to_metadata_store(
             api_key=settings.anthropic_api_key,
             environment_id=settings.require_anthropic_environment_id(),
-            metadata={WORKER_SANDBOX_METADATA_KEY: sandbox.sandbox_id},
+            legacy_key=WORKER_SANDBOX_METADATA_KEY,
+            store_key=WORKER_SANDBOX_STORE_METADATA_KEY,
+            sandbox_id=sandbox.sandbox_id,
         )
     return sandbox
 
@@ -161,7 +166,24 @@ def ensure_worker_sandbox(
     worker_max_idle_seconds: float | None,
     log_level: str,
     sandbox_id: str | None = None,
+    sandbox_ids: list[str] | None = None,
 ) -> Sandbox:
+    candidate_ids = list(
+        dict.fromkeys([*(sandbox_ids or []), *([sandbox_id] if sandbox_id else [])])
+    )
+    for candidate_id in candidate_ids:
+        try:
+            return start_worker_sandbox(
+                settings,
+                template_name=template_name,
+                timeout_seconds=timeout_seconds,
+                worker_max_idle_seconds=worker_max_idle_seconds,
+                log_level=log_level,
+                sandbox_id=candidate_id,
+            )
+        except Exception:
+            continue
+
     try:
         return start_worker_sandbox(
             settings,
@@ -252,16 +274,19 @@ def start_webhook_server_sandbox(
         port=port,
     )
     if settings.anthropic_api_key:
-        update_environment_metadata(
+        add_sandbox_to_metadata_store(
             api_key=settings.anthropic_api_key,
             environment_id=settings.require_anthropic_environment_id(),
-            metadata={WEBHOOK_SANDBOX_METADATA_KEY: sandbox.sandbox_id},
+            legacy_key=WEBHOOK_SANDBOX_METADATA_KEY,
+            store_key=WEBHOOK_SANDBOX_STORE_METADATA_KEY,
+            sandbox_id=sandbox.sandbox_id,
         )
     return sandbox
 
 
 def stop_worker_sandbox(settings: Settings, sandbox_id: str) -> None:
     Sandbox.kill(sandbox_id)
+    JsonSandboxStore().remove_sandbox(sandbox_id=sandbox_id)
     if settings.anthropic_api_key and settings.anthropic_environment_id:
         clear_matching_sandbox_metadata(
             api_key=settings.anthropic_api_key,

@@ -23,9 +23,11 @@ import {
   DEFAULT_TEMPLATE_NAME,
   DEFAULT_WORKER_MAX_IDLE_SECONDS,
 } from "./constants.js";
-import { WORKER_SANDBOX_METADATA_KEY, retrieveEnvironment } from "./environment.js";
+import { JsonSandboxStore } from "./app-sandbox-store.js";
 import { ensureWorkerSandbox } from "./sandbox-worker.js";
 import { loadSettings, requireSetting, type Settings } from "./settings.js";
+
+const store = new JsonSandboxStore();
 
 function webhookClient(settings: Settings) {
   return new Anthropic({
@@ -33,22 +35,31 @@ function webhookClient(settings: Settings) {
   });
 }
 
-async function currentWorkerSandboxId(settings: Settings) {
-  const environment = await retrieveEnvironment({
-    apiKey: requireSetting(settings.anthropicApiKey, "ANTHROPIC_API_KEY"),
-    environmentId: requireSetting(settings.anthropicEnvironmentId, "ANTHROPIC_ENVIRONMENT_ID"),
-  });
-  return environment.metadata[WORKER_SANDBOX_METADATA_KEY];
+function sessionId(event: unknown) {
+  const id = (event as { data?: { id?: unknown } }).data?.id;
+  if (!id) {
+    throw new Error("webhook event does not include data.id");
+  }
+  return String(id);
 }
 
-async function ensureWorkerForEvent(settings: Settings) {
-  return ensureWorkerSandbox(settings, {
-    sandboxId: await currentWorkerSandboxId(settings),
+async function ensureWorkerForEvent(settings: Settings, event: unknown) {
+  const environmentId = requireSetting(settings.anthropicEnvironmentId, "ANTHROPIC_ENVIRONMENT_ID");
+  const session = sessionId(event);
+  const assignment = await store.get({ environmentId, sessionId: session });
+  const sandbox = await ensureWorkerSandbox(settings, {
+    sandboxId: assignment?.sandboxId,
     templateName: DEFAULT_TEMPLATE_NAME,
     timeoutSeconds: DEFAULT_SANDBOX_TIMEOUT_SECONDS,
     workerMaxIdleSeconds: DEFAULT_WORKER_MAX_IDLE_SECONDS,
     logLevel: DEFAULT_LOG_LEVEL,
   });
+  await store.upsert({
+    environmentId,
+    sessionId: session,
+    sandboxId: sandbox.sandboxId,
+  });
+  return sandbox;
 }
 
 async function readBody(request: IncomingMessage) {
@@ -86,7 +97,7 @@ async function handleWebhook(request: IncomingMessage, response: ServerResponse)
     });
 
     if (event.data.type === "session.status_run_started") {
-      const sandbox = await ensureWorkerForEvent(settings);
+      const sandbox = await ensureWorkerForEvent(settings, event);
       response.writeHead(204, { "x-e2b-worker-sandbox-id": sandbox.sandboxId });
       response.end();
       return;
@@ -107,6 +118,11 @@ const server = createServer((request, response) => {
     return;
   }
 
+  if (request.method === "GET" && request.url === "/sandboxes") {
+    void store.list().then((assignments) => writeJson(response, 200, { sandboxes: assignments }));
+    return;
+  }
+
   if (request.method === "POST" && request.url === "/webhook") {
     void handleWebhook(request, response);
     return;
@@ -120,6 +136,87 @@ const port = Number(process.env.PORT ?? "8000");
 server.listen(port, "0.0.0.0", () => {
   console.log(`app webhook server listening on ${port}`);
 });
+```
+
+Create `src/app-sandbox-store.ts` for the app-owned assignments:
+
+```ts
+import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { dirname, resolve } from "node:path";
+
+import { exampleRoot } from "./settings.js";
+
+export type SandboxAssignment = {
+  environmentId: string;
+  sessionId: string;
+  sandboxId: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+function storePath() {
+  return process.env.APP_SANDBOX_STORE_PATH ?? resolve(exampleRoot, ".managed-agent-sandbox-store.json");
+}
+
+export class JsonSandboxStore {
+  constructor(private readonly path = storePath()) {}
+
+  async list() {
+    return this.read();
+  }
+
+  async get({ environmentId, sessionId }: { environmentId: string; sessionId: string }) {
+    const assignments = await this.read();
+    return assignments.find(
+      (item) => item.environmentId === environmentId && item.sessionId === sessionId,
+    );
+  }
+
+  async upsert({ environmentId, sessionId, sandboxId }: {
+    environmentId: string;
+    sessionId: string;
+    sandboxId: string;
+  }) {
+    const assignments = await this.read();
+    const existing = assignments.find(
+      (item) => item.environmentId === environmentId && item.sessionId === sessionId,
+    );
+    const timestamp = new Date().toISOString();
+    await this.write([
+      ...assignments.filter(
+        (item) => !(item.environmentId === environmentId && item.sessionId === sessionId),
+      ),
+      {
+        environmentId,
+        sessionId,
+        sandboxId,
+        status: "active",
+        createdAt: existing?.createdAt ?? timestamp,
+        updatedAt: timestamp,
+      },
+    ]);
+  }
+
+  async removeSandbox(sandboxId: string) {
+    await this.write((await this.read()).filter((item) => item.sandboxId !== sandboxId));
+  }
+
+  private async read(): Promise<SandboxAssignment[]> {
+    try {
+      const raw = JSON.parse(await readFile(this.path, "utf8"));
+      return Array.isArray(raw) ? raw : [];
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === "ENOENT") return [];
+      throw error;
+    }
+  }
+
+  private async write(assignments: SandboxAssignment[]) {
+    await mkdir(dirname(this.path), { recursive: true });
+    await writeFile(this.path, `${JSON.stringify(assignments, null, 2)}\n`);
+  }
+}
 ```
 
 ## 2. Add Worker Ensure Helpers

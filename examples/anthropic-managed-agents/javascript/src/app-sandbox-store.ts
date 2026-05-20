@@ -1,0 +1,118 @@
+import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { dirname, resolve } from "node:path";
+
+import { exampleRoot } from "./settings.js";
+
+export type SandboxAssignment = {
+  environmentId: string;
+  sessionId: string;
+  sandboxId: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+function now() {
+  return new Date().toISOString();
+}
+
+function storePath() {
+  return process.env.APP_SANDBOX_STORE_PATH ?? resolve(exampleRoot, ".managed-agent-sandbox-store.json");
+}
+
+export class JsonSandboxStore {
+  constructor(private readonly path = storePath()) {}
+
+  async list() {
+    return this.read();
+  }
+
+  async get({
+    environmentId,
+    sessionId,
+  }: {
+    environmentId: string;
+    sessionId: string;
+  }) {
+    const assignments = await this.read();
+    return assignments.find(
+      (item) => item.environmentId === environmentId && item.sessionId === sessionId,
+    );
+  }
+
+  async upsert({
+    environmentId,
+    sessionId,
+    sandboxId,
+    status = "active",
+  }: {
+    environmentId: string;
+    sessionId: string;
+    sandboxId: string;
+    status?: string;
+  }) {
+    const assignments = await this.read();
+    const existing = assignments.find(
+      (item) => item.environmentId === environmentId && item.sessionId === sessionId,
+    );
+    const timestamp = now();
+    const assignment: SandboxAssignment = {
+      environmentId,
+      sessionId,
+      sandboxId,
+      status,
+      createdAt: existing?.createdAt ?? timestamp,
+      updatedAt: timestamp,
+    };
+    await this.write([
+      ...assignments.filter(
+        (item) => !(item.environmentId === environmentId && item.sessionId === sessionId),
+      ),
+      assignment,
+    ]);
+    return assignment;
+  }
+
+  async removeSandbox(sandboxId: string) {
+    const assignments = await this.read();
+    await this.write(assignments.filter((item) => item.sandboxId !== sandboxId));
+  }
+
+  private async read(): Promise<SandboxAssignment[]> {
+    try {
+      const raw = JSON.parse(await readFile(this.path, "utf8"));
+      if (!Array.isArray(raw)) {
+        return [];
+      }
+      return raw
+        .filter(
+          (item) =>
+            item &&
+            typeof item === "object" &&
+            item.environmentId &&
+            item.sessionId &&
+            item.sandboxId &&
+            item.createdAt &&
+            item.updatedAt,
+        )
+        .map((item) => ({
+          environmentId: String(item.environmentId),
+          sessionId: String(item.sessionId),
+          sandboxId: String(item.sandboxId),
+          status: String(item.status ?? "active"),
+          createdAt: String(item.createdAt),
+          updatedAt: String(item.updatedAt),
+        }));
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+        return [];
+      }
+      throw error;
+    }
+  }
+
+  private async write(assignments: SandboxAssignment[]) {
+    await mkdir(dirname(this.path), { recursive: true });
+    await writeFile(this.path, `${JSON.stringify(assignments, null, 2)}\n`);
+  }
+}

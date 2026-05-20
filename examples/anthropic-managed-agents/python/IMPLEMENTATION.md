@@ -59,7 +59,7 @@ The template should:
 
 - start from Python 3.12
 - install shell utilities used by the Anthropic toolset
-- install `anthropic`, `fastapi`, and `uvicorn`
+- install `anthropic[webhooks]`, `fastapi`, and `uvicorn`
 - copy the worker and webhook runtime modules into `/opt/anthropic-managed-agents`
 - create writable `/mnt/session`
 - set `/mnt/session` as the default workdir

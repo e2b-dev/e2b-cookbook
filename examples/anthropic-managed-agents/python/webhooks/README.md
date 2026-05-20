@@ -75,7 +75,12 @@ Create an Anthropic webhook endpoint in the [Anthropic Agents workspace](https:/
 `session.status_run_started`. See Anthropic's
 [Managed Agents webhook docs](https://platform.claude.com/docs/en/managed-agents/webhooks).
 Copy the generated `whsec_...` signing key into
-`ANTHROPIC_WEBHOOK_SIGNING_KEY` in `../.env`, then restart the webhook sandbox.
+`ANTHROPIC_WEBHOOK_SIGNING_KEY` in `../.env`, then restart the same webhook sandbox so the public
+URL stays unchanged:
+
+```bash
+make start-webhook-server SANDBOX_ID="<E2B_WEBHOOK_SANDBOX_ID>"
+```
 
 The server can start without `ANTHROPIC_WEBHOOK_SIGNING_KEY` so you can get the public E2B URL first.
 Until the key is configured, `/webhook` returns `503`.

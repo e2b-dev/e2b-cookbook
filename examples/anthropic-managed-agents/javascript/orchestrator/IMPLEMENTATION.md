@@ -139,7 +139,7 @@ export async function startWorkerSandbox({
   anthropicApiKey,
   environmentId,
   environmentKey,
-  templateName = "anthropic-managed-agents",
+  templateName = "anthropic-managed-agents-js",
 }: {
   anthropicApiKey: string;
   environmentId: string;

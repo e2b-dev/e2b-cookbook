@@ -19,12 +19,14 @@ flowchart LR
 
 ## Setup
 
-From the parent `javascript/` directory:
+Install dependencies and create `.env` from the parent `javascript/` directory:
 
 ```bash
 npm install
 cp .env.template .env
 ```
+
+Then run the `make ...` commands below from this `orchestrator/` directory.
 
 Fill in `.env`:
 

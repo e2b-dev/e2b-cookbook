@@ -21,6 +21,8 @@ Create `anthropic_managed_agents_e2b/app_webhook_server.py`:
 ```python
 from __future__ import annotations
 
+import asyncio
+import logging
 from threading import Lock
 
 import anthropic
@@ -41,6 +43,7 @@ app = FastAPI()
 store = JsonSandboxStore()
 worker_locks: dict[tuple[str, str], Lock] = {}
 worker_locks_lock = Lock()
+logger = logging.getLogger(__name__)
 
 
 def _settings() -> Settings:
@@ -87,6 +90,16 @@ def _ensure_worker_for_session(settings: Settings, environment_id: str, session_
     return sandbox
 
 
+def _log_background_worker_result(task: asyncio.Task[object]) -> None:
+    try:
+        sandbox = task.result()
+    except Exception:
+        logger.exception("failed to start worker sandbox")
+        return
+
+    logger.info("started worker sandbox %s", getattr(sandbox, "sandbox_id", ""))
+
+
 @app.get("/health")
 def health() -> dict[str, bool]:
     return {"ok": True}
@@ -112,17 +125,13 @@ async def webhook(request: Request) -> Response:
             key=signing_key,
         )
     except Exception:
-        return Response("invalid signature", status_code=400)
+        logger.exception("invalid webhook signature")
+        return Response("invalid signature", status_code=401)
 
     if event.data.type == "session.status_run_started":
-        try:
-            sandbox = ensure_worker_for_event(settings, event)
-        except Exception:
-            return Response("failed to start worker sandbox", status_code=500)
-        return Response(
-            status_code=204,
-            headers={"x-e2b-worker-sandbox-id": sandbox.sandbox_id},
-        )
+        task = asyncio.create_task(asyncio.to_thread(ensure_worker_for_event, settings, event))
+        task.add_done_callback(_log_background_worker_result)
+        return Response(status_code=204)
 
     return Response(status_code=204)
 ```
@@ -275,15 +284,21 @@ def ensure_worker_sandbox(
     log_level: str,
     sandbox_id: str | None = None,
 ) -> Sandbox:
-    try:
+    if sandbox_id:
+        try:
             return start_worker_sandbox(
                 settings,
                 template_name=template_name,
                 timeout_seconds=timeout_seconds,
-            worker_max_idle_seconds=worker_max_idle_seconds,
-            log_level=log_level,
-            sandbox_id=sandbox_id,
-        )
+                worker_max_idle_seconds=worker_max_idle_seconds,
+                log_level=log_level,
+                sandbox_id=sandbox_id,
+            )
+        except Exception:
+            logger.exception(
+                "failed to connect worker sandbox %s; creating a replacement",
+                sandbox_id,
+            )
 
     return start_worker_sandbox(
         settings,

@@ -17,12 +17,14 @@ flowchart LR
 
 ## Setup
 
-From the parent `javascript/` directory:
+Install dependencies and create `.env` from the parent `javascript/` directory:
 
 ```bash
 npm install
 cp .env.template .env
 ```
+
+Then run the `make ...` commands below from this `webhooks/` directory.
 
 Fill in `.env`:
 
@@ -68,7 +70,11 @@ Create an Anthropic webhook endpoint in the [Anthropic Agents workspace](https:/
 [Managed Agents webhook docs](https://platform.claude.com/docs/en/managed-agents/webhooks).
 
 Save the generated signing key as `ANTHROPIC_WEBHOOK_SIGNING_KEY` in `../.env`, then restart
-the webhook sandbox.
+the same webhook sandbox so the public URL stays unchanged:
+
+```bash
+make start-webhook-server SANDBOX_ID=<E2B_WEBHOOK_SANDBOX_ID>
+```
 
 Until the key is configured, `/webhook` returns `503`.
 

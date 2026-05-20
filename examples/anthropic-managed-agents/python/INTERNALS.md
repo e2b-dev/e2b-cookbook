@@ -104,7 +104,7 @@ Defines the E2B template:
 
 - starts from Python 3.12 slim
 - installs shell utilities used by the sandbox tools
-- installs `anthropic>=0.103.0`, `fastapi>=0.116.0`, and `uvicorn>=0.35.0`
+- installs `anthropic[webhooks]>=0.103.0`, `fastapi>=0.116.0`, and `uvicorn>=0.35.0`
 - copies the packaged worker/webhook modules into `/opt/anthropic-managed-agents`
 - creates writable `/mnt/session`
 - creates `/opt/anthropic-managed-agents` for the worker and webhook server runtime

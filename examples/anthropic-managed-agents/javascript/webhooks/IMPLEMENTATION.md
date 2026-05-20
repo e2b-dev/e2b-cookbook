@@ -25,7 +25,7 @@ export async function startWebhookSandbox({
   environmentId,
   environmentKey,
   webhookSigningKey,
-  templateName = "anthropic-managed-agents",
+  templateName = "anthropic-managed-agents-js",
   port = 8000,
 }: {
   anthropicApiKey: string;
@@ -95,7 +95,18 @@ const REMOTE_WORKER = `${REMOTE_DIR}/src/worker-runtime.ts`;
 const REMOTE_PID = `${REMOTE_DIR}/worker.pid`;
 const REMOTE_LOG = `${REMOTE_DIR}/worker.log`;
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY ?? "not-needed" });
+const client = new Anthropic({ apiKey: "not-needed" });
+
+function workerEnv() {
+  return {
+    ANTHROPIC_ENVIRONMENT_ID: process.env.ANTHROPIC_ENVIRONMENT_ID,
+    ANTHROPIC_ENVIRONMENT_KEY: process.env.ANTHROPIC_ENVIRONMENT_KEY,
+    WORKER_MAX_IDLE_SECONDS: process.env.WORKER_MAX_IDLE_SECONDS,
+    LOG_LEVEL: process.env.LOG_LEVEL,
+    PATH: process.env.PATH,
+    HOME: process.env.HOME,
+  };
+}
 
 function workerIsRunning() {
   if (!existsSync(REMOTE_PID)) return false;
@@ -110,7 +121,7 @@ function startWorkerIfNeeded() {
   const child = spawn(REMOTE_TSX, [REMOTE_WORKER], {
     cwd: REMOTE_WORKDIR,
     detached: true,
-    env: process.env,
+    env: workerEnv(),
     stdio: ["ignore", "pipe", "pipe"],
   });
   child.stdout.pipe(log);
@@ -154,7 +165,7 @@ async function handleWebhook(request: IncomingMessage, response: ServerResponse)
     response.writeHead(204);
     response.end();
   } catch {
-    response.writeHead(400, { "content-type": "text/plain" });
+    response.writeHead(401, { "content-type": "text/plain" });
     response.end("invalid signature");
   }
 }

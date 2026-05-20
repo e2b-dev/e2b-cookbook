@@ -50,3 +50,5 @@ Fill in `.env`. The example also reads the repository root `.env` if you keep sh
 ```bash
 npm run check
 ```
+
+For a concrete event-by-event walkthrough, see [EXAMPLE_USAGE.md](./EXAMPLE_USAGE.md).

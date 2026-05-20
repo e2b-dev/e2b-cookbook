@@ -57,4 +57,5 @@ uv run ruff check .
 uv build --wheel
 ```
 
+For a concrete event-by-event walkthrough, see [EXAMPLE_USAGE.md](./EXAMPLE_USAGE.md).
 For function-level details, see [INTERNALS.md](./INTERNALS.md).

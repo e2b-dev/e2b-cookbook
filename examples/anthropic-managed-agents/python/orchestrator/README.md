@@ -98,3 +98,5 @@ SessionStatusIdleEvent ... stop_reason=EndTurn
 - One worker sandbox can service the self-hosted environment. Start more workers for more capacity.
 - Tool calls execute inside the E2B sandbox under `/mnt/session`.
 - Secrets and Anthropic resource IDs stay runtime-only in `../.env`; they are not baked into the E2B template.
+
+For a concrete event-by-event walkthrough, see [../EXAMPLE_USAGE.md](../EXAMPLE_USAGE.md).

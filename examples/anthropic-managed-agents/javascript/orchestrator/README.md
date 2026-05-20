@@ -77,3 +77,5 @@ make stop-worker SANDBOX_ID=<E2B_WORKER_SANDBOX_ID>
 
 The worker uses `/mnt/session` as this example's E2B workdir and writes generated artifacts
 under `/mnt/session/outputs` when useful.
+
+For a concrete event-by-event walkthrough, see [../EXAMPLE_USAGE.md](../EXAMPLE_USAGE.md).

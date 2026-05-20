@@ -76,3 +76,5 @@ make stop-worker SANDBOX_ID=<E2B_WEBHOOK_SANDBOX_ID>
 - The webhook server is only the event-driven entrypoint. It still starts the same Anthropic
   environment worker used by the orchestrator example.
 - This is a simple single-sandbox example, not production per-session isolation.
+
+For a concrete event-by-event walkthrough, see [../EXAMPLE_USAGE.md](../EXAMPLE_USAGE.md).

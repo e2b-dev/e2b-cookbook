@@ -84,3 +84,5 @@ make stop-worker SANDBOX_ID="<sandbox-id>"
   `EnvironmentWorker.run()` inside E2B.
 - Tool calls execute inside the E2B sandbox under `/mnt/session`.
 - Secrets and Anthropic resource IDs stay runtime-only in `../.env`; they are not baked into the E2B template.
+
+For a concrete event-by-event walkthrough, see [../EXAMPLE_USAGE.md](../EXAMPLE_USAGE.md).

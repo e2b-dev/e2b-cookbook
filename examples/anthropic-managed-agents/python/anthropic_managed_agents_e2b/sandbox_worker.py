@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import shlex
 from pathlib import Path
 
@@ -23,6 +24,7 @@ REMOTE_PID = f"{REMOTE_DIR}/worker.pid"
 REMOTE_LOG = f"{REMOTE_DIR}/worker.log"
 REMOTE_WEBHOOK_PID = f"{REMOTE_DIR}/webhook.pid"
 REMOTE_WEBHOOK_LOG = f"{REMOTE_DIR}/webhook.log"
+logger = logging.getLogger(__name__)
 REMOTE_WORKER_ENTRYPOINT = """\
 from anthropic_managed_agents_e2b.worker_runtime import main
 
@@ -95,14 +97,16 @@ def start_worker_process(
 
 
 def worker_process_is_running(sandbox: Sandbox) -> bool:
-    check = f"""
-    set -eu
-    test -f {shlex.quote(REMOTE_PID)}
-    pid="$(cat {shlex.quote(REMOTE_PID)})"
-    test -n "$pid"
-    kill -0 "$pid"
-    """
-    result = sandbox.commands.run(f"bash -lc {shlex.quote(check)}", timeout=5)
+    check = (
+        f"test -f {shlex.quote(REMOTE_PID)} && "
+        f'pid="$(cat {shlex.quote(REMOTE_PID)})" && '
+        'test -n "$pid" && '
+        'kill -0 "$pid"'
+    )
+    try:
+        result = sandbox.commands.run(f"bash -lc {shlex.quote(check)}", timeout=5)
+    except Exception:
+        return False
     return result.exit_code == 0
 
 
@@ -178,7 +182,10 @@ def ensure_worker_sandbox(
                 sandbox_id=sandbox_id,
             )
         except Exception:
-            pass
+            logger.exception(
+                "failed to connect worker sandbox %s; creating a replacement",
+                sandbox_id,
+            )
 
     return start_worker_sandbox(
         settings,

@@ -13,7 +13,19 @@ REMOTE_PID = REMOTE_DIR / "worker.pid"
 REMOTE_LOG = REMOTE_DIR / "worker.log"
 
 app = FastAPI()
-client = anthropic.Anthropic()
+client = anthropic.Anthropic(api_key="not-needed")
+
+
+def worker_env() -> dict[str, str]:
+    keys = (
+        "ANTHROPIC_ENVIRONMENT_ID",
+        "ANTHROPIC_ENVIRONMENT_KEY",
+        "WORKER_MAX_IDLE_SECONDS",
+        "LOG_LEVEL",
+        "PATH",
+        "HOME",
+    )
+    return {key: value for key in keys if (value := os.environ.get(key))}
 
 
 def worker_is_running() -> bool:
@@ -40,7 +52,7 @@ def start_worker_if_needed() -> None:
             stdout=log_file,
             stderr=subprocess.STDOUT,
             start_new_session=True,
-            env=os.environ.copy(),
+            env=worker_env(),
         )
     REMOTE_PID.write_text(f"{process.pid}\n")
 
@@ -64,7 +76,7 @@ async def webhook(request: Request) -> Response:
             key=signing_key,
         )
     except Exception:
-        return Response("invalid signature", status_code=400)
+        return Response("invalid signature", status_code=401)
 
     if event.data.type == "session.status_run_started":
         start_worker_if_needed()

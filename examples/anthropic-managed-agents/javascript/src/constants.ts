@@ -20,5 +20,6 @@ export const WEB_TOOLS = ["web_fetch", "web_search"] as const;
 export const DEFAULT_MODEL = "claude-sonnet-4-6";
 export const DEFAULT_SYSTEM_PROMPT =
   "You have a Linux sandbox. Use /mnt/session as the working directory. " +
+  "Agent skills are downloaded under /mnt/session/skills/<name>/. " +
   "Write generated artifacts under /mnt/session/outputs when useful. " +
   "Use the available tools to complete the task.";

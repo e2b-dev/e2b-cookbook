@@ -74,6 +74,16 @@ function writeJson(response: ServerResponse, statusCode: number, body: unknown) 
   response.end(JSON.stringify(body));
 }
 
+function startWorkerInBackground(settings: Settings, event: unknown) {
+  void ensureWorkerForEvent(settings, event)
+    .then((sandbox) => {
+      console.log(`started worker sandbox ${sandbox.sandboxId}`);
+    })
+    .catch((error) => {
+      console.error("failed to start worker sandbox", error);
+    });
+}
+
 async function handleWebhook(request: IncomingMessage, response: ServerResponse) {
   const settings = loadSettings();
   const signingKey = settings.anthropicWebhookSigningKey;
@@ -98,21 +108,15 @@ async function handleWebhook(request: IncomingMessage, response: ServerResponse)
     });
   } catch (error) {
     console.error(error);
-    response.writeHead(400, { "content-type": "text/plain" });
+    response.writeHead(401, { "content-type": "text/plain" });
     response.end("invalid signature");
     return;
   }
 
   if (event.data.type === "session.status_run_started") {
-    try {
-      const sandbox = await ensureWorkerForEvent(settings, event);
-      response.writeHead(204, { "x-e2b-worker-sandbox-id": sandbox.sandboxId });
-      response.end();
-    } catch (error) {
-      console.error(error);
-      response.writeHead(500, { "content-type": "text/plain" });
-      response.end("failed to start worker sandbox");
-    }
+    startWorkerInBackground(settings, event);
+    response.writeHead(204);
+    response.end();
     return;
   }
 

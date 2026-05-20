@@ -16,7 +16,9 @@ export const template = Template()
     "ripgrep",
     "sed",
     "sudo",
+    "tar",
     "tree",
+    "unzip",
     "util-linux",
   ])
   .runCmd(

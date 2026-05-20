@@ -90,17 +90,19 @@ function workerEnv(settings: Settings, options: WorkerOptions) {
 }
 
 export async function workerProcessIsRunning(sandbox: Sandbox) {
-  const check = `
-    set -eu
-    test -f ${REMOTE_PID}
-    pid="$(cat ${REMOTE_PID})"
-    test -n "$pid"
-    kill -0 "$pid"
-  `;
-  const result = await sandbox.commands.run(`bash -lc ${JSON.stringify(check)}`, {
-    timeoutMs: 5_000,
-  });
-  return result.exitCode === 0;
+  const check =
+    `test -f ${REMOTE_PID} && ` +
+    `pid="$(cat ${REMOTE_PID})" && ` +
+    `test -n "$pid" && ` +
+    `kill -0 "$pid"`;
+  try {
+    const result = await sandbox.commands.run(`bash -lc ${JSON.stringify(check)}`, {
+      timeoutMs: 5_000,
+    });
+    return result.exitCode === 0;
+  } catch {
+    return false;
+  }
 }
 
 export async function ensureWorkerProcess(
@@ -147,8 +149,8 @@ export async function ensureWorkerSandbox(settings: Settings, options: WorkerOpt
   for (const candidateId of candidateIds) {
     try {
       return await startWorkerSandbox(settings, { ...options, sandboxId: candidateId });
-    } catch {
-      // Try the next stored sandbox id before creating a replacement.
+    } catch (error) {
+      console.warn(`failed to connect worker sandbox ${candidateId}; trying next candidate`, error);
     }
   }
 
@@ -158,6 +160,7 @@ export async function ensureWorkerSandbox(settings: Settings, options: WorkerOpt
     if (!options.sandboxId) {
       throw error;
     }
+    console.warn(`failed to connect worker sandbox ${options.sandboxId}; creating a replacement`, error);
     return startWorkerSandbox(settings, { ...options, sandboxId: undefined });
   }
 }
@@ -187,6 +190,8 @@ export async function startWebhookServerSandbox(settings: Settings, options: Web
     envs.ANTHROPIC_WEBHOOK_SIGNING_KEY = settings.anthropicWebhookSigningKey;
   }
 
+  const healthUrl = `http://127.0.0.1:${options.port ?? DEFAULT_WEBHOOK_PORT}/health`;
+  const attempts = Array.from({ length: 30 }, (_, index) => index + 1).join(" ");
   const handle = await sandbox.commands.run(
     `bash -lc ${JSON.stringify(`exec ${REMOTE_TSX} ${REMOTE_WEBHOOK} >> ${REMOTE_WEBHOOK_LOG} 2>&1`)}`,
     {
@@ -207,13 +212,23 @@ export async function startWebhookServerSandbox(settings: Settings, options: Web
     });
   }
 
-  const result = await sandbox.commands.run("true", {
-    envs,
-    timeoutMs: 5_000,
-  });
-
-  if (result.exitCode !== 0) {
-    throw new Error(`webhook server start failed:\n${result.stdout}\n${result.stderr}`);
+  const healthCheck =
+    `for i in ${attempts}; do ` +
+    `curl --fail --silent --show-error ${healthUrl} && exit 0; ` +
+    `sleep 1; ` +
+    `done; ` +
+    `echo "webhook log:" >&2; ` +
+    `tail -100 ${REMOTE_WEBHOOK_LOG} >&2 || true; ` +
+    `exit 1`;
+  try {
+    await sandbox.commands.run(`bash -lc ${JSON.stringify(healthCheck)}`, {
+      timeoutMs: 35_000,
+    });
+  } catch (error) {
+    const result = error as { stdout?: string; stderr?: string };
+    const output = [result.stdout, result.stderr].filter(Boolean).join("\n");
+    const message = output || (error instanceof Error ? error.message : String(error));
+    throw new Error(`webhook server health check failed: ${healthUrl}\n${message}`);
   }
 
   return sandbox;

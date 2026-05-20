@@ -33,7 +33,7 @@ Fill in `../.env`:
 | `E2B_ACCESS_TOKEN` | Required to build the E2B template. |
 | `ANTHROPIC_API_KEY` | Used to create environments, agents, and sessions. |
 | `ANTHROPIC_ENVIRONMENT_ID` | Printed by `create-environment`. |
-| `ANTHROPIC_ENVIRONMENT_KEY` | Generated from the [Anthropic Agents workspace](https://platform.claude.com/workspaces/default/agents). See Anthropic's [environment docs](https://platform.claude.com/docs/en/managed-agents/environments). |
+| `ANTHROPIC_ENVIRONMENT_KEY` | Generated from the [Anthropic Environments workspace](https://platform.claude.com/workspaces/default/environments). See Anthropic's [environment docs](https://platform.claude.com/docs/en/managed-agents/environments). |
 | `ANTHROPIC_AGENT_ID` | Printed by `create-agent`. |
 
 ## Create Anthropic Resources
@@ -46,7 +46,7 @@ For the Anthropic concepts behind these commands, see the Managed Agents docs fo
 make create-environment NAME=my-e2b-env
 ```
 
-Save the printed `ANTHROPIC_ENVIRONMENT_ID`, open the printed URL in the [Anthropic Agents workspace](https://platform.claude.com/workspaces/default/agents), and generate
+Save the printed `ANTHROPIC_ENVIRONMENT_ID`, open the printed URL in the [Anthropic Environments workspace](https://platform.claude.com/workspaces/default/environments), and generate
 `ANTHROPIC_ENVIRONMENT_KEY` for the self-hosted environment.
 
 ```bash

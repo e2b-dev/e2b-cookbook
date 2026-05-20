@@ -32,7 +32,7 @@ Fill in `../.env`:
 | `E2B_API_KEY` | Required to start the webhook sandbox. |
 | `E2B_ACCESS_TOKEN` | Required to build the E2B template. |
 | `ANTHROPIC_ENVIRONMENT_ID` | Anthropic self-hosted environment id. |
-| `ANTHROPIC_ENVIRONMENT_KEY` | Anthropic self-hosted environment key. |
+| `ANTHROPIC_ENVIRONMENT_KEY` | Anthropic self-hosted environment key from the [Anthropic Environments workspace](https://platform.claude.com/workspaces/default/environments). |
 | `ANTHROPIC_WEBHOOK_SIGNING_KEY` | Required for real webhook deliveries. Start once without it to get the URL, then add it. |
 
 ## Build the E2B Template

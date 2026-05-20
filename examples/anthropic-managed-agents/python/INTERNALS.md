@@ -63,11 +63,11 @@ must exist before making API calls.
 Creates an Anthropic environment with `config={"type": "self_hosted"}`. It prints:
 
 - `ANTHROPIC_ENVIRONMENT_ID`
-- the Anthropic Agents workspace URL for that environment
+- the Anthropic Environments workspace URL for that environment
 - the next step for generating `ANTHROPIC_ENVIRONMENT_KEY`
 
 The SDK creates the environment, but the environment key is generated from the
-[Anthropic Agents workspace](https://platform.claude.com/workspaces/default/agents).
+[Anthropic Environments workspace](https://platform.claude.com/workspaces/default/environments).
 
 ### `agent.py`
 

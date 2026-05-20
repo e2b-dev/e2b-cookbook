@@ -22,6 +22,8 @@ flowchart LR
 | `worker.py` | Minimal wrapper around `client.beta.environments.work.worker(...).run()`. |
 | `send_message.py` | Small smoke driver that creates a session and streams events. |
 
+For a function-by-function walkthrough, see [INTERNALS.md](./INTERNALS.md).
+
 ## Setup
 
 ```bash
@@ -117,4 +119,3 @@ SessionStatusIdleEvent ... stop_reason=EndTurn
 - One worker sandbox can service the self-hosted environment. Start more workers if you want more capacity.
 - Tool calls execute inside the E2B sandbox under `/mnt/session`.
 - For production, use separate credentials for setup/session creation and for the self-hosted worker.
-

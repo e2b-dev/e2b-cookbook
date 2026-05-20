@@ -127,7 +127,13 @@ const server = createServer((request, response) => {
   }
 
   if (request.method === "POST" && request.url === "/webhook") {
-    void handleWebhook(request, response);
+    void handleWebhook(request, response).catch((error) => {
+      console.error(error);
+      if (!response.headersSent) {
+        response.writeHead(500, { "content-type": "text/plain" });
+      }
+      response.end("webhook handler failed");
+    });
     return;
   }
 

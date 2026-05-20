@@ -109,7 +109,6 @@ await client.beta.environments.work
     environmentId,
     environmentKey,
     workdir: "/mnt/session",
-    unrestrictedPaths: true,
     maxIdleMs,
   })
   .run();
@@ -117,6 +116,7 @@ await client.beta.environments.work
 
 This is the core handoff. Anthropic's SDK owns polling, claiming work, heartbeating, dispatching
 tool calls, and sending tool results back to the session.
+Leaving `unrestrictedPaths` unset keeps file tools constrained to the worker `workdir`.
 
 ## 7. Start an Auto-Resume Webhook Sandbox
 

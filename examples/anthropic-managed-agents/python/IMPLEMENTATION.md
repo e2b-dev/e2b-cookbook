@@ -106,7 +106,6 @@ async with AsyncAnthropic(auth_token=environment_key) as client:
         environment_id=environment_id,
         environment_key=environment_key,
         workdir="/mnt/session",
-        unrestricted_paths=True,
         max_idle=max_idle_seconds(),
     )
     await worker.run()
@@ -114,6 +113,7 @@ async with AsyncAnthropic(auth_token=environment_key) as client:
 
 This is the core handoff. Anthropic's SDK owns polling, claiming work, heartbeating, dispatching
 tool calls, and sending tool results back to the session.
+Leaving `unrestricted_paths` unset keeps file tools constrained to the worker `workdir`.
 
 ## 7. Start an Auto-Resume Webhook Sandbox
 

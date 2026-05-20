@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build-template": "tsx src/cli.ts build-template",
-    "check": "tsc --noEmit",
+    "check": "tsc --noEmit && ../scripts/security-check.sh",
     "create-agent": "tsx src/cli.ts create-agent",
     "create-environment": "tsx src/cli.ts create-environment",
     "send": "tsx src/cli.ts send",

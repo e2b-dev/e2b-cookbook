@@ -27,7 +27,6 @@ async def run_worker() -> None:
             environment_id=environment_id,
             environment_key=environment_key,
             workdir=WORKDIR,
-            unrestricted_paths=True,
             max_idle=max_idle_seconds(),
         )
         await worker.run()

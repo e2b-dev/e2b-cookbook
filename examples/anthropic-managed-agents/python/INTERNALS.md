@@ -187,12 +187,12 @@ await client.beta.environments.work.worker(
     environment_id=environment_id,
     environment_key=environment_key,
     workdir="/mnt/session",
-    unrestricted_paths=True,
     max_idle=max_idle_seconds(),
 ).run()
 ```
 
 This is the core handoff to Anthropic's SDK. The SDK worker polls for work, claims it, heartbeats while handling tool calls, sends tool results back to the session, and stops work items when they are done.
+Leaving `unrestricted_paths` unset keeps file tools constrained to the worker `workdir`.
 
 ### `webhook_runtime.py`
 

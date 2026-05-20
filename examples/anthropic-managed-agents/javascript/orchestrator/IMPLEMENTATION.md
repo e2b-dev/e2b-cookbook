@@ -114,7 +114,6 @@ async function main() {
       environmentId,
       environmentKey,
       workdir: WORKDIR,
-      unrestrictedPaths: true,
       maxIdleMs: maxIdleMs(),
     })
     .run();

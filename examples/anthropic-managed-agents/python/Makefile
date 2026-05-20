@@ -6,6 +6,7 @@ install:
 
 check:
 	.venv/bin/python -m compileall anthropic_managed_agents_e2b
+	../scripts/security-check.sh
 
 build-template:
 	.venv/bin/anthropic-managed-agents-build-template

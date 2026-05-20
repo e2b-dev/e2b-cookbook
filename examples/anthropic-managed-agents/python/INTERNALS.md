@@ -74,6 +74,10 @@ The SDK creates the environment, but the environment key is generated from the C
 
 Creates a Managed Agent using the requested model, defaulting to `claude-sonnet-4-6`.
 
+The default system prompt tells Claude that `/mnt/session` is the sandbox workdir and that generated
+artifacts should go under `/mnt/session/outputs` when useful. Anthropic's examples often use
+`/workspace`; this example uses `/mnt/session` to match the E2B template workdir.
+
 It enables Anthropic's `agent_toolset_20260401` with:
 
 - `bash`
@@ -164,9 +168,11 @@ This is the core handoff to Anthropic's SDK. The SDK worker polls for work, clai
 
 `webhook(request)`
 
-Verifies Anthropic webhook deliveries using `client.beta.webhooks.unwrap()`, which reads
-`ANTHROPIC_WEBHOOK_SIGNING_KEY`. On `session.status_run_started`, it starts `worker.py` unless the
-worker pid is already running, then returns `204`.
+Verifies Anthropic webhook deliveries using `client.beta.webhooks.unwrap(..., key=signing_key)`.
+The server can start without `ANTHROPIC_WEBHOOK_SIGNING_KEY` so setup can print the public E2B URL
+before the Anthropic webhook endpoint exists. Until the key is configured, `/webhook` returns `503`.
+On `session.status_run_started`, it starts `worker.py` unless the worker pid is already running, then
+returns `204`.
 
 `health()`
 

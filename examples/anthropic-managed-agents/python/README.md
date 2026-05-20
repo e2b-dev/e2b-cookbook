@@ -44,7 +44,7 @@ Fill in `.env`. The example also reads the repository root `.env` if you keep sh
 | `ANTHROPIC_API_KEY` | Used by setup scripts and the session smoke driver. |
 | `ANTHROPIC_ENVIRONMENT_ID` | Printed by `create_environment.py`. |
 | `ANTHROPIC_ENVIRONMENT_KEY` | Generate this in the Claude Console environment page. |
-| `ANTHROPIC_WEBHOOK_SIGNING_KEY` | Required only for the webhook server flow. Generate this when creating the webhook endpoint. |
+| `ANTHROPIC_WEBHOOK_SIGNING_KEY` | Required only for receiving webhook deliveries. Start the webhook server once to get the URL, then generate this key when creating the Anthropic webhook endpoint. |
 | `ANTHROPIC_AGENT_ID` | Printed by `create_agent.py`. |
 
 ## Create Anthropic Resources
@@ -130,7 +130,7 @@ Worker runtime defaults are intentionally CLI options, not `.env` entries:
 python start_worker.py --timeout 3600 --max-idle 300 --log-level INFO
 ```
 
-The worker sandbox runs:
+The worker sandbox runs with `/mnt/session` as the E2B workdir:
 
 ```python
 await client.beta.environments.work.worker(
@@ -164,9 +164,10 @@ lifecycle={"on_timeout": "pause", "auto_resume": True}
 ```
 
 It starts a FastAPI server at `/webhook` and prints a public HTTPS URL. In the Anthropic Console,
-create a webhook endpoint with that URL and subscribe it to `session.status_run_started`. Copy the
-generated `whsec_...` signing key into `ANTHROPIC_WEBHOOK_SIGNING_KEY`, then restart the webhook
-server so it can verify deliveries.
+create a webhook endpoint with that URL and subscribe it to `session.status_run_started`. The server
+can start without `ANTHROPIC_WEBHOOK_SIGNING_KEY` so you can get the URL first. Copy the generated
+`whsec_...` signing key into `ANTHROPIC_WEBHOOK_SIGNING_KEY`, then restart the webhook server so it
+can verify deliveries.
 
 When Anthropic delivers `session.status_run_started`, E2B auto-resumes the sandbox if it was paused.
 The webhook handler verifies the signature, starts `EnvironmentWorker.run()` if it is not already
@@ -204,9 +205,9 @@ SessionStatusIdleEvent ... stop_reason=EndTurn
 
 - This example intentionally keeps the host side small and lets Anthropic's SDK manage the work queue.
 - The template bakes in the package and dependencies. Secrets stay runtime-only and are passed when the worker or webhook server starts.
-- One worker sandbox can service the self-hosted environment. Start more workers if you want more capacity.
+- One worker sandbox can service the self-hosted environment. This is a simple worker demo, not a per-session isolation architecture. Start more workers if you want more capacity.
 - The webhook server flow is for event-driven starts. It still runs the same Anthropic environment worker inside E2B.
-- Tool calls execute inside the E2B sandbox under `/mnt/session`.
+- Tool calls execute inside the E2B sandbox under `/mnt/session`. This is the E2B workdir choice for this example; the agent prompt asks Claude to use `/mnt/session/outputs` for generated artifacts when useful.
 - For production, use separate credentials for setup/session creation and for the self-hosted worker.
 
 ## Validation

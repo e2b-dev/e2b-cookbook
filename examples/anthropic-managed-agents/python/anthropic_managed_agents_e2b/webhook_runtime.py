@@ -52,9 +52,17 @@ def health() -> dict[str, bool]:
 
 @app.post("/webhook")
 async def webhook(request: Request) -> Response:
+    signing_key = os.environ.get("ANTHROPIC_WEBHOOK_SIGNING_KEY")
+    if not signing_key:
+        return Response("ANTHROPIC_WEBHOOK_SIGNING_KEY is required", status_code=503)
+
     payload = (await request.body()).decode()
     try:
-        event = client.beta.webhooks.unwrap(payload, headers=dict(request.headers))
+        event = client.beta.webhooks.unwrap(
+            payload,
+            headers=dict(request.headers),
+            key=signing_key,
+        )
     except Exception:
         return Response("invalid signature", status_code=400)
 

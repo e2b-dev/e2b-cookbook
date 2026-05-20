@@ -7,7 +7,11 @@ import anthropic
 SANDBOX_TOOLS = ("bash", "read", "write", "edit", "glob", "grep")
 WEB_TOOLS = ("web_fetch", "web_search")
 DEFAULT_MODEL = "claude-sonnet-4-6"
-DEFAULT_SYSTEM_PROMPT = "You have a Linux sandbox. Use the available tools to complete the task."
+DEFAULT_SYSTEM_PROMPT = (
+    "You have a Linux sandbox. Use /mnt/session as the working directory. "
+    "Write generated artifacts under /mnt/session/outputs when useful. "
+    "Use the available tools to complete the task."
+)
 
 
 def create_agent(

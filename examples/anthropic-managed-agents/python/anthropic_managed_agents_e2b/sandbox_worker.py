@@ -122,12 +122,13 @@ def start_webhook_server_process(
     envs = {
         "ANTHROPIC_ENVIRONMENT_ID": settings.require_anthropic_environment_id(),
         "ANTHROPIC_ENVIRONMENT_KEY": settings.require_anthropic_environment_key(),
-        "ANTHROPIC_WEBHOOK_SIGNING_KEY": settings.require_anthropic_webhook_signing_key(),
         "WORKER_MAX_IDLE_SECONDS": "none"
         if worker_max_idle_seconds is None
         else str(worker_max_idle_seconds),
         "LOG_LEVEL": log_level,
     }
+    if settings.anthropic_webhook_signing_key:
+        envs["ANTHROPIC_WEBHOOK_SIGNING_KEY"] = settings.anthropic_webhook_signing_key
     uvicorn_command = (
         "python -m uvicorn anthropic_managed_agents_e2b.webhook_runtime:app "
         f"--host 0.0.0.0 --port {port} > {shlex.quote(REMOTE_WEBHOOK_LOG)} "
@@ -156,7 +157,6 @@ def start_webhook_server_sandbox(
 ) -> Sandbox:
     settings.require_anthropic_environment_id()
     settings.require_anthropic_environment_key()
-    settings.require_anthropic_webhook_signing_key()
 
     if sandbox_id:
         sandbox = Sandbox.connect(sandbox_id, timeout=timeout_seconds)

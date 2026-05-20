@@ -12,6 +12,11 @@ dependencies = [
     "uvicorn>=0.35.0",
 ]
 
+[dependency-groups]
+dev = [
+    "ruff>=0.15.0",
+]
+
 [project.scripts]
 anthropic-managed-agents-build-template = "anthropic_managed_agents_e2b.cli:build_template_main"
 anthropic-managed-agents-create-agent = "anthropic_managed_agents_e2b.cli:create_agent_main"

@@ -55,6 +55,14 @@ E2B_WEBHOOK_SANDBOX_ID=...
 Anthropic webhook URL: https://.../webhook
 ```
 
+The command stores `E2B_WEBHOOK_SANDBOX_ID` on the Anthropic environment metadata as
+`e2b_webhook_sandbox_id`. That gives another process a lookup path from
+`ANTHROPIC_ENVIRONMENT_ID` to the auto-resumable E2B webhook sandbox:
+
+```bash
+make show-environment
+```
+
 Create an Anthropic webhook endpoint in the [Anthropic Agents workspace](https://platform.claude.com/workspaces/default/agents) with the printed URL and subscribe it to
 `session.status_run_started`. For signing details, see Anthropic's
 [Managed Agents webhook docs](https://platform.claude.com/docs/en/managed-agents/webhooks).
@@ -69,6 +77,8 @@ Until the key is configured, `/webhook` returns `503`.
 ```bash
 make stop-worker SANDBOX_ID=<E2B_WEBHOOK_SANDBOX_ID>
 ```
+
+If the stopped sandbox ID matches `e2b_webhook_sandbox_id`, the stop command clears that metadata key.
 
 ## Notes
 

@@ -15,6 +15,7 @@ sequenceDiagram
 
     App->>E2B: make start-worker
     E2B->>Worker: run client.beta.environments.work.worker(...).run()
+    App->>Anthropic: update environment metadata e2b_worker_sandbox_id
     Worker->>Anthropic: poll self-hosted environment work queue
     App->>Anthropic: create session
     App->>Anthropic: send user.message
@@ -139,6 +140,8 @@ Both flows use the same worker contract:
 | `ANTHROPIC_ENVIRONMENT_KEY` | Bearer credential for the environment worker. |
 | `/mnt/session` | This example's E2B workdir. |
 | `/mnt/session/outputs` | Suggested artifact output directory. |
+| `e2b_worker_sandbox_id` | Environment metadata key for the orchestrator worker sandbox. |
+| `e2b_webhook_sandbox_id` | Environment metadata key for the auto-resumable webhook sandbox. |
 
 The worker is intentionally simple: one E2B sandbox can service sessions for the environment, but it
 is not production per-session isolation.

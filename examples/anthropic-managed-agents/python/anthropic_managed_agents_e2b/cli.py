@@ -3,7 +3,13 @@ from __future__ import annotations
 import argparse
 
 from anthropic_managed_agents_e2b.agent import DEFAULT_MODEL, create_agent
-from anthropic_managed_agents_e2b.environment import console_url, create_self_hosted_environment
+from anthropic_managed_agents_e2b.environment import (
+    WEBHOOK_SANDBOX_METADATA_KEY,
+    WORKER_SANDBOX_METADATA_KEY,
+    console_url,
+    create_self_hosted_environment,
+    retrieve_environment,
+)
 from anthropic_managed_agents_e2b.sandbox_worker import (
     REMOTE_LOG,
     REMOTE_WEBHOOK_LOG,
@@ -43,6 +49,22 @@ def create_environment_main() -> None:
     print(f"ANTHROPIC_ENVIRONMENT_ID={env.id}")
     print(f"Claude Console: {console_url(env.id)}")
     print("Open the Console URL and generate ANTHROPIC_ENVIRONMENT_KEY.")
+
+
+def show_environment_main() -> None:
+    parser = argparse.ArgumentParser(description="Show Anthropic environment metadata.")
+    parser.parse_args()
+
+    settings = load_settings()
+    env = retrieve_environment(
+        api_key=settings.require_anthropic_api_key(),
+        environment_id=settings.require_anthropic_environment_id(),
+    )
+
+    print(f"ANTHROPIC_ENVIRONMENT_ID={env.id}")
+    print(f"name={env.name}")
+    print(f"{WORKER_SANDBOX_METADATA_KEY}={env.metadata.get(WORKER_SANDBOX_METADATA_KEY, '')}")
+    print(f"{WEBHOOK_SANDBOX_METADATA_KEY}={env.metadata.get(WEBHOOK_SANDBOX_METADATA_KEY, '')}")
 
 
 def create_agent_main() -> None:
@@ -127,8 +149,7 @@ def stop_worker_main() -> None:
     parser.add_argument("sandbox_id")
     args = parser.parse_args()
 
-    load_settings()
-    stop_worker_sandbox(args.sandbox_id)
+    stop_worker_sandbox(load_settings(), args.sandbox_id)
     print(f"killed {args.sandbox_id}")
 
 

@@ -45,6 +45,14 @@ Fill in `.env`. The example also reads the repository root `.env` if you keep sh
 | `ANTHROPIC_WEBHOOK_SIGNING_KEY` | Required only for receiving webhook deliveries. See [`webhooks/`](./webhooks/). |
 | `ANTHROPIC_AGENT_ID` | Printed by `npm run create-agent`. |
 
+When a worker sandbox starts, the example writes the sandbox ID back to the Anthropic
+environment metadata. Use `npm run show-environment` to inspect:
+
+| Metadata key | Set by |
+| --- | --- |
+| `e2b_worker_sandbox_id` | [`orchestrator/`](./orchestrator/) |
+| `e2b_webhook_sandbox_id` | [`webhooks/`](./webhooks/) |
+
 ## Validation
 
 ```bash

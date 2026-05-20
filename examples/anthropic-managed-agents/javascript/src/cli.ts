@@ -8,7 +8,13 @@ import {
   REMOTE_WEBHOOK_LOG,
 } from "./constants.js";
 import { createAgent } from "./agent.js";
-import { consoleUrl, createSelfHostedEnvironment } from "./environment.js";
+import {
+  WEBHOOK_SANDBOX_METADATA_KEY,
+  WORKER_SANDBOX_METADATA_KEY,
+  consoleUrl,
+  createSelfHostedEnvironment,
+  retrieveEnvironment,
+} from "./environment.js";
 import { streamMessage } from "./session.js";
 import { loadSettings, requireSetting } from "./settings.js";
 import { buildTemplate } from "./template-builder.js";
@@ -36,6 +42,7 @@ function maxIdleArg(value: string | undefined) {
 function usage() {
   console.error(`Usage:
   npm run create-environment -- <name>
+  npm run show-environment
   npm run create-agent -- <name> [--model <model>]
   npm run build-template -- [--template-name <name>]
   npm run start-worker -- [--sandbox-id <id>] [--template-name <name>]
@@ -75,6 +82,22 @@ async function main() {
     });
     console.log(`ANTHROPIC_AGENT_ID=${agent.id}`);
     console.log(`created agent ${agent.id} name=${agent.name} version=${agent.version}`);
+    return;
+  }
+
+  if (command === "show-environment") {
+    const environment = await retrieveEnvironment({
+      apiKey: requireSetting(settings.anthropicApiKey, "ANTHROPIC_API_KEY"),
+      environmentId: requireSetting(settings.anthropicEnvironmentId, "ANTHROPIC_ENVIRONMENT_ID"),
+    });
+    console.log(`ANTHROPIC_ENVIRONMENT_ID=${environment.id}`);
+    console.log(`name=${environment.name}`);
+    console.log(
+      `${WORKER_SANDBOX_METADATA_KEY}=${environment.metadata[WORKER_SANDBOX_METADATA_KEY] ?? ""}`,
+    );
+    console.log(
+      `${WEBHOOK_SANDBOX_METADATA_KEY}=${environment.metadata[WEBHOOK_SANDBOX_METADATA_KEY] ?? ""}`,
+    );
     return;
   }
 
@@ -120,7 +143,7 @@ async function main() {
     if (!sandboxId) {
       throw new Error("sandbox id is required");
     }
-    await stopWorkerSandbox(sandboxId);
+    await stopWorkerSandbox(settings, sandboxId);
     console.log(`killed ${sandboxId}`);
     return;
   }

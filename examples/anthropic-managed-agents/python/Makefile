@@ -1,4 +1,4 @@
-.PHONY: install check build-template start-worker start-webhook-server stop-worker send
+.PHONY: install check build-template show-environment start-worker start-webhook-server stop-worker send
 
 install:
 	python3.12 -m venv .venv
@@ -9,6 +9,9 @@ check:
 
 build-template:
 	.venv/bin/anthropic-managed-agents-build-template
+
+show-environment:
+	.venv/bin/anthropic-managed-agents-show-environment
 
 start-worker:
 	.venv/bin/anthropic-managed-agents-start-worker

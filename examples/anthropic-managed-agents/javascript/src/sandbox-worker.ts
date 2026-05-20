@@ -18,6 +18,12 @@ import {
   REMOTE_WORKDIR,
   REMOTE_WORKER,
 } from "./constants.js";
+import {
+  WEBHOOK_SANDBOX_METADATA_KEY,
+  WORKER_SANDBOX_METADATA_KEY,
+  clearMatchingSandboxMetadata,
+  updateEnvironmentMetadata,
+} from "./environment.js";
 import { exampleRoot, requireSetting, type Settings } from "./settings.js";
 
 export type WorkerOptions = {
@@ -92,6 +98,13 @@ export async function startWorkerSandbox(settings: Settings, options: WorkerOpti
   });
   await sandbox.files.write(REMOTE_PID, `${handle.pid}\n`);
   await handle.disconnect();
+  if (settings.anthropicApiKey) {
+    await updateEnvironmentMetadata({
+      apiKey: settings.anthropicApiKey,
+      environmentId: requireSetting(settings.anthropicEnvironmentId, "ANTHROPIC_ENVIRONMENT_ID"),
+      metadata: { [WORKER_SANDBOX_METADATA_KEY]: sandbox.sandboxId },
+    });
+  }
 
   return sandbox;
 }
@@ -131,6 +144,13 @@ export async function startWebhookServerSandbox(settings: Settings, options: Web
   );
   await sandbox.files.write(REMOTE_WEBHOOK_PID, `${handle.pid}\n`);
   await handle.disconnect();
+  if (settings.anthropicApiKey) {
+    await updateEnvironmentMetadata({
+      apiKey: settings.anthropicApiKey,
+      environmentId: requireSetting(settings.anthropicEnvironmentId, "ANTHROPIC_ENVIRONMENT_ID"),
+      metadata: { [WEBHOOK_SANDBOX_METADATA_KEY]: sandbox.sandboxId },
+    });
+  }
 
   const result = await sandbox.commands.run("true", {
     envs,
@@ -144,7 +164,14 @@ export async function startWebhookServerSandbox(settings: Settings, options: Web
   return sandbox;
 }
 
-export async function stopWorkerSandbox(sandboxId: string) {
+export async function stopWorkerSandbox(settings: Settings, sandboxId: string) {
   const sandbox = await Sandbox.connect(sandboxId);
   await sandbox.kill();
+  if (settings.anthropicApiKey && settings.anthropicEnvironmentId) {
+    await clearMatchingSandboxMetadata({
+      apiKey: settings.anthropicApiKey,
+      environmentId: settings.anthropicEnvironmentId,
+      sandboxId,
+    });
+  }
 }

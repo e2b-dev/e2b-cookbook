@@ -1,4 +1,4 @@
-.PHONY: create-environment create-agent build-template start-worker send stop-worker
+.PHONY: create-environment create-agent build-template show-environment start-worker send stop-worker
 
 create-environment:
 	npm --prefix .. run create-environment -- $(NAME)
@@ -8,6 +8,9 @@ create-agent:
 
 build-template:
 	npm --prefix .. run build-template
+
+show-environment:
+	npm --prefix .. run show-environment
 
 start-worker:
 	npm --prefix .. run start-worker

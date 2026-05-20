@@ -70,11 +70,21 @@ This bakes the Python package, Anthropic SDK, FastAPI/Uvicorn webhook dependenci
 make start-worker
 ```
 
-The command prints `E2B_WORKER_SANDBOX_ID`. Stop that sandbox later with:
+The command prints `E2B_WORKER_SANDBOX_ID` and stores that value on the Anthropic environment
+metadata as `e2b_worker_sandbox_id`. That gives another process a lookup path from
+`ANTHROPIC_ENVIRONMENT_ID` to the active E2B sandbox:
+
+```bash
+make show-environment
+```
+
+Stop that sandbox later with:
 
 ```bash
 make stop-worker SANDBOX_ID="<sandbox-id>"
 ```
+
+If the stopped sandbox ID matches `e2b_worker_sandbox_id`, the stop command clears that metadata key.
 
 ## Send a Session Message
 

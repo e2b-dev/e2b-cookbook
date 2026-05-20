@@ -13,10 +13,11 @@ The repo-facing examples are split by use case:
 anthropic-managed-agents-create-environment  -> creates Anthropic self-hosted environment
 anthropic-managed-agents-create-agent        -> creates a Claude Managed Agent with sandbox tools
 anthropic-managed-agents-build-template      -> builds the E2B worker template
+anthropic-managed-agents-show-environment    -> prints environment metadata with E2B sandbox IDs
 anthropic-managed-agents-start-worker        -> starts one E2B sandbox and launches the worker
 anthropic-managed-agents-start-webhook-server -> starts an auto-resumable webhook receiver sandbox
 anthropic-managed-agents-send-message        -> creates a session and streams events
-anthropic-managed-agents-stop-worker         -> kills the worker sandbox
+anthropic-managed-agents-stop-worker         -> kills the sandbox and clears matching metadata
 ```
 
 The implementation lives in the `anthropic_managed_agents_e2b` package. `pyproject.toml` exposes
@@ -135,6 +136,8 @@ It redirects worker output to `/opt/anthropic-managed-agents/worker.log` and wri
 `start_worker_sandbox(settings, template_name, timeout_seconds, worker_max_idle_seconds, log_level, sandbox_id)`
 
 Creates a new E2B sandbox from the requested template, or reconnects to `--sandbox-id`. Then it uploads and starts the worker. It prints the worker sandbox ID for later cleanup.
+When `ANTHROPIC_API_KEY` is configured, it also updates Anthropic environment metadata:
+`e2b_worker_sandbox_id=<sandbox id>`.
 
 `start_webhook_server_sandbox(settings, template_name, timeout_seconds, worker_max_idle_seconds, log_level, port, sandbox_id)`
 
@@ -143,6 +146,14 @@ reconnects to `--sandbox-id`. It uploads the same worker code plus the FastAPI w
 starts Uvicorn. Register the printed `/webhook` URL in the
 [Anthropic Agents workspace](https://platform.claude.com/workspaces/default/agents) for
 `session.status_run_started`.
+When `ANTHROPIC_API_KEY` is configured, it also updates Anthropic environment metadata:
+`e2b_webhook_sandbox_id=<sandbox id>`.
+
+`stop_worker_sandbox(settings, sandbox_id)`
+
+Kills the E2B sandbox. When `ANTHROPIC_API_KEY` and `ANTHROPIC_ENVIRONMENT_ID` are configured, it
+also clears `e2b_worker_sandbox_id` or `e2b_webhook_sandbox_id` if either value matches the stopped
+sandbox id.
 
 ### `worker_runtime.py`
 

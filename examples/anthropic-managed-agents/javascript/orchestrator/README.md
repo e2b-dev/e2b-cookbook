@@ -69,11 +69,21 @@ make start-worker
 make send
 ```
 
+`make start-worker` prints `E2B_WORKER_SANDBOX_ID` and stores that value on the Anthropic
+environment metadata as `e2b_worker_sandbox_id`. That gives another process a lookup path from
+`ANTHROPIC_ENVIRONMENT_ID` to the active E2B sandbox:
+
+```bash
+make show-environment
+```
+
 To stop the sandbox:
 
 ```bash
 make stop-worker SANDBOX_ID=<E2B_WORKER_SANDBOX_ID>
 ```
+
+If the stopped sandbox ID matches `e2b_worker_sandbox_id`, the stop command clears that metadata key.
 
 The worker uses `/mnt/session` as this example's E2B workdir and writes generated artifacts
 under `/mnt/session/outputs` when useful.

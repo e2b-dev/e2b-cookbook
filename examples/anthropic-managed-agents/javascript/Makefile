@@ -1,4 +1,4 @@
-.PHONY: install check build-template start-worker start-webhook-server stop-worker send
+.PHONY: install check build-template show-environment start-worker start-webhook-server stop-worker send
 
 install:
 	npm install
@@ -8,6 +8,9 @@ check:
 
 build-template:
 	npm run build-template
+
+show-environment:
+	npm run show-environment
 
 start-worker:
 	npm run start-worker

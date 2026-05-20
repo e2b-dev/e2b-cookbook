@@ -1,0 +1,33 @@
+.PHONY: install check build-template show-environment start-worker start-webhook-server start-app-webhook-server stop-worker send upload-file
+
+install:
+	python3.12 -m venv .venv
+	.venv/bin/pip install -e .
+
+check:
+	.venv/bin/python -m compileall anthropic_managed_agents_e2b
+	../scripts/security-check.sh
+
+build-template:
+	.venv/bin/anthropic-managed-agents-build-template
+
+show-environment:
+	.venv/bin/anthropic-managed-agents-show-environment
+
+start-worker:
+	.venv/bin/anthropic-managed-agents-start-worker
+
+start-webhook-server:
+	.venv/bin/anthropic-managed-agents-start-webhook-server
+
+start-app-webhook-server:
+	.venv/bin/anthropic-managed-agents-start-app-webhook-server
+
+stop-worker:
+	.venv/bin/anthropic-managed-agents-stop-worker $(SANDBOX_ID)
+
+send:
+	.venv/bin/anthropic-managed-agents-send-message "Run pwd, then echo hello from E2B"
+
+upload-file:
+	.venv/bin/anthropic-managed-agents-upload-file $(SANDBOX_ID) $(FILE) $(REMOTE_PATH)

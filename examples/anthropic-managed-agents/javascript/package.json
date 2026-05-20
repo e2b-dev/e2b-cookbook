@@ -1,0 +1,26 @@
+{
+  "name": "anthropic-managed-agents-e2b-js",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build-template": "tsx src/cli.ts build-template",
+    "check": "tsc --noEmit",
+    "create-agent": "tsx src/cli.ts create-agent",
+    "create-environment": "tsx src/cli.ts create-environment",
+    "send": "tsx src/cli.ts send",
+    "start-webhook-server": "tsx src/cli.ts start-webhook-server",
+    "start-worker": "tsx src/cli.ts start-worker",
+    "stop-worker": "tsx src/cli.ts stop-worker"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.97.1",
+    "dotenv": "^17.2.3",
+    "e2b": "^2.21.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}

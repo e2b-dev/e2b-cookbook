@@ -166,12 +166,8 @@ def ensure_worker_sandbox(
     worker_max_idle_seconds: float | None,
     log_level: str,
     sandbox_id: str | None = None,
-    sandbox_ids: list[str] | None = None,
 ) -> Sandbox:
-    candidate_ids = list(
-        dict.fromkeys([*(sandbox_ids or []), *([sandbox_id] if sandbox_id else [])])
-    )
-    for candidate_id in candidate_ids:
+    if sandbox_id:
         try:
             return start_worker_sandbox(
                 settings,
@@ -179,30 +175,18 @@ def ensure_worker_sandbox(
                 timeout_seconds=timeout_seconds,
                 worker_max_idle_seconds=worker_max_idle_seconds,
                 log_level=log_level,
-                sandbox_id=candidate_id,
+                sandbox_id=sandbox_id,
             )
         except Exception:
-            continue
+            pass
 
-    try:
-        return start_worker_sandbox(
-            settings,
-            template_name=template_name,
-            timeout_seconds=timeout_seconds,
-            worker_max_idle_seconds=worker_max_idle_seconds,
-            log_level=log_level,
-            sandbox_id=sandbox_id,
-        )
-    except Exception:
-        if sandbox_id is None:
-            raise
-        return start_worker_sandbox(
-            settings,
-            template_name=template_name,
-            timeout_seconds=timeout_seconds,
-            worker_max_idle_seconds=worker_max_idle_seconds,
-            log_level=log_level,
-        )
+    return start_worker_sandbox(
+        settings,
+        template_name=template_name,
+        timeout_seconds=timeout_seconds,
+        worker_max_idle_seconds=worker_max_idle_seconds,
+        log_level=log_level,
+    )
 
 
 def start_webhook_server_process(

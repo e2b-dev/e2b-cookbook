@@ -6,8 +6,13 @@ template build, and the E2B worker runtime. Add the files and edits below to tur
 package into this flow:
 
 ```text
-Anthropic webhook -> your app -> Anthropic environment metadata -> E2B worker sandbox
+Anthropic webhook -> your app -> app-owned sandbox store -> E2B worker sandbox
 ```
+
+The app-owned store lets your app reconnect to the same worker sandbox for a repeated
+`session.status_run_started` webhook. The Anthropic worker in this example still polls at the
+self-hosted environment level, so this is app-owned sandbox lifecycle control rather than a hard
+session-affinity guarantee.
 
 ## 1. Add the App Webhook Server
 
@@ -15,6 +20,8 @@ Create `anthropic_managed_agents_e2b/app_webhook_server.py`:
 
 ```python
 from __future__ import annotations
+
+from threading import Lock
 
 import anthropic
 from fastapi import FastAPI, Request, Response
@@ -32,6 +39,8 @@ from anthropic_managed_agents_e2b.settings import (
 
 app = FastAPI()
 store = JsonSandboxStore()
+worker_locks: dict[tuple[str, str], Lock] = {}
+worker_locks_lock = Lock()
 
 
 def _settings() -> Settings:
@@ -53,6 +62,14 @@ def _session_id(event: object) -> str:
 def ensure_worker_for_event(settings: Settings, event: object):
     environment_id = settings.require_anthropic_environment_id()
     session_id = _session_id(event)
+    with worker_locks_lock:
+        worker_lock = worker_locks.setdefault((environment_id, session_id), Lock())
+
+    with worker_lock:
+        return _ensure_worker_for_session(settings, environment_id, session_id)
+
+
+def _ensure_worker_for_session(settings: Settings, environment_id: str, session_id: str):
     assignment = store.get(environment_id=environment_id, session_id=session_id)
     sandbox = ensure_worker_sandbox(
         settings,
@@ -98,7 +115,10 @@ async def webhook(request: Request) -> Response:
         return Response("invalid signature", status_code=400)
 
     if event.data.type == "session.status_run_started":
-        sandbox = ensure_worker_for_event(settings, event)
+        try:
+            sandbox = ensure_worker_for_event(settings, event)
+        except Exception:
+            return Response("failed to start worker sandbox", status_code=500)
         return Response(
             status_code=204,
             headers={"x-e2b-worker-sandbox-id": sandbox.sandbox_id},
@@ -256,24 +276,22 @@ def ensure_worker_sandbox(
     sandbox_id: str | None = None,
 ) -> Sandbox:
     try:
-        return start_worker_sandbox(
-            settings,
-            template_name=template_name,
-            timeout_seconds=timeout_seconds,
+            return start_worker_sandbox(
+                settings,
+                template_name=template_name,
+                timeout_seconds=timeout_seconds,
             worker_max_idle_seconds=worker_max_idle_seconds,
             log_level=log_level,
             sandbox_id=sandbox_id,
         )
-    except Exception:
-        if sandbox_id is None:
-            raise
-        return start_worker_sandbox(
-            settings,
-            template_name=template_name,
-            timeout_seconds=timeout_seconds,
-            worker_max_idle_seconds=worker_max_idle_seconds,
-            log_level=log_level,
-        )
+
+    return start_worker_sandbox(
+        settings,
+        template_name=template_name,
+        timeout_seconds=timeout_seconds,
+        worker_max_idle_seconds=worker_max_idle_seconds,
+        log_level=log_level,
+    )
 ```
 
 Then update `start_worker_sandbox(...)` so it calls `ensure_worker_process(...)` instead of always
@@ -304,10 +322,12 @@ def start_worker_sandbox(
         log_level=log_level,
     )
     if settings.anthropic_api_key:
-        update_environment_metadata(
+        add_sandbox_to_metadata_store(
             api_key=settings.anthropic_api_key,
             environment_id=settings.require_anthropic_environment_id(),
-            metadata={WORKER_SANDBOX_METADATA_KEY: sandbox.sandbox_id},
+            legacy_key=WORKER_SANDBOX_METADATA_KEY,
+            store_key=WORKER_SANDBOX_STORE_METADATA_KEY,
+            sandbox_id=sandbox.sandbox_id,
         )
     return sandbox
 ```
@@ -364,7 +384,7 @@ stop-worker:
 
 ## 5. Configure Runtime Values
 
-Create `../.env` with:
+Create `.env` in the parent `python/` directory with:
 
 ```bash
 E2B_API_KEY="..."
@@ -382,7 +402,7 @@ and subscribe it to `session.status_run_started`.
 ## 6. Run It
 
 ```bash
-uv sync
+uv sync --project ..
 make build-template
 make start-app-webhook-server
 ```
@@ -400,5 +420,5 @@ Stop the active worker sandbox when done:
 
 ```bash
 make show-environment
-make stop-worker SANDBOX_ID="<e2b_worker_sandbox_id>"
+make stop-worker SANDBOX_ID="<sandbox-id-from-show-environment-or-sandboxes>"
 ```

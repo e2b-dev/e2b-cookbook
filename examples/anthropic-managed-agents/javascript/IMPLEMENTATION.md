@@ -83,6 +83,7 @@ It should:
 
 ```text
 e2b_worker_sandbox_id=<sandbox id>
+e2b_worker_sandbox_ids=["<sandbox id>", ...]
 ```
 
 The process environment passed to the worker must include:
@@ -138,6 +139,7 @@ lifecycle: { onTimeout: "pause", autoResume: true }
 
 ```text
 e2b_webhook_sandbox_id=<sandbox id>
+e2b_webhook_sandbox_ids=["<sandbox id>", ...]
 ```
 
 ## 8. Verify Webhooks and Start the Worker
@@ -237,15 +239,17 @@ Implement:
 ANTHROPIC_ENVIRONMENT_ID=...
 name=...
 e2b_worker_sandbox_id=...
+e2b_worker_sandbox_ids=...
 e2b_webhook_sandbox_id=...
+e2b_webhook_sandbox_ids=...
 ```
 
 `stopWorkerSandbox(settings, sandboxId)` should kill the E2B sandbox and clear
 `e2b_worker_sandbox_id` or `e2b_webhook_sandbox_id` only when the stored value matches the sandbox
-being stopped.
+being stopped. It should also remove the sandbox id from the matching JSON metadata list.
 
-That gives another process a reliable lookup path:
+That gives another process a simple lookup path:
 
 ```text
-ANTHROPIC_ENVIRONMENT_ID -> environment.metadata.e2b_*_sandbox_id -> E2B sandbox
+ANTHROPIC_ENVIRONMENT_ID -> environment.metadata.e2b_*_sandbox_ids -> E2B sandbox ids
 ```

@@ -15,7 +15,7 @@ sequenceDiagram
 
     App->>E2B: make start-worker
     E2B->>Worker: run EnvironmentWorker.run()
-    App->>Anthropic: update environment metadata e2b_worker_sandbox_id
+    App->>Anthropic: update environment metadata with worker sandbox id
     Worker->>Anthropic: poll self-hosted environment work queue
     App->>Anthropic: create session
     App->>Anthropic: send user.message
@@ -138,8 +138,11 @@ Both flows use the same worker contract:
 | `ANTHROPIC_ENVIRONMENT_KEY` | Bearer credential for the environment worker. |
 | `/mnt/session` | This example's E2B workdir. |
 | `/mnt/session/outputs` | Suggested artifact output directory. |
-| `e2b_worker_sandbox_id` | Environment metadata key for the orchestrator worker sandbox. |
-| `e2b_webhook_sandbox_id` | Environment metadata key for the auto-resumable webhook sandbox. |
+| `e2b_worker_sandbox_id` | Compatibility metadata key for the most recent worker sandbox. |
+| `e2b_worker_sandbox_ids` | JSON metadata list of known worker sandboxes. |
+| `e2b_webhook_sandbox_id` | Compatibility metadata key for the most recent auto-resumable webhook sandbox. |
+| `e2b_webhook_sandbox_ids` | JSON metadata list of known auto-resumable webhook sandboxes. |
 
-The worker is intentionally simple: one E2B sandbox can service sessions for the environment, but it
-is not production per-session isolation.
+The worker polls work at the Anthropic environment level. Multiple E2B sandboxes can be tracked and
+started by these examples, but strict per-session isolation needs a production routing primitive or
+an app-level design that scopes work to a specific worker.

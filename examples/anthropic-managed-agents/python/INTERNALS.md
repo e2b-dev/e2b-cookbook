@@ -149,7 +149,7 @@ Uploads the runtime and starts the worker only when no live worker process is fo
 
 Creates a new E2B sandbox from the requested template, or reconnects to `--sandbox-id`. Then it uploads and starts the worker. It prints the worker sandbox ID for later cleanup.
 When `ANTHROPIC_API_KEY` is configured, it also updates Anthropic environment metadata:
-`e2b_worker_sandbox_id=<sandbox id>`.
+`e2b_worker_sandbox_id=<sandbox id>` and appends the id to `e2b_worker_sandbox_ids`.
 
 `ensure_worker_sandbox(settings, template_name, timeout_seconds, worker_max_idle_seconds, log_level, sandbox_id)`
 
@@ -164,13 +164,13 @@ starts Uvicorn. Register the printed `/webhook` URL in the
 [Anthropic Agents workspace](https://platform.claude.com/workspaces/default/agents) for
 `session.status_run_started`.
 When `ANTHROPIC_API_KEY` is configured, it also updates Anthropic environment metadata:
-`e2b_webhook_sandbox_id=<sandbox id>`.
+`e2b_webhook_sandbox_id=<sandbox id>` and appends the id to `e2b_webhook_sandbox_ids`.
 
 `stop_worker_sandbox(settings, sandbox_id)`
 
 Kills the E2B sandbox. When `ANTHROPIC_API_KEY` and `ANTHROPIC_ENVIRONMENT_ID` are configured, it
 also clears `e2b_worker_sandbox_id` or `e2b_webhook_sandbox_id` if either value matches the stopped
-sandbox id.
+sandbox id, and removes the id from the matching metadata list.
 
 ### `worker_runtime.py`
 
@@ -213,9 +213,9 @@ Returns a small health response with whether the worker process is currently run
 `webhook(request)`
 
 Verifies Anthropic webhook deliveries in the app process. On `session.status_run_started`, it reads
-`e2b_worker_sandbox_id` from Anthropic environment metadata, reconnects to that E2B sandbox when
-possible, starts the worker process if needed, or creates a replacement worker sandbox when the
-stored id is missing or stale.
+`event.data.id` as the session id, looks up that session in the app-owned JSON sandbox store,
+reconnects to the stored E2B sandbox when possible, starts the worker process if needed, or creates
+a replacement worker sandbox when the stored id is missing or stale.
 
 ### `session.py`
 

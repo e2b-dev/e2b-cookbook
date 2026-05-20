@@ -24,7 +24,7 @@ npm install
 cp .env.template .env
 ```
 
-Fill in `../.env`:
+Fill in `.env`:
 
 | Variable | Notes |
 | --- | --- |

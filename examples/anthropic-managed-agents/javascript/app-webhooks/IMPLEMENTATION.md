@@ -6,8 +6,13 @@ helpers, template build, and the E2B worker runtime. Add the files and edits bel
 worker package into this flow:
 
 ```text
-Anthropic webhook -> your app -> Anthropic environment metadata -> E2B worker sandbox
+Anthropic webhook -> your app -> app-owned sandbox store -> E2B worker sandbox
 ```
+
+The app-owned store lets your app reconnect to the same worker sandbox for a repeated
+`session.status_run_started` webhook. The Anthropic worker in this example still polls at the
+self-hosted environment level, so this is app-owned sandbox lifecycle control rather than a hard
+session-affinity guarantee.
 
 ## 1. Add the App Webhook Server
 
@@ -28,6 +33,7 @@ import { ensureWorkerSandbox } from "./sandbox-worker.js";
 import { loadSettings, requireSetting, type Settings } from "./settings.js";
 
 const store = new JsonSandboxStore();
+const pendingWorkers = new Map<string, Promise<Awaited<ReturnType<typeof ensureWorkerSandbox>>>>();
 
 function webhookClient(settings: Settings) {
   return new Anthropic({
@@ -46,6 +52,20 @@ function sessionId(event: unknown) {
 async function ensureWorkerForEvent(settings: Settings, event: unknown) {
   const environmentId = requireSetting(settings.anthropicEnvironmentId, "ANTHROPIC_ENVIRONMENT_ID");
   const session = sessionId(event);
+  const key = `${environmentId}:${session}`;
+  const pending = pendingWorkers.get(key);
+  if (pending) {
+    return pending;
+  }
+
+  const worker = ensureWorkerForSession(settings, environmentId, session).finally(() => {
+    pendingWorkers.delete(key);
+  });
+  pendingWorkers.set(key, worker);
+  return worker;
+}
+
+async function ensureWorkerForSession(settings: Settings, environmentId: string, session: string) {
   const assignment = await store.get({ environmentId, sessionId: session });
   const sandbox = await ensureWorkerSandbox(settings, {
     sandboxId: assignment?.sandboxId,
@@ -85,8 +105,10 @@ async function handleWebhook(request: IncomingMessage, response: ServerResponse)
   }
   const body = await readBody(request);
 
+  const client = webhookClient(settings);
+  let event: ReturnType<typeof client.beta.webhooks.unwrap>;
   try {
-    const event = webhookClient(settings).beta.webhooks.unwrap(body, {
+    event = client.beta.webhooks.unwrap(body, {
       headers: Object.fromEntries(
         Object.entries(request.headers).map(([key, value]) => [
           key,
@@ -95,21 +117,28 @@ async function handleWebhook(request: IncomingMessage, response: ServerResponse)
       ),
       key: signingKey,
     });
-
-    if (event.data.type === "session.status_run_started") {
-      const sandbox = await ensureWorkerForEvent(settings, event);
-      response.writeHead(204, { "x-e2b-worker-sandbox-id": sandbox.sandboxId });
-      response.end();
-      return;
-    }
-
-    response.writeHead(204);
-    response.end();
   } catch (error) {
     console.error(error);
     response.writeHead(400, { "content-type": "text/plain" });
     response.end("invalid signature");
+    return;
   }
+
+  if (event.data.type === "session.status_run_started") {
+    try {
+      const sandbox = await ensureWorkerForEvent(settings, event);
+      response.writeHead(204, { "x-e2b-worker-sandbox-id": sandbox.sandboxId });
+      response.end();
+    } catch (error) {
+      console.error(error);
+      response.writeHead(500, { "content-type": "text/plain" });
+      response.end("failed to start worker sandbox");
+    }
+    return;
+  }
+
+  response.writeHead(204);
+  response.end();
 }
 
 const server = createServer((request, response) => {
@@ -119,12 +148,24 @@ const server = createServer((request, response) => {
   }
 
   if (request.method === "GET" && request.url === "/sandboxes") {
-    void store.list().then((assignments) => writeJson(response, 200, { sandboxes: assignments }));
+    void store
+      .list()
+      .then((assignments) => writeJson(response, 200, { sandboxes: assignments }))
+      .catch((error) => {
+        console.error(error);
+        writeJson(response, 500, { error: "failed to read sandbox store" });
+      });
     return;
   }
 
   if (request.method === "POST" && request.url === "/webhook") {
-    void handleWebhook(request, response);
+    void handleWebhook(request, response).catch((error) => {
+      console.error(error);
+      if (!response.headersSent) {
+        response.writeHead(500, { "content-type": "text/plain" });
+      }
+      response.end("webhook handler failed");
+    });
     return;
   }
 
@@ -258,6 +299,17 @@ export async function ensureWorkerProcess(
 }
 
 export async function ensureWorkerSandbox(settings: Settings, options: WorkerOptions = {}) {
+  const candidateIds = [
+    ...new Set([...(options.sandboxIds ?? []), options.sandboxId].filter((item): item is string => Boolean(item))),
+  ];
+  for (const candidateId of candidateIds) {
+    try {
+      return await startWorkerSandbox(settings, { ...options, sandboxId: candidateId });
+    } catch {
+      // Try the next stored sandbox id before creating a replacement.
+    }
+  }
+
   try {
     return await startWorkerSandbox(settings, options);
   } catch (error) {
@@ -280,10 +332,12 @@ export async function startWorkerSandbox(settings: Settings, options: WorkerOpti
   const sandbox = await createOrConnectWorkerSandbox(settings, options);
   await ensureWorkerProcess(sandbox, settings, options);
   if (settings.anthropicApiKey) {
-    await updateEnvironmentMetadata({
+    await addSandboxToMetadataStore({
       apiKey: settings.anthropicApiKey,
       environmentId: requireSetting(settings.anthropicEnvironmentId, "ANTHROPIC_ENVIRONMENT_ID"),
-      metadata: { [WORKER_SANDBOX_METADATA_KEY]: sandbox.sandboxId },
+      legacyKey: WORKER_SANDBOX_METADATA_KEY,
+      storeKey: WORKER_SANDBOX_STORE_METADATA_KEY,
+      sandboxId: sandbox.sandboxId,
     });
   }
 
@@ -325,7 +379,7 @@ stop-worker:
 
 ## 5. Configure Runtime Values
 
-Create `../.env` with:
+Create `.env` in the parent `javascript/` directory with:
 
 ```bash
 E2B_API_KEY="..."
@@ -343,7 +397,7 @@ and subscribe it to `session.status_run_started`.
 ## 6. Run It
 
 ```bash
-npm install
+npm --prefix .. install
 make build-template
 make start-app-webhook-server
 ```
@@ -361,5 +415,5 @@ Stop the active worker sandbox when done:
 
 ```bash
 make show-environment
-make stop-worker SANDBOX_ID="<e2b_worker_sandbox_id>"
+make stop-worker SANDBOX_ID="<sandbox-id-from-show-environment-or-sandboxes>"
 ```

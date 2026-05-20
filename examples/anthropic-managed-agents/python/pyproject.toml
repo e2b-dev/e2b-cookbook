@@ -5,7 +5,7 @@ description = "Run Anthropic Managed Agents self-hosted workers inside E2B sandb
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "anthropic>=0.103.0",
+    "anthropic[webhooks]>=0.103.0",
     "e2b>=2.21.0",
     "fastapi>=0.116.0",
     "python-dotenv>=1.0.0",

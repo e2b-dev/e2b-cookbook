@@ -12,6 +12,7 @@ import { ensureWorkerSandbox } from "./sandbox-worker.js";
 import { loadSettings, requireSetting, type Settings } from "./settings.js";
 
 const store = new JsonSandboxStore();
+const pendingWorkers = new Map<string, Promise<Awaited<ReturnType<typeof ensureWorkerSandbox>>>>();
 
 function webhookClient(settings: Settings) {
   return new Anthropic({
@@ -30,6 +31,20 @@ function sessionId(event: unknown) {
 async function ensureWorkerForEvent(settings: Settings, event: unknown) {
   const environmentId = requireSetting(settings.anthropicEnvironmentId, "ANTHROPIC_ENVIRONMENT_ID");
   const session = sessionId(event);
+  const key = `${environmentId}:${session}`;
+  const pending = pendingWorkers.get(key);
+  if (pending) {
+    return pending;
+  }
+
+  const worker = ensureWorkerForSession(settings, environmentId, session).finally(() => {
+    pendingWorkers.delete(key);
+  });
+  pendingWorkers.set(key, worker);
+  return worker;
+}
+
+async function ensureWorkerForSession(settings: Settings, environmentId: string, session: string) {
   const assignment = await store.get({ environmentId, sessionId: session });
   const sandbox = await ensureWorkerSandbox(settings, {
     sandboxId: assignment?.sandboxId,
@@ -69,8 +84,10 @@ async function handleWebhook(request: IncomingMessage, response: ServerResponse)
   }
   const body = await readBody(request);
 
+  const client = webhookClient(settings);
+  let event: ReturnType<typeof client.beta.webhooks.unwrap>;
   try {
-    const event = webhookClient(settings).beta.webhooks.unwrap(body, {
+    event = client.beta.webhooks.unwrap(body, {
       headers: Object.fromEntries(
         Object.entries(request.headers).map(([key, value]) => [
           key,
@@ -79,21 +96,28 @@ async function handleWebhook(request: IncomingMessage, response: ServerResponse)
       ),
       key: signingKey,
     });
-
-    if (event.data.type === "session.status_run_started") {
-      const sandbox = await ensureWorkerForEvent(settings, event);
-      response.writeHead(204, { "x-e2b-worker-sandbox-id": sandbox.sandboxId });
-      response.end();
-      return;
-    }
-
-    response.writeHead(204);
-    response.end();
   } catch (error) {
     console.error(error);
     response.writeHead(400, { "content-type": "text/plain" });
     response.end("invalid signature");
+    return;
   }
+
+  if (event.data.type === "session.status_run_started") {
+    try {
+      const sandbox = await ensureWorkerForEvent(settings, event);
+      response.writeHead(204, { "x-e2b-worker-sandbox-id": sandbox.sandboxId });
+      response.end();
+    } catch (error) {
+      console.error(error);
+      response.writeHead(500, { "content-type": "text/plain" });
+      response.end("failed to start worker sandbox");
+    }
+    return;
+  }
+
+  response.writeHead(204);
+  response.end();
 }
 
 const server = createServer((request, response) => {
@@ -103,12 +127,24 @@ const server = createServer((request, response) => {
   }
 
   if (request.method === "GET" && request.url === "/sandboxes") {
-    void store.list().then((assignments) => writeJson(response, 200, { sandboxes: assignments }));
+    void store
+      .list()
+      .then((assignments) => writeJson(response, 200, { sandboxes: assignments }))
+      .catch((error) => {
+        console.error(error);
+        writeJson(response, 500, { error: "failed to read sandbox store" });
+      });
     return;
   }
 
   if (request.method === "POST" && request.url === "/webhook") {
-    void handleWebhook(request, response);
+    void handleWebhook(request, response).catch((error) => {
+      console.error(error);
+      if (!response.headersSent) {
+        response.writeHead(500, { "content-type": "text/plain" });
+      }
+      response.end("webhook handler failed");
+    });
     return;
   }
 

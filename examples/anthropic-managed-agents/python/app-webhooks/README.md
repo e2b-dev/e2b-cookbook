@@ -8,8 +8,8 @@ app starts or reconnects the E2B worker sandbox.
 flowchart LR
     session["Managed Agents session"] --> webhook["Anthropic webhook"]
     webhook --> app["your app webhook endpoint"]
-    app --> metadata["Anthropic environment metadata"]
-    metadata --> sandbox["E2B worker sandbox"]
+    app --> store["app-owned sandbox store"]
+    store --> sandbox["E2B worker sandbox"]
     app --> sandbox
     sandbox --> env["Anthropic self-hosted environment"]
     sandbox --> workdir["/mnt/session"]
@@ -24,7 +24,7 @@ uv sync
 cp .env.template .env
 ```
 
-Fill in `../.env`:
+Fill in `.env`:
 
 | Variable | Notes |
 | --- | --- |
@@ -61,6 +61,12 @@ When Anthropic sends a run-started webhook, the app:
 3. Looks up that session id in the app-owned sandbox store.
 4. Reconnects to that session's sandbox and starts the worker if needed.
 5. Creates a fresh E2B sandbox and writes a new store assignment if the session is new or stale.
+
+The JSON store is a local example store. For a multi-instance app, use a database with a
+transactional session assignment so duplicate webhook deliveries cannot create duplicate workers.
+The worker itself still polls Anthropic at the environment level, so treat this flow as app-owned
+sandbox lifecycle control, not a hard session-affinity primitive unless your Anthropic integration
+also scopes work to a specific worker.
 
 Inspect the app-owned assignments:
 

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from threading import Lock
+
 import anthropic
 from fastapi import FastAPI, Request, Response
 
@@ -16,6 +18,8 @@ from anthropic_managed_agents_e2b.settings import (
 
 app = FastAPI()
 store = JsonSandboxStore()
+worker_locks: dict[tuple[str, str], Lock] = {}
+worker_locks_lock = Lock()
 
 
 def _settings() -> Settings:
@@ -37,6 +41,14 @@ def _session_id(event: object) -> str:
 def ensure_worker_for_event(settings: Settings, event: object):
     environment_id = settings.require_anthropic_environment_id()
     session_id = _session_id(event)
+    with worker_locks_lock:
+        worker_lock = worker_locks.setdefault((environment_id, session_id), Lock())
+
+    with worker_lock:
+        return _ensure_worker_for_session(settings, environment_id, session_id)
+
+
+def _ensure_worker_for_session(settings: Settings, environment_id: str, session_id: str):
     assignment = store.get(environment_id=environment_id, session_id=session_id)
     sandbox = ensure_worker_sandbox(
         settings,
@@ -82,7 +94,10 @@ async def webhook(request: Request) -> Response:
         return Response("invalid signature", status_code=400)
 
     if event.data.type == "session.status_run_started":
-        sandbox = ensure_worker_for_event(settings, event)
+        try:
+            sandbox = ensure_worker_for_event(settings, event)
+        except Exception:
+            return Response("failed to start worker sandbox", status_code=500)
         return Response(
             status_code=204,
             headers={"x-e2b-worker-sandbox-id": sandbox.sandbox_id},

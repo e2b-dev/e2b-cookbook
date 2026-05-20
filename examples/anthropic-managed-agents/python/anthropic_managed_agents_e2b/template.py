@@ -7,6 +7,8 @@ REMOTE_PACKAGE_DIR = f"{REMOTE_DIR}/anthropic_managed_agents_e2b"
 PACKAGE_FILES = [
     "__init__.py",
     "agent.py",
+    "app_sandbox_store.py",
+    "app_webhook_server.py",
     "cli.py",
     "environment.py",
     "sandbox_worker.py",
@@ -42,7 +44,7 @@ def worker_template() -> Template:
         )
         .run_cmd(
             "python -m pip install --no-cache-dir "
-            "'anthropic>=0.103.0' 'fastapi>=0.116.0' 'uvicorn>=0.35.0'"
+            "'anthropic[webhooks]>=0.103.0' 'fastapi>=0.116.0' 'uvicorn>=0.35.0'"
         )
         .run_cmd(
             "sudo mkdir -p /mnt/session /opt/anthropic-managed-agents "

@@ -55,7 +55,7 @@ const REMOTE_DIR = "/opt/anthropic-managed-agents-js";
 const REMOTE_SRC_DIR = `${REMOTE_DIR}/src`;
 const REMOTE_WORKDIR = "/mnt/session";
 
-export const template = Template()
+export const template = Template({ fileContextPath: "." })
   .fromNodeImage("24")
   .aptInstall([
     "bash",
@@ -69,7 +69,9 @@ export const template = Template()
     "ripgrep",
     "sed",
     "sudo",
+    "tar",
     "tree",
+    "unzip",
     "util-linux",
   ])
   .runCmd(
@@ -79,8 +81,8 @@ export const template = Template()
   .setWorkdir(REMOTE_DIR)
   .runCmd("npm init -y")
   .npmInstall(["@anthropic-ai/sdk@^0.97.1", "tsx@^4.21.0", "typescript@^5.9.3"])
-  .copy("worker-runtime.ts", `${REMOTE_SRC_DIR}/`)
-  .copy("webhook-runtime.ts", `${REMOTE_SRC_DIR}/`)
+  .copy("src/worker-runtime.ts", `${REMOTE_SRC_DIR}/`)
+  .copy("src/webhook-runtime.ts", `${REMOTE_SRC_DIR}/`)
   .setWorkdir(REMOTE_WORKDIR);
 ```
 

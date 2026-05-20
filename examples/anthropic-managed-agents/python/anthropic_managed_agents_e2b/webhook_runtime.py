@@ -11,6 +11,7 @@ REMOTE_DIR = Path("/opt/anthropic-managed-agents")
 REMOTE_WORKER = REMOTE_DIR / "worker.py"
 REMOTE_PID = REMOTE_DIR / "worker.pid"
 REMOTE_LOG = REMOTE_DIR / "worker.log"
+MAX_WEBHOOK_BODY_BYTES = 1_048_576
 
 app = FastAPI()
 client = anthropic.Anthropic(api_key="not-needed")
@@ -57,6 +58,21 @@ def start_worker_if_needed() -> None:
     REMOTE_PID.write_text(f"{process.pid}\n")
 
 
+async def read_limited_body(request: Request, max_bytes: int) -> str:
+    content_length = request.headers.get("content-length")
+    if content_length and int(content_length) > max_bytes:
+        raise ValueError("request body too large")
+
+    chunks: list[bytes] = []
+    size = 0
+    async for chunk in request.stream():
+        size += len(chunk)
+        if size > max_bytes:
+            raise ValueError("request body too large")
+        chunks.append(chunk)
+    return b"".join(chunks).decode()
+
+
 @app.get("/health")
 def health() -> dict[str, bool]:
     return {"ok": True, "worker_running": worker_is_running()}
@@ -68,7 +84,11 @@ async def webhook(request: Request) -> Response:
     if not signing_key:
         return Response("ANTHROPIC_WEBHOOK_SIGNING_KEY is required", status_code=503)
 
-    payload = (await request.body()).decode()
+    try:
+        payload = await read_limited_body(request, MAX_WEBHOOK_BODY_BYTES)
+    except ValueError:
+        return Response("request body too large", status_code=413)
+
     try:
         event = client.beta.webhooks.unwrap(
             payload,

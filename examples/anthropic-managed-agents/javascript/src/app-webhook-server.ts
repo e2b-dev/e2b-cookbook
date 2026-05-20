@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { timingSafeEqual } from "node:crypto";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 
 import {
@@ -13,6 +14,9 @@ import { loadSettings, requireSetting, type Settings } from "./settings.js";
 
 const store = new JsonSandboxStore();
 const pendingWorkers = new Map<string, Promise<Awaited<ReturnType<typeof ensureWorkerSandbox>>>>();
+const MAX_WEBHOOK_BODY_BYTES = 1_048_576;
+
+class PayloadTooLargeError extends Error {}
 
 function webhookClient(settings: Settings) {
   return new Anthropic({
@@ -61,10 +65,21 @@ async function ensureWorkerForSession(settings: Settings, environmentId: string,
   return sandbox;
 }
 
-async function readBody(request: IncomingMessage) {
+async function readBody(request: IncomingMessage, maxBytes: number) {
+  const contentLength = request.headers["content-length"];
+  if (contentLength && Number(contentLength) > maxBytes) {
+    throw new PayloadTooLargeError("request body too large");
+  }
+
   const chunks: Buffer[] = [];
+  let size = 0;
   for await (const chunk of request) {
-    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+    const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+    size += buffer.length;
+    if (size > maxBytes) {
+      throw new PayloadTooLargeError("request body too large");
+    }
+    chunks.push(buffer);
   }
   return Buffer.concat(chunks).toString("utf8");
 }
@@ -84,6 +99,19 @@ function startWorkerInBackground(settings: Settings, event: unknown) {
     });
 }
 
+function hasAdminAccess(request: IncomingMessage, settings: Settings) {
+  const expected = settings.appWebhookAdminToken;
+  const authorization = request.headers.authorization;
+  const actual = authorization?.startsWith("Bearer ") ? authorization.slice("Bearer ".length) : "";
+  if (!expected || !actual) {
+    return false;
+  }
+
+  const expectedBuffer = Buffer.from(expected);
+  const actualBuffer = Buffer.from(actual);
+  return expectedBuffer.length === actualBuffer.length && timingSafeEqual(expectedBuffer, actualBuffer);
+}
+
 async function handleWebhook(request: IncomingMessage, response: ServerResponse) {
   const settings = loadSettings();
   const signingKey = settings.anthropicWebhookSigningKey;
@@ -92,7 +120,18 @@ async function handleWebhook(request: IncomingMessage, response: ServerResponse)
     response.end("ANTHROPIC_WEBHOOK_SIGNING_KEY is required");
     return;
   }
-  const body = await readBody(request);
+
+  let body: string;
+  try {
+    body = await readBody(request, MAX_WEBHOOK_BODY_BYTES);
+  } catch (error) {
+    if (error instanceof PayloadTooLargeError) {
+      response.writeHead(413, { "content-type": "text/plain" });
+      response.end("request body too large");
+      return;
+    }
+    throw error;
+  }
 
   const client = webhookClient(settings);
   let event: ReturnType<typeof client.beta.webhooks.unwrap>;
@@ -131,6 +170,12 @@ const server = createServer((request, response) => {
   }
 
   if (request.method === "GET" && request.url === "/sandboxes") {
+    if (!hasAdminAccess(request, loadSettings())) {
+      response.writeHead(401, { "content-type": "text/plain" });
+      response.end("unauthorized");
+      return;
+    }
+
     void store
       .list()
       .then((assignments) => writeJson(response, 200, { sandboxes: assignments }))

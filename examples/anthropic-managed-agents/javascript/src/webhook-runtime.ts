@@ -9,8 +9,11 @@ const REMOTE_TSX = `${REMOTE_DIR}/node_modules/.bin/tsx`;
 const REMOTE_WORKER = `${REMOTE_DIR}/src/worker-runtime.ts`;
 const REMOTE_PID = `${REMOTE_DIR}/worker.pid`;
 const REMOTE_LOG = `${REMOTE_DIR}/worker.log`;
+const MAX_WEBHOOK_BODY_BYTES = 1_048_576;
 
 const client = new Anthropic({ apiKey: "not-needed" });
+
+class PayloadTooLargeError extends Error {}
 
 function workerEnv() {
   return {
@@ -50,10 +53,21 @@ function startWorkerIfNeeded() {
   writeFileSync(REMOTE_PID, `${child.pid}\n`);
 }
 
-async function readBody(request: IncomingMessage) {
+async function readBody(request: IncomingMessage, maxBytes: number) {
+  const contentLength = request.headers["content-length"];
+  if (contentLength && Number(contentLength) > maxBytes) {
+    throw new PayloadTooLargeError("request body too large");
+  }
+
   const chunks: Buffer[] = [];
+  let size = 0;
   for await (const chunk of request) {
-    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+    const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+    size += buffer.length;
+    if (size > maxBytes) {
+      throw new PayloadTooLargeError("request body too large");
+    }
+    chunks.push(buffer);
   }
   return Buffer.concat(chunks).toString("utf8");
 }
@@ -71,7 +85,18 @@ async function handleWebhook(request: IncomingMessage, response: ServerResponse)
     return;
   }
 
-  const body = await readBody(request);
+  let body: string;
+  try {
+    body = await readBody(request, MAX_WEBHOOK_BODY_BYTES);
+  } catch (error) {
+    if (error instanceof PayloadTooLargeError) {
+      response.writeHead(413, { "content-type": "text/plain" });
+      response.end("request body too large");
+      return;
+    }
+    throw error;
+  }
+
   try {
     const event = client.beta.webhooks.unwrap(body, {
       headers: Object.fromEntries(

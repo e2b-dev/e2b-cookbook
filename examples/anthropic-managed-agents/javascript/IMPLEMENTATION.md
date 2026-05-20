@@ -180,7 +180,7 @@ It should:
 
 This keeps webhook policy, routing, observability, and sandbox replacement under app control while
 still using the same E2B worker runtime. Add `GET /sandboxes` so operators can inspect the current
-session-to-sandbox assignments.
+session-to-sandbox assignments behind an app-owned bearer token.
 
 ## 10. Send a Session Message
 

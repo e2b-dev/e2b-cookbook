@@ -34,6 +34,7 @@ Fill in `.env`:
 | `ANTHROPIC_ENVIRONMENT_ID` | Anthropic self-hosted environment id. |
 | `ANTHROPIC_ENVIRONMENT_KEY` | Anthropic self-hosted environment key from the [Anthropic Environments workspace](https://platform.claude.com/workspaces/default/environments). |
 | `ANTHROPIC_WEBHOOK_SIGNING_KEY` | Required for real webhook deliveries. |
+| `APP_WEBHOOK_ADMIN_TOKEN` | Bearer token for app-owned debug endpoints such as `GET /sandboxes`. |
 | `APP_SANDBOX_STORE_PATH` | Optional path for the app-owned session-to-sandbox JSON store. Defaults to `../.managed-agent-sandbox-store.json`. |
 
 ## Build the E2B Template
@@ -71,7 +72,7 @@ also scopes work to a specific worker.
 Inspect the app-owned assignments:
 
 ```bash
-curl http://127.0.0.1:8000/sandboxes
+curl -H "Authorization: Bearer $APP_WEBHOOK_ADMIN_TOKEN" http://127.0.0.1:8000/sandboxes
 ```
 
 ## Stop

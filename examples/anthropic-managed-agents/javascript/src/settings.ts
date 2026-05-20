@@ -12,6 +12,7 @@ export type Settings = {
   anthropicEnvironmentId?: string;
   anthropicEnvironmentKey?: string;
   anthropicWebhookSigningKey?: string;
+  appWebhookAdminToken?: string;
 };
 
 export function loadDotenvFiles() {
@@ -31,6 +32,7 @@ export function loadSettings(): Settings {
     anthropicEnvironmentId: optional("ANTHROPIC_ENVIRONMENT_ID"),
     anthropicEnvironmentKey: optional("ANTHROPIC_ENVIRONMENT_KEY"),
     anthropicWebhookSigningKey: optional("ANTHROPIC_WEBHOOK_SIGNING_KEY"),
+    appWebhookAdminToken: optional("APP_WEBHOOK_ADMIN_TOKEN"),
   };
 }
 

@@ -22,11 +22,12 @@ Create `anthropic_managed_agents_e2b/app_webhook_server.py`:
 from __future__ import annotations
 
 import asyncio
+import hmac
 import logging
 from threading import Lock
 
 import anthropic
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, HTTPException, Request, Response
 
 from anthropic_managed_agents_e2b.app_sandbox_store import JsonSandboxStore
 from anthropic_managed_agents_e2b.sandbox_worker import ensure_worker_sandbox
@@ -35,6 +36,7 @@ from anthropic_managed_agents_e2b.settings import (
     DEFAULT_SANDBOX_TIMEOUT_SECONDS,
     DEFAULT_TEMPLATE_NAME,
     DEFAULT_WORKER_MAX_IDLE_SECONDS,
+    MAX_WEBHOOK_BODY_BYTES,
     Settings,
     load_settings,
 )
@@ -100,13 +102,39 @@ def _log_background_worker_result(task: asyncio.Task[object]) -> None:
     logger.info("started worker sandbox %s", getattr(sandbox, "sandbox_id", ""))
 
 
+async def _read_limited_body(request: Request, max_bytes: int) -> str:
+    content_length = request.headers.get("content-length")
+    if content_length and int(content_length) > max_bytes:
+        raise ValueError("request body too large")
+
+    chunks: list[bytes] = []
+    size = 0
+    async for chunk in request.stream():
+        size += len(chunk)
+        if size > max_bytes:
+            raise ValueError("request body too large")
+        chunks.append(chunk)
+    return b"".join(chunks).decode()
+
+
+def _has_admin_access(request: Request, settings: Settings) -> bool:
+    expected = settings.app_webhook_admin_token
+    authorization = request.headers.get("authorization", "")
+    prefix = "Bearer "
+    actual = authorization[len(prefix) :] if authorization.startswith(prefix) else ""
+    return bool(expected and actual and hmac.compare_digest(expected, actual))
+
+
 @app.get("/health")
 def health() -> dict[str, bool]:
     return {"ok": True}
 
 
 @app.get("/sandboxes")
-def sandboxes() -> dict[str, list[dict[str, str]]]:
+def sandboxes(request: Request) -> dict[str, list[dict[str, str]]]:
+    if not _has_admin_access(request, _settings()):
+        raise HTTPException(status_code=401, detail="unauthorized")
+
     return {"sandboxes": [assignment.__dict__ for assignment in store.list()]}
 
 
@@ -116,7 +144,10 @@ async def webhook(request: Request) -> Response:
     signing_key = settings.anthropic_webhook_signing_key
     if not signing_key:
         return Response("ANTHROPIC_WEBHOOK_SIGNING_KEY is required", status_code=503)
-    payload = (await request.body()).decode()
+    try:
+        payload = await _read_limited_body(request, MAX_WEBHOOK_BODY_BYTES)
+    except ValueError:
+        return Response("request body too large", status_code=413)
 
     try:
         event = _webhook_client(settings).beta.webhooks.unwrap(
@@ -408,6 +439,7 @@ ANTHROPIC_API_KEY="..."
 ANTHROPIC_ENVIRONMENT_ID="env_..."
 ANTHROPIC_ENVIRONMENT_KEY="..."
 ANTHROPIC_WEBHOOK_SIGNING_KEY="..."
+APP_WEBHOOK_ADMIN_TOKEN="replace-with-random-token"
 ```
 
 Create the Anthropic environment in the [Anthropic Environments workspace](https://platform.claude.com/workspaces/default/environments).

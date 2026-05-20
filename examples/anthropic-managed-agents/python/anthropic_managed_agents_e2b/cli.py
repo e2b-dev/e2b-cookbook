@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+from pathlib import Path
 
 from anthropic_managed_agents_e2b.agent import DEFAULT_MODEL, create_agent
 from anthropic_managed_agents_e2b.environment import (
@@ -16,6 +17,7 @@ from anthropic_managed_agents_e2b.sandbox_worker import (
     start_webhook_server_sandbox,
     start_worker_sandbox,
     stop_worker_sandbox,
+    upload_file_to_sandbox,
 )
 from anthropic_managed_agents_e2b.session import stream_message
 from anthropic_managed_agents_e2b.settings import (
@@ -168,3 +170,19 @@ def send_message_main() -> None:
         message=args.message,
     ):
         print(event, flush=True)
+
+
+def upload_file_main() -> None:
+    parser = argparse.ArgumentParser(description="Upload a local file into an E2B worker sandbox.")
+    parser.add_argument("sandbox_id")
+    parser.add_argument("file", type=Path)
+    parser.add_argument("remote_path", nargs="?", default="/mnt/session/uploads/example-input.txt")
+    args = parser.parse_args()
+
+    load_settings()
+    remote_path = upload_file_to_sandbox(
+        sandbox_id=args.sandbox_id,
+        local_path=args.file,
+        remote_path=args.remote_path,
+    )
+    print(f"uploaded {args.file} to {remote_path}")

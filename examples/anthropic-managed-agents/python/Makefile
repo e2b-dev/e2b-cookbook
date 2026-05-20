@@ -1,4 +1,4 @@
-.PHONY: install check build-template show-environment start-worker start-webhook-server stop-worker send
+.PHONY: install check build-template show-environment start-worker start-webhook-server stop-worker send upload-file
 
 install:
 	python3.12 -m venv .venv
@@ -24,3 +24,6 @@ stop-worker:
 
 send:
 	.venv/bin/anthropic-managed-agents-send-message "Run pwd, then echo hello from E2B"
+
+upload-file:
+	.venv/bin/anthropic-managed-agents-upload-file $(SANDBOX_ID) $(FILE) $(REMOTE_PATH)

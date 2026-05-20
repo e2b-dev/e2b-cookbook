@@ -1,4 +1,4 @@
-.PHONY: create-environment create-agent build-template show-environment start-worker send stop-worker
+.PHONY: create-environment create-agent build-template show-environment start-worker send upload-file stop-worker
 
 create-environment:
 	uv run --project .. anthropic-managed-agents-create-environment $(NAME)
@@ -17,6 +17,9 @@ start-worker:
 
 send:
 	uv run --project .. anthropic-managed-agents-send-message "Run pwd, then echo hello from E2B"
+
+upload-file:
+	uv run --project .. anthropic-managed-agents-upload-file $(SANDBOX_ID) $(FILE) $(or $(REMOTE_PATH),/mnt/session/uploads/example-input.txt)
 
 stop-worker:
 	uv run --project .. anthropic-managed-agents-stop-worker $(SANDBOX_ID)

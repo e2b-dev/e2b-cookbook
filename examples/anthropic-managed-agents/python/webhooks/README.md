@@ -96,3 +96,4 @@ If the stopped sandbox ID matches `e2b_webhook_sandbox_id`, the stop command cle
 - Secrets and Anthropic resource IDs stay runtime-only in `../.env`; they are not baked into the E2B template.
 
 For a concrete event-by-event walkthrough, see [../EXAMPLE_USAGE.md](../EXAMPLE_USAGE.md).
+For a complete code-level implementation, see [IMPLEMENTATION.md](./IMPLEMENTATION.md).

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import shlex
+from pathlib import Path
 
 from e2b import Sandbox
 
@@ -208,3 +209,9 @@ def stop_worker_sandbox(settings: Settings, sandbox_id: str) -> None:
             environment_id=settings.anthropic_environment_id,
             sandbox_id=sandbox_id,
         )
+
+
+def upload_file_to_sandbox(*, sandbox_id: str, local_path: Path, remote_path: str) -> str:
+    sandbox = Sandbox.connect(sandbox_id)
+    sandbox.files.write(remote_path, local_path.read_bytes())
+    return remote_path

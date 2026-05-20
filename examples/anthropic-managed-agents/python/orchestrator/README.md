@@ -102,6 +102,18 @@ UserToolResultEvent ... text='hello from E2B'
 SessionStatusIdleEvent ... stop_reason=EndTurn
 ```
 
+To upload a local file into the running E2B worker sandbox:
+
+```bash
+make upload-file \
+  SANDBOX_ID="<sandbox-id>" \
+  FILE=/tmp/example-input.txt \
+  REMOTE_PATH=/mnt/session/uploads/example-input.txt
+```
+
+Then ask the agent to read `/mnt/session/uploads/example-input.txt`. Anthropic session `resources`
+are not supported for self-hosted environments, so this example uploads files through E2B.
+
 ## Notes
 
 - This is a simple worker demo, not per-session isolation.
@@ -110,3 +122,4 @@ SessionStatusIdleEvent ... stop_reason=EndTurn
 - Secrets and Anthropic resource IDs stay runtime-only in `../.env`; they are not baked into the E2B template.
 
 For a concrete event-by-event walkthrough, see [../EXAMPLE_USAGE.md](../EXAMPLE_USAGE.md).
+For a complete code-level implementation, see [IMPLEMENTATION.md](./IMPLEMENTATION.md).

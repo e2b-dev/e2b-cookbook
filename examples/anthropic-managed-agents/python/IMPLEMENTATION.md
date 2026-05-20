@@ -171,13 +171,33 @@ It should:
 4. Print streamed events.
 5. Stop when the stream reaches `session.status_idle` with `stop_reason.type == "end_turn"`.
 
-## 10. Look Up and Clean Up Sandbox Metadata
+## 10. Upload Files into the E2B Worker Sandbox
+
+Anthropic session `resources` are not available for self-hosted environments. For this E2B pattern,
+upload files through E2B before sending the session message:
+
+```python
+from pathlib import Path
+from e2b import Sandbox
+
+
+def upload_file_to_sandbox(sandbox_id: str, local_path: Path, remote_path: str):
+    sandbox = Sandbox.connect(sandbox_id)
+    sandbox.files.write(remote_path, local_path.read_bytes())
+    return remote_path
+```
+
+Then ask the agent to read the remote path, for example
+`/mnt/session/uploads/example-input.txt`.
+
+## 11. Look Up and Clean Up Sandbox Metadata
 
 Implement:
 
 - `retrieve_environment(api_key, environment_id)`
 - `update_environment_metadata(api_key, environment_id, metadata)`
 - `clear_matching_sandbox_metadata(api_key, environment_id, sandbox_id)`
+- `upload_file_to_sandbox(sandbox_id, local_path, remote_path)`
 - `show_environment_main()`
 
 `show_environment_main()` should print:

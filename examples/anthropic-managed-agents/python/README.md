@@ -1,6 +1,7 @@
 # Claude Managed Agents with E2B Workers
 
-Run Anthropic Managed Agents self-hosted environment workers from E2B sandboxes.
+Run [Anthropic Managed Agents](https://platform.claude.com/docs/en/managed-agents/overview)
+self-hosted environment workers from E2B sandboxes.
 
 This directory contains the shared Python package and two runnable use-case folders:
 
@@ -44,7 +45,7 @@ Fill in `.env`. The example also reads the repository root `.env` if you keep sh
 | `E2B_ACCESS_TOKEN` | Required to build the E2B template. |
 | `ANTHROPIC_API_KEY` | Used by setup scripts and the session smoke driver. |
 | `ANTHROPIC_ENVIRONMENT_ID` | Printed by `anthropic-managed-agents-create-environment`. |
-| `ANTHROPIC_ENVIRONMENT_KEY` | Generate this in the Anthropic Console environment page. |
+| `ANTHROPIC_ENVIRONMENT_KEY` | Generate this in the Anthropic Console environment page. See Anthropic's [environment docs](https://platform.claude.com/docs/en/managed-agents/environments). |
 | `ANTHROPIC_WEBHOOK_SIGNING_KEY` | Required only for receiving webhook deliveries. See [`webhooks/`](./webhooks/). |
 | `ANTHROPIC_AGENT_ID` | Printed by `anthropic-managed-agents-create-agent`. |
 

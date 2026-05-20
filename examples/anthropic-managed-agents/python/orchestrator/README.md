@@ -1,6 +1,7 @@
 # Managed Agents Worker Orchestrator
 
-Start and manage an Anthropic self-hosted environment worker from your app or CLI.
+Start and manage an [Anthropic Managed Agents](https://platform.claude.com/docs/en/managed-agents/overview)
+self-hosted environment worker from your app or CLI.
 
 This is the simplest E2B shape: your host process starts one E2B sandbox from the managed-agents
 template, launches Anthropic's `EnvironmentWorker.run()` inside it, then creates Managed Agents
@@ -32,17 +33,21 @@ Fill in `../.env`:
 | `E2B_ACCESS_TOKEN` | Required to build the E2B template. |
 | `ANTHROPIC_API_KEY` | Used to create environments, agents, and sessions. |
 | `ANTHROPIC_ENVIRONMENT_ID` | Printed by `create-environment`. |
-| `ANTHROPIC_ENVIRONMENT_KEY` | Generated from the Anthropic Console environment page. |
+| `ANTHROPIC_ENVIRONMENT_KEY` | Generated from the Anthropic Console environment page. See Anthropic's [environment docs](https://platform.claude.com/docs/en/managed-agents/environments). |
 | `ANTHROPIC_AGENT_ID` | Printed by `create-agent`. |
 
 ## Create Anthropic Resources
+
+For the Anthropic concepts behind these commands, see the Managed Agents docs for
+[environments](https://platform.claude.com/docs/en/managed-agents/environments) and
+[agents](https://platform.claude.com/docs/en/managed-agents/agents).
 
 ```bash
 make create-environment NAME=my-e2b-env
 ```
 
-Save the printed `ANTHROPIC_ENVIRONMENT_ID`, open the printed Console URL, and generate
-`ANTHROPIC_ENVIRONMENT_KEY`.
+Save the printed `ANTHROPIC_ENVIRONMENT_ID`, open the printed Anthropic Console URL, and generate
+`ANTHROPIC_ENVIRONMENT_KEY` for the self-hosted environment.
 
 ```bash
 make create-agent NAME=my-e2b-agent

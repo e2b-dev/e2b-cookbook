@@ -1,6 +1,7 @@
 # Managed Agents Webhook Worker
 
-Run the Anthropic webhook receiver inside an auto-resumable E2B sandbox.
+Run the [Anthropic Managed Agents](https://platform.claude.com/docs/en/managed-agents/overview)
+webhook receiver inside an auto-resumable E2B sandbox.
 
 This flow is useful when you want Anthropic to wake your E2B worker on demand. Anthropic sends a
 `session.status_run_started` webhook, E2B auto-resumes the webhook sandbox, and the webhook handler
@@ -63,7 +64,9 @@ Anthropic webhook URL: https://.../webhook
 ```
 
 Create an Anthropic webhook endpoint with the printed URL and subscribe it to
-`session.status_run_started`. Copy the generated `whsec_...` signing key into
+`session.status_run_started`. See Anthropic's
+[Managed Agents webhook docs](https://platform.claude.com/docs/en/managed-agents/webhooks).
+Copy the generated `whsec_...` signing key into
 `ANTHROPIC_WEBHOOK_SIGNING_KEY` in `../.env`, then restart the webhook sandbox.
 
 The server can start without `ANTHROPIC_WEBHOOK_SIGNING_KEY` so you can get the public E2B URL first.

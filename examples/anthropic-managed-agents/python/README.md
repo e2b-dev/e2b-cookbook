@@ -89,7 +89,8 @@ Or:
 anthropic-managed-agents-build-template
 ```
 
-This builds an E2B template with Python, shell tools, the Anthropic SDK, and a writable `/mnt/session` workdir.
+This builds an E2B template with Python, shell tools, the Anthropic/FastAPI runtime dependencies,
+the packaged worker code, and a writable `/mnt/session` workdir.
 
 The default template name is `anthropic-managed-agents`. Use `--template-name` to override it.
 
@@ -202,6 +203,7 @@ SessionStatusIdleEvent ... stop_reason=EndTurn
 ## Notes
 
 - This example intentionally keeps the host side small and lets Anthropic's SDK manage the work queue.
+- The template bakes in the package and dependencies. Secrets stay runtime-only and are passed when the worker or webhook server starts.
 - One worker sandbox can service the self-hosted environment. Start more workers if you want more capacity.
 - The webhook server flow is for event-driven starts. It still runs the same Anthropic environment worker inside E2B.
 - Tool calls execute inside the E2B sandbox under `/mnt/session`.

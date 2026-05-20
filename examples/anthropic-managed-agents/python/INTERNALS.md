@@ -95,9 +95,10 @@ Defines the E2B template:
 
 - starts from Python 3.12 slim
 - installs shell utilities used by the sandbox tools
-- installs `anthropic>=0.103.0`
+- installs `anthropic>=0.103.0`, `fastapi>=0.116.0`, and `uvicorn>=0.35.0`
+- copies the packaged worker/webhook modules into `/opt/anthropic-managed-agents`
 - creates writable `/mnt/session`
-- creates `/opt/anthropic-managed-agents` for the uploaded worker script
+- creates `/opt/anthropic-managed-agents` for the worker and webhook server runtime
 - sets `/mnt/session` as the default workdir
 
 ### `template_builder.py`
@@ -111,8 +112,9 @@ Builds the E2B template with `Template.build()`. The default template name is
 
 `upload_worker(sandbox)`
 
-Writes a small worker entrypoint and the packaged worker/webhook modules into the sandbox under
-`/opt/anthropic-managed-agents`.
+Writes a small worker entrypoint and refreshes the packaged worker/webhook modules under
+`/opt/anthropic-managed-agents`. The template already bakes these modules in; the upload keeps local
+development changes usable without rebuilding the template every time.
 
 `start_worker_process(sandbox, settings)`
 

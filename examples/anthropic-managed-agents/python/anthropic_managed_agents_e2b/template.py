@@ -2,6 +2,22 @@ from __future__ import annotations
 
 from e2b import Template
 
+REMOTE_DIR = "/opt/anthropic-managed-agents"
+REMOTE_PACKAGE_DIR = f"{REMOTE_DIR}/anthropic_managed_agents_e2b"
+PACKAGE_FILES = [
+    "__init__.py",
+    "agent.py",
+    "cli.py",
+    "environment.py",
+    "sandbox_worker.py",
+    "session.py",
+    "settings.py",
+    "template.py",
+    "template_builder.py",
+    "webhook_runtime.py",
+    "worker_runtime.py",
+]
+
 
 def worker_template() -> Template:
     return (
@@ -29,9 +45,12 @@ def worker_template() -> Template:
             "'anthropic>=0.103.0' 'fastapi>=0.116.0' 'uvicorn>=0.35.0'"
         )
         .run_cmd(
-            "sudo mkdir -p /mnt/session /opt/anthropic-managed-agents && "
-            "sudo chmod 777 /mnt/session /opt/anthropic-managed-agents"
+            "sudo mkdir -p /mnt/session /opt/anthropic-managed-agents "
+            "/opt/anthropic-managed-agents/anthropic_managed_agents_e2b && "
+            "sudo chmod 777 /mnt/session /opt/anthropic-managed-agents "
+            "/opt/anthropic-managed-agents/anthropic_managed_agents_e2b"
         )
+        .copy(PACKAGE_FILES, REMOTE_PACKAGE_DIR)
         .run_cmd("python --version && rg --version | head -1")
         .set_workdir("/mnt/session")
     )

@@ -67,6 +67,7 @@ def build_template_main() -> None:
     parser.add_argument("--template-name", default=DEFAULT_TEMPLATE_NAME)
     args = parser.parse_args()
 
+    load_settings()
     info = build_template(template_name=args.template_name)
     print(f"E2B_TEMPLATE_NAME={info.name}")
 

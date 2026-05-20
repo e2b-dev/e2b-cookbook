@@ -127,6 +127,7 @@ def stop_worker_main() -> None:
     parser.add_argument("sandbox_id")
     args = parser.parse_args()
 
+    load_settings()
     stop_worker_sandbox(args.sandbox_id)
     print(f"killed {args.sandbox_id}")
 

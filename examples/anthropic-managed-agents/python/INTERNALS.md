@@ -63,10 +63,11 @@ must exist before making API calls.
 Creates an Anthropic environment with `config={"type": "self_hosted"}`. It prints:
 
 - `ANTHROPIC_ENVIRONMENT_ID`
-- the Claude Console URL for that environment
+- the Anthropic Agents workspace URL for that environment
 - the next step for generating `ANTHROPIC_ENVIRONMENT_KEY`
 
-The SDK creates the environment, but the environment key is generated from the Console.
+The SDK creates the environment, but the environment key is generated from the
+[Anthropic Agents workspace](https://platform.claude.com/workspaces/default/agents).
 
 ### `agent.py`
 
@@ -139,7 +140,8 @@ Creates a new E2B sandbox from the requested template, or reconnects to `--sandb
 
 Creates a new E2B sandbox with `lifecycle={"on_timeout": "pause", "auto_resume": True}`, or
 reconnects to `--sandbox-id`. It uploads the same worker code plus the FastAPI webhook server and
-starts Uvicorn. Register the printed `/webhook` URL in the Anthropic Console for
+starts Uvicorn. Register the printed `/webhook` URL in the
+[Anthropic Agents workspace](https://platform.claude.com/workspaces/default/agents) for
 `session.status_run_started`.
 
 ### `worker_runtime.py`

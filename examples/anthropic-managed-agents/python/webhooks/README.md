@@ -63,7 +63,7 @@ E2B_WEBHOOK_SANDBOX_ID=...
 Anthropic webhook URL: https://.../webhook
 ```
 
-Create an Anthropic webhook endpoint with the printed URL and subscribe it to
+Create an Anthropic webhook endpoint in the [Anthropic Agents workspace](https://platform.claude.com/workspaces/default/agents) with the printed URL and subscribe it to
 `session.status_run_started`. See Anthropic's
 [Managed Agents webhook docs](https://platform.claude.com/docs/en/managed-agents/webhooks).
 Copy the generated `whsec_...` signing key into

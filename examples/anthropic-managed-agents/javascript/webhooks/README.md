@@ -1,16 +1,19 @@
 # JavaScript Auto-Resume Webhook Worker
 
-Use this flow when you want Anthropic to wake the E2B worker sandbox on demand. The webhook
-receiver runs inside an auto-resumable E2B sandbox.
+Use this flow when you want Anthropic to wake an E2B-hosted router on demand. The router runs inside
+an auto-resumable E2B sandbox and starts or reconnects a worker sandbox for each session.
 
 When a Managed Agents session needs work, Anthropic sends a `session.status_run_started`
-webhook, E2B auto-resumes the webhook sandbox, and the webhook handler starts the worker process.
+webhook, E2B auto-resumes the router sandbox, and the router claims work from Anthropic's
+self-hosted environment queue. The claimed session id becomes the default E2B worker sandbox key.
 
 ```mermaid
 flowchart LR
     session["Managed Agents session"] --> webhook["Anthropic webhook"]
-    webhook --> receiver["E2B auto-resume webhook sandbox"]
-    receiver --> worker["worker process"]
+    webhook --> receiver["E2B auto-resume router sandbox"]
+    receiver --> store["session sandbox store"]
+    store --> worker["E2B worker sandbox"]
+    receiver --> worker
     worker --> env["Anthropic self-hosted environment"]
     worker --> workdir["/mnt/session"]
 ```
@@ -30,8 +33,9 @@ Fill in `.env`:
 
 | Variable | Notes |
 | --- | --- |
-| `E2B_API_KEY` | Required to start the webhook sandbox. |
+| `E2B_API_KEY` | Required to start the router sandbox and session worker sandboxes. |
 | `E2B_ACCESS_TOKEN` | Required to build the E2B template. |
+| `ANTHROPIC_API_KEY` | Used by the webhook router to claim work and inspect sessions. |
 | `ANTHROPIC_ENVIRONMENT_ID` | Anthropic self-hosted environment id. |
 | `ANTHROPIC_ENVIRONMENT_KEY` | Anthropic self-hosted environment key from the [Anthropic Environments workspace](https://platform.claude.com/workspaces/default/environments). |
 | `ANTHROPIC_WEBHOOK_SIGNING_KEY` | Required for real webhook deliveries. Start once without it to get the URL, then add it. |
@@ -93,14 +97,13 @@ If the stopped sandbox ID matches `e2b_webhook_sandbox_id`, the stop command cle
 
 ## Notes
 
-- The webhook sandbox uses `lifecycle: { onTimeout: "pause", autoResume: true }`.
-- The webhook server is only the event-driven entrypoint. It still starts the same Anthropic
-  environment worker used by the orchestrator example.
-- The public template starts bounded per-event workers inside the same sandbox. This is good for a
-  reusable webhook-worker sandbox, but it is still not production per-session isolation.
-- Persistent state is scoped to the webhook sandbox. Files in `/mnt/session` can be shared by any
-  session handled by that sandbox's worker pool. Use `../app-webhooks/` with
-  `APP_SANDBOX_ROUTING_SCOPE=session` for session-owned persistent state.
+- The webhook router sandbox uses `lifecycle: { onTimeout: "pause", autoResume: true }`.
+- The webhook router is only the event-driven entrypoint. It drains Anthropic's self-hosted
+  environment queue, claims work, and routes each claimed session to an E2B worker sandbox.
+- The public template defaults to `APP_SANDBOX_ROUTING_SCOPE=session`, so follow-up turns for the
+  same Managed Agents session reconnect to the same worker sandbox and `/mnt/session` filesystem.
+- Use `APP_SANDBOX_ROUTING_SCOPE=agent` or `environment` only when you intentionally want broader
+  sandbox reuse.
 
 For a concrete event-by-event walkthrough, see [../EXAMPLE_USAGE.md](../EXAMPLE_USAGE.md).
 For a complete code-level implementation, see [IMPLEMENTATION.md](./IMPLEMENTATION.md).

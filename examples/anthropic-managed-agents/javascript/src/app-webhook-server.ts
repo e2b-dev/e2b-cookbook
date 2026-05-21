@@ -15,6 +15,7 @@ import { loadSettings, requireSetting, type Settings } from "./settings.js";
 const store = new JsonSandboxStore();
 const pendingWorkers = new Map<string, Promise<Awaited<ReturnType<typeof ensureWorkerSandbox>>>>();
 const MAX_WEBHOOK_BODY_BYTES = 1_048_576;
+const ROUTING_SCOPES = new Set(["session", "agent", "environment"]);
 
 class PayloadTooLargeError extends Error {}
 
@@ -32,24 +33,66 @@ function sessionId(event: unknown) {
   return String(id);
 }
 
+function routingScope(settings: Settings) {
+  const scope = settings.appSandboxRoutingScope ?? "session";
+  if (!ROUTING_SCOPES.has(scope)) {
+    throw new Error("APP_SANDBOX_ROUTING_SCOPE must be session, agent, or environment");
+  }
+  return scope;
+}
+
+async function routingTarget(settings: Settings, session: string) {
+  const configuredEnvironmentId = requireSetting(
+    settings.anthropicEnvironmentId,
+    "ANTHROPIC_ENVIRONMENT_ID",
+  );
+  const scope = routingScope(settings);
+  if (scope === "session") {
+    return { environmentId: configuredEnvironmentId, routingScope: scope, routingId: session };
+  }
+  if (scope === "environment") {
+    return {
+      environmentId: configuredEnvironmentId,
+      routingScope: scope,
+      routingId: configuredEnvironmentId,
+    };
+  }
+
+  const sessionInfo = await webhookClient(settings).beta.sessions.retrieve(session);
+  if (sessionInfo.environment_id !== configuredEnvironmentId) {
+    throw new Error(
+      `session ${session} belongs to ${sessionInfo.environment_id}, but this worker is configured for ${configuredEnvironmentId}`,
+    );
+  }
+  return {
+    environmentId: sessionInfo.environment_id,
+    routingScope: scope,
+    routingId: sessionInfo.agent.id,
+  };
+}
+
 async function ensureWorkerForEvent(settings: Settings, event: unknown) {
-  const environmentId = requireSetting(settings.anthropicEnvironmentId, "ANTHROPIC_ENVIRONMENT_ID");
   const session = sessionId(event);
-  const key = `${environmentId}:${session}`;
+  const target = await routingTarget(settings, session);
+  const key = `${target.routingScope}:${target.environmentId}:${target.routingId}`;
   const pending = pendingWorkers.get(key);
   if (pending) {
     return pending;
   }
 
-  const worker = ensureWorkerForSession(settings, environmentId, session).finally(() => {
+  const worker = ensureWorkerForTarget(settings, target, session).finally(() => {
     pendingWorkers.delete(key);
   });
   pendingWorkers.set(key, worker);
   return worker;
 }
 
-async function ensureWorkerForSession(settings: Settings, environmentId: string, session: string) {
-  const assignment = await store.get({ environmentId, sessionId: session });
+async function ensureWorkerForTarget(
+  settings: Settings,
+  target: { environmentId: string; routingScope: string; routingId: string },
+  session: string,
+) {
+  const assignment = await store.get(target);
   const sandbox = await ensureWorkerSandbox(settings, {
     sandboxId: assignment?.sandboxId,
     templateName: DEFAULT_TEMPLATE_NAME,
@@ -58,7 +101,7 @@ async function ensureWorkerForSession(settings: Settings, environmentId: string,
     logLevel: DEFAULT_LOG_LEVEL,
   });
   await store.upsert({
-    environmentId,
+    ...target,
     sessionId: session,
     sandboxId: sandbox.sandboxId,
   });

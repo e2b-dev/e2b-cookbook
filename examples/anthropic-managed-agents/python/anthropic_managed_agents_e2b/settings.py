@@ -35,6 +35,7 @@ class Settings:
     anthropic_environment_key: str | None
     anthropic_webhook_signing_key: str | None
     app_webhook_admin_token: str | None
+    app_sandbox_routing_scope: str | None
 
     def require(self, field_name: str, env_name: str) -> str:
         value = getattr(self, field_name)
@@ -67,4 +68,5 @@ def load_settings() -> Settings:
         anthropic_environment_key=_optional("ANTHROPIC_ENVIRONMENT_KEY"),
         anthropic_webhook_signing_key=_optional("ANTHROPIC_WEBHOOK_SIGNING_KEY"),
         app_webhook_admin_token=_optional("APP_WEBHOOK_ADMIN_TOKEN"),
+        app_sandbox_routing_scope=_optional("APP_SANDBOX_ROUTING_SCOPE"),
     )

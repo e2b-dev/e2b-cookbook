@@ -22,9 +22,10 @@ from anthropic_managed_agents_e2b.settings import (
 
 app = FastAPI()
 store = JsonSandboxStore()
-worker_locks: dict[tuple[str, str], Lock] = {}
+worker_locks: dict[tuple[str, str, str], Lock] = {}
 worker_locks_lock = Lock()
 logger = logging.getLogger(__name__)
+ROUTING_SCOPES = {"session", "agent", "environment"}
 
 
 def _settings() -> Settings:
@@ -43,18 +44,52 @@ def _session_id(event: object) -> str:
     return str(session_id)
 
 
+def _routing_scope(settings: Settings) -> str:
+    scope = settings.app_sandbox_routing_scope or "session"
+    if scope not in ROUTING_SCOPES:
+        raise RuntimeError("APP_SANDBOX_ROUTING_SCOPE must be session, agent, or environment")
+    return scope
+
+
+def _routing_target(settings: Settings, session_id: str) -> tuple[str, str, str]:
+    configured_environment_id = settings.require_anthropic_environment_id()
+    scope = _routing_scope(settings)
+    if scope == "session":
+        return configured_environment_id, scope, session_id
+    if scope == "environment":
+        return configured_environment_id, scope, configured_environment_id
+
+    session = _webhook_client(settings).beta.sessions.retrieve(session_id)
+    if session.environment_id != configured_environment_id:
+        raise RuntimeError(
+            f"session {session_id} belongs to {session.environment_id}, "
+            f"but this worker is configured for {configured_environment_id}"
+        )
+    return session.environment_id, scope, session.agent.id
+
+
 def ensure_worker_for_event(settings: Settings, event: object):
-    environment_id = settings.require_anthropic_environment_id()
     session_id = _session_id(event)
+    environment_id, routing_scope, routing_id = _routing_target(settings, session_id)
     with worker_locks_lock:
-        worker_lock = worker_locks.setdefault((environment_id, session_id), Lock())
+        worker_lock = worker_locks.setdefault((environment_id, routing_scope, routing_id), Lock())
 
     with worker_lock:
-        return _ensure_worker_for_session(settings, environment_id, session_id)
+        return _ensure_worker_for_target(
+            settings, environment_id, routing_scope, routing_id, session_id
+        )
 
 
-def _ensure_worker_for_session(settings: Settings, environment_id: str, session_id: str):
-    assignment = store.get(environment_id=environment_id, session_id=session_id)
+def _ensure_worker_for_target(
+    settings: Settings,
+    environment_id: str,
+    routing_scope: str,
+    routing_id: str,
+    session_id: str,
+):
+    assignment = store.get(
+        environment_id=environment_id, routing_scope=routing_scope, routing_id=routing_id
+    )
     sandbox = ensure_worker_sandbox(
         settings,
         template_name=DEFAULT_TEMPLATE_NAME,
@@ -65,6 +100,8 @@ def _ensure_worker_for_session(settings: Settings, environment_id: str, session_
     )
     store.upsert(
         environment_id=environment_id,
+        routing_scope=routing_scope,
+        routing_id=routing_id,
         session_id=session_id,
         sandbox_id=sandbox.sandbox_id,
     )

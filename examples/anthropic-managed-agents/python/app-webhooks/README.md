@@ -36,6 +36,7 @@ Fill in `.env`:
 | `ANTHROPIC_WEBHOOK_SIGNING_KEY` | Required for real webhook deliveries. |
 | `APP_WEBHOOK_ADMIN_TOKEN` | Bearer token for app-owned debug endpoints such as `GET /sandboxes`. |
 | `APP_SANDBOX_STORE_PATH` | Optional path for the app-owned session-to-sandbox JSON store. Defaults to `../.managed-agent-sandbox-store.json`. |
+| `APP_SANDBOX_ROUTING_SCOPE` | Optional sandbox reuse scope: `session` (default), `agent`, or `environment`. |
 
 ## Build the E2B Template
 
@@ -59,15 +60,22 @@ When Anthropic sends a run-started webhook, the app:
 
 1. Verifies the raw payload with `ANTHROPIC_WEBHOOK_SIGNING_KEY`.
 2. Reads `event.data.id` as the Managed Agents session id.
-3. Looks up that session id in the app-owned sandbox store.
-4. Reconnects to that session's sandbox and starts the worker if needed.
-5. Creates a fresh E2B sandbox and writes a new store assignment if the session is new or stale.
+3. Computes the sandbox routing key from `APP_SANDBOX_ROUTING_SCOPE`.
+4. Reconnects to that route's sandbox and starts the worker if needed.
+5. Creates a fresh E2B sandbox and writes a new store assignment if the route is new or stale.
+
+Routing scopes:
+
+| Scope | Sandbox key | Use when |
+| --- | --- | --- |
+| `session` | `environment_id + session_id` | You want the strongest isolation and separate filesystem state per Managed Agents session. |
+| `agent` | `environment_id + agent.id` | You want sessions for the same agent to reuse a warm sandbox. The app retrieves the session to read `agent.id`. |
+| `environment` | `environment_id` | You want one shared worker sandbox for the whole self-hosted environment. |
 
 The JSON store is a local example store. For a multi-instance app, use a database with a
 transactional session assignment so duplicate webhook deliveries cannot create duplicate workers.
-The worker itself still polls Anthropic at the environment level, so treat this flow as app-owned
-sandbox lifecycle control, not a hard session-affinity primitive unless your Anthropic integration
-also scopes work to a specific worker.
+The worker itself still polls Anthropic at the environment level, so `agent` and `environment`
+scopes are reuse policies, not hard routing guarantees for a specific work item.
 
 Inspect the app-owned assignments:
 

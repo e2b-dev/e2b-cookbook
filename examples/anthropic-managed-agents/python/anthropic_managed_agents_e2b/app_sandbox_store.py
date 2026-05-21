@@ -23,6 +23,8 @@ def _store_path() -> Path:
 @dataclass(frozen=True)
 class SandboxAssignment:
     environment_id: str
+    routing_scope: str
+    routing_id: str
     session_id: str
     sandbox_id: str
     status: str
@@ -39,12 +41,15 @@ class JsonSandboxStore:
         with self._lock:
             return self._read()
 
-    def get(self, *, environment_id: str, session_id: str) -> SandboxAssignment | None:
+    def get(
+        self, *, environment_id: str, routing_scope: str, routing_id: str
+    ) -> SandboxAssignment | None:
         with self._lock:
             for assignment in self._read():
                 if (
                     assignment.environment_id == environment_id
-                    and assignment.session_id == session_id
+                    and assignment.routing_scope == routing_scope
+                    and assignment.routing_id == routing_id
                 ):
                     return assignment
         return None
@@ -53,6 +58,8 @@ class JsonSandboxStore:
         self,
         *,
         environment_id: str,
+        routing_scope: str,
+        routing_id: str,
         session_id: str,
         sandbox_id: str,
         status: str = "active",
@@ -64,12 +71,16 @@ class JsonSandboxStore:
                 (
                     item
                     for item in assignments
-                    if item.environment_id == environment_id and item.session_id == session_id
+                    if item.environment_id == environment_id
+                    and item.routing_scope == routing_scope
+                    and item.routing_id == routing_id
                 ),
                 None,
             )
             assignment = SandboxAssignment(
                 environment_id=environment_id,
+                routing_scope=routing_scope,
+                routing_id=routing_id,
                 session_id=session_id,
                 sandbox_id=sandbox_id,
                 status=status,
@@ -79,7 +90,11 @@ class JsonSandboxStore:
             updated = [
                 item
                 for item in assignments
-                if not (item.environment_id == environment_id and item.session_id == session_id)
+                if not (
+                    item.environment_id == environment_id
+                    and item.routing_scope == routing_scope
+                    and item.routing_id == routing_id
+                )
             ]
             updated.append(assignment)
             self._write(updated)
@@ -98,6 +113,8 @@ class JsonSandboxStore:
         return [
             SandboxAssignment(
                 environment_id=str(item["environment_id"]),
+                routing_scope=str(item.get("routing_scope", "session")),
+                routing_id=str(item.get("routing_id", item["session_id"])),
                 session_id=str(item["session_id"]),
                 sandbox_id=str(item["sandbox_id"]),
                 status=str(item.get("status", "active")),

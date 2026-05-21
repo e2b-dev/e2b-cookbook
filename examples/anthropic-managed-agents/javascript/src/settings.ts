@@ -13,6 +13,7 @@ export type Settings = {
   anthropicEnvironmentKey?: string;
   anthropicWebhookSigningKey?: string;
   appWebhookAdminToken?: string;
+  appSandboxRoutingScope?: string;
 };
 
 export function loadDotenvFiles() {
@@ -33,6 +34,7 @@ export function loadSettings(): Settings {
     anthropicEnvironmentKey: optional("ANTHROPIC_ENVIRONMENT_KEY"),
     anthropicWebhookSigningKey: optional("ANTHROPIC_WEBHOOK_SIGNING_KEY"),
     appWebhookAdminToken: optional("APP_WEBHOOK_ADMIN_TOKEN"),
+    appSandboxRoutingScope: optional("APP_SANDBOX_ROUTING_SCOPE"),
   };
 }
 

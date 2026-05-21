@@ -30,4 +30,4 @@ needs `ANTHROPIC_ENVIRONMENT_ID`, `ANTHROPIC_ENVIRONMENT_KEY`, and
 `ANTHROPIC_WEBHOOK_SIGNING_KEY`; keep `ANTHROPIC_API_KEY` in your app.
 
 See [javascript/webhooks/PUBLIC_TEMPLATE.md](./javascript/webhooks/PUBLIC_TEMPLATE.md) for the
-copy-paste SDK example.
+copy-paste SDK example and the end-to-end setup and smoke-test process.

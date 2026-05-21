@@ -145,7 +145,7 @@ Implement `webhook(request)`.
 It should:
 
 1. Return `503` when `ANTHROPIC_WEBHOOK_SIGNING_KEY` is not configured.
-2. Read the raw request body.
+2. Read the raw request body with a fixed size limit.
 3. Verify the payload with:
 
 ```python
@@ -156,10 +156,13 @@ event = client.beta.webhooks.unwrap(
 )
 ```
 
-4. If `event.data.type == "session.status_run_started"`, start the worker process if it is not already running.
+4. If `event.data.type == "session.status_run_started"`, start a worker process when capacity is available.
 5. Return `204` for accepted webhook deliveries.
 
-Also implement `health()` so setup can confirm the webhook sandbox is serving HTTP.
+Also implement `health()` so setup can confirm the webhook sandbox is serving HTTP and see the
+current worker count. The webhook sandbox should support file-backed config in `/mnt/session` so a
+resumed sandbox can receive updated environment keys, signing keys, idle timeout, and log level
+without rebuilding the template.
 
 ## 9. App-Owned Webhook Routing
 
@@ -171,9 +174,10 @@ It should:
 1. Receive `POST /webhook` in the app process.
 2. Verify the raw Anthropic webhook payload with `client.beta.webhooks.unwrap(...)`.
 3. Read `event.data.id` as the Managed Agents session id.
-4. Look up that session id in an app-owned sandbox store.
-5. Reconnect to that session's sandbox and start the worker if needed, or create a fresh worker
-   sandbox when the assignment is missing or stale.
+4. Compute the sandbox routing key. The default scope is `session`, but app deployments can choose
+   `agent` or `environment` with `APP_SANDBOX_ROUTING_SCOPE`.
+5. Reconnect to that key's sandbox and start the worker if needed, or create a fresh worker sandbox
+   when the assignment is missing or stale.
 
 This keeps webhook policy, routing, observability, and sandbox replacement under app control while
 still using the same E2B worker runtime. Add `GET /sandboxes` so operators can inspect the current

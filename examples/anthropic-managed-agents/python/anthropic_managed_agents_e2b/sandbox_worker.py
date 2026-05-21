@@ -18,12 +18,18 @@ from anthropic_managed_agents_e2b.environment import (
 from anthropic_managed_agents_e2b.settings import PACKAGE_ROOT, Settings
 
 REMOTE_DIR = "/opt/anthropic-managed-agents"
+REMOTE_WORKDIR = "/mnt/session"
 REMOTE_PACKAGE_DIR = f"{REMOTE_DIR}/anthropic_managed_agents_e2b"
 REMOTE_WORKER = f"{REMOTE_DIR}/worker.py"
 REMOTE_PID = f"{REMOTE_DIR}/worker.pid"
 REMOTE_LOG = f"{REMOTE_DIR}/worker.log"
 REMOTE_WEBHOOK_PID = f"{REMOTE_DIR}/webhook.pid"
 REMOTE_WEBHOOK_LOG = f"{REMOTE_DIR}/webhook.log"
+REMOTE_ENVIRONMENT_ID = f"{REMOTE_WORKDIR}/.anthropic-environment-id"
+REMOTE_ENVIRONMENT_KEY = f"{REMOTE_WORKDIR}/.anthropic-environment-key"
+REMOTE_WEBHOOK_SIGNING_KEY = f"{REMOTE_WORKDIR}/.anthropic-webhook-signing-key"
+REMOTE_WORKER_MAX_IDLE_SECONDS = f"{REMOTE_WORKDIR}/.worker-max-idle-seconds"
+REMOTE_LOG_LEVEL = f"{REMOTE_WORKDIR}/.log-level"
 logger = logging.getLogger(__name__)
 REMOTE_WORKER_ENTRYPOINT = """\
 from anthropic_managed_agents_e2b.worker_runtime import main
@@ -230,6 +236,33 @@ def start_webhook_server_process(
         raise RuntimeError(f"webhook server start failed:\n{result.stdout}\n{result.stderr}")
 
 
+def write_webhook_config(
+    sandbox: Sandbox,
+    settings: Settings,
+    *,
+    worker_max_idle_seconds: float | None,
+    log_level: str,
+) -> None:
+    sandbox.files.write(
+        REMOTE_ENVIRONMENT_ID,
+        f"{settings.require_anthropic_environment_id()}\n",
+    )
+    sandbox.files.write(
+        REMOTE_ENVIRONMENT_KEY,
+        f"{settings.require_anthropic_environment_key()}\n",
+    )
+    sandbox.files.write(
+        REMOTE_WORKER_MAX_IDLE_SECONDS,
+        "none\n" if worker_max_idle_seconds is None else f"{worker_max_idle_seconds}\n",
+    )
+    sandbox.files.write(REMOTE_LOG_LEVEL, f"{log_level}\n")
+    if settings.anthropic_webhook_signing_key:
+        sandbox.files.write(
+            REMOTE_WEBHOOK_SIGNING_KEY,
+            f"{settings.anthropic_webhook_signing_key}\n",
+        )
+
+
 def start_webhook_server_sandbox(
     settings: Settings,
     *,
@@ -257,6 +290,12 @@ def start_webhook_server_sandbox(
         )
 
     upload_worker(sandbox)
+    write_webhook_config(
+        sandbox,
+        settings,
+        worker_max_idle_seconds=worker_max_idle_seconds,
+        log_level=log_level,
+    )
     start_webhook_server_process(
         sandbox,
         settings,

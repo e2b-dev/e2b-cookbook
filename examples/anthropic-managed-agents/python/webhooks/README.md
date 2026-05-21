@@ -85,6 +85,26 @@ make start-webhook-server SANDBOX_ID="<E2B_WEBHOOK_SANDBOX_ID>"
 The server can start without `ANTHROPIC_WEBHOOK_SIGNING_KEY` so you can get the public E2B URL first.
 Until the key is configured, `/webhook` returns `503`.
 
+The webhook sandbox stores its runtime config under `/mnt/session` before starting Uvicorn:
+
+| File | Purpose |
+| --- | --- |
+| `.anthropic-environment-id` | Anthropic environment to work from. |
+| `.anthropic-environment-key` | Environment-scoped worker credential. |
+| `.anthropic-webhook-signing-key` | Webhook signature secret, when configured. |
+| `.worker-max-idle-seconds` | Worker SDK idle timeout. |
+| `.log-level` | Worker log level. |
+
+Each signed `session.status_run_started` event starts a bounded worker process if capacity is
+available. The default cap is `MAX_WORKERS=4`; extra starts are retried until a worker exits. Check
+the sandbox with:
+
+```bash
+curl "https://<sandbox-host>/health"
+```
+
+The response includes `worker_running` and `worker_count`.
+
 ## Stop the Webhook Sandbox
 
 ```bash

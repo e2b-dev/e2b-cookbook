@@ -130,6 +130,7 @@ function startWorkerIfCapacity({ retryingPendingStart = false } = {}) {
     }
     scheduleWorkerRetry();
   });
+  scheduleWorkerRetry();
 }
 
 function webhookSigningKey() {

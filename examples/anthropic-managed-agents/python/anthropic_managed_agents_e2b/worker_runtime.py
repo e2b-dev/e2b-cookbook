@@ -10,7 +10,14 @@ WORKDIR = "/mnt/session"
 
 
 def max_idle_seconds() -> float | None:
-    raw = os.environ.get("WORKER_MAX_IDLE_SECONDS", "300")
+    raw = os.environ.get("WORKER_MAX_IDLE_SECONDS", "30")
+    if raw.lower() in {"", "none", "null"}:
+        return None
+    return float(raw)
+
+
+def run_seconds() -> float | None:
+    raw = os.environ.get("WORKER_RUN_SECONDS", "180")
     if raw.lower() in {"", "none", "null"}:
         return None
     return float(raw)
@@ -18,9 +25,11 @@ def max_idle_seconds() -> float | None:
 
 async def run_worker() -> None:
     logging.basicConfig(level=os.environ.get("LOG_LEVEL", "INFO"))
+    logger = logging.getLogger(__name__)
 
     environment_id = os.environ["ANTHROPIC_ENVIRONMENT_ID"]
     environment_key = os.environ["ANTHROPIC_ENVIRONMENT_KEY"]
+    max_run_seconds = run_seconds()
 
     async with AsyncAnthropic(auth_token=environment_key) as client:
         worker = client.beta.environments.work.worker(
@@ -29,7 +38,14 @@ async def run_worker() -> None:
             workdir=WORKDIR,
             max_idle=max_idle_seconds(),
         )
-        await worker.run()
+        if max_run_seconds is None:
+            await worker.run()
+            return
+
+        try:
+            await asyncio.wait_for(worker.run(), timeout=max_run_seconds)
+        except TimeoutError:
+            logger.info("worker reached WORKER_RUN_SECONDS=%s; exiting", max_run_seconds)
 
 
 def main() -> None:

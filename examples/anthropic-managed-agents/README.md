@@ -21,3 +21,13 @@ app-owned webhook router.
 | --- | --- | --- |
 | Python | [python](./python) | E2B template builder, long-running Anthropic `EnvironmentWorker`, setup scripts, and a session smoke driver. |
 | JavaScript | [javascript](./javascript) | E2B template builder, TypeScript worker/webhook runtime, setup scripts, and a session smoke driver. |
+
+## Public Webhook Template
+
+Use `E2B/claude-managed-agents-webhooks` if you want a sandbox that starts an Anthropic Managed
+Agents webhook receiver automatically and runs the worker inside `/mnt/session`. The sandbox only
+needs `ANTHROPIC_ENVIRONMENT_ID`, `ANTHROPIC_ENVIRONMENT_KEY`, and
+`ANTHROPIC_WEBHOOK_SIGNING_KEY`; keep `ANTHROPIC_API_KEY` in your app.
+
+See [javascript/webhooks/PUBLIC_TEMPLATE.md](./javascript/webhooks/PUBLIC_TEMPLATE.md) for the
+copy-paste SDK example and the end-to-end setup and smoke-test process.

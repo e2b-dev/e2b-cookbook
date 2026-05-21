@@ -3,6 +3,7 @@ from __future__ import annotations
 from e2b import Template
 
 REMOTE_DIR = "/opt/anthropic-managed-agents"
+REMOTE_CONFIG_DIR = f"{REMOTE_DIR}/config"
 REMOTE_PACKAGE_DIR = f"{REMOTE_DIR}/anthropic_managed_agents_e2b"
 PACKAGE_FILES = [
     "__init__.py",
@@ -48,9 +49,11 @@ def worker_template() -> Template:
         )
         .run_cmd(
             "sudo mkdir -p /mnt/session /opt/anthropic-managed-agents "
-            "/opt/anthropic-managed-agents/anthropic_managed_agents_e2b && "
+            "/opt/anthropic-managed-agents/anthropic_managed_agents_e2b "
+            "/opt/anthropic-managed-agents/config && "
             "sudo chmod 777 /mnt/session /opt/anthropic-managed-agents "
-            "/opt/anthropic-managed-agents/anthropic_managed_agents_e2b"
+            "/opt/anthropic-managed-agents/anthropic_managed_agents_e2b && "
+            "sudo chmod 700 /opt/anthropic-managed-agents/config"
         )
         .copy(PACKAGE_FILES, REMOTE_PACKAGE_DIR)
         .run_cmd("python --version && rg --version | head -1")

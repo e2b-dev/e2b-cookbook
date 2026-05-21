@@ -10,9 +10,11 @@ Anthropic webhook -> your app -> app-owned sandbox store -> E2B worker sandbox
 ```
 
 The app-owned store lets your app reconnect to the same worker sandbox for a repeated
-`session.status_run_started` webhook. The Anthropic worker in this example still polls at the
-self-hosted environment level, so this is app-owned sandbox lifecycle control rather than a hard
-session-affinity guarantee.
+`session.status_run_started` webhook. The app drains Anthropic's self-hosted environment queue and
+starts each E2B sandbox with the claimed `ANTHROPIC_WORK_ID` and `ANTHROPIC_SESSION_ID`; the sandbox
+then calls `EnvironmentWorker.handle_item()` for that one work item. Do not start a normal
+environment-polling worker inside a session-owned sandbox, because it can claim a different queued
+session.
 
 ## 1. Add the App Webhook Server
 

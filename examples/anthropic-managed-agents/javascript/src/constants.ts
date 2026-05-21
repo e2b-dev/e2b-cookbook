@@ -1,10 +1,12 @@
-export const DEFAULT_TEMPLATE_NAME = "anthropic-managed-agents-js";
-export const DEFAULT_WORKER_MAX_IDLE_SECONDS = 300;
+export const DEFAULT_TEMPLATE_NAME = "claude-managed-agents-webhooks";
+export const DEFAULT_WORKER_MAX_IDLE_SECONDS = 30;
 export const DEFAULT_SANDBOX_TIMEOUT_SECONDS = 3600;
+export const DEFAULT_APP_SANDBOX_TIMEOUT_SECONDS = 300;
 export const DEFAULT_WEBHOOK_PORT = 8000;
 export const DEFAULT_LOG_LEVEL = "INFO";
 
 export const REMOTE_DIR = "/opt/anthropic-managed-agents-js";
+export const REMOTE_CONFIG_DIR = `${REMOTE_DIR}/config`;
 export const REMOTE_SRC_DIR = `${REMOTE_DIR}/src`;
 export const REMOTE_WORKDIR = "/mnt/session";
 export const REMOTE_WORKER = `${REMOTE_SRC_DIR}/worker-runtime.ts`;
@@ -14,6 +16,11 @@ export const REMOTE_LOG = `${REMOTE_DIR}/worker.log`;
 export const REMOTE_WEBHOOK_PID = `${REMOTE_DIR}/webhook.pid`;
 export const REMOTE_WEBHOOK_LOG = `${REMOTE_DIR}/webhook.log`;
 export const REMOTE_TSX = `${REMOTE_DIR}/node_modules/.bin/tsx`;
+export const REMOTE_ENVIRONMENT_ID = `${REMOTE_CONFIG_DIR}/anthropic-environment-id`;
+export const REMOTE_ENVIRONMENT_KEY = `${REMOTE_CONFIG_DIR}/anthropic-environment-key`;
+export const REMOTE_WEBHOOK_SIGNING_KEY = `${REMOTE_CONFIG_DIR}/anthropic-webhook-signing-key`;
+export const REMOTE_WORKER_MAX_IDLE_SECONDS = `${REMOTE_CONFIG_DIR}/worker-max-idle-seconds`;
+export const REMOTE_LOG_LEVEL = `${REMOTE_CONFIG_DIR}/log-level`;
 
 export const SANDBOX_TOOLS = ["bash", "read", "write", "edit", "glob", "grep"] as const;
 export const WEB_TOOLS = ["web_fetch", "web_search"] as const;

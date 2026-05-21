@@ -5,6 +5,8 @@ import { exampleRoot } from "./settings.js";
 
 export type SandboxAssignment = {
   environmentId: string;
+  routingScope: string;
+  routingId: string;
   sessionId: string;
   sandboxId: string;
   status: string;
@@ -29,35 +31,49 @@ export class JsonSandboxStore {
 
   async get({
     environmentId,
-    sessionId,
+    routingScope,
+    routingId,
   }: {
     environmentId: string;
-    sessionId: string;
+    routingScope: string;
+    routingId: string;
   }) {
     const assignments = await this.read();
     return assignments.find(
-      (item) => item.environmentId === environmentId && item.sessionId === sessionId,
+      (item) =>
+        item.environmentId === environmentId &&
+        item.routingScope === routingScope &&
+        item.routingId === routingId,
     );
   }
 
   async upsert({
     environmentId,
+    routingScope,
+    routingId,
     sessionId,
     sandboxId,
     status = "active",
   }: {
     environmentId: string;
+    routingScope: string;
+    routingId: string;
     sessionId: string;
     sandboxId: string;
     status?: string;
   }) {
     const assignments = await this.read();
     const existing = assignments.find(
-      (item) => item.environmentId === environmentId && item.sessionId === sessionId,
+      (item) =>
+        item.environmentId === environmentId &&
+        item.routingScope === routingScope &&
+        item.routingId === routingId,
     );
     const timestamp = now();
     const assignment: SandboxAssignment = {
       environmentId,
+      routingScope,
+      routingId,
       sessionId,
       sandboxId,
       status,
@@ -66,7 +82,12 @@ export class JsonSandboxStore {
     };
     await this.write([
       ...assignments.filter(
-        (item) => !(item.environmentId === environmentId && item.sessionId === sessionId),
+        (item) =>
+          !(
+            item.environmentId === environmentId &&
+            item.routingScope === routingScope &&
+            item.routingId === routingId
+          ),
       ),
       assignment,
     ]);
@@ -80,7 +101,11 @@ export class JsonSandboxStore {
 
   private async read(): Promise<SandboxAssignment[]> {
     try {
-      const raw = JSON.parse(await readFile(this.path, "utf8"));
+      const text = await readFile(this.path, "utf8");
+      if (!text.trim()) {
+        return [];
+      }
+      const raw = JSON.parse(text);
       if (!Array.isArray(raw)) {
         return [];
       }
@@ -97,6 +122,8 @@ export class JsonSandboxStore {
         )
         .map((item) => ({
           environmentId: String(item.environmentId),
+          routingScope: String(item.routingScope ?? "session"),
+          routingId: String(item.routingId ?? item.sessionId),
           sessionId: String(item.sessionId),
           sandboxId: String(item.sandboxId),
           status: String(item.status ?? "active"),

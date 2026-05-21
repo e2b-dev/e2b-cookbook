@@ -30,4 +30,14 @@ check_absent \
   "webhook handlers must attach .catch() so unexpected read/verify errors return a response" \
   "$ROOT_DIR/javascript/src" "$ROOT_DIR/javascript"/*/*.md
 
+check_absent \
+  "/mnt/session/.anthropic-environment-key" \
+  "environment keys must not be stored in the model/tool-accessible workdir" \
+  "$ROOT_DIR/javascript/src" "$ROOT_DIR/python/anthropic_managed_agents_e2b" "$ROOT_DIR"/*.md "$ROOT_DIR/javascript"/*.md "$ROOT_DIR/javascript"/*/*.md "$ROOT_DIR/python"/*.md "$ROOT_DIR/python"/*/*.md
+
+check_absent \
+  "/mnt/session/.anthropic-webhook-signing-key" \
+  "webhook signing keys must not be stored in the model/tool-accessible workdir" \
+  "$ROOT_DIR/javascript/src" "$ROOT_DIR/python/anthropic_managed_agents_e2b" "$ROOT_DIR"/*.md "$ROOT_DIR/javascript"/*.md "$ROOT_DIR/javascript"/*/*.md "$ROOT_DIR/python"/*.md "$ROOT_DIR/python"/*/*.md
+
 exit "$failed"

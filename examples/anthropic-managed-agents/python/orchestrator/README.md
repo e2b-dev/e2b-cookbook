@@ -118,8 +118,13 @@ are not supported for self-hosted environments, so this example uploads files th
 
 - This is a simple worker demo, not per-session isolation.
 - One worker sandbox can service the self-hosted environment. Start more workers for more capacity.
+- Persistent state is scoped to the worker sandbox. Files under `/mnt/session` can be shared by
+  any session that worker claims.
 - Tool calls execute inside the E2B sandbox under `/mnt/session`.
 - Secrets and Anthropic resource IDs stay runtime-only in `../.env`; they are not baked into the E2B template.
+
+Use `../app-webhooks/` with `APP_SANDBOX_ROUTING_SCOPE=session` when each Managed Agents session
+needs its own sandbox and follow-up state.
 
 For a concrete event-by-event walkthrough, see [../EXAMPLE_USAGE.md](../EXAMPLE_USAGE.md).
 For a complete code-level implementation, see [IMPLEMENTATION.md](./IMPLEMENTATION.md).

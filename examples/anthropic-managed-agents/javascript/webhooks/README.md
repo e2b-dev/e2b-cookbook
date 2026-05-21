@@ -42,6 +42,10 @@ Fill in `.env`:
 make build-template
 ```
 
+The reusable public template name for this flow is `E2B/claude-managed-agents-webhooks`. See
+[PUBLIC_TEMPLATE.md](./PUBLIC_TEMPLATE.md) for the minimal SDK usage shape and a complete
+setup-and-smoke-test process for using the webhook receiver as the worker sandbox.
+
 ## Start Once to Get the Webhook URL
 
 You can start the webhook sandbox before creating the Anthropic webhook endpoint:
@@ -69,8 +73,9 @@ Create an Anthropic webhook endpoint in the [Anthropic Agents workspace](https:/
 `session.status_run_started`. For signing details, see Anthropic's
 [Managed Agents webhook docs](https://platform.claude.com/docs/en/managed-agents/webhooks).
 
-Save the generated signing key as `ANTHROPIC_WEBHOOK_SIGNING_KEY` in `../.env`, then restart
-the same webhook sandbox so the public URL stays unchanged:
+Save the generated signing key as `ANTHROPIC_WEBHOOK_SIGNING_KEY` in `../.env`, then run the
+command again with the same sandbox ID. The helper writes the signing key into the sandbox so the
+public URL stays unchanged:
 
 ```bash
 make start-webhook-server SANDBOX_ID=<E2B_WEBHOOK_SANDBOX_ID>
@@ -91,7 +96,11 @@ If the stopped sandbox ID matches `e2b_webhook_sandbox_id`, the stop command cle
 - The webhook sandbox uses `lifecycle: { onTimeout: "pause", autoResume: true }`.
 - The webhook server is only the event-driven entrypoint. It still starts the same Anthropic
   environment worker used by the orchestrator example.
-- This is a simple single-sandbox example, not production per-session isolation.
+- The public template starts bounded per-event workers inside the same sandbox. This is good for a
+  reusable webhook-worker sandbox, but it is still not production per-session isolation.
+- Persistent state is scoped to the webhook sandbox. Files in `/mnt/session` can be shared by any
+  session handled by that sandbox's worker pool. Use `../app-webhooks/` with
+  `APP_SANDBOX_ROUTING_SCOPE=session` for session-owned persistent state.
 
 For a concrete event-by-event walkthrough, see [../EXAMPLE_USAGE.md](../EXAMPLE_USAGE.md).
 For a complete code-level implementation, see [IMPLEMENTATION.md](./IMPLEMENTATION.md).

@@ -85,6 +85,27 @@ make start-webhook-server SANDBOX_ID="<E2B_WEBHOOK_SANDBOX_ID>"
 The server can start without `ANTHROPIC_WEBHOOK_SIGNING_KEY` so you can get the public E2B URL first.
 Until the key is configured, `/webhook` returns `503`.
 
+The webhook sandbox stores its runtime config under `/opt/anthropic-managed-agents/config`, outside
+the agent workdir, before starting Uvicorn:
+
+| File | Purpose |
+| --- | --- |
+| `anthropic-environment-id` | Anthropic environment to work from. |
+| `anthropic-environment-key` | Environment-scoped worker credential. |
+| `anthropic-webhook-signing-key` | Webhook signature secret, when configured. |
+| `worker-max-idle-seconds` | Worker SDK idle timeout. |
+| `log-level` | Worker log level. |
+
+Each signed `session.status_run_started` event starts a bounded worker process if capacity is
+available. The default cap is `MAX_WORKERS=4`; extra starts are retried until a worker exits. Check
+the sandbox with:
+
+```bash
+curl "https://<sandbox-host>/health"
+```
+
+The response includes `worker_running` and `worker_count`.
+
 ## Stop the Webhook Sandbox
 
 ```bash
@@ -97,8 +118,13 @@ If the stopped sandbox ID matches `e2b_webhook_sandbox_id`, the stop command cle
 
 - The webhook server is only the event-driven entrypoint. It still starts the same Anthropic
   `EnvironmentWorker.run()` inside E2B.
+- Persistent state is scoped to the webhook sandbox. Files in `/mnt/session` can be shared by any
+  session handled by that sandbox's worker pool.
 - Tool calls execute inside the E2B sandbox under `/mnt/session`.
 - Secrets and Anthropic resource IDs stay runtime-only in `../.env`; they are not baked into the E2B template.
+
+Use `../app-webhooks/` with `APP_SANDBOX_ROUTING_SCOPE=session` when each Managed Agents session
+needs its own sandbox and follow-up state.
 
 For a concrete event-by-event walkthrough, see [../EXAMPLE_USAGE.md](../EXAMPLE_USAGE.md).
 For a complete code-level implementation, see [IMPLEMENTATION.md](./IMPLEMENTATION.md).

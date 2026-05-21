@@ -4,6 +4,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from "node:ht
 
 import {
   DEFAULT_LOG_LEVEL,
+  DEFAULT_APP_SANDBOX_TIMEOUT_SECONDS,
   DEFAULT_SANDBOX_TIMEOUT_SECONDS,
   DEFAULT_TEMPLATE_NAME,
   DEFAULT_WORKER_MAX_IDLE_SECONDS,
@@ -14,7 +15,9 @@ import { loadSettings, requireSetting, type Settings } from "./settings.js";
 
 const store = new JsonSandboxStore();
 const pendingWorkers = new Map<string, Promise<Awaited<ReturnType<typeof ensureWorkerSandbox>>>>();
+const pendingDrains = new Map<string, Promise<void>>();
 const MAX_WEBHOOK_BODY_BYTES = 1_048_576;
+const ROUTING_SCOPES = new Set(["session", "agent", "environment"]);
 
 class PayloadTooLargeError extends Error {}
 
@@ -24,45 +27,109 @@ function webhookClient(settings: Settings) {
   });
 }
 
-function sessionId(event: unknown) {
-  const id = (event as { data?: { id?: unknown } }).data?.id;
-  if (!id) {
-    throw new Error("webhook event does not include data.id");
+function routingScope(settings: Settings) {
+  const scope = settings.appSandboxRoutingScope ?? "session";
+  if (!ROUTING_SCOPES.has(scope)) {
+    throw new Error("APP_SANDBOX_ROUTING_SCOPE must be session, agent, or environment");
   }
-  return String(id);
+  return scope;
 }
 
-async function ensureWorkerForEvent(settings: Settings, event: unknown) {
-  const environmentId = requireSetting(settings.anthropicEnvironmentId, "ANTHROPIC_ENVIRONMENT_ID");
-  const session = sessionId(event);
-  const key = `${environmentId}:${session}`;
+async function routingTarget(settings: Settings, session: string) {
+  const configuredEnvironmentId = requireSetting(
+    settings.anthropicEnvironmentId,
+    "ANTHROPIC_ENVIRONMENT_ID",
+  );
+  const scope = routingScope(settings);
+  if (scope === "session") {
+    return { environmentId: configuredEnvironmentId, routingScope: scope, routingId: session };
+  }
+  if (scope === "environment") {
+    return {
+      environmentId: configuredEnvironmentId,
+      routingScope: scope,
+      routingId: configuredEnvironmentId,
+    };
+  }
+
+  const sessionInfo = await webhookClient(settings).beta.sessions.retrieve(session);
+  if (sessionInfo.environment_id !== configuredEnvironmentId) {
+    throw new Error(
+      `session ${session} belongs to ${sessionInfo.environment_id}, but this worker is configured for ${configuredEnvironmentId}`,
+    );
+  }
+  return {
+    environmentId: sessionInfo.environment_id,
+    routingScope: scope,
+    routingId: sessionInfo.agent.id,
+  };
+}
+
+async function ensureWorkerForWork(settings: Settings, work: {
+  id: string;
+  environment_id: string;
+  data: { type?: string; id?: string };
+}) {
+  if (work.data.type !== "session" || !work.data.id) {
+    return undefined;
+  }
+  const session = work.data.id;
+  const target = await routingTarget(settings, session);
+  const key = `${target.routingScope}:${target.environmentId}:${target.routingId}`;
   const pending = pendingWorkers.get(key);
   if (pending) {
     return pending;
   }
 
-  const worker = ensureWorkerForSession(settings, environmentId, session).finally(() => {
+  const worker = ensureWorkerForTarget(settings, target, {
+    workId: work.id,
+    sessionId: session,
+  }).finally(() => {
     pendingWorkers.delete(key);
   });
   pendingWorkers.set(key, worker);
   return worker;
 }
 
-async function ensureWorkerForSession(settings: Settings, environmentId: string, session: string) {
-  const assignment = await store.get({ environmentId, sessionId: session });
+async function ensureWorkerForTarget(
+  settings: Settings,
+  target: { environmentId: string; routingScope: string; routingId: string },
+  work: { workId: string; sessionId: string },
+) {
+  const assignment = await store.get(target);
   const sandbox = await ensureWorkerSandbox(settings, {
     sandboxId: assignment?.sandboxId,
     templateName: DEFAULT_TEMPLATE_NAME,
-    timeoutSeconds: DEFAULT_SANDBOX_TIMEOUT_SECONDS,
+    timeoutSeconds:
+      target.routingScope === "session"
+        ? DEFAULT_APP_SANDBOX_TIMEOUT_SECONDS
+        : DEFAULT_SANDBOX_TIMEOUT_SECONDS,
     workerMaxIdleSeconds: DEFAULT_WORKER_MAX_IDLE_SECONDS,
     logLevel: DEFAULT_LOG_LEVEL,
+    workId: work.workId,
+    sessionId: work.sessionId,
   });
   await store.upsert({
-    environmentId,
-    sessionId: session,
+    ...target,
+    sessionId: work.sessionId,
     sandboxId: sandbox.sandboxId,
   });
   return sandbox;
+}
+
+async function drainWorkQueue(settings: Settings) {
+  const environmentId = requireSetting(settings.anthropicEnvironmentId, "ANTHROPIC_ENVIRONMENT_ID");
+  const environmentKey = requireSetting(settings.anthropicEnvironmentKey, "ANTHROPIC_ENVIRONMENT_KEY");
+  const client = webhookClient(settings);
+
+  for await (const work of client.beta.environments.work.poller({
+    environmentId,
+    environmentKey,
+    autoStop: false,
+    drain: true,
+  })) {
+    await ensureWorkerForWork(settings, work);
+  }
 }
 
 async function readBody(request: IncomingMessage, maxBytes: number) {
@@ -89,14 +156,24 @@ function writeJson(response: ServerResponse, statusCode: number, body: unknown) 
   response.end(JSON.stringify(body));
 }
 
-function startWorkerInBackground(settings: Settings, event: unknown) {
-  void ensureWorkerForEvent(settings, event)
-    .then((sandbox) => {
-      console.log(`started worker sandbox ${sandbox.sandboxId}`);
+function startQueueDrainInBackground(settings: Settings) {
+  const environmentId = requireSetting(settings.anthropicEnvironmentId, "ANTHROPIC_ENVIRONMENT_ID");
+  const pending = pendingDrains.get(environmentId);
+  if (pending) {
+    return;
+  }
+
+  const drain = drainWorkQueue(settings)
+    .then(() => {
+      console.log(`drained work queue for ${environmentId}`);
     })
     .catch((error) => {
-      console.error("failed to start worker sandbox", error);
+      console.error("failed to drain work queue", error);
+    })
+    .finally(() => {
+      pendingDrains.delete(environmentId);
     });
+  pendingDrains.set(environmentId, drain);
 }
 
 function hasAdminAccess(request: IncomingMessage, settings: Settings) {
@@ -153,7 +230,7 @@ async function handleWebhook(request: IncomingMessage, response: ServerResponse)
   }
 
   if (event.data.type === "session.status_run_started") {
-    startWorkerInBackground(settings, event);
+    startQueueDrainInBackground(settings);
     response.writeHead(204);
     response.end();
     return;

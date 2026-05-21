@@ -18,12 +18,19 @@ from anthropic_managed_agents_e2b.environment import (
 from anthropic_managed_agents_e2b.settings import PACKAGE_ROOT, Settings
 
 REMOTE_DIR = "/opt/anthropic-managed-agents"
+REMOTE_CONFIG_DIR = f"{REMOTE_DIR}/config"
+REMOTE_WORKDIR = "/mnt/session"
 REMOTE_PACKAGE_DIR = f"{REMOTE_DIR}/anthropic_managed_agents_e2b"
 REMOTE_WORKER = f"{REMOTE_DIR}/worker.py"
 REMOTE_PID = f"{REMOTE_DIR}/worker.pid"
 REMOTE_LOG = f"{REMOTE_DIR}/worker.log"
 REMOTE_WEBHOOK_PID = f"{REMOTE_DIR}/webhook.pid"
 REMOTE_WEBHOOK_LOG = f"{REMOTE_DIR}/webhook.log"
+REMOTE_ENVIRONMENT_ID = f"{REMOTE_CONFIG_DIR}/anthropic-environment-id"
+REMOTE_ENVIRONMENT_KEY = f"{REMOTE_CONFIG_DIR}/anthropic-environment-key"
+REMOTE_WEBHOOK_SIGNING_KEY = f"{REMOTE_CONFIG_DIR}/anthropic-webhook-signing-key"
+REMOTE_WORKER_MAX_IDLE_SECONDS = f"{REMOTE_CONFIG_DIR}/worker-max-idle-seconds"
+REMOTE_LOG_LEVEL = f"{REMOTE_CONFIG_DIR}/log-level"
 logger = logging.getLogger(__name__)
 REMOTE_WORKER_ENTRYPOINT = """\
 from anthropic_managed_agents_e2b.worker_runtime import main
@@ -46,6 +53,7 @@ def create_or_connect_worker_sandbox(
     return Sandbox.create(
         template_name,
         timeout=timeout_seconds,
+        lifecycle={"on_timeout": "pause", "auto_resume": True},
         metadata={
             "managed_by": "anthropic-managed-agents-e2b",
             "anthropic.environment_id": settings.anthropic_environment_id or "",
@@ -76,6 +84,8 @@ def start_worker_process(
     *,
     worker_max_idle_seconds: float | None,
     log_level: str,
+    work_id: str | None = None,
+    session_id: str | None = None,
 ) -> None:
     envs = {
         "ANTHROPIC_ENVIRONMENT_ID": settings.require_anthropic_environment_id(),
@@ -85,6 +95,10 @@ def start_worker_process(
         else str(worker_max_idle_seconds),
         "LOG_LEVEL": log_level,
     }
+    if work_id:
+        envs["ANTHROPIC_WORK_ID"] = work_id
+    if session_id:
+        envs["ANTHROPIC_SESSION_ID"] = session_id
     wrapper = f"""
     set -eu
     cd /mnt/session
@@ -116,15 +130,20 @@ def ensure_worker_process(
     *,
     worker_max_idle_seconds: float | None,
     log_level: str,
+    work_id: str | None = None,
+    session_id: str | None = None,
 ) -> None:
     upload_worker(sandbox)
-    if worker_process_is_running(sandbox):
+    handles_claimed_work = bool(work_id or session_id)
+    if not handles_claimed_work and worker_process_is_running(sandbox):
         return
     start_worker_process(
         sandbox,
         settings,
         worker_max_idle_seconds=worker_max_idle_seconds,
         log_level=log_level,
+        work_id=work_id,
+        session_id=session_id,
     )
 
 
@@ -135,6 +154,8 @@ def start_worker_sandbox(
     timeout_seconds: int,
     worker_max_idle_seconds: float | None,
     log_level: str,
+    work_id: str | None = None,
+    session_id: str | None = None,
     sandbox_id: str | None = None,
 ) -> Sandbox:
     settings.require_anthropic_environment_id()
@@ -150,6 +171,8 @@ def start_worker_sandbox(
         settings,
         worker_max_idle_seconds=worker_max_idle_seconds,
         log_level=log_level,
+        work_id=work_id,
+        session_id=session_id,
     )
     if settings.anthropic_api_key:
         add_sandbox_to_metadata_store(
@@ -169,6 +192,8 @@ def ensure_worker_sandbox(
     timeout_seconds: int,
     worker_max_idle_seconds: float | None,
     log_level: str,
+    work_id: str | None = None,
+    session_id: str | None = None,
     sandbox_id: str | None = None,
 ) -> Sandbox:
     if sandbox_id:
@@ -179,6 +204,8 @@ def ensure_worker_sandbox(
                 timeout_seconds=timeout_seconds,
                 worker_max_idle_seconds=worker_max_idle_seconds,
                 log_level=log_level,
+                work_id=work_id,
+                session_id=session_id,
                 sandbox_id=sandbox_id,
             )
         except Exception:
@@ -193,6 +220,8 @@ def ensure_worker_sandbox(
         timeout_seconds=timeout_seconds,
         worker_max_idle_seconds=worker_max_idle_seconds,
         log_level=log_level,
+        work_id=work_id,
+        session_id=session_id,
     )
 
 
@@ -230,6 +259,38 @@ def start_webhook_server_process(
         raise RuntimeError(f"webhook server start failed:\n{result.stdout}\n{result.stderr}")
 
 
+def write_webhook_config(
+    sandbox: Sandbox,
+    settings: Settings,
+    *,
+    worker_max_idle_seconds: float | None,
+    log_level: str,
+) -> None:
+    sandbox.commands.run(
+        f"mkdir -p {shlex.quote(REMOTE_CONFIG_DIR)} && chmod 700 {shlex.quote(REMOTE_CONFIG_DIR)}",
+        timeout=5,
+    )
+    sandbox.files.write(
+        REMOTE_ENVIRONMENT_ID,
+        f"{settings.require_anthropic_environment_id()}\n",
+    )
+    sandbox.files.write(
+        REMOTE_ENVIRONMENT_KEY,
+        f"{settings.require_anthropic_environment_key()}\n",
+    )
+    sandbox.files.write(
+        REMOTE_WORKER_MAX_IDLE_SECONDS,
+        "none\n" if worker_max_idle_seconds is None else f"{worker_max_idle_seconds}\n",
+    )
+    sandbox.files.write(REMOTE_LOG_LEVEL, f"{log_level}\n")
+    if settings.anthropic_webhook_signing_key:
+        sandbox.files.write(
+            REMOTE_WEBHOOK_SIGNING_KEY,
+            f"{settings.anthropic_webhook_signing_key}\n",
+        )
+    sandbox.commands.run(f"chmod 600 {shlex.quote(REMOTE_CONFIG_DIR)}/*", timeout=5)
+
+
 def start_webhook_server_sandbox(
     settings: Settings,
     *,
@@ -257,6 +318,12 @@ def start_webhook_server_sandbox(
         )
 
     upload_worker(sandbox)
+    write_webhook_config(
+        sandbox,
+        settings,
+        worker_max_idle_seconds=worker_max_idle_seconds,
+        log_level=log_level,
+    )
     start_webhook_server_process(
         sandbox,
         settings,

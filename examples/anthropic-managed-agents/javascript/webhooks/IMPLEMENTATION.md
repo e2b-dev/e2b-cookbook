@@ -25,7 +25,7 @@ export async function startWebhookSandbox({
   environmentId,
   environmentKey,
   webhookSigningKey,
-  templateName = "anthropic-managed-agents-js",
+  templateName = "claude-managed-agents-webhooks",
   port = 8000,
 }: {
   anthropicApiKey: string;
@@ -55,7 +55,7 @@ export async function startWebhookSandbox({
   const envs: Record<string, string> = {
     ANTHROPIC_ENVIRONMENT_ID: environmentId,
     ANTHROPIC_ENVIRONMENT_KEY: environmentKey,
-    WORKER_MAX_IDLE_SECONDS: "300",
+    WORKER_MAX_IDLE_SECONDS: "30",
     LOG_LEVEL: "INFO",
     WEBHOOK_PORT: String(port),
   };

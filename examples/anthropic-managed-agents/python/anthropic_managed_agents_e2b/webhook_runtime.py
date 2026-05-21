@@ -2,60 +2,160 @@ from __future__ import annotations
 
 import os
 import subprocess
+import threading
 from pathlib import Path
 
 import anthropic
 from fastapi import FastAPI, Request, Response
 
 REMOTE_DIR = Path("/opt/anthropic-managed-agents")
+REMOTE_CONFIG_DIR = REMOTE_DIR / "config"
+REMOTE_WORKDIR = Path("/mnt/session")
 REMOTE_WORKER = REMOTE_DIR / "worker.py"
 REMOTE_PID = REMOTE_DIR / "worker.pid"
+REMOTE_PIDS_DIR = REMOTE_DIR / "worker-pids"
 REMOTE_LOG = REMOTE_DIR / "worker.log"
+REMOTE_ENVIRONMENT_ID = REMOTE_CONFIG_DIR / "anthropic-environment-id"
+REMOTE_ENVIRONMENT_KEY = REMOTE_CONFIG_DIR / "anthropic-environment-key"
+REMOTE_WEBHOOK_SIGNING_KEY = REMOTE_CONFIG_DIR / "anthropic-webhook-signing-key"
+REMOTE_WORKER_MAX_IDLE_SECONDS = REMOTE_CONFIG_DIR / "worker-max-idle-seconds"
+REMOTE_LOG_LEVEL = REMOTE_CONFIG_DIR / "log-level"
 MAX_WEBHOOK_BODY_BYTES = 1_048_576
+MAX_WORKERS = max(1, int(os.environ.get("MAX_WORKERS", "4")))
+WORKER_RETRY_SECONDS = 5
 
 app = FastAPI()
 client = anthropic.Anthropic(api_key="not-needed")
+worker_state_lock = threading.Lock()
+pending_worker_starts = 0
+worker_retry_timer: threading.Timer | None = None
+
+
+def file_value(path: Path) -> str | None:
+    if not path.exists():
+        return None
+    value = path.read_text().strip()
+    return value or None
+
+
+def config_value(name: str, path: Path) -> str | None:
+    return os.environ.get(name) or file_value(path)
 
 
 def worker_env() -> dict[str, str]:
-    keys = (
-        "ANTHROPIC_ENVIRONMENT_ID",
-        "ANTHROPIC_ENVIRONMENT_KEY",
-        "WORKER_MAX_IDLE_SECONDS",
-        "LOG_LEVEL",
-        "PATH",
-        "HOME",
-    )
-    return {key: value for key in keys if (value := os.environ.get(key))}
+    env = {
+        "ANTHROPIC_ENVIRONMENT_ID": config_value(
+            "ANTHROPIC_ENVIRONMENT_ID",
+            REMOTE_ENVIRONMENT_ID,
+        ),
+        "ANTHROPIC_ENVIRONMENT_KEY": config_value(
+            "ANTHROPIC_ENVIRONMENT_KEY",
+            REMOTE_ENVIRONMENT_KEY,
+        ),
+        "WORKER_MAX_IDLE_SECONDS": config_value(
+            "WORKER_MAX_IDLE_SECONDS",
+            REMOTE_WORKER_MAX_IDLE_SECONDS,
+        ),
+        "WORKER_RUN_SECONDS": os.environ.get("WORKER_RUN_SECONDS"),
+        "LOG_LEVEL": config_value("LOG_LEVEL", REMOTE_LOG_LEVEL),
+        "PATH": os.environ.get("PATH"),
+        "HOME": os.environ.get("HOME"),
+    }
+    return {key: value for key, value in env.items() if value is not None}
 
 
-def worker_is_running() -> bool:
-    if not REMOTE_PID.exists():
-        return False
+def process_is_running(pid: int) -> bool:
+    return pid > 0 and Path(f"/proc/{pid}").exists()
 
+
+def pid_file_value(path: Path) -> int | None:
     try:
-        pid = int(REMOTE_PID.read_text().strip())
-    except ValueError:
-        return False
-
-    return Path(f"/proc/{pid}").exists()
+        return int(path.read_text().strip())
+    except (OSError, ValueError):
+        return None
 
 
-def start_worker_if_needed() -> None:
-    if worker_is_running():
+def _active_worker_pids_locked() -> list[int]:
+    REMOTE_PIDS_DIR.mkdir(parents=True, exist_ok=True)
+    pids: list[int] = []
+
+    for path in REMOTE_PIDS_DIR.iterdir():
+        pid = pid_file_value(path)
+        if pid is not None and process_is_running(pid):
+            pids.append(pid)
+        else:
+            path.unlink(missing_ok=True)
+
+    latest_pid = pid_file_value(REMOTE_PID)
+    if latest_pid is not None and process_is_running(latest_pid) and latest_pid not in pids:
+        pids.append(latest_pid)
+
+    return pids
+
+
+def active_worker_pids() -> list[int]:
+    with worker_state_lock:
+        return _active_worker_pids_locked()
+
+
+def _schedule_worker_retry_locked() -> None:
+    global worker_retry_timer
+
+    if worker_retry_timer is not None or pending_worker_starts == 0:
         return
 
-    with REMOTE_LOG.open("ab") as log_file:
-        process = subprocess.Popen(
-            ["python", str(REMOTE_WORKER)],
-            cwd="/mnt/session",
-            stdin=subprocess.DEVNULL,
-            stdout=log_file,
-            stderr=subprocess.STDOUT,
-            start_new_session=True,
-            env=worker_env(),
-        )
-    REMOTE_PID.write_text(f"{process.pid}\n")
+    worker_retry_timer = threading.Timer(
+        WORKER_RETRY_SECONDS,
+        lambda: start_worker_if_capacity(retrying_pending_start=True),
+    )
+    worker_retry_timer.daemon = True
+    worker_retry_timer.start()
+
+
+def cleanup_worker_on_exit(process: subprocess.Popen[bytes]) -> None:
+    process.wait()
+    with worker_state_lock:
+        (REMOTE_PIDS_DIR / f"{process.pid}.pid").unlink(missing_ok=True)
+        _schedule_worker_retry_locked()
+
+
+def start_worker_if_capacity(*, retrying_pending_start: bool = False) -> None:
+    global pending_worker_starts, worker_retry_timer
+
+    with worker_state_lock:
+        if retrying_pending_start:
+            worker_retry_timer = None
+
+        if len(_active_worker_pids_locked()) >= MAX_WORKERS:
+            if not retrying_pending_start:
+                pending_worker_starts = min(pending_worker_starts + 1, MAX_WORKERS)
+            _schedule_worker_retry_locked()
+            return
+
+        if retrying_pending_start:
+            pending_worker_starts = max(0, pending_worker_starts - 1)
+
+        with REMOTE_LOG.open("ab") as log_file:
+            process = subprocess.Popen(
+                ["python", str(REMOTE_WORKER)],
+                cwd=REMOTE_WORKDIR,
+                stdin=subprocess.DEVNULL,
+                stdout=log_file,
+                stderr=subprocess.STDOUT,
+                start_new_session=True,
+                env=worker_env(),
+            )
+        REMOTE_PID.write_text(f"{process.pid}\n")
+        (REMOTE_PIDS_DIR / f"{process.pid}.pid").write_text(f"{process.pid}\n")
+        threading.Thread(target=cleanup_worker_on_exit, args=(process,), daemon=True).start()
+        _schedule_worker_retry_locked()
+
+
+def webhook_signing_key() -> str | None:
+    key_file = Path(
+        os.environ.get("ANTHROPIC_WEBHOOK_SIGNING_KEY_FILE", REMOTE_WEBHOOK_SIGNING_KEY)
+    )
+    return config_value("ANTHROPIC_WEBHOOK_SIGNING_KEY", key_file)
 
 
 async def read_limited_body(request: Request, max_bytes: int) -> str:
@@ -74,13 +174,14 @@ async def read_limited_body(request: Request, max_bytes: int) -> str:
 
 
 @app.get("/health")
-def health() -> dict[str, bool]:
-    return {"ok": True, "worker_running": worker_is_running()}
+def health() -> dict[str, bool | int]:
+    pids = active_worker_pids()
+    return {"ok": True, "worker_running": len(pids) > 0, "worker_count": len(pids)}
 
 
 @app.post("/webhook")
 async def webhook(request: Request) -> Response:
-    signing_key = os.environ.get("ANTHROPIC_WEBHOOK_SIGNING_KEY")
+    signing_key = webhook_signing_key()
     if not signing_key:
         return Response("ANTHROPIC_WEBHOOK_SIGNING_KEY is required", status_code=503)
 
@@ -99,6 +200,6 @@ async def webhook(request: Request) -> Response:
         return Response("invalid signature", status_code=401)
 
     if event.data.type == "session.status_run_started":
-        start_worker_if_needed()
+        start_worker_if_capacity()
 
     return Response(status_code=204)

@@ -10,8 +10,9 @@ PACKAGE_ROOT = Path(__file__).resolve().parent
 EXAMPLE_ROOT = PACKAGE_ROOT.parent
 REPO_ROOT = EXAMPLE_ROOT.parents[2]
 DEFAULT_TEMPLATE_NAME = "anthropic-managed-agents"
-DEFAULT_WORKER_MAX_IDLE_SECONDS = 300.0
+DEFAULT_WORKER_MAX_IDLE_SECONDS = 30.0
 DEFAULT_SANDBOX_TIMEOUT_SECONDS = 3600
+DEFAULT_APP_SANDBOX_TIMEOUT_SECONDS = 300
 DEFAULT_WEBHOOK_PORT = 8000
 DEFAULT_LOG_LEVEL = "INFO"
 MAX_WEBHOOK_BODY_BYTES = 1_048_576
@@ -35,6 +36,7 @@ class Settings:
     anthropic_environment_key: str | None
     anthropic_webhook_signing_key: str | None
     app_webhook_admin_token: str | None
+    app_sandbox_routing_scope: str | None
 
     def require(self, field_name: str, env_name: str) -> str:
         value = getattr(self, field_name)
@@ -67,4 +69,5 @@ def load_settings() -> Settings:
         anthropic_environment_key=_optional("ANTHROPIC_ENVIRONMENT_KEY"),
         anthropic_webhook_signing_key=_optional("ANTHROPIC_WEBHOOK_SIGNING_KEY"),
         app_webhook_admin_token=_optional("APP_WEBHOOK_ADMIN_TOKEN"),
+        app_sandbox_routing_scope=_optional("APP_SANDBOX_ROUTING_SCOPE"),
     )

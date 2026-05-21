@@ -102,7 +102,11 @@ Implement the worker runtime entrypoint.
 It should run Anthropic's SDK worker:
 
 ```ts
-const client = new Anthropic({ authToken: environmentKey });
+const client = new Anthropic({
+  authToken: environmentKey,
+  logger: console,
+  logLevel: "info",
+});
 
 await client.beta.environments.work
   .worker({
@@ -117,6 +121,13 @@ await client.beta.environments.work
 This is the core handoff. Anthropic's SDK owns polling, claiming work, heartbeating, dispatching
 tool calls, and sending tool results back to the session.
 Leaving `unrestrictedPaths` unset keeps file tools constrained to the worker `workdir`.
+Use a short default idle timeout, such as 30 seconds, so a completed or quiet session does not keep
+the single example worker from polling later work for several minutes.
+For webhook-driven sandboxes, start a bounded worker process on each `session.status_run_started`
+delivery instead of treating one PID as the whole queue. Cap concurrency, and give each worker a
+runtime guard so an idle event stream cannot block later sessions indefinitely. If all worker slots
+are full, keep a small retry counter so that skipped webhook deliveries start a worker once capacity
+opens again.
 
 ## 7. Start an Auto-Resume Webhook Sandbox
 
@@ -173,14 +184,16 @@ It should:
 
 1. Receive `POST /webhook` in the app process.
 2. Verify the raw Anthropic webhook payload with `client.beta.webhooks.unwrap(...)`.
-3. Read `event.data.id` as the Managed Agents session id.
-4. Look up that session id in an app-owned sandbox store.
-5. Reconnect to that session's sandbox and start the worker if needed, or create a fresh worker
-   sandbox when the assignment is missing or stale.
+3. Wake an app-side drain of the self-hosted environment work queue.
+4. For each claimed session work item, compute the sandbox routing key from
+   `APP_SANDBOX_ROUTING_SCOPE`.
+5. Reconnect to that key's sandbox and start `worker.handleItem()` with the claimed work id, or
+   create a fresh worker sandbox when the assignment is missing or stale.
 
 This keeps webhook policy, routing, observability, and sandbox replacement under app control while
 still using the same E2B worker runtime. Add `GET /sandboxes` so operators can inspect the current
-session-to-sandbox assignments behind an app-owned bearer token.
+session-to-sandbox assignments behind an app-owned bearer token. Do not start a normal
+environment-polling worker inside the session sandbox; it can claim a different queued session.
 
 ## 10. Send a Session Message
 

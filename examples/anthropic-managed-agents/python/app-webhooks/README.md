@@ -36,6 +36,7 @@ Fill in `.env`:
 | `ANTHROPIC_WEBHOOK_SIGNING_KEY` | Required for real webhook deliveries. |
 | `APP_WEBHOOK_ADMIN_TOKEN` | Bearer token for app-owned debug endpoints such as `GET /sandboxes`. |
 | `APP_SANDBOX_STORE_PATH` | Optional path for the app-owned session-to-sandbox JSON store. Defaults to `../.managed-agent-sandbox-store.json`. |
+| `APP_SANDBOX_ROUTING_SCOPE` | Optional sandbox reuse scope: `session` (default), `agent`, or `environment`. |
 
 ## Build the E2B Template
 
@@ -58,16 +59,35 @@ to `session.status_run_started`.
 When Anthropic sends a run-started webhook, the app:
 
 1. Verifies the raw payload with `ANTHROPIC_WEBHOOK_SIGNING_KEY`.
-2. Reads `event.data.id` as the Managed Agents session id.
-3. Looks up that session id in the app-owned sandbox store.
-4. Reconnects to that session's sandbox and starts the worker if needed.
-5. Creates a fresh E2B sandbox and writes a new store assignment if the session is new or stale.
+2. Wakes an app-side drain of Anthropic's self-hosted environment work queue.
+3. Claims queued work with the environment key.
+4. Computes the sandbox routing key from the claimed work item's session id and
+   `APP_SANDBOX_ROUTING_SCOPE`.
+5. Reconnects to that route's sandbox or creates a fresh E2B sandbox, writes the store assignment,
+   and starts the worker with the claimed `ANTHROPIC_WORK_ID` and `ANTHROPIC_SESSION_ID`.
+
+Routing scopes:
+
+| Scope | Sandbox key | Use when |
+| --- | --- | --- |
+| `session` | `environment_id + session_id` | You want the strongest isolation and separate filesystem state per Managed Agents session. |
+| `agent` | `environment_id + agent.id` | You want sessions for the same agent to reuse a warm sandbox. The app retrieves the session to read `agent.id`. |
+| `environment` | `environment_id` | You want one shared worker sandbox for the whole self-hosted environment. |
 
 The JSON store is a local example store. For a multi-instance app, use a database with a
 transactional session assignment so duplicate webhook deliveries cannot create duplicate workers.
-The worker itself still polls Anthropic at the environment level, so treat this flow as app-owned
-sandbox lifecycle control, not a hard session-affinity primitive unless your Anthropic integration
-also scopes work to a specific worker.
+SQLite is enough for a single-node deployment; Postgres or Redis is a better fit once multiple app
+replicas can receive the same webhook. An in-memory catalog is only useful for a toy demo because a
+process restart loses the session-to-sandbox mapping needed for follow-up work.
+
+Worker sandboxes are created with E2B auto-resume and pause-on-timeout lifecycle settings. The app
+does not need to manually pause them: the app claims work, the sandbox handles that claimed item,
+the worker exits after idle, and E2B pauses the sandbox after its timeout. A follow-up event for the
+same session reconnects to the same sandbox.
+
+The app drains the environment queue because the queue, not the webhook payload, is the source of
+truth for which work item has been claimed. That prevents a session-owned sandbox from accidentally
+polling and claiming a different queued session.
 
 Inspect the app-owned assignments:
 

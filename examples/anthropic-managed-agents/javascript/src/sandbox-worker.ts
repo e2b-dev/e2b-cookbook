@@ -212,9 +212,12 @@ export async function startWebhookServerSandbox(settings: Settings, options: Web
   if (settings.anthropicWebhookSigningKey) {
     envs.ANTHROPIC_WEBHOOK_SIGNING_KEY = settings.anthropicWebhookSigningKey;
   }
-  await sandbox.commands.run(`mkdir -p ${REMOTE_CONFIG_DIR} && chmod 700 ${REMOTE_CONFIG_DIR}`, {
-    timeoutMs: 5_000,
-  });
+  await sandbox.commands.run(
+    `sudo mkdir -p ${REMOTE_CONFIG_DIR} && sudo chown user:user ${REMOTE_CONFIG_DIR} && chmod 700 ${REMOTE_CONFIG_DIR}`,
+    {
+      timeoutMs: 5_000,
+    },
+  );
   await sandbox.files.write([
     ...(settings.e2bApiKey ? [{ path: REMOTE_E2B_API_KEY, data: `${settings.e2bApiKey}\n` }] : []),
     ...(settings.anthropicApiKey

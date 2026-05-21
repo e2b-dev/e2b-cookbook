@@ -31,6 +31,7 @@ export const template = Template({ fileContextPath: "." })
   ])
   .runCmd(
     `sudo mkdir -p ${REMOTE_WORKDIR} ${REMOTE_DIR} ${REMOTE_SRC_DIR} ${REMOTE_CONFIG_DIR} && ` +
+      `sudo chown -R user:user ${REMOTE_WORKDIR} ${REMOTE_DIR} && ` +
       `sudo chmod 777 ${REMOTE_WORKDIR} ${REMOTE_DIR} ${REMOTE_SRC_DIR} && ` +
       `sudo chmod 700 ${REMOTE_CONFIG_DIR}`,
   )

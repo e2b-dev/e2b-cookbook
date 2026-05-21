@@ -47,15 +47,24 @@ async function main() {
     maxRunMs === undefined ? undefined : setTimeout(() => controller.abort(), maxRunMs);
 
   try {
-    await client.beta.environments.work
-      .worker({
+    const worker = client.beta.environments.work.worker({
+      environmentId,
+      environmentKey,
+      workdir: WORKDIR,
+      maxIdleMs: maxIdleMs(),
+      signal: controller.signal,
+    });
+    if (process.env.ANTHROPIC_WORK_ID || process.env.ANTHROPIC_SESSION_ID) {
+      await worker.handleItem({
+        workId: process.env.ANTHROPIC_WORK_ID,
         environmentId,
+        sessionId: process.env.ANTHROPIC_SESSION_ID,
         environmentKey,
-        workdir: WORKDIR,
-        maxIdleMs: maxIdleMs(),
         signal: controller.signal,
-      })
-      .run();
+      });
+    } else {
+      await worker.run();
+    }
   } finally {
     if (timer) {
       clearTimeout(timer);

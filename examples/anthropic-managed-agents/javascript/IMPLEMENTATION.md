@@ -184,14 +184,16 @@ It should:
 
 1. Receive `POST /webhook` in the app process.
 2. Verify the raw Anthropic webhook payload with `client.beta.webhooks.unwrap(...)`.
-3. Read `event.data.id` as the Managed Agents session id.
-4. Look up that session id in an app-owned sandbox store.
-5. Reconnect to that session's sandbox and start the worker if needed, or create a fresh worker
-   sandbox when the assignment is missing or stale.
+3. Wake an app-side drain of the self-hosted environment work queue.
+4. For each claimed session work item, compute the sandbox routing key from
+   `APP_SANDBOX_ROUTING_SCOPE`.
+5. Reconnect to that key's sandbox and start `worker.handleItem()` with the claimed work id, or
+   create a fresh worker sandbox when the assignment is missing or stale.
 
 This keeps webhook policy, routing, observability, and sandbox replacement under app control while
 still using the same E2B worker runtime. Add `GET /sandboxes` so operators can inspect the current
-session-to-sandbox assignments behind an app-owned bearer token.
+session-to-sandbox assignments behind an app-owned bearer token. Do not start a normal
+environment-polling worker inside the session sandbox; it can claim a different queued session.
 
 ## 10. Send a Session Message
 

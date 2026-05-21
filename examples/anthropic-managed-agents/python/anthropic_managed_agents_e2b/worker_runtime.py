@@ -38,12 +38,22 @@ async def run_worker() -> None:
             workdir=WORKDIR,
             max_idle=max_idle_seconds(),
         )
+        runner = (
+            worker.handle_item(
+                work_id=os.environ.get("ANTHROPIC_WORK_ID"),
+                environment_id=environment_id,
+                session_id=os.environ.get("ANTHROPIC_SESSION_ID"),
+                environment_key=environment_key,
+            )
+            if os.environ.get("ANTHROPIC_WORK_ID") or os.environ.get("ANTHROPIC_SESSION_ID")
+            else worker.run()
+        )
         if max_run_seconds is None:
-            await worker.run()
+            await runner
             return
 
         try:
-            await asyncio.wait_for(worker.run(), timeout=max_run_seconds)
+            await asyncio.wait_for(runner, timeout=max_run_seconds)
         except TimeoutError:
             logger.info("worker reached WORKER_RUN_SECONDS=%s; exiting", max_run_seconds)
 

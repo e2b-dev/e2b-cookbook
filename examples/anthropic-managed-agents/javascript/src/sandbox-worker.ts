@@ -41,6 +41,8 @@ export type WorkerOptions = {
   logLevel?: string;
   sandboxId?: string;
   sandboxIds?: string[];
+  workId?: string;
+  sessionId?: string;
 };
 
 export type WebhookOptions = WorkerOptions & {
@@ -92,6 +94,8 @@ function workerEnv(settings: Settings, options: WorkerOptions) {
         ? "none"
         : String(options.workerMaxIdleSeconds ?? DEFAULT_WORKER_MAX_IDLE_SECONDS),
     LOG_LEVEL: (options.logLevel ?? DEFAULT_LOG_LEVEL).toUpperCase(),
+    ...(options.workId ? { ANTHROPIC_WORK_ID: options.workId } : {}),
+    ...(options.sessionId ? { ANTHROPIC_SESSION_ID: options.sessionId } : {}),
   };
 }
 

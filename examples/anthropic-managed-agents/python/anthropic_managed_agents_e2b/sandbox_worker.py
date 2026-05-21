@@ -83,6 +83,8 @@ def start_worker_process(
     *,
     worker_max_idle_seconds: float | None,
     log_level: str,
+    work_id: str | None = None,
+    session_id: str | None = None,
 ) -> None:
     envs = {
         "ANTHROPIC_ENVIRONMENT_ID": settings.require_anthropic_environment_id(),
@@ -92,6 +94,10 @@ def start_worker_process(
         else str(worker_max_idle_seconds),
         "LOG_LEVEL": log_level,
     }
+    if work_id:
+        envs["ANTHROPIC_WORK_ID"] = work_id
+    if session_id:
+        envs["ANTHROPIC_SESSION_ID"] = session_id
     wrapper = f"""
     set -eu
     cd /mnt/session
@@ -123,6 +129,8 @@ def ensure_worker_process(
     *,
     worker_max_idle_seconds: float | None,
     log_level: str,
+    work_id: str | None = None,
+    session_id: str | None = None,
 ) -> None:
     upload_worker(sandbox)
     if worker_process_is_running(sandbox):
@@ -132,6 +140,8 @@ def ensure_worker_process(
         settings,
         worker_max_idle_seconds=worker_max_idle_seconds,
         log_level=log_level,
+        work_id=work_id,
+        session_id=session_id,
     )
 
 
@@ -142,6 +152,8 @@ def start_worker_sandbox(
     timeout_seconds: int,
     worker_max_idle_seconds: float | None,
     log_level: str,
+    work_id: str | None = None,
+    session_id: str | None = None,
     sandbox_id: str | None = None,
 ) -> Sandbox:
     settings.require_anthropic_environment_id()
@@ -157,6 +169,8 @@ def start_worker_sandbox(
         settings,
         worker_max_idle_seconds=worker_max_idle_seconds,
         log_level=log_level,
+        work_id=work_id,
+        session_id=session_id,
     )
     if settings.anthropic_api_key:
         add_sandbox_to_metadata_store(
@@ -176,6 +190,8 @@ def ensure_worker_sandbox(
     timeout_seconds: int,
     worker_max_idle_seconds: float | None,
     log_level: str,
+    work_id: str | None = None,
+    session_id: str | None = None,
     sandbox_id: str | None = None,
 ) -> Sandbox:
     if sandbox_id:
@@ -186,6 +202,8 @@ def ensure_worker_sandbox(
                 timeout_seconds=timeout_seconds,
                 worker_max_idle_seconds=worker_max_idle_seconds,
                 log_level=log_level,
+                work_id=work_id,
+                session_id=session_id,
                 sandbox_id=sandbox_id,
             )
         except Exception:
@@ -200,6 +218,8 @@ def ensure_worker_sandbox(
         timeout_seconds=timeout_seconds,
         worker_max_idle_seconds=worker_max_idle_seconds,
         log_level=log_level,
+        work_id=work_id,
+        session_id=session_id,
     )
 
 

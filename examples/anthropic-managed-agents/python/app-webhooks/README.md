@@ -59,10 +59,12 @@ to `session.status_run_started`.
 When Anthropic sends a run-started webhook, the app:
 
 1. Verifies the raw payload with `ANTHROPIC_WEBHOOK_SIGNING_KEY`.
-2. Reads `event.data.id` as the Managed Agents session id.
-3. Computes the sandbox routing key from `APP_SANDBOX_ROUTING_SCOPE`.
-4. Reconnects to that route's sandbox and starts the worker if needed.
-5. Creates a fresh E2B sandbox and writes a new store assignment if the route is new or stale.
+2. Wakes an app-side drain of Anthropic's self-hosted environment work queue.
+3. Claims queued work with the environment key.
+4. Computes the sandbox routing key from the claimed work item's session id and
+   `APP_SANDBOX_ROUTING_SCOPE`.
+5. Reconnects to that route's sandbox or creates a fresh E2B sandbox, writes the store assignment,
+   and starts the worker with the claimed `ANTHROPIC_WORK_ID` and `ANTHROPIC_SESSION_ID`.
 
 Routing scopes:
 
@@ -79,12 +81,13 @@ replicas can receive the same webhook. An in-memory catalog is only useful for a
 process restart loses the session-to-sandbox mapping needed for follow-up work.
 
 Worker sandboxes are created with E2B auto-resume and pause-on-timeout lifecycle settings. The app
-does not need to manually pause them: let the Anthropic worker exit after idle, keep the session's
-sandbox assignment in the catalog, and let E2B pause the sandbox after its timeout. A follow-up event
-for the same session reconnects to the same sandbox.
+does not need to manually pause them: the app claims work, the sandbox handles that claimed item,
+the worker exits after idle, and E2B pauses the sandbox after its timeout. A follow-up event for the
+same session reconnects to the same sandbox.
 
-The worker itself still polls Anthropic at the environment level, so `agent` and `environment`
-scopes are reuse policies, not hard routing guarantees for a specific work item.
+The app drains the environment queue because the queue, not the webhook payload, is the source of
+truth for which work item has been claimed. That prevents a session-owned sandbox from accidentally
+polling and claiming a different queued session.
 
 Inspect the app-owned assignments:
 

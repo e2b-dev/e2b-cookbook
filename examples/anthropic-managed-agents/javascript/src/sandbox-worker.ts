@@ -126,6 +126,7 @@ export async function ensureWorkerProcess(
   options: WorkerOptions = {},
 ) {
   await uploadRuntime(sandbox);
+  await sandbox.commands.run(`mkdir -p ${REMOTE_WORKDIR}/outputs`, { timeoutMs: 5_000 });
   const handlesClaimedWork = Boolean(options.workId || options.sessionId);
   if (!handlesClaimedWork && await workerProcessIsRunning(sandbox)) {
     return;

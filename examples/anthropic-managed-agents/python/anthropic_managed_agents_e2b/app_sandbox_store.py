@@ -107,7 +107,10 @@ class JsonSandboxStore:
     def _read(self) -> list[SandboxAssignment]:
         if not self.path.exists():
             return []
-        raw = json.loads(self.path.read_text())
+        text = self.path.read_text()
+        if not text.strip():
+            return []
+        raw = json.loads(text)
         if not isinstance(raw, list):
             return []
         return [

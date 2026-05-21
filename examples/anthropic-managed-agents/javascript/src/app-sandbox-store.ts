@@ -101,7 +101,11 @@ export class JsonSandboxStore {
 
   private async read(): Promise<SandboxAssignment[]> {
     try {
-      const raw = JSON.parse(await readFile(this.path, "utf8"));
+      const text = await readFile(this.path, "utf8");
+      if (!text.trim()) {
+        return [];
+      }
+      const raw = JSON.parse(text);
       if (!Array.isArray(raw)) {
         return [];
       }

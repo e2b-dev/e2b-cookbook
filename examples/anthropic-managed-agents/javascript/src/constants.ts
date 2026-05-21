@@ -1,6 +1,7 @@
 export const DEFAULT_TEMPLATE_NAME = "claude-managed-agents-webhooks";
 export const DEFAULT_WORKER_MAX_IDLE_SECONDS = 30;
 export const DEFAULT_SANDBOX_TIMEOUT_SECONDS = 3600;
+export const DEFAULT_APP_SANDBOX_TIMEOUT_SECONDS = 300;
 export const DEFAULT_WEBHOOK_PORT = 8000;
 export const DEFAULT_LOG_LEVEL = "INFO";
 

@@ -11,6 +11,7 @@ from fastapi import FastAPI, HTTPException, Request, Response
 from anthropic_managed_agents_e2b.app_sandbox_store import JsonSandboxStore
 from anthropic_managed_agents_e2b.sandbox_worker import ensure_worker_sandbox
 from anthropic_managed_agents_e2b.settings import (
+    DEFAULT_APP_SANDBOX_TIMEOUT_SECONDS,
     DEFAULT_LOG_LEVEL,
     DEFAULT_SANDBOX_TIMEOUT_SECONDS,
     DEFAULT_TEMPLATE_NAME,
@@ -93,7 +94,11 @@ def _ensure_worker_for_target(
     sandbox = ensure_worker_sandbox(
         settings,
         template_name=DEFAULT_TEMPLATE_NAME,
-        timeout_seconds=DEFAULT_SANDBOX_TIMEOUT_SECONDS,
+        timeout_seconds=(
+            DEFAULT_APP_SANDBOX_TIMEOUT_SECONDS
+            if routing_scope == "session"
+            else DEFAULT_SANDBOX_TIMEOUT_SECONDS
+        ),
         worker_max_idle_seconds=DEFAULT_WORKER_MAX_IDLE_SECONDS,
         log_level=DEFAULT_LOG_LEVEL,
         sandbox_id=assignment.sandbox_id if assignment else None,

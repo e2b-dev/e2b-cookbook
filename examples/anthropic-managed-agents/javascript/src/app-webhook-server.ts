@@ -4,6 +4,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from "node:ht
 
 import {
   DEFAULT_LOG_LEVEL,
+  DEFAULT_APP_SANDBOX_TIMEOUT_SECONDS,
   DEFAULT_SANDBOX_TIMEOUT_SECONDS,
   DEFAULT_TEMPLATE_NAME,
   DEFAULT_WORKER_MAX_IDLE_SECONDS,
@@ -96,7 +97,10 @@ async function ensureWorkerForTarget(
   const sandbox = await ensureWorkerSandbox(settings, {
     sandboxId: assignment?.sandboxId,
     templateName: DEFAULT_TEMPLATE_NAME,
-    timeoutSeconds: DEFAULT_SANDBOX_TIMEOUT_SECONDS,
+    timeoutSeconds:
+      target.routingScope === "session"
+        ? DEFAULT_APP_SANDBOX_TIMEOUT_SECONDS
+        : DEFAULT_SANDBOX_TIMEOUT_SECONDS,
     workerMaxIdleSeconds: DEFAULT_WORKER_MAX_IDLE_SECONDS,
     logLevel: DEFAULT_LOG_LEVEL,
   });

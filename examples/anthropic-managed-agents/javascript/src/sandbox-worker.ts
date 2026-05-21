@@ -55,6 +55,7 @@ async function createOrConnectWorkerSandbox(settings: Settings, options: WorkerO
 
   return Sandbox.create(options.templateName ?? DEFAULT_TEMPLATE_NAME, {
     timeoutMs,
+    lifecycle: { onTimeout: "pause", autoResume: true },
     metadata: {
       managed_by: "anthropic-managed-agents-e2b-js",
       "anthropic.environment_id": settings.anthropicEnvironmentId ?? "",

@@ -52,6 +52,7 @@ def create_or_connect_worker_sandbox(
     return Sandbox.create(
         template_name,
         timeout=timeout_seconds,
+        lifecycle={"on_timeout": "pause", "auto_resume": True},
         metadata={
             "managed_by": "anthropic-managed-agents-e2b",
             "anthropic.environment_id": settings.anthropic_environment_id or "",

@@ -74,6 +74,15 @@ Routing scopes:
 
 The JSON store is a local example store. For a multi-instance app, use a database with a
 transactional session assignment so duplicate webhook deliveries cannot create duplicate workers.
+SQLite is enough for a single-node deployment; Postgres or Redis is a better fit once multiple app
+replicas can receive the same webhook. An in-memory catalog is only useful for a toy demo because a
+process restart loses the session-to-sandbox mapping needed for follow-up work.
+
+Worker sandboxes are created with E2B auto-resume and pause-on-timeout lifecycle settings. The app
+does not need to manually pause them: let the Anthropic worker exit after idle, keep the session's
+sandbox assignment in the catalog, and let E2B pause the sandbox after its timeout. A follow-up event
+for the same session reconnects to the same sandbox.
+
 The worker itself still polls Anthropic at the environment level, so `agent` and `environment`
 scopes are reuse policies, not hard routing guarantees for a specific work item.
 

@@ -8,6 +8,7 @@ import {
   DEFAULT_TEMPLATE_NAME,
   DEFAULT_WEBHOOK_PORT,
   DEFAULT_WORKER_MAX_IDLE_SECONDS,
+  REMOTE_CONFIG_DIR,
   REMOTE_ENVIRONMENT_ID,
   REMOTE_ENVIRONMENT_KEY,
   REMOTE_LOG_LEVEL,
@@ -207,6 +208,9 @@ export async function startWebhookServerSandbox(settings: Settings, options: Web
   if (settings.anthropicWebhookSigningKey) {
     envs.ANTHROPIC_WEBHOOK_SIGNING_KEY = settings.anthropicWebhookSigningKey;
   }
+  await sandbox.commands.run(`mkdir -p ${REMOTE_CONFIG_DIR} && chmod 700 ${REMOTE_CONFIG_DIR}`, {
+    timeoutMs: 5_000,
+  });
   await sandbox.files.write([
     { path: REMOTE_ENVIRONMENT_ID, data: `${envs.ANTHROPIC_ENVIRONMENT_ID}\n` },
     { path: REMOTE_ENVIRONMENT_KEY, data: `${envs.ANTHROPIC_ENVIRONMENT_KEY}\n` },
@@ -219,6 +223,7 @@ export async function startWebhookServerSandbox(settings: Settings, options: Web
       ? [{ path: REMOTE_WEBHOOK_SIGNING_KEY, data: `${settings.anthropicWebhookSigningKey}\n` }]
       : []),
   ]);
+  await sandbox.commands.run(`chmod 600 ${REMOTE_CONFIG_DIR}/*`, { timeoutMs: 5_000 });
 
   const healthUrl = `http://127.0.0.1:${options.port ?? DEFAULT_WEBHOOK_PORT}/health`;
   let webhookServerReady = false;

@@ -9,16 +9,17 @@ import anthropic
 from fastapi import FastAPI, Request, Response
 
 REMOTE_DIR = Path("/opt/anthropic-managed-agents")
+REMOTE_CONFIG_DIR = REMOTE_DIR / "config"
 REMOTE_WORKDIR = Path("/mnt/session")
 REMOTE_WORKER = REMOTE_DIR / "worker.py"
 REMOTE_PID = REMOTE_DIR / "worker.pid"
 REMOTE_PIDS_DIR = REMOTE_DIR / "worker-pids"
 REMOTE_LOG = REMOTE_DIR / "worker.log"
-REMOTE_ENVIRONMENT_ID = REMOTE_WORKDIR / ".anthropic-environment-id"
-REMOTE_ENVIRONMENT_KEY = REMOTE_WORKDIR / ".anthropic-environment-key"
-REMOTE_WEBHOOK_SIGNING_KEY = REMOTE_WORKDIR / ".anthropic-webhook-signing-key"
-REMOTE_WORKER_MAX_IDLE_SECONDS = REMOTE_WORKDIR / ".worker-max-idle-seconds"
-REMOTE_LOG_LEVEL = REMOTE_WORKDIR / ".log-level"
+REMOTE_ENVIRONMENT_ID = REMOTE_CONFIG_DIR / "anthropic-environment-id"
+REMOTE_ENVIRONMENT_KEY = REMOTE_CONFIG_DIR / "anthropic-environment-key"
+REMOTE_WEBHOOK_SIGNING_KEY = REMOTE_CONFIG_DIR / "anthropic-webhook-signing-key"
+REMOTE_WORKER_MAX_IDLE_SECONDS = REMOTE_CONFIG_DIR / "worker-max-idle-seconds"
+REMOTE_LOG_LEVEL = REMOTE_CONFIG_DIR / "log-level"
 MAX_WEBHOOK_BODY_BYTES = 1_048_576
 MAX_WORKERS = max(1, int(os.environ.get("MAX_WORKERS", "4")))
 WORKER_RETRY_SECONDS = 5

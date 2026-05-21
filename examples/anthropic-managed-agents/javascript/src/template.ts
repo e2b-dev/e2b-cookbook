@@ -2,6 +2,7 @@ import { Template } from "e2b";
 
 import {
   DEFAULT_WEBHOOK_PORT,
+  REMOTE_CONFIG_DIR,
   REMOTE_DIR,
   REMOTE_SRC_DIR,
   REMOTE_WEBHOOK,
@@ -29,8 +30,9 @@ export const template = Template({ fileContextPath: "." })
     "util-linux",
   ])
   .runCmd(
-    `sudo mkdir -p ${REMOTE_WORKDIR} ${REMOTE_DIR} ${REMOTE_SRC_DIR} && ` +
-      `sudo chmod 777 ${REMOTE_WORKDIR} ${REMOTE_DIR} ${REMOTE_SRC_DIR}`,
+    `sudo mkdir -p ${REMOTE_WORKDIR} ${REMOTE_DIR} ${REMOTE_SRC_DIR} ${REMOTE_CONFIG_DIR} && ` +
+      `sudo chmod 777 ${REMOTE_WORKDIR} ${REMOTE_DIR} ${REMOTE_SRC_DIR} && ` +
+      `sudo chmod 700 ${REMOTE_CONFIG_DIR}`,
   )
   .setWorkdir(REMOTE_DIR)
   .runCmd("npm init -y")

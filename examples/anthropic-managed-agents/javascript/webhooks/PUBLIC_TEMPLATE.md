@@ -18,15 +18,15 @@ const sandbox = await Sandbox.create("E2B/claude-managed-agents-webhooks", {
 
 await sandbox.files.write([
   {
-    path: "/mnt/session/.anthropic-environment-id",
+    path: "/opt/anthropic-managed-agents-js/config/anthropic-environment-id",
     data: `${process.env.ANTHROPIC_ENVIRONMENT_ID}\n`,
   },
   {
-    path: "/mnt/session/.anthropic-environment-key",
+    path: "/opt/anthropic-managed-agents-js/config/anthropic-environment-key",
     data: `${process.env.ANTHROPIC_ENVIRONMENT_KEY}\n`,
   },
   {
-    path: "/mnt/session/.anthropic-webhook-signing-key",
+    path: "/opt/anthropic-managed-agents-js/config/anthropic-webhook-signing-key",
     data: `${process.env.ANTHROPIC_WEBHOOK_SIGNING_KEY}\n`,
   },
 ]);
@@ -54,13 +54,17 @@ Anthropic gives you the webhook signing key after you register the endpoint. If 
 signing key yet:
 
 1. Start the sandbox and write `ANTHROPIC_ENVIRONMENT_ID` and `ANTHROPIC_ENVIRONMENT_KEY` into
-   `/mnt/session/.anthropic-environment-id` and `/mnt/session/.anthropic-environment-key`.
+   `/opt/anthropic-managed-agents-js/config/anthropic-environment-id` and
+   `/opt/anthropic-managed-agents-js/config/anthropic-environment-key`.
 2. Copy `https://<sandbox-host>/webhook` into the Anthropic webhook settings.
 3. Save the generated signing key.
 4. Write the signing key into the same sandbox:
 
 ```ts
-await sandbox.files.write("/mnt/session/.anthropic-webhook-signing-key", `${signingKey}\n`);
+await sandbox.files.write(
+  "/opt/anthropic-managed-agents-js/config/anthropic-webhook-signing-key",
+  `${signingKey}\n`,
+);
 ```
 
 Until the signing key is configured, `/health` returns `200` and `/webhook` returns `503`.
@@ -77,11 +81,11 @@ Use this when the E2B sandbox itself is the webhook receiver and worker host.
 ```ts
 await sandbox.files.write([
   {
-    path: "/mnt/session/.anthropic-environment-id",
+    path: "/opt/anthropic-managed-agents-js/config/anthropic-environment-id",
     data: `${process.env.ANTHROPIC_ENVIRONMENT_ID}\n`,
   },
   {
-    path: "/mnt/session/.anthropic-environment-key",
+    path: "/opt/anthropic-managed-agents-js/config/anthropic-environment-key",
     data: `${process.env.ANTHROPIC_ENVIRONMENT_KEY}\n`,
   },
 ]);
@@ -93,7 +97,7 @@ await sandbox.files.write([
 
 ```ts
 await sandbox.files.write(
-  "/mnt/session/.anthropic-webhook-signing-key",
+  "/opt/anthropic-managed-agents-js/config/anthropic-webhook-signing-key",
   `${process.env.ANTHROPIC_WEBHOOK_SIGNING_KEY}\n`,
 );
 ```
@@ -142,6 +146,8 @@ archived sessions, stale environment keys, and missing webhook signing keys are 
 ## Runtime Behavior
 
 - The webhook server starts automatically from the template start command.
+- Runtime config files live under `/opt/anthropic-managed-agents-js/config`, outside the agent
+  workdir, with restrictive file permissions.
 - The worker runs with `/mnt/session` as its workdir.
 - File tools stay constrained to `/mnt/session`; unrestricted paths are not enabled.
 - Skills are downloaded under `/mnt/session/skills/<name>/`.
@@ -153,5 +159,6 @@ archived sessions, stale environment keys, and missing webhook signing keys are 
 - If a webhook arrives while all worker slots are full, the server retries the skipped worker start
   until a slot opens.
 - Each worker defaults to a 30-second session idle timeout and a 180-second process runtime guard.
-  Override the idle timeout with `/mnt/session/.worker-max-idle-seconds`; override the runtime guard
-  with `WORKER_RUN_SECONDS` in the template environment if your tasks usually run longer.
+  Override the idle timeout with
+  `/opt/anthropic-managed-agents-js/config/worker-max-idle-seconds`; override the runtime guard with
+  `WORKER_RUN_SECONDS` in the template environment if your tasks usually run longer.

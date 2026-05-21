@@ -70,14 +70,14 @@ def start_webhook_sandbox(
 
 The process environment is allowlisted. The webhook server reads the Anthropic environment id,
 environment key, webhook signing key, worker idle timeout, and log level either from environment
-variables or from these files in `/mnt/session`:
+variables or from these files in `/opt/anthropic-managed-agents/config`, outside the agent workdir:
 
 ```text
-.anthropic-environment-id
-.anthropic-environment-key
-.anthropic-webhook-signing-key
-.worker-max-idle-seconds
-.log-level
+anthropic-environment-id
+anthropic-environment-key
+anthropic-webhook-signing-key
+worker-max-idle-seconds
+log-level
 ```
 
 That file-backed path lets the app update a resumed webhook sandbox without baking secrets or an

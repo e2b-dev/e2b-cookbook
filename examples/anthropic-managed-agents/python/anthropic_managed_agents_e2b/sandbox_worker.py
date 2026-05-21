@@ -18,6 +18,7 @@ from anthropic_managed_agents_e2b.environment import (
 from anthropic_managed_agents_e2b.settings import PACKAGE_ROOT, Settings
 
 REMOTE_DIR = "/opt/anthropic-managed-agents"
+REMOTE_CONFIG_DIR = f"{REMOTE_DIR}/config"
 REMOTE_WORKDIR = "/mnt/session"
 REMOTE_PACKAGE_DIR = f"{REMOTE_DIR}/anthropic_managed_agents_e2b"
 REMOTE_WORKER = f"{REMOTE_DIR}/worker.py"
@@ -25,11 +26,11 @@ REMOTE_PID = f"{REMOTE_DIR}/worker.pid"
 REMOTE_LOG = f"{REMOTE_DIR}/worker.log"
 REMOTE_WEBHOOK_PID = f"{REMOTE_DIR}/webhook.pid"
 REMOTE_WEBHOOK_LOG = f"{REMOTE_DIR}/webhook.log"
-REMOTE_ENVIRONMENT_ID = f"{REMOTE_WORKDIR}/.anthropic-environment-id"
-REMOTE_ENVIRONMENT_KEY = f"{REMOTE_WORKDIR}/.anthropic-environment-key"
-REMOTE_WEBHOOK_SIGNING_KEY = f"{REMOTE_WORKDIR}/.anthropic-webhook-signing-key"
-REMOTE_WORKER_MAX_IDLE_SECONDS = f"{REMOTE_WORKDIR}/.worker-max-idle-seconds"
-REMOTE_LOG_LEVEL = f"{REMOTE_WORKDIR}/.log-level"
+REMOTE_ENVIRONMENT_ID = f"{REMOTE_CONFIG_DIR}/anthropic-environment-id"
+REMOTE_ENVIRONMENT_KEY = f"{REMOTE_CONFIG_DIR}/anthropic-environment-key"
+REMOTE_WEBHOOK_SIGNING_KEY = f"{REMOTE_CONFIG_DIR}/anthropic-webhook-signing-key"
+REMOTE_WORKER_MAX_IDLE_SECONDS = f"{REMOTE_CONFIG_DIR}/worker-max-idle-seconds"
+REMOTE_LOG_LEVEL = f"{REMOTE_CONFIG_DIR}/log-level"
 logger = logging.getLogger(__name__)
 REMOTE_WORKER_ENTRYPOINT = """\
 from anthropic_managed_agents_e2b.worker_runtime import main
@@ -265,6 +266,10 @@ def write_webhook_config(
     worker_max_idle_seconds: float | None,
     log_level: str,
 ) -> None:
+    sandbox.commands.run(
+        f"mkdir -p {shlex.quote(REMOTE_CONFIG_DIR)} && chmod 700 {shlex.quote(REMOTE_CONFIG_DIR)}",
+        timeout=5,
+    )
     sandbox.files.write(
         REMOTE_ENVIRONMENT_ID,
         f"{settings.require_anthropic_environment_id()}\n",
@@ -283,6 +288,7 @@ def write_webhook_config(
             REMOTE_WEBHOOK_SIGNING_KEY,
             f"{settings.anthropic_webhook_signing_key}\n",
         )
+    sandbox.commands.run(f"chmod 600 {shlex.quote(REMOTE_CONFIG_DIR)}/*", timeout=5)
 
 
 def start_webhook_server_sandbox(

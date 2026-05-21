@@ -12,17 +12,18 @@ import {
 import { spawn } from "node:child_process";
 
 const REMOTE_DIR = "/opt/anthropic-managed-agents-js";
+const REMOTE_CONFIG_DIR = `${REMOTE_DIR}/config`;
 const REMOTE_WORKDIR = "/mnt/session";
 const REMOTE_TSX = `${REMOTE_DIR}/node_modules/.bin/tsx`;
 const REMOTE_WORKER = `${REMOTE_DIR}/src/worker-runtime.ts`;
 const REMOTE_PID = `${REMOTE_DIR}/worker.pid`;
 const REMOTE_PIDS_DIR = `${REMOTE_DIR}/worker-pids`;
 const REMOTE_LOG = `${REMOTE_DIR}/worker.log`;
-const REMOTE_ENVIRONMENT_ID = `${REMOTE_WORKDIR}/.anthropic-environment-id`;
-const REMOTE_ENVIRONMENT_KEY = `${REMOTE_WORKDIR}/.anthropic-environment-key`;
-const REMOTE_WEBHOOK_SIGNING_KEY = `${REMOTE_WORKDIR}/.anthropic-webhook-signing-key`;
-const REMOTE_WORKER_MAX_IDLE_SECONDS = `${REMOTE_WORKDIR}/.worker-max-idle-seconds`;
-const REMOTE_LOG_LEVEL = `${REMOTE_WORKDIR}/.log-level`;
+const REMOTE_ENVIRONMENT_ID = `${REMOTE_CONFIG_DIR}/anthropic-environment-id`;
+const REMOTE_ENVIRONMENT_KEY = `${REMOTE_CONFIG_DIR}/anthropic-environment-key`;
+const REMOTE_WEBHOOK_SIGNING_KEY = `${REMOTE_CONFIG_DIR}/anthropic-webhook-signing-key`;
+const REMOTE_WORKER_MAX_IDLE_SECONDS = `${REMOTE_CONFIG_DIR}/worker-max-idle-seconds`;
+const REMOTE_LOG_LEVEL = `${REMOTE_CONFIG_DIR}/log-level`;
 const MAX_WEBHOOK_BODY_BYTES = 1_048_576;
 const MAX_WORKERS = Number(process.env.MAX_WORKERS ?? "4");
 const WORKER_RETRY_MS = 5_000;

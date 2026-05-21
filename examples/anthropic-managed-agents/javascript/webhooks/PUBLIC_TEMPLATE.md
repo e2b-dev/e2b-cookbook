@@ -73,3 +73,11 @@ Until the signing key is configured, `/health` returns `200` and `/webhook` retu
 - Skills are downloaded under `/mnt/session/skills/<name>/`.
 - Generated artifacts should be written under `/mnt/session/outputs`.
 - Request bodies larger than 1 MiB are rejected before signature verification.
+- The webhook server starts one bounded worker process per `session.status_run_started` event, up to
+  `MAX_WORKERS` concurrent workers. This keeps later sessions moving even when an older session is
+  still waiting on an idle event stream.
+- If a webhook arrives while all worker slots are full, the server retries the skipped worker start
+  until a slot opens.
+- Each worker defaults to a 30-second session idle timeout and a 180-second process runtime guard.
+  Override the idle timeout with `/mnt/session/.worker-max-idle-seconds`; override the runtime guard
+  with `WORKER_RUN_SECONDS` in the template environment if your tasks usually run longer.

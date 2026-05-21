@@ -102,7 +102,11 @@ Implement the worker runtime entrypoint.
 It should run Anthropic's SDK worker:
 
 ```ts
-const client = new Anthropic({ authToken: environmentKey });
+const client = new Anthropic({
+  authToken: environmentKey,
+  logger: console,
+  logLevel: "info",
+});
 
 await client.beta.environments.work
   .worker({
@@ -117,6 +121,13 @@ await client.beta.environments.work
 This is the core handoff. Anthropic's SDK owns polling, claiming work, heartbeating, dispatching
 tool calls, and sending tool results back to the session.
 Leaving `unrestrictedPaths` unset keeps file tools constrained to the worker `workdir`.
+Use a short default idle timeout, such as 30 seconds, so a completed or quiet session does not keep
+the single example worker from polling later work for several minutes.
+For webhook-driven sandboxes, start a bounded worker process on each `session.status_run_started`
+delivery instead of treating one PID as the whole queue. Cap concurrency, and give each worker a
+runtime guard so an idle event stream cannot block later sessions indefinitely. If all worker slots
+are full, keep a small retry counter so that skipped webhook deliveries start a worker once capacity
+opens again.
 
 ## 7. Start an Auto-Resume Webhook Sandbox
 

@@ -1,6 +1,14 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
-import { existsSync, readFileSync, writeFileSync, createWriteStream } from "node:fs";
+import {
+  createWriteStream,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  unlinkSync,
+  writeFileSync,
+} from "node:fs";
 import { spawn } from "node:child_process";
 
 const REMOTE_DIR = "/opt/anthropic-managed-agents-js";
@@ -8,6 +16,7 @@ const REMOTE_WORKDIR = "/mnt/session";
 const REMOTE_TSX = `${REMOTE_DIR}/node_modules/.bin/tsx`;
 const REMOTE_WORKER = `${REMOTE_DIR}/src/worker-runtime.ts`;
 const REMOTE_PID = `${REMOTE_DIR}/worker.pid`;
+const REMOTE_PIDS_DIR = `${REMOTE_DIR}/worker-pids`;
 const REMOTE_LOG = `${REMOTE_DIR}/worker.log`;
 const REMOTE_ENVIRONMENT_ID = `${REMOTE_WORKDIR}/.anthropic-environment-id`;
 const REMOTE_ENVIRONMENT_KEY = `${REMOTE_WORKDIR}/.anthropic-environment-key`;
@@ -15,8 +24,12 @@ const REMOTE_WEBHOOK_SIGNING_KEY = `${REMOTE_WORKDIR}/.anthropic-webhook-signing
 const REMOTE_WORKER_MAX_IDLE_SECONDS = `${REMOTE_WORKDIR}/.worker-max-idle-seconds`;
 const REMOTE_LOG_LEVEL = `${REMOTE_WORKDIR}/.log-level`;
 const MAX_WEBHOOK_BODY_BYTES = 1_048_576;
+const MAX_WORKERS = Number(process.env.MAX_WORKERS ?? "4");
+const WORKER_RETRY_MS = 5_000;
 
 const client = new Anthropic({ apiKey: "not-needed" });
+let pendingWorkerStarts = 0;
+let workerRetryTimer: NodeJS.Timeout | undefined;
 
 class PayloadTooLargeError extends Error {}
 
@@ -37,24 +50,64 @@ function workerEnv() {
     ANTHROPIC_ENVIRONMENT_ID: configValue("ANTHROPIC_ENVIRONMENT_ID", REMOTE_ENVIRONMENT_ID),
     ANTHROPIC_ENVIRONMENT_KEY: configValue("ANTHROPIC_ENVIRONMENT_KEY", REMOTE_ENVIRONMENT_KEY),
     WORKER_MAX_IDLE_SECONDS: configValue("WORKER_MAX_IDLE_SECONDS", REMOTE_WORKER_MAX_IDLE_SECONDS),
+    WORKER_RUN_SECONDS: process.env.WORKER_RUN_SECONDS,
     LOG_LEVEL: configValue("LOG_LEVEL", REMOTE_LOG_LEVEL),
     PATH: process.env.PATH,
     HOME: process.env.HOME,
   };
 }
 
-function workerIsRunning() {
-  if (!existsSync(REMOTE_PID)) {
-    return false;
-  }
-
-  const pid = Number(readFileSync(REMOTE_PID, "utf8").trim());
+function processIsRunning(pid: number) {
   return Number.isInteger(pid) && existsSync(`/proc/${pid}`);
 }
 
-function startWorkerIfNeeded() {
-  if (workerIsRunning()) {
+function activeWorkerPids() {
+  mkdirSync(REMOTE_PIDS_DIR, { recursive: true });
+  const pids: number[] = [];
+
+  for (const file of readdirSync(REMOTE_PIDS_DIR)) {
+    const path = `${REMOTE_PIDS_DIR}/${file}`;
+    const pid = Number(readFileSync(path, "utf8").trim());
+    if (processIsRunning(pid)) {
+      pids.push(pid);
+    } else {
+      unlinkSync(path);
+    }
+  }
+
+  if (existsSync(REMOTE_PID)) {
+    const pid = Number(readFileSync(REMOTE_PID, "utf8").trim());
+    if (processIsRunning(pid) && !pids.includes(pid)) {
+      pids.push(pid);
+    }
+  }
+
+  return pids;
+}
+
+function scheduleWorkerRetry() {
+  if (workerRetryTimer || pendingWorkerStarts === 0) {
     return;
+  }
+
+  workerRetryTimer = setTimeout(() => {
+    workerRetryTimer = undefined;
+    startWorkerIfCapacity({ retryingPendingStart: true });
+  }, WORKER_RETRY_MS);
+}
+
+function startWorkerIfCapacity({ retryingPendingStart = false } = {}) {
+  const pids = activeWorkerPids();
+  if (pids.length >= MAX_WORKERS) {
+    if (!retryingPendingStart) {
+      pendingWorkerStarts = Math.min(pendingWorkerStarts + 1, MAX_WORKERS);
+    }
+    scheduleWorkerRetry();
+    return;
+  }
+
+  if (retryingPendingStart) {
+    pendingWorkerStarts = Math.max(0, pendingWorkerStarts - 1);
   }
 
   const log = createWriteStream(REMOTE_LOG, { flags: "a" });
@@ -68,6 +121,15 @@ function startWorkerIfNeeded() {
   child.stderr.pipe(log);
   child.unref();
   writeFileSync(REMOTE_PID, `${child.pid}\n`);
+  writeFileSync(`${REMOTE_PIDS_DIR}/${child.pid}.pid`, `${child.pid}\n`);
+  child.on("exit", () => {
+    try {
+      unlinkSync(`${REMOTE_PIDS_DIR}/${child.pid}.pid`);
+    } catch {
+      // The health check can clean stale pid files too.
+    }
+    scheduleWorkerRetry();
+  });
 }
 
 function webhookSigningKey() {
@@ -131,7 +193,7 @@ async function handleWebhook(request: IncomingMessage, response: ServerResponse)
     });
 
     if (event.data.type === "session.status_run_started") {
-      startWorkerIfNeeded();
+      startWorkerIfCapacity();
     }
 
     response.writeHead(204);
@@ -144,7 +206,8 @@ async function handleWebhook(request: IncomingMessage, response: ServerResponse)
 
 const server = createServer((request, response) => {
   if (request.method === "GET" && request.url === "/health") {
-    writeJson(response, 200, { ok: true, worker_running: workerIsRunning() });
+    const pids = activeWorkerPids();
+    writeJson(response, 200, { ok: true, worker_running: pids.length > 0, worker_count: pids.length });
     return;
   }
 

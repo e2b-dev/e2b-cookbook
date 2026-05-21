@@ -26,6 +26,7 @@ WORKER_RETRY_SECONDS = 5
 
 app = FastAPI()
 client = anthropic.Anthropic(api_key="not-needed")
+worker_state_lock = threading.Lock()
 pending_worker_starts = 0
 worker_retry_timer: threading.Timer | None = None
 
@@ -74,7 +75,7 @@ def pid_file_value(path: Path) -> int | None:
         return None
 
 
-def active_worker_pids() -> list[int]:
+def _active_worker_pids_locked() -> list[int]:
     REMOTE_PIDS_DIR.mkdir(parents=True, exist_ok=True)
     pids: list[int] = []
 
@@ -92,7 +93,12 @@ def active_worker_pids() -> list[int]:
     return pids
 
 
-def schedule_worker_retry() -> None:
+def active_worker_pids() -> list[int]:
+    with worker_state_lock:
+        return _active_worker_pids_locked()
+
+
+def _schedule_worker_retry_locked() -> None:
     global worker_retry_timer
 
     if worker_retry_timer is not None or pending_worker_starts == 0:
@@ -108,39 +114,41 @@ def schedule_worker_retry() -> None:
 
 def cleanup_worker_on_exit(process: subprocess.Popen[bytes]) -> None:
     process.wait()
-    (REMOTE_PIDS_DIR / f"{process.pid}.pid").unlink(missing_ok=True)
-    schedule_worker_retry()
+    with worker_state_lock:
+        (REMOTE_PIDS_DIR / f"{process.pid}.pid").unlink(missing_ok=True)
+        _schedule_worker_retry_locked()
 
 
 def start_worker_if_capacity(*, retrying_pending_start: bool = False) -> None:
     global pending_worker_starts, worker_retry_timer
 
-    if retrying_pending_start:
-        worker_retry_timer = None
+    with worker_state_lock:
+        if retrying_pending_start:
+            worker_retry_timer = None
 
-    if len(active_worker_pids()) >= MAX_WORKERS:
-        if not retrying_pending_start:
-            pending_worker_starts = min(pending_worker_starts + 1, MAX_WORKERS)
-        schedule_worker_retry()
-        return
+        if len(_active_worker_pids_locked()) >= MAX_WORKERS:
+            if not retrying_pending_start:
+                pending_worker_starts = min(pending_worker_starts + 1, MAX_WORKERS)
+            _schedule_worker_retry_locked()
+            return
 
-    if retrying_pending_start:
-        pending_worker_starts = max(0, pending_worker_starts - 1)
+        if retrying_pending_start:
+            pending_worker_starts = max(0, pending_worker_starts - 1)
 
-    with REMOTE_LOG.open("ab") as log_file:
-        process = subprocess.Popen(
-            ["python", str(REMOTE_WORKER)],
-            cwd=REMOTE_WORKDIR,
-            stdin=subprocess.DEVNULL,
-            stdout=log_file,
-            stderr=subprocess.STDOUT,
-            start_new_session=True,
-            env=worker_env(),
-        )
-    REMOTE_PID.write_text(f"{process.pid}\n")
-    (REMOTE_PIDS_DIR / f"{process.pid}.pid").write_text(f"{process.pid}\n")
-    threading.Thread(target=cleanup_worker_on_exit, args=(process,), daemon=True).start()
-    schedule_worker_retry()
+        with REMOTE_LOG.open("ab") as log_file:
+            process = subprocess.Popen(
+                ["python", str(REMOTE_WORKER)],
+                cwd=REMOTE_WORKDIR,
+                stdin=subprocess.DEVNULL,
+                stdout=log_file,
+                stderr=subprocess.STDOUT,
+                start_new_session=True,
+                env=worker_env(),
+            )
+        REMOTE_PID.write_text(f"{process.pid}\n")
+        (REMOTE_PIDS_DIR / f"{process.pid}.pid").write_text(f"{process.pid}\n")
+        threading.Thread(target=cleanup_worker_on_exit, args=(process,), daemon=True).start()
+        _schedule_worker_retry_locked()
 
 
 def webhook_signing_key() -> str | None:

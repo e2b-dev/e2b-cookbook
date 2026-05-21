@@ -8,6 +8,9 @@ import {
   DEFAULT_TEMPLATE_NAME,
   DEFAULT_WEBHOOK_PORT,
   DEFAULT_WORKER_MAX_IDLE_SECONDS,
+  REMOTE_ENVIRONMENT_ID,
+  REMOTE_ENVIRONMENT_KEY,
+  REMOTE_LOG_LEVEL,
   REMOTE_LOG,
   REMOTE_PID,
   REMOTE_SRC_DIR,
@@ -16,6 +19,7 @@ import {
   REMOTE_WEBHOOK_LOG,
   REMOTE_WEBHOOK_PID,
   REMOTE_WEBHOOK_SIGNING_KEY,
+  REMOTE_WORKER_MAX_IDLE_SECONDS,
   REMOTE_WORKDIR,
   REMOTE_WORKER,
 } from "./constants.js";
@@ -190,10 +194,6 @@ export async function startWebhookServerSandbox(settings: Settings, options: Web
       });
 
   await uploadRuntime(sandbox);
-  if (settings.anthropicWebhookSigningKey) {
-    await sandbox.files.write(REMOTE_WEBHOOK_SIGNING_KEY, `${settings.anthropicWebhookSigningKey}\n`);
-  }
-
   const envs: Record<string, string> = {
     ...workerEnv(settings, options),
     WEBHOOK_PORT: String(options.port ?? DEFAULT_WEBHOOK_PORT),
@@ -201,6 +201,18 @@ export async function startWebhookServerSandbox(settings: Settings, options: Web
   if (settings.anthropicWebhookSigningKey) {
     envs.ANTHROPIC_WEBHOOK_SIGNING_KEY = settings.anthropicWebhookSigningKey;
   }
+  await sandbox.files.write([
+    { path: REMOTE_ENVIRONMENT_ID, data: `${envs.ANTHROPIC_ENVIRONMENT_ID}\n` },
+    { path: REMOTE_ENVIRONMENT_KEY, data: `${envs.ANTHROPIC_ENVIRONMENT_KEY}\n` },
+    {
+      path: REMOTE_WORKER_MAX_IDLE_SECONDS,
+      data: `${envs.WORKER_MAX_IDLE_SECONDS ?? DEFAULT_WORKER_MAX_IDLE_SECONDS}\n`,
+    },
+    { path: REMOTE_LOG_LEVEL, data: `${envs.LOG_LEVEL ?? DEFAULT_LOG_LEVEL}\n` },
+    ...(settings.anthropicWebhookSigningKey
+      ? [{ path: REMOTE_WEBHOOK_SIGNING_KEY, data: `${settings.anthropicWebhookSigningKey}\n` }]
+      : []),
+  ]);
 
   const healthUrl = `http://127.0.0.1:${options.port ?? DEFAULT_WEBHOOK_PORT}/health`;
   let webhookServerReady = false;

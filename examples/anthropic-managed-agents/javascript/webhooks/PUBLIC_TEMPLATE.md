@@ -13,15 +13,23 @@ Anthropic `EnvironmentWorker` in `/mnt/session`.
 import { Sandbox } from "e2b";
 
 const sandbox = await Sandbox.create("E2B/claude-managed-agents-webhooks", {
-  envs: {
-    ANTHROPIC_ENVIRONMENT_ID: process.env.ANTHROPIC_ENVIRONMENT_ID!,
-    ANTHROPIC_ENVIRONMENT_KEY: process.env.ANTHROPIC_ENVIRONMENT_KEY!,
-    ANTHROPIC_WEBHOOK_SIGNING_KEY: process.env.ANTHROPIC_WEBHOOK_SIGNING_KEY!,
-    WORKER_MAX_IDLE_SECONDS: "300",
-    LOG_LEVEL: "INFO",
-  },
   lifecycle: { onTimeout: "pause", autoResume: true },
 });
+
+await sandbox.files.write([
+  {
+    path: "/mnt/session/.anthropic-environment-id",
+    data: `${process.env.ANTHROPIC_ENVIRONMENT_ID}\n`,
+  },
+  {
+    path: "/mnt/session/.anthropic-environment-key",
+    data: `${process.env.ANTHROPIC_ENVIRONMENT_KEY}\n`,
+  },
+  {
+    path: "/mnt/session/.anthropic-webhook-signing-key",
+    data: `${process.env.ANTHROPIC_WEBHOOK_SIGNING_KEY}\n`,
+  },
+]);
 
 console.log(`https://${sandbox.getHost(8000)}/webhook`);
 ```
@@ -45,7 +53,8 @@ agents, creating environments, registering webhooks, and sending session message
 Anthropic gives you the webhook signing key after you register the endpoint. If you do not have the
 signing key yet:
 
-1. Start the sandbox with `ANTHROPIC_ENVIRONMENT_ID` and `ANTHROPIC_ENVIRONMENT_KEY`.
+1. Start the sandbox and write `ANTHROPIC_ENVIRONMENT_ID` and `ANTHROPIC_ENVIRONMENT_KEY` into
+   `/mnt/session/.anthropic-environment-id` and `/mnt/session/.anthropic-environment-key`.
 2. Copy `https://<sandbox-host>/webhook` into the Anthropic webhook settings.
 3. Save the generated signing key.
 4. Write the signing key into the same sandbox:

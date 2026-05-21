@@ -9,19 +9,35 @@ const REMOTE_TSX = `${REMOTE_DIR}/node_modules/.bin/tsx`;
 const REMOTE_WORKER = `${REMOTE_DIR}/src/worker-runtime.ts`;
 const REMOTE_PID = `${REMOTE_DIR}/worker.pid`;
 const REMOTE_LOG = `${REMOTE_DIR}/worker.log`;
+const REMOTE_ENVIRONMENT_ID = `${REMOTE_WORKDIR}/.anthropic-environment-id`;
+const REMOTE_ENVIRONMENT_KEY = `${REMOTE_WORKDIR}/.anthropic-environment-key`;
 const REMOTE_WEBHOOK_SIGNING_KEY = `${REMOTE_WORKDIR}/.anthropic-webhook-signing-key`;
+const REMOTE_WORKER_MAX_IDLE_SECONDS = `${REMOTE_WORKDIR}/.worker-max-idle-seconds`;
+const REMOTE_LOG_LEVEL = `${REMOTE_WORKDIR}/.log-level`;
 const MAX_WEBHOOK_BODY_BYTES = 1_048_576;
 
 const client = new Anthropic({ apiKey: "not-needed" });
 
 class PayloadTooLargeError extends Error {}
 
+function fileValue(path: string) {
+  if (!existsSync(path)) {
+    return undefined;
+  }
+  const value = readFileSync(path, "utf8").trim();
+  return value || undefined;
+}
+
+function configValue(name: string, path: string) {
+  return process.env[name] || fileValue(path);
+}
+
 function workerEnv() {
   return {
-    ANTHROPIC_ENVIRONMENT_ID: process.env.ANTHROPIC_ENVIRONMENT_ID,
-    ANTHROPIC_ENVIRONMENT_KEY: process.env.ANTHROPIC_ENVIRONMENT_KEY,
-    WORKER_MAX_IDLE_SECONDS: process.env.WORKER_MAX_IDLE_SECONDS,
-    LOG_LEVEL: process.env.LOG_LEVEL,
+    ANTHROPIC_ENVIRONMENT_ID: configValue("ANTHROPIC_ENVIRONMENT_ID", REMOTE_ENVIRONMENT_ID),
+    ANTHROPIC_ENVIRONMENT_KEY: configValue("ANTHROPIC_ENVIRONMENT_KEY", REMOTE_ENVIRONMENT_KEY),
+    WORKER_MAX_IDLE_SECONDS: configValue("WORKER_MAX_IDLE_SECONDS", REMOTE_WORKER_MAX_IDLE_SECONDS),
+    LOG_LEVEL: configValue("LOG_LEVEL", REMOTE_LOG_LEVEL),
     PATH: process.env.PATH,
     HOME: process.env.HOME,
   };
@@ -55,16 +71,8 @@ function startWorkerIfNeeded() {
 }
 
 function webhookSigningKey() {
-  if (process.env.ANTHROPIC_WEBHOOK_SIGNING_KEY) {
-    return process.env.ANTHROPIC_WEBHOOK_SIGNING_KEY;
-  }
-
   const keyPath = process.env.ANTHROPIC_WEBHOOK_SIGNING_KEY_FILE ?? REMOTE_WEBHOOK_SIGNING_KEY;
-  if (existsSync(keyPath)) {
-    return readFileSync(keyPath, "utf8").trim();
-  }
-
-  return undefined;
+  return configValue("ANTHROPIC_WEBHOOK_SIGNING_KEY", keyPath);
 }
 
 async function readBody(request: IncomingMessage, maxBytes: number) {

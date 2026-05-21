@@ -115,7 +115,7 @@ from anthropic import AsyncAnthropic
 
 
 def max_idle_seconds() -> float | None:
-    raw = os.environ.get("WORKER_MAX_IDLE_SECONDS", "300")
+    raw = os.environ.get("WORKER_MAX_IDLE_SECONDS", "30")
     if raw.lower() in {"", "none", "null"}:
         return None
     return float(raw)
@@ -179,7 +179,7 @@ def start_worker_sandbox(
         envs={
             "ANTHROPIC_ENVIRONMENT_ID": environment_id,
             "ANTHROPIC_ENVIRONMENT_KEY": environment_key,
-            "WORKER_MAX_IDLE_SECONDS": "300",
+            "WORKER_MAX_IDLE_SECONDS": "30",
             "LOG_LEVEL": "INFO",
         },
         timeout=15,

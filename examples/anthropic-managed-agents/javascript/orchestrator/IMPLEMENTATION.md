@@ -94,7 +94,7 @@ import Anthropic from "@anthropic-ai/sdk";
 const WORKDIR = "/mnt/session";
 
 function maxIdleMs() {
-  const raw = process.env.WORKER_MAX_IDLE_SECONDS ?? "300";
+  const raw = process.env.WORKER_MAX_IDLE_SECONDS ?? "30";
   if (["", "none", "null"].includes(raw.toLowerCase())) {
     return undefined;
   }
@@ -171,7 +171,7 @@ export async function startWorkerSandbox({
       envs: {
         ANTHROPIC_ENVIRONMENT_ID: environmentId,
         ANTHROPIC_ENVIRONMENT_KEY: environmentKey,
-        WORKER_MAX_IDLE_SECONDS: "300",
+        WORKER_MAX_IDLE_SECONDS: "30",
         LOG_LEVEL: "INFO",
       },
     },

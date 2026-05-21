@@ -65,7 +65,7 @@ session-to-sandbox store so multiple Managed Agents sessions can map to differen
 | Folder | Persistent state scope |
 | --- | --- |
 | [`orchestrator/`](./orchestrator/) | One worker sandbox polls the environment queue. `/mnt/session` persists for that sandbox and can be shared by any session the worker claims. |
-| [`webhooks/`](./webhooks/) | One auto-resumable webhook sandbox owns `/mnt/session` for the worker pool it starts. This is shared worker state, not per-session state. |
+| [`webhooks/`](./webhooks/) | One auto-resumable webhook router starts or reconnects worker sandboxes. The default `session` routing scope gives each session its own persistent `/mnt/session`. |
 | [`app-webhooks/`](./app-webhooks/) | The app routes claimed work to a sandbox by `APP_SANDBOX_ROUTING_SCOPE`. The default `session` scope gives each session its own persistent `/mnt/session`. |
 
 ## Validation

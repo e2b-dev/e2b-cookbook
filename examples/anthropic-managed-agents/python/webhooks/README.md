@@ -117,8 +117,13 @@ If the stopped sandbox ID matches `e2b_webhook_sandbox_id`, the stop command cle
 
 - The webhook server is only the event-driven entrypoint. It still starts the same Anthropic
   `EnvironmentWorker.run()` inside E2B.
+- Persistent state is scoped to the webhook sandbox. Files in `/mnt/session` can be shared by any
+  session handled by that sandbox's worker pool.
 - Tool calls execute inside the E2B sandbox under `/mnt/session`.
 - Secrets and Anthropic resource IDs stay runtime-only in `../.env`; they are not baked into the E2B template.
+
+Use `../app-webhooks/` with `APP_SANDBOX_ROUTING_SCOPE=session` when each Managed Agents session
+needs its own sandbox and follow-up state.
 
 For a concrete event-by-event walkthrough, see [../EXAMPLE_USAGE.md](../EXAMPLE_USAGE.md).
 For a complete code-level implementation, see [IMPLEMENTATION.md](./IMPLEMENTATION.md).

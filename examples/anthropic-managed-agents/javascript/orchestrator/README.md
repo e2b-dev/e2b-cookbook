@@ -102,5 +102,12 @@ are not supported for self-hosted environments, so this example uploads files th
 The worker uses `/mnt/session` as this example's E2B workdir and writes generated artifacts
 under `/mnt/session/outputs` when useful.
 
+## State Scope
+
+This flow scopes persistent state to the worker sandbox. The worker polls the Anthropic
+self-hosted environment queue, so `/mnt/session` can contain files created by any session that
+worker claims. Use `../app-webhooks/` with `APP_SANDBOX_ROUTING_SCOPE=session` when each Managed
+Agents session needs its own sandbox and follow-up state.
+
 For a concrete event-by-event walkthrough, see [../EXAMPLE_USAGE.md](../EXAMPLE_USAGE.md).
 For a complete code-level implementation, see [IMPLEMENTATION.md](./IMPLEMENTATION.md).

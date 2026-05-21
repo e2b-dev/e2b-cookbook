@@ -133,7 +133,8 @@ def ensure_worker_process(
     session_id: str | None = None,
 ) -> None:
     upload_worker(sandbox)
-    if worker_process_is_running(sandbox):
+    handles_claimed_work = bool(work_id or session_id)
+    if not handles_claimed_work and worker_process_is_running(sandbox):
         return
     start_worker_process(
         sandbox,

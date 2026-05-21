@@ -98,6 +98,9 @@ If the stopped sandbox ID matches `e2b_webhook_sandbox_id`, the stop command cle
   environment worker used by the orchestrator example.
 - The public template starts bounded per-event workers inside the same sandbox. This is good for a
   reusable webhook-worker sandbox, but it is still not production per-session isolation.
+- Persistent state is scoped to the webhook sandbox. Files in `/mnt/session` can be shared by any
+  session handled by that sandbox's worker pool. Use `../app-webhooks/` with
+  `APP_SANDBOX_ROUTING_SCOPE=session` for session-owned persistent state.
 
 For a concrete event-by-event walkthrough, see [../EXAMPLE_USAGE.md](../EXAMPLE_USAGE.md).
 For a complete code-level implementation, see [IMPLEMENTATION.md](./IMPLEMENTATION.md).

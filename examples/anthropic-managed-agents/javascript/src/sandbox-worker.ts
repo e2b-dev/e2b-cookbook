@@ -121,7 +121,8 @@ export async function ensureWorkerProcess(
   options: WorkerOptions = {},
 ) {
   await uploadRuntime(sandbox);
-  if (await workerProcessIsRunning(sandbox)) {
+  const handlesClaimedWork = Boolean(options.workId || options.sessionId);
+  if (!handlesClaimedWork && await workerProcessIsRunning(sandbox)) {
     return;
   }
   const handle = await sandbox.commands.run(`bash -lc ${JSON.stringify(`exec ${REMOTE_TSX} ${REMOTE_WORKER} >> ${REMOTE_LOG} 2>&1`)}`, {

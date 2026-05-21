@@ -145,6 +145,7 @@ Both flows use the same worker contract:
 | `e2b_webhook_sandbox_id` | Compatibility metadata key for the most recent auto-resumable webhook sandbox. |
 | `e2b_webhook_sandbox_ids` | JSON metadata list of known auto-resumable webhook sandboxes. |
 
-The worker polls work at the Anthropic environment level. Multiple E2B sandboxes can be tracked and
-started by these examples, but strict per-session isolation needs a production routing primitive or
-an app-level design that scopes work to a specific worker.
+The direct worker and sandbox-hosted webhook examples poll work at the Anthropic environment level,
+so persistent files belong to the worker sandbox that claimed the work. Use the `app-webhooks/`
+example with `APP_SANDBOX_ROUTING_SCOPE=session` when each Managed Agents session should have its
+own E2B sandbox and follow-up state.

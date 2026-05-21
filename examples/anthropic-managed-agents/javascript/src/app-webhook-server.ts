@@ -71,11 +71,13 @@ async function ensureWorkerForWork(settings: Settings, work: {
   data: { type?: string; id?: string };
 }) {
   if (work.data.type !== "session" || !work.data.id) {
+    console.log(`skipping unsupported work item ${work.id} type=${work.data.type ?? "unknown"}`);
     return undefined;
   }
   const session = work.data.id;
   const target = await routingTarget(settings, session);
   const key = `${target.routingScope}:${target.environmentId}:${target.routingId}`;
+  console.log(`routing work ${work.id} session=${session} key=${key}`);
   const pending = pendingWorkers.get(key);
   if (pending) {
     return pending;
@@ -114,6 +116,9 @@ async function ensureWorkerForTarget(
     sessionId: work.sessionId,
     sandboxId: sandbox.sandboxId,
   });
+  console.log(
+    `assigned session=${work.sessionId} scope=${target.routingScope} routing_id=${target.routingId} sandbox=${sandbox.sandboxId}`,
+  );
   return sandbox;
 }
 

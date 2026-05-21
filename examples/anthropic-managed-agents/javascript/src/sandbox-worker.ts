@@ -8,7 +8,11 @@ import {
   DEFAULT_TEMPLATE_NAME,
   DEFAULT_WEBHOOK_PORT,
   DEFAULT_WORKER_MAX_IDLE_SECONDS,
+  REMOTE_ANTHROPIC_API_KEY,
+  REMOTE_APP_SANDBOX_ROUTING_SCOPE,
+  REMOTE_APP_WEBHOOK_ADMIN_TOKEN,
   REMOTE_CONFIG_DIR,
+  REMOTE_E2B_API_KEY,
   REMOTE_ENVIRONMENT_ID,
   REMOTE_ENVIRONMENT_KEY,
   REMOTE_LOG_LEVEL,
@@ -122,6 +126,7 @@ export async function ensureWorkerProcess(
   options: WorkerOptions = {},
 ) {
   await uploadRuntime(sandbox);
+  await sandbox.commands.run(`mkdir -p ${REMOTE_WORKDIR}/outputs`, { timeoutMs: 5_000 });
   const handlesClaimedWork = Boolean(options.workId || options.sessionId);
   if (!handlesClaimedWork && await workerProcessIsRunning(sandbox)) {
     return;
@@ -208,10 +213,17 @@ export async function startWebhookServerSandbox(settings: Settings, options: Web
   if (settings.anthropicWebhookSigningKey) {
     envs.ANTHROPIC_WEBHOOK_SIGNING_KEY = settings.anthropicWebhookSigningKey;
   }
-  await sandbox.commands.run(`mkdir -p ${REMOTE_CONFIG_DIR} && chmod 700 ${REMOTE_CONFIG_DIR}`, {
-    timeoutMs: 5_000,
-  });
+  await sandbox.commands.run(
+    `sudo mkdir -p ${REMOTE_CONFIG_DIR} && sudo chown user:user ${REMOTE_CONFIG_DIR} && chmod 700 ${REMOTE_CONFIG_DIR}`,
+    {
+      timeoutMs: 5_000,
+    },
+  );
   await sandbox.files.write([
+    ...(settings.e2bApiKey ? [{ path: REMOTE_E2B_API_KEY, data: `${settings.e2bApiKey}\n` }] : []),
+    ...(settings.anthropicApiKey
+      ? [{ path: REMOTE_ANTHROPIC_API_KEY, data: `${settings.anthropicApiKey}\n` }]
+      : []),
     { path: REMOTE_ENVIRONMENT_ID, data: `${envs.ANTHROPIC_ENVIRONMENT_ID}\n` },
     { path: REMOTE_ENVIRONMENT_KEY, data: `${envs.ANTHROPIC_ENVIRONMENT_KEY}\n` },
     {
@@ -221,6 +233,12 @@ export async function startWebhookServerSandbox(settings: Settings, options: Web
     { path: REMOTE_LOG_LEVEL, data: `${envs.LOG_LEVEL ?? DEFAULT_LOG_LEVEL}\n` },
     ...(settings.anthropicWebhookSigningKey
       ? [{ path: REMOTE_WEBHOOK_SIGNING_KEY, data: `${settings.anthropicWebhookSigningKey}\n` }]
+      : []),
+    ...(settings.appWebhookAdminToken
+      ? [{ path: REMOTE_APP_WEBHOOK_ADMIN_TOKEN, data: `${settings.appWebhookAdminToken}\n` }]
+      : []),
+    ...(settings.appSandboxRoutingScope
+      ? [{ path: REMOTE_APP_SANDBOX_ROUTING_SCOPE, data: `${settings.appSandboxRoutingScope}\n` }]
       : []),
   ]);
   await sandbox.commands.run(`chmod 600 ${REMOTE_CONFIG_DIR}/*`, { timeoutMs: 5_000 });

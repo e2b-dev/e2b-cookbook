@@ -51,6 +51,10 @@ Fill in `.env`. The example also reads the repository root `.env` if you keep sh
 | `ANTHROPIC_WEBHOOK_SIGNING_KEY` | Required only for receiving webhook deliveries. See [`webhooks/`](./webhooks/). |
 | `ANTHROPIC_AGENT_ID` | Printed by `anthropic-managed-agents-create-agent`. |
 
+`anthropic-managed-agents-create-agent` adds the default system prompt for this sandbox. If you
+create the agent in the Anthropic Console instead, add equivalent instructions that tell it to use
+relative file paths, for example `outputs/result.txt`, and to look for skills under `skills/<name>/`.
+
 When a worker sandbox starts, the example writes the sandbox ID back to the Anthropic
 environment metadata. Use `anthropic-managed-agents-show-environment` to inspect:
 

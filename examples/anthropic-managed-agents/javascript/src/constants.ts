@@ -1,4 +1,5 @@
-export const DEFAULT_TEMPLATE_NAME = "claude-managed-agents-webhooks";
+export const DEFAULT_BUILD_TEMPLATE_NAME = "claude-managed-agents-webhooks";
+export const DEFAULT_TEMPLATE_NAME = "E2B/claude-managed-agents-webhooks";
 export const DEFAULT_WORKER_MAX_IDLE_SECONDS = 30;
 export const DEFAULT_SANDBOX_TIMEOUT_SECONDS = 3600;
 export const DEFAULT_APP_SANDBOX_TIMEOUT_SECONDS = 300;
@@ -31,7 +32,8 @@ export const SANDBOX_TOOLS = ["bash", "read", "write", "edit", "glob", "grep"] a
 export const WEB_TOOLS = ["web_fetch", "web_search"] as const;
 export const DEFAULT_MODEL = "claude-sonnet-4-6";
 export const DEFAULT_SYSTEM_PROMPT =
-  "You have a Linux sandbox. Use /mnt/session as the working directory. " +
-  "Agent skills are downloaded under /mnt/session/skills/<name>/. " +
-  "Write generated artifacts under /mnt/session/outputs when useful. " +
+  "You have a Linux sandbox. You are already in the working directory. " +
+  "Agent skills are downloaded under skills/<name>/. " +
+  "Write generated artifacts under outputs/ when useful. " +
+  "When using file tools, use relative paths like outputs/result.txt. " +
   "Use the available tools to complete the task.";

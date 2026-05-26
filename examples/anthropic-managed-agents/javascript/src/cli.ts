@@ -1,6 +1,7 @@
 import {
   DEFAULT_LOG_LEVEL,
   DEFAULT_SANDBOX_TIMEOUT_SECONDS,
+  DEFAULT_BUILD_TEMPLATE_NAME,
   DEFAULT_TEMPLATE_NAME,
   DEFAULT_WEBHOOK_PORT,
   DEFAULT_WORKER_MAX_IDLE_SECONDS,
@@ -121,7 +122,7 @@ async function main() {
   }
 
   if (command === "build-template") {
-    const info = await buildTemplate(optionValue(args, "--template-name", DEFAULT_TEMPLATE_NAME));
+    const info = await buildTemplate(optionValue(args, "--template-name", DEFAULT_BUILD_TEMPLATE_NAME));
     console.log(`E2B_TEMPLATE_NAME=${info.name}`);
     return;
   }

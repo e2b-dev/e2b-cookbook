@@ -216,6 +216,11 @@ Read more about E2B on the [E2B website](https://e2b.dev) and the official [E2B 
       <td><a href="./examples/mcp-research-agent-js">TypeScript</a></td>
     </tr>
     <tr>
+      <td>Bilig WorkPaper Formula Readback</td>
+      <td>Run spreadsheet formula readback proof inside an E2B sandbox</td>
+      <td><a href="./examples/bilig-workpaper-formula-readback-js">TypeScript</a></td>
+    </tr>
+    <tr>
       <td>MCP Claude Code</td>
       <td>Claude Code with MCP integration</td>
       <td><a href="./examples/mcp-claude-code-js">TypeScript</a></td>

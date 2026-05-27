@@ -46,38 +46,30 @@ Set the `E2B_API_KEY` in `.env`. You can get the API key at [https://e2b.dev/das
 E2B_API_KEY="..."
 ```
 
-**2. Change ANTHROPIC_API_KEY in the code**
+**2. Set ANTHROPIC_API_KEY in `.env`**
 
-Replace `<your api key>` in the code with your actual Anthropic API key.
-
-**3. Initialize the virtual environment**
+Add your Anthropic API key to the `.env` file:
 
 ```
-python -m venv .venv
+ANTHROPIC_API_KEY="..."
 ```
 
-**4. Activate the virtual environment**
-
-macOS/Unix
+**3. Install Poetry** (if not already installed)
 
 ```
-source .venv/bin/activate
+curl -sSL https://install.python-poetry.org | python3 -
 ```
 
-Windows
+Or visit [https://python-poetry.org/docs/#installation](https://python-poetry.org/docs/#installation) for other installation methods.
+
+**4. Install dependencies**
 
 ```
-.venv\Scripts\activate
+poetry install
 ```
 
-**5. Install dependencies**
+**5. Run the example**
 
 ```
-pip install -e .
-```
-
-**6. Run the example**
-
-```
-python anthropic_claude_code_in_sandbox/main.py
+poetry run start
 ```

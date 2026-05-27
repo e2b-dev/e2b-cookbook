@@ -68,9 +68,6 @@ async function runResearchAgent() {
   await mcpServer.close();
   console.log('MCP server closed successfully');
   
-  console.log('Cleaning up sandbox...');
-  await sandbox.kill();
-  console.log('Sandbox closed successfully');
 }
 
 // Run the research agent

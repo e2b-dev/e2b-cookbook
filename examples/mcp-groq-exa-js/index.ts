@@ -46,10 +46,6 @@ async function runGroqExaExample() {
   console.log('\nResearch Results:');
   console.log(response.output_text);
 
-  // Cleanup
-  console.log('\nCleaning up sandbox...');
-  await sandbox.kill();
-  console.log('Sandbox closed successfully');
 }
 
 // Run the Groq Exa example

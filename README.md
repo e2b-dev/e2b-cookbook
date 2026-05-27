@@ -181,6 +181,12 @@ Read more about E2B on the [E2B website](https://e2b.dev) and the official [E2B 
       <td><a href="./examples/stirrup-python">Python</a></td>
       <td>-</td>
     </tr>
+    <tr>
+      <td>BU Agent SDK</td>
+      <td>Minimal SDK for building agents</td>
+      <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/bu-agent-sdk-python">Python</a></td>
+      <td>-</td>
+    </tr>
   </tbody>
 </table>
 

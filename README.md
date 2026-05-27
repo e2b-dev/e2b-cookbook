@@ -238,6 +238,7 @@ Read more about E2B on the [E2B website](https://e2b.dev) and the official [E2B 
 - Upload dataset and analyze it with Llama 3 - [Python](./examples/upload-dataset-code-interpreter)
 - Scrape Airbnb and analyze data with Claude 3 Opus and Firecrawl - [TypeScript](./examples/firecrawl-scrape-and-analyze-airbnb-data)
 - Visualize website topics with Claude 3.5 Sonnet and Firecrawl - [Python](./examples/claude-visualize-website-topics)
+- Search the web with the Perplexity Search API and analyze results in a sandbox - [Python](./examples/perplexity-search-python) / [TypeScript](./examples/perplexity-search-js)
 - Next.js app with LLM + Code Interpreter and streaming - [TypeScript](./examples/nextjs-code-interpreter)
 - How to run a Docker container in E2B - [Python/TypeScript](./examples/docker-in-e2b)
 - How to run Playwright in E2B - [TypeScript](./examples/playwright-in-e2b)

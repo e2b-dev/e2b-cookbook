@@ -1,0 +1,27 @@
+{
+  "name": "perplexity-search-js",
+  "version": "1.0.0",
+  "description": "Use the Perplexity Search API together with E2B Sandbox to gather and analyze sources.",
+  "main": "index.ts",
+  "type": "module",
+  "scripts": {
+    "start": "tsx index.ts",
+    "build": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@e2b/code-interpreter": "^1.0.1",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.16.6",
+    "tsx": "^4.7.3",
+    "typescript": "^5.4.5"
+  },
+  "keywords": [
+    "e2b",
+    "perplexity",
+    "search",
+    "sandbox"
+  ],
+  "license": "MIT"
+}

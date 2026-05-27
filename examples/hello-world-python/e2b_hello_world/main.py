@@ -1,11 +1,11 @@
 from dotenv import load_dotenv
 load_dotenv()
-from e2b_code_interpreter import Sandbox
+from e2b import Sandbox
 
 def main():
     sbx = Sandbox() # By default the sandbox is alive for 5 minutes
-    execution = sbx.run_code("print('hello world')") # Execute Python inside the sandbox
-    print(execution.logs)
+    result = sbx.commands.run('echo "hello world"') # Execute a command inside the sandbox
+    print(result.stdout)
 
     files = sbx.files.list("/")
     print(files)

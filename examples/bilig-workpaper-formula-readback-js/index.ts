@@ -2,7 +2,7 @@ import 'dotenv/config';
 import { Sandbox } from 'e2b';
 
 const workdir = '/tmp/bilig-workpaper-formula-readback';
-const workpaperVersion = '0.130.7';
+const workpaperVersion = '0.131.1';
 
 const proofScript = String.raw`
 import {

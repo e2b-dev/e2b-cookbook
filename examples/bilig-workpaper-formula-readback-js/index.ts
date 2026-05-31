@@ -2,6 +2,7 @@ import 'dotenv/config';
 import { Sandbox } from 'e2b';
 
 const workdir = '/tmp/bilig-workpaper-formula-readback';
+const workpaperVersion = '0.130.7';
 
 const proofScript = String.raw`
 import {
@@ -140,8 +141,8 @@ async function run() {
     await sandbox.commands.run(`mkdir -p ${workdir}`);
     await sandbox.files.write(`${workdir}/workpaper-proof.mjs`, proofScript);
 
-    console.log('Installing @bilig/workpaper@0.107.8 inside the sandbox...');
-    await sandbox.commands.run('npm init -y >/dev/null && npm install @bilig/workpaper@0.107.8 >/dev/null', {
+    console.log(`Installing @bilig/workpaper@${workpaperVersion} inside the sandbox...`);
+    await sandbox.commands.run(`npm init -y >/dev/null && npm install @bilig/workpaper@${workpaperVersion} >/dev/null`, {
       cwd: workdir,
       timeoutMs: 120_000,
     });

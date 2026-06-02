@@ -40,7 +40,7 @@ Use this shape when an agent needs spreadsheet logic but should not drive Excel,
 
 - Creates a fresh E2B sandbox.
 - Uploads a small WorkPaper verification script into `/tmp`.
-- Installs `@bilig/workpaper@0.154.0` in the sandbox at runtime.
+- Installs `@bilig/workpaper@0.157.0` in the sandbox at runtime.
 - Builds a workbook with input and formula sheets.
 - Edits `Assumptions!B3` from `0.25` to `0.4`.
 - Reads calculated output before and after the edit.

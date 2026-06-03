@@ -1,0 +1,43 @@
+[project]
+name = "anthropic-managed-agents-e2b-worker"
+version = "0.1.0"
+description = "Run Anthropic Managed Agents self-hosted workers inside E2B sandboxes"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "anthropic[webhooks]>=0.103.0",
+    "e2b>=2.21.0",
+    "fastapi>=0.116.0",
+    "python-dotenv>=1.0.0",
+    "uvicorn>=0.35.0",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.0",
+]
+
+[project.scripts]
+anthropic-managed-agents-build-template = "anthropic_managed_agents_e2b.cli:build_template_main"
+anthropic-managed-agents-create-agent = "anthropic_managed_agents_e2b.cli:create_agent_main"
+anthropic-managed-agents-create-environment = "anthropic_managed_agents_e2b.cli:create_environment_main"
+anthropic-managed-agents-send-message = "anthropic_managed_agents_e2b.cli:send_message_main"
+anthropic-managed-agents-show-environment = "anthropic_managed_agents_e2b.cli:show_environment_main"
+anthropic-managed-agents-start-app-webhook-server = "anthropic_managed_agents_e2b.cli:start_app_webhook_server_main"
+anthropic-managed-agents-start-webhook-server = "anthropic_managed_agents_e2b.cli:start_webhook_server_main"
+anthropic-managed-agents-start-worker = "anthropic_managed_agents_e2b.cli:start_worker_main"
+anthropic-managed-agents-stop-worker = "anthropic_managed_agents_e2b.cli:stop_worker_main"
+anthropic-managed-agents-upload-file = "anthropic_managed_agents_e2b.cli:upload_file_main"
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["anthropic_managed_agents_e2b"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

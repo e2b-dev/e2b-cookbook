@@ -1,0 +1,32 @@
+{
+  "name": "browsecli-in-e2b",
+  "version": "1.0.0",
+  "description": "Run the Browserbase `browse` CLI inside an E2B sandbox to reach any site through a Verified Browserbase browser over CDP (residential IP, stealth, CAPTCHA solving).",
+  "type": "module",
+  "main": "index.ts",
+  "scripts": {
+    "start": "tsx index.ts",
+    "build:template": "e2b template build",
+    "dev": "tsx watch index.ts"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "e2b": "^2.3.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.16.6",
+    "tsx": "^4.7.3",
+    "typescript": "^5.4.5"
+  },
+  "keywords": [
+    "e2b",
+    "browserbase",
+    "browse-cli",
+    "sandbox",
+    "cdp",
+    "verified",
+    "anti-bot",
+    "captcha"
+  ],
+  "license": "MIT"
+}

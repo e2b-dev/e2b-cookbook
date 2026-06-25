@@ -1,0 +1,27 @@
+# e2b.toml — E2B template config for "BrowseCLI in an E2B sandbox".
+#
+# Build it:   e2b template build
+# E2B reads `dockerfile` to build the image, then registers it under
+# `template_name`. Use that name from the SDK: Sandbox.create({ template: '...' }).
+#
+# `template_id` is assigned by E2B on first build and written back into this
+# file automatically — leave it absent (or as-is) before your first build.
+
+# Template identifier — what you pass to Sandbox.create({ template: '...' }).
+# `template_id` is the required field; E2B may rewrite/confirm it on first build.
+template_id = "browsecli-sandbox"
+
+# Optional human-readable alias (also accepted by Sandbox.create).
+template_name = "browsecli-sandbox"
+
+# The image definition for this template.
+dockerfile = "e2b.Dockerfile"
+
+# E2B keeps the sandbox alive and you drive it from the SDK (sbx.commands.run).
+# A long-lived no-op start_cmd keeps the VM up so you can exec the demo on it.
+start_cmd = "tail -f /dev/null"
+
+# Modest resources — the browser runs remotely on Browserbase, so the sandbox
+# itself only needs enough to run the `browse` CLI / your agent loop.
+cpu_count = 2
+memory_mb = 1024

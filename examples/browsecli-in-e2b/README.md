@@ -16,32 +16,26 @@ The agent loop runs **in the sandbox**; the browser runs **on Browserbase**.
 └──────────────────────────┘        page data / refs      └──────────────────────────┘
 ```
 
-## Why this recipe (vs what E2B already ships)
+## Why a remote browser
 
-E2B already has two browser stories in the cookbook:
+A vanilla Firecracker/OCI sandbox browser has a **datacenter IP** (often blocked
+by Cloudflare/Akamai/DataDome), no fingerprint hardening, and no CAPTCHA solving,
+so it gets walled by many protected sites. This example keeps the browser out of
+the sandbox entirely: the sandbox runs the `browse` CLI (or your agent loop) and
+connects out over CDP to a **Verified Browserbase browser** that uses a
+residential IP, passes bot detection, and solves challenges server-side. You keep
+E2B's isolation, with a browser that can reach protected sites.
 
-- **[`mcp-browserbase-js`](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/mcp-browserbase-js)** —
-  runs Browserbase as an **MCP server** inside the sandbox and points an OpenAI
-  agent at it through E2B's MCP gateway. Great for "give a model a browser tool,"
-  but it's an MCP-gateway pattern, not a CLI you script.
-- A **Kernel-backed browser** template — an in-sandbox browser primitive.
+| | This example | In-sandbox Chrome |
+| --- | --- | --- |
+| Where the browser runs | Browserbase (remote) | Inside the sandbox |
+| Egress IP | Residential / Verified | Datacenter (often blocked) |
+| Bot-detection fingerprint | Hardened (Verified mode) | Raw headless |
+| CAPTCHA / challenge solving | Automatic, server-side | None |
 
-This example fills the slot Kernel occupies, but with **anti-bot as the headline**:
-a vanilla Firecracker/OCI sandbox browser has a **datacenter IP** (instantly
-blocked by Cloudflare/Akamai/DataDome), no fingerprint hardening, and no CAPTCHA
-solving. Here the browser never runs in the sandbox at all — the sandbox runs the
-`browse` CLI (or your agent loop) and connects out over CDP to a **Verified
-Browserbase browser** that uses a residential IP, passes bot detection, and
-solves challenges server-side. Same isolation guarantees from E2B; a browser that
-can actually reach protected production sites.
-
-| | This recipe | In-sandbox Chrome / Kernel | `mcp-browserbase-js` |
-| --- | --- | --- | --- |
-| Where the browser runs | Browserbase (remote) | Inside the sandbox | Browserbase (via MCP) |
-| Egress IP | Residential / Verified | Datacenter (blocked) | Residential / Verified |
-| Bot-detection fingerprint | Hardened (Verified mode) | Raw headless | Hardened |
-| CAPTCHA / challenge solving | Automatic, server-side | None | Automatic |
-| How you drive it | `browse` CLI / your loop | CDP / Playwright | MCP tool calls from a model |
+> Prefer to give a model a browser **tool** via MCP instead of scripting a CLI?
+> See the [`mcp-browserbase-js`](https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/mcp-browserbase-js)
+> example — same Browserbase backend, MCP-gateway pattern.
 
 ## Files
 

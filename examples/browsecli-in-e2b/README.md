@@ -16,8 +16,11 @@ no Chrome/Chromium is installed in the sandbox image.
 └───────────────────────────┘        page data            └───────────────────────────┘
 ```
 
-The default task: go to Hacker News, find the most controversial post, read the
-top comments, and summarize the debate. Override it with the `TASK` env var.
+The default task is a deep-research example: pull the most recent 10-Q filing for
+Snowflake, Datadog, and MongoDB from SEC EDGAR and return a comparison of their
+quarterly revenue, growth, RPO, and top risk factor. The agent plans its own
+steps — there are no site-specific instructions in the prompt. Override the goal
+with the `TASK` env var.
 
 ## How it works
 
@@ -81,7 +84,7 @@ Expected tail of output:
 
 ```
 ===== FINAL ANSWER =====
-<the agent's summary of the comment thread>
+<the agent's synthesized, sourced answer>
 ```
 
 ## Notes

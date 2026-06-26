@@ -8,7 +8,7 @@ import { z } from 'zod';
 
 const SESSION = 'agent';
 const TASK = process.env.TASK ||
-  'Go to Hacker News and find the most controversial post from today, then read the top 3 comments and summarize the debate.';
+  "For Snowflake, Datadog, and MongoDB, find each company's most recent 10-Q filing on SEC EDGAR (start at https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany). Open the actual primary filing document — not the filing index, cover page, or an exhibit — and extract quarterly revenue, year-over-year revenue growth, remaining performance obligations (RPO), and the single most significant risk factor. Return a comparison table across all three companies and cite each filing's URL.";
 
 const run = (args) => {
   try {
@@ -19,38 +19,29 @@ const run = (args) => {
   } catch (e) { return `ERROR: ${(e.stdout || '') + (e.stderr || e.message || '')}`.slice(0, 400); }
 };
 
-const system = `You drive a REAL web browser by running the browse CLI in a shell (the browser runs remotely on Browserbase).
-Each tool call runs: browse <your args> --session ${SESSION}
-Commands:
+const system = `You are an autonomous deep-research agent. You answer questions by investigating the live web with a real browser that runs remotely on Browserbase. Each tool call runs: browse <your args> (every call is automatically scoped to one shared session "${SESSION}").
+Useful commands:
   open <url> --remote   # navigate (ALWAYS include --remote so it uses the cloud browser)
-  get markdown body     # read a page as markdown (keeps links/URLs)
-  get text body         # read a page as PLAIN TEXT (cleaner for reading comment threads)
+  get markdown body     # read the current page as markdown (keeps links/URLs)
+  get text body         # read the current page as plain text
+Use "--help" to discover more commands.
 
-Plan (be efficient, ~6 calls):
-1. open https://news.ycombinator.com --remote, then "get markdown body" ONCE — the front page lists ~30 stories, each with points and an "N comments" link to https://news.ycombinator.com/item?id=NNNN. (Use markdown here because it contains the item URLs.)
-2. Pick the most controversial = highest comment count (and/or a divisive topic). Take its exact item URL from the markdown.
-3. open that item URL --remote, then "get text body" to read the post + comments. (Use TEXT here — HN comment pages are unreadable as markdown.)
-4. Write a concise summary of the debate from the top 3 comments.
-
-Rules:
-- If a page returns ERROR or looks empty, DO NOT retry it — pick a DIFFERENT story.
-- As soon as you've read ONE comment thread successfully, STOP browsing and write the summary.
-- Use exact item URLs from the markdown; never guess ids.`;
+Plan your own research: break the question into sub-questions, find and open relevant sources, follow links, and read pages to gather evidence. Use several independent sources and cross-check key facts. If a page returns ERROR or looks empty, try a different source instead of retrying it unchanged. When you can answer thoroughly, stop browsing and return a concise, well-sourced synthesis that cites the URLs you used.`;
 
 const result = await generateText({
   model: anthropic('claude-sonnet-4-5'),
-  stopWhen: stepCountIs(20),
+  stopWhen: stepCountIs(50),
   system,
   prompt: TASK,
   tools: {
     browse: tool({
-      description: 'Run a browse CLI command (omit leading "browse"). e.g. open https://news.ycombinator.com --remote ; get markdown body ; get text body',
+      description: 'Run a browse CLI command (omit leading "browse"). e.g. open https://example.com --remote ; get markdown body ; get text body',
       inputSchema: z.object({ args: z.string() }),
       execute: async ({ args }) => {
         process.stdout.write(`-> browse ${args}\n`);
         const out = run(args);
         process.stdout.write(`   <- ${out.length} chars${out.startsWith('ERROR') ? ' [ERR]' : ''}\n`);
-        return out.slice(0, 22000);
+        return out.slice(0, 40000);
       },
     }),
   },

@@ -1,13 +1,12 @@
 {
   "name": "browsecli-in-e2b",
   "version": "1.0.0",
-  "description": "Run the Browserbase `browse` CLI inside an E2B sandbox to reach any site through a Verified Browserbase browser over CDP (residential IP, stealth, CAPTCHA solving).",
+  "description": "Run a browser agent (Vercel AI SDK) inside an E2B sandbox that drives a remote Browserbase browser over CDP via the `browse` CLI.",
   "type": "module",
   "main": "index.ts",
   "scripts": {
     "start": "tsx index.ts",
-    "build:template": "e2b template build",
-    "dev": "tsx watch index.ts"
+    "build:template": "e2b template build"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
@@ -24,9 +23,8 @@
     "browse-cli",
     "sandbox",
     "cdp",
-    "verified",
-    "anti-bot",
-    "captcha"
+    "agent",
+    "ai-sdk"
   ],
   "license": "MIT"
 }

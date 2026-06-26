@@ -10,9 +10,17 @@ const SESSION = 'agent';
 const TASK = process.env.TASK ||
   "For Snowflake, Datadog, and MongoDB, find each company's most recent 10-Q filing on SEC EDGAR (start at https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany). Open the actual primary filing document — not the filing index, cover page, or an exhibit — and extract quarterly revenue, year-over-year revenue growth, remaining performance obligations (RPO), and the single most significant risk factor. Return a comparison table across all three companies and cite each filing's URL.";
 
+// Split the model's free-form arg string into tokens (respecting simple quotes),
+// then re-quote each one for the shell. Without this, a URL containing shell
+// metacharacters like `&` (common in query strings — e.g. SEC EDGAR links) would
+// be split by the shell and break the command.
+const splitArgs = (s) => (s.match(/"[^"]*"|'[^']*'|\S+/g) || []).map((t) => t.replace(/^(["'])([\s\S]*)\1$/, '$2'));
+const shq = (s) => `'${String(s).replace(/'/g, `'\\''`)}'`;
+
 const run = (args) => {
+  const cmd = `browse ${splitArgs(args).map(shq).join(' ')} --session ${SESSION}`;
   try {
-    return execSync(`browse ${args} --session ${SESSION}`, {
+    return execSync(cmd, {
       encoding: 'utf8', timeout: 45000, killSignal: 'SIGKILL',
       env: process.env, stdio: ['ignore', 'pipe', 'ignore'],
     });
@@ -30,7 +38,7 @@ Plan your own research: break the question into sub-questions, find and open rel
 
 const result = await generateText({
   model: anthropic('claude-sonnet-4-5'),
-  stopWhen: stepCountIs(50),
+  stopWhen: stepCountIs(40),
   system,
   prompt: TASK,
   tools: {

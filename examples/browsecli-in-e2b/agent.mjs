@@ -8,7 +8,7 @@ import { z } from 'zod';
 
 const SESSION = 'agent';
 const TASK = process.env.TASK ||
-  "For Snowflake, Datadog, and MongoDB, find each company's most recent 10-Q filing on SEC EDGAR (start at https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany). Open the actual primary filing document — not the filing index, cover page, or an exhibit — and extract quarterly revenue, year-over-year revenue growth, remaining performance obligations (RPO), and the single most significant risk factor. Return a comparison table across all three companies and cite each filing's URL.";
+  "Using SEC EDGAR (start at https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany), research the recent SEC filing activity of Snowflake, Datadog, and MongoDB. For each company find its most recent 10-Q — the filing date, the fiscal period it covers, and the URL of the primary filing document — plus the date of its most recent 10-K. Return a comparison table across all three companies, citing the EDGAR pages you used.";
 
 // Split the model's free-form arg string into tokens (respecting simple quotes),
 // then re-quote each one for the shell. Without this, a URL containing shell
@@ -34,7 +34,12 @@ Useful commands:
   get text body         # read the current page as plain text
 Use "--help" to discover more commands.
 
-Plan your own research: break the question into sub-questions, find and open relevant sources, follow links, and read pages to gather evidence. Use several independent sources and cross-check key facts. If a page returns ERROR or looks empty, try a different source instead of retrying it unchanged. When you can answer thoroughly, stop browsing and return a concise, well-sourced synthesis that cites the URLs you used.`;
+Plan your own research: break the question into sub-questions, find and open relevant sources, follow links, and read pages to gather evidence. Use several independent sources and cross-check key facts. If a page returns ERROR or looks empty, try a different source instead of retrying it unchanged. When you can answer thoroughly, stop browsing and return a concise, well-sourced synthesis that cites the URLs you used.
+
+To stay effective:
+- Pages are fully rendered (JavaScript runs) before you read them — the text/markdown you get back IS the real content. Read it carefully and extract what you need; don't assume a page "needs JavaScript" or abandon a source that already has the answer.
+- Read each page once. Don't fetch the same page twice or as both markdown and text (for long pages "get text body" is best), and don't chase detours when a page you already have answers the question.
+- Your steps are limited: once you have what you need for one item, move on, and leave yourself a step to write the final answer.`;
 
 const result = await generateText({
   model: anthropic('claude-sonnet-4-5'),

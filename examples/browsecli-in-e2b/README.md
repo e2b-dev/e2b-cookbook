@@ -16,11 +16,11 @@ no Chrome/Chromium is installed in the sandbox image.
 └───────────────────────────┘        page data            └───────────────────────────┘
 ```
 
-The default task is a deep-research example: pull the most recent 10-Q filing for
-Snowflake, Datadog, and MongoDB from SEC EDGAR and return a comparison of their
-quarterly revenue, growth, RPO, and top risk factor. The agent plans its own
-steps — there are no site-specific instructions in the prompt. Override the goal
-with the `TASK` env var.
+The default task is a deep-research example: for Snowflake, Datadog, and MongoDB,
+find each company's most recent 10-Q on SEC EDGAR (filing date, fiscal period,
+primary-document URL) plus the date of its most recent 10-K, and return a
+comparison table. The agent plans its own steps — there are no site-specific
+instructions in the prompt. Override the goal with the `TASK` env var.
 
 ## How it works
 

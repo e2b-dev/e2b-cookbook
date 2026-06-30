@@ -35,7 +35,7 @@ const BROWSERBASE_API_KEY = req('BROWSERBASE_API_KEY');
 
 const TASK =
   process.env.TASK ||
-  "For Snowflake, Datadog, and MongoDB, find each company's most recent 10-Q filing on SEC EDGAR (start at https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany). Confirm you have identified the single most recent 10-Q before reporting. Open the actual primary filing document (its .htm URL) — not the filing index, a viewer/preview page, or an exhibit — and extract the filing date and the fiscal period the report covers. Also report each company's most recent 10-K filing date. Return a comparison table across all three companies and cite each filing's direct document URL.";
+  "Using Amazon (https://www.amazon.com), research the current top mechanical keyboards: search the site, then for the top 5 results compare each product's title, price, star rating, and number of ratings. Return a comparison table including each product's URL.";
 
 const system = `You are an autonomous deep-research agent. You have a \`browse\` CLI (Browserbase browser automation) in your bash tool — it is installed, and its auth and a shared browser session are already configured via environment variables. Learn how to use it by running \`browse --help\` (and \`browse <command> --help\` as needed), then complete the task. When you cite a document, link the direct document itself, not a viewer, preview, or index page that wraps it. Return a clear, well-sourced answer.`;
 

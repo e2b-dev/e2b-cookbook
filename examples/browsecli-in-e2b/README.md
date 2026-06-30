@@ -21,10 +21,11 @@ the browser runs on **Browserbase**:
 This is the idiomatic "sandbox as a tool" shape: the agent reasons on the host, and
 the sandbox is the isolated place where its commands actually run.
 
-The default task is a deep-research example: find the most recent 10-Q filing for
-Snowflake, Datadog, and MongoDB on SEC EDGAR and return a comparison of each filing's
-date, the fiscal period it covers, the primary-document URL, and each company's most
-recent 10-K date. The agent plans its own steps — there are no site-specific
+The default task is a product-research example: search Amazon for the top mechanical
+keyboards and return a comparison of the top 5 results — each product's title, price,
+star rating, number of ratings, and its product URL. It's a deliberately browser-only
+task: Amazon search returns no products to a plain `curl`, so the agent has to drive a
+real browser to get the data. The agent plans its own steps — there are no site-specific
 instructions in the prompt. Override the goal with the `TASK` env var.
 
 ## How it works

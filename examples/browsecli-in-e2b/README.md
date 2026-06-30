@@ -1,47 +1,52 @@
 # Browser agent in an E2B sandbox
 
-Run a small browser **agent** inside an [E2B](https://e2b.dev) sandbox. The agent
-(built on the [Vercel AI SDK](https://sdk.vercel.ai)) has a single tool — the
+A deep-research **agent** (built on the [Vercel AI SDK](https://sdk.vercel.ai)) whose
+only tool runs commands inside an [E2B](https://e2b.dev) sandbox. The sandbox has the
 Browserbase [`browse`](https://github.com/browserbase/stagehand/tree/main/packages/cli)
-CLI — and uses it to drive a **remote Browserbase browser** over CDP.
+CLI installed, so the agent does its research by running `browse` commands there.
+`browse` drives a **remote Browserbase browser** over CDP — no Chrome runs in the
+sandbox itself.
 
-The agent loop runs **in the sandbox**; the browser runs **on Browserbase**, so
-no Chrome/Chromium is installed in the sandbox image.
+The agent loop runs on the **host**; its `bash` tool executes inside the **sandbox**;
+the browser runs on **Browserbase**:
 
 ```
-┌───────────────────────────┐        CDP over wss         ┌───────────────────────────┐
-│  E2B sandbox (Firecracker) │ ──────────────────────────▶ │  Browserbase browser       │
-│  node + AI SDK agent loop  │                              │  (remote, headless)        │
-│  tool: `browse` CLI        │ ◀──────────────────────────│                            │
-└───────────────────────────┘        page data            └───────────────────────────┘
+┌────────────────────────┐   bash   ┌────────────────────────┐   CDP/wss   ┌────────────────────────┐
+│  host (index.ts)       │ ───────▶ │  E2B sandbox           │ ──────────▶ │  Browserbase browser   │
+│  AI SDK agent loop     │          │  `browse` CLI          │             │  (remote, headless)    │
+│  tool: bash → sandbox  │ ◀─────── │  commands.run(cmd)     │ ◀────────── │                        │
+└────────────────────────┘  output  └────────────────────────┘  page data  └────────────────────────┘
 ```
 
-The default task is a deep-research example: for Snowflake, Datadog, and MongoDB,
-find each company's most recent 10-Q on SEC EDGAR (filing date, fiscal period,
-primary-document URL) plus the date of its most recent 10-K, and return a
-comparison table. The agent plans its own steps — there are no site-specific
+This is the idiomatic "sandbox as a tool" shape: the agent reasons on the host, and
+the sandbox is the isolated place where its commands actually run.
+
+The default task is a deep-research example: find the most recent 10-Q filing for
+Snowflake, Datadog, and MongoDB on SEC EDGAR and return a comparison of each filing's
+date, the fiscal period it covers, the primary-document URL, and each company's most
+recent 10-K date. The agent plans its own steps — there are no site-specific
 instructions in the prompt. Override the goal with the `TASK` env var.
 
 ## How it works
 
-1. The driver (`index.ts`) creates a sandbox from the `browsecli-sandbox` template
-   (Node + the `browse` CLI, no browser).
-2. It uploads `agent.mjs` into the sandbox, installs the agent's deps
-   (`ai`, `@ai-sdk/anthropic`, `zod`) there, and runs `node agent.mjs`.
-3. The agent calls `browse open <url> --remote`, `browse get markdown body`,
-   etc. Each call drives a remote Browserbase browser; the browser never runs in
-   the sandbox.
+1. `index.ts` (on your machine) creates a sandbox from the `browsecli-sandbox`
+   template (Node + the `browse` CLI, no browser) and injects `BROWSERBASE_API_KEY`
+   into the sandbox's environment.
+2. It runs an AI SDK agent loop on the host. The agent's single `bash` tool sends
+   each command to the sandbox via `sandbox.commands.run(command)`.
+3. The agent runs `browse open '<url>' --remote --session agent`,
+   `browse get markdown body --session agent`, etc. Each call drives a remote
+   Browserbase browser; the browser never runs in the sandbox.
 4. The agent prints a `FINAL ANSWER` summarizing what it found.
 
 ## Files
 
 | File | Purpose |
 | --- | --- |
-| `agent.mjs` | The agent (Vercel AI SDK `generateText`); its only tool shells out to `browse`. Runs **inside** the sandbox. |
-| `index.ts` | Driver — `Sandbox.create({ template })`, uploads the agent, installs its deps, runs it, streams output. |
+| `index.ts` | The whole example: creates the sandbox, runs the AI SDK agent loop on the host, and exposes a `bash` tool that execs inside the sandbox via `sandbox.commands.run`. |
 | `e2b.Dockerfile` | The template image: `node:20-slim` + `npm i -g browse`. **No Chrome.** |
 | `e2b.toml` | E2B template config (`template_name`, `dockerfile`, `start_cmd`, resources). |
-| `package.json` | Deps for the TS driver (`e2b`, `tsx`, `dotenv`). |
+| `package.json` | Deps (`e2b`, `ai`, `@ai-sdk/anthropic`, `zod`, `tsx`, `dotenv`). |
 | `env.template` | `E2B_API_KEY`, `ANTHROPIC_API_KEY`, `BROWSERBASE_API_KEY`. |
 
 ## Setup
@@ -59,7 +64,7 @@ You need three keys:
 
 ## Build the template (one-time / on image change)
 
-The driver creates sandboxes from a template built from `e2b.Dockerfile`.
+The example creates sandboxes from a template built from `e2b.Dockerfile`.
 Build it with the [E2B CLI](https://e2b.dev/docs/cli):
 
 ```bash
@@ -89,8 +94,10 @@ Expected tail of output:
 
 ## Notes
 
-- The agent uses a plain remote browser (`browse open <url> --remote`), which
+- The agent uses a plain remote browser (`browse open '<url>' --remote`), which
   works on **any Browserbase plan**.
 - Verified browsers (residential IP + automatic CAPTCHA solving) are a Scale-plan
-  upgrade. To use one, add `--verified` to the `browse open` calls in `agent.mjs`.
+  upgrade. To use one, tell the agent to add `--verified` to its `browse open` calls.
   See https://www.browserbase.com/pricing.
+- `BROWSERBASE_API_KEY` is passed to the sandbox via the SDK's `envs` option, so it
+  only ever lives in the sandbox's environment — never written to a committed file.

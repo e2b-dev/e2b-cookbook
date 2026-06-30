@@ -1,7 +1,7 @@
 {
   "name": "browsecli-in-e2b",
   "version": "1.0.0",
-  "description": "Run a browser agent (Vercel AI SDK) inside an E2B sandbox that drives a remote Browserbase browser over CDP via the `browse` CLI.",
+  "description": "A host-side deep-research agent (Vercel AI SDK) whose only tool runs `browse` CLI commands inside an E2B sandbox, driving a remote Browserbase browser over CDP.",
   "type": "module",
   "main": "index.ts",
   "scripts": {
@@ -9,8 +9,11 @@
     "build:template": "e2b template build"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^2.0.0",
+    "ai": "^5.0.0",
     "dotenv": "^16.4.5",
-    "e2b": "^2.3.4"
+    "e2b": "^2.3.4",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/node": "^20.16.6",

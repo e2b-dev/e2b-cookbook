@@ -70,7 +70,7 @@ console.log(`› Sandbox ready: ${sandbox.sandboxId}`);
 try {
   console.log('› Running the deep-research agent (host loop, sandbox tool)…\n');
   const result = await generateText({
-    model: anthropic('claude-sonnet-4-5'),
+    model: anthropic('claude-sonnet-5'),
     stopWhen: stepCountIs(40),
     system,
     prompt: TASK,

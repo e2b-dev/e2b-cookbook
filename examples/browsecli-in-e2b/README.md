@@ -30,13 +30,17 @@ instructions in the prompt. Override the goal with the `TASK` env var.
 ## How it works
 
 1. `index.ts` (on your machine) creates a sandbox from the `browsecli-sandbox`
-   template (Node + the `browse` CLI, no browser) and injects `BROWSERBASE_API_KEY`
-   into the sandbox's environment.
+   template (Node + the `browse` CLI, no browser) and injects two env vars into the
+   sandbox: `BROWSERBASE_API_KEY` (so `browse` can authenticate) and
+   `BROWSE_SESSION=agent` (so every `browse` call runs remotely and shares one
+   browser session — no `--remote`/`--session` flags needed).
 2. It runs an AI SDK agent loop on the host. The agent's single `bash` tool sends
    each command to the sandbox via `sandbox.commands.run(command)`.
-3. The agent runs `browse open '<url>' --remote --session agent`,
-   `browse get markdown body --session agent`, etc. Each call drives a remote
-   Browserbase browser; the browser never runs in the sandbox.
+3. The agent has a minimal system prompt: it learns the CLI on its own by running
+   `browse --help`, then drives the remote Browserbase browser with plain commands
+   like `browse open '<url>'` and `browse get markdown body`. Thanks to the env vars,
+   those calls run remotely and persist across steps with no extra flags; the browser
+   never runs in the sandbox.
 4. The agent prints a `FINAL ANSWER` summarizing what it found.
 
 ## Files
@@ -94,10 +98,10 @@ Expected tail of output:
 
 ## Notes
 
-- The agent uses a plain remote browser (`browse open '<url>' --remote`), which
-  works on **any Browserbase plan**.
+- The agent uses a plain remote browser, which works on **any Browserbase plan**.
+- `BROWSE_SESSION=agent` in the sandbox env makes every `browse` call run remotely
+  and share a single session, so the agent never needs `--remote` or `--session`.
 - Verified browsers (residential IP + automatic CAPTCHA solving) are a Scale-plan
-  upgrade. To use one, tell the agent to add `--verified` to its `browse open` calls.
-  See https://www.browserbase.com/pricing.
+  upgrade. See https://www.browserbase.com/pricing.
 - `BROWSERBASE_API_KEY` is passed to the sandbox via the SDK's `envs` option, so it
   only ever lives in the sandbox's environment — never written to a committed file.

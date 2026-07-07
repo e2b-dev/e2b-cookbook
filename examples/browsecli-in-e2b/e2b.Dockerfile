@@ -3,18 +3,14 @@
 # Built with the E2B CLI:  e2b template build
 # (E2B reads this file via the `dockerfile` field in e2b.toml.)
 #
-# This image installs Node + the `browse` CLI. NO Chrome/Chromium is installed:
-# the browser lives on Browserbase and is reached over CDP at run time. The
-# E2B sandbox runs your agent loop; the browser runs remotely.
+# Builds directly from the official prebuilt `browse` CLI image
+# (node:20-slim + browse). NO Chrome/Chromium: the browser lives on Browserbase
+# and is reached over CDP at run time. The E2B sandbox runs your agent loop; the
+# browser runs remotely.
 #
-# Any OCI base image works on E2B. We use node:20-slim so `browse` (an npm
-# package) and its `node` runtime are first-class.
-FROM node:20-slim
-
-# `browse` is the Browserbase CLI (browser automation + cloud APIs). The agent's
-# own deps (ai / @ai-sdk/anthropic / zod) are installed at run time by the driver.
-RUN npm install -g browse@latest \
-    && browse --version
+# Pin a version (e.g. ghcr.io/browserbase/browse:0.9.4) for reproducibility, or
+# use `FROM node:20-slim` + `RUN npm i -g browse` for a fully self-contained image.
+FROM ghcr.io/browserbase/browse:latest
 
 WORKDIR /home/user
 

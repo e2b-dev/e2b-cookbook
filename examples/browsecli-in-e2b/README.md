@@ -49,7 +49,7 @@ instructions in the prompt. Override the goal with the `TASK` env var.
 | File | Purpose |
 | --- | --- |
 | `index.ts` | The whole example: creates the sandbox, runs the AI SDK agent loop on the host, and exposes a `bash` tool that execs inside the sandbox via `sandbox.commands.run`. |
-| `e2b.Dockerfile` | The template image: `node:20-slim` + `npm i -g browse`. **No Chrome.** |
+| `e2b.Dockerfile` | The template image: `FROM ghcr.io/browserbase/browse` (the official prebuilt CLI image). **No Chrome.** |
 | `e2b.toml` | E2B template config (`template_name`, `dockerfile`, `start_cmd`, resources). |
 | `package.json` | Deps (`e2b`, `ai`, `@ai-sdk/anthropic`, `zod`, `tsx`, `dotenv`). |
 | `env.template` | `E2B_API_KEY`, `ANTHROPIC_API_KEY`, `BROWSERBASE_API_KEY`. |

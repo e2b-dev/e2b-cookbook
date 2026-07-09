@@ -43,7 +43,11 @@ instructions in the prompt. Override the goal with the `TASK` env var.
    commands like `browse open '<url>'` and `browse get markdown body`. Thanks to the env vars,
    those calls run remotely and persist across steps with no extra flags; the browser
    never runs in the sandbox.
-4. The agent prints a `FINAL ANSWER` summarizing what it found.
+4. The prompt also tells the agent it's running in a sandbox with no local browser
+   (so it never passes `--local`), injects today's date at runtime so it's never
+   guessing or hardcoding one, and tells it to give its best final answer from
+   whatever it's gathered if it's getting close to the step limit.
+5. The agent prints a `FINAL ANSWER` summarizing what it found.
 
 ## Files
 

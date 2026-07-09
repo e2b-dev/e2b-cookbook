@@ -8,7 +8,7 @@
 # and is reached over CDP at run time. The E2B sandbox runs your agent loop; the
 # browser runs remotely.
 #
-# Pin a version (e.g. ghcr.io/browserbase/browse:0.9.4) for reproducibility, or
+# Pin a version (e.g. ghcr.io/browserbase/browse:0.9.5) for reproducibility, or
 # use `FROM node:20-slim` + `RUN npm i -g browse` for a fully self-contained image.
 FROM ghcr.io/browserbase/browse:latest
 

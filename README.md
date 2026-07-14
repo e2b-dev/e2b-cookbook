@@ -65,7 +65,7 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td><a href="./examples/openai-codex-in-sandbox-js">TypeScript</a></td>
     </tr>
     <tr>
-      <td rowspan="3">Anthropic</td>
+      <td rowspan="4">Anthropic</td>
       <td>Claude 3 Opus</td>
       <td>Code interpreter</td>
       <td><a href="./examples/claude-code-interpreter-python">Python</a></td>
@@ -76,6 +76,12 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td>Claude Code, running inside a Sandbox</td>
       <td><a href="./examples/anthropic-claude-code-in-sandbox-python">Python</a></td>
       <td><a href="./examples/anthropic-claude-code-in-sandbox-js">TypeScript</a></td>
+    </tr>
+    <tr>
+      <td>Claude Agent SDK</td>
+      <td>Claude Agent SDK agent, running inside a Sandbox</td>
+      <td>-</td>
+      <td><a href="./examples/claude-agent-sdk-in-sandbox-js">TypeScript</a></td>
     </tr>
     <tr>
       <td>Claude Managed Agents</td>

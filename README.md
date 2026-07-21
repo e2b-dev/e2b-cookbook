@@ -170,6 +170,12 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td><a href="./examples/agentkit-coding-agent">TypeScript</a></td>
     </tr>
     <tr>
+      <td>AgentsKit</td>
+      <td>AgentsKit sandbox lifecycle, timeouts, and output handling</td>
+      <td>-</td>
+      <td><a href="./examples/agentskit-sandbox-js">TypeScript</a></td>
+    </tr>
+    <tr>
     <td><a href="https://sandboxagent.dev/docs/sdk-overview">Sandbox Agent SDK</a></td>
       <td>Run Sandbox Agent inside E2B and connect with the SDK</td>
       <td>-</td>

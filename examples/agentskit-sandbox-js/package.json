@@ -8,7 +8,7 @@
     "check": "tsc --noEmit"
   },
   "dependencies": {
-    "@agentskit/sandbox": "~0.6.0",
+    "@agentskit/sandbox": "~0.6.1",
     "@e2b/code-interpreter": "~2.6.1",
     "dotenv": "~17.4.2"
   },

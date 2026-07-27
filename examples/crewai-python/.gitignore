@@ -1,0 +1,10 @@
+# Virtual environments
+.venv
+
+# Environment files
+.env
+
+# Python caches
+__pycache__
+.pytest_cache
+.ruff_cache

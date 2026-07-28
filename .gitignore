@@ -6,3 +6,8 @@ node_modules
 /logs
 .next
 next-env.d.ts
+
+# Local planning and cross-repository documentation drafts
+DECISIONS.md
+CREWAI_DOCS_DRAFT.mdx
+CREWAI_ATTRIBUTION.patch

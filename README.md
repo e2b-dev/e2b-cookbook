@@ -170,6 +170,12 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td><a href="./examples/nextjs-code-interpreter">TypeScript</a></td>
     </tr>
     <tr>
+    <td>▲ <a href="https://eve.dev/docs">Vercel eve</a></td>
+      <td>Feedback analyst agent whose sandbox backend is E2B, publishing an HTML report from the sandbox</td>
+      <td>-</td>
+      <td><a href="./examples/vercel-eve-feedback-analyst-js">TypeScript</a></td>
+    </tr>
+    <tr>
     <td>AgentKit</td>
       <td>AgentKit Coding Agent</td>
       <td>-</td>

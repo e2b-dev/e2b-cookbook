@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.flue/
+.flue-vite/
+.env*
+!.env.example
+.DS_Store
+*.tsbuildinfo

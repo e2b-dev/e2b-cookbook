@@ -1,0 +1,8 @@
+packages:
+  - '.'
+
+# Neither postinstall is needed: @google/genai only prints a notice and
+# protobufjs (via e2b) regenerates types it already ships.
+allowBuilds:
+  '@google/genai': false
+  protobufjs: false

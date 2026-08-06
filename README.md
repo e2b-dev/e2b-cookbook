@@ -170,6 +170,12 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td><a href="./examples/nextjs-code-interpreter">TypeScript</a></td>
     </tr>
     <tr>
+    <td><a href="https://flueframework.com">Flue</a></td>
+      <td>Feedback analyst agent running entirely inside an E2B sandbox, publishing an HTML report from the sandbox</td>
+      <td>-</td>
+      <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/flue-feedback-analyst-js">TypeScript</a></td>
+    </tr>
+    <tr>
     <td>AgentKit</td>
       <td>AgentKit Coding Agent</td>
       <td>-</td>

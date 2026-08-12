@@ -25,7 +25,7 @@ from agents.extensions.sandbox import E2BSandboxClient, E2BSandboxClientOptions,
 from examples.sandbox.misc.example_support import text_manifest
 from examples.sandbox.misc.workspace_shell import WorkspaceShellCapability
 
-DEFAULT_MODEL = "gpt-5.4"
+DEFAULT_MODEL = "gpt-5.6-terra"
 DEFAULT_TIMEOUT_SECONDS = 900
 DEFAULT_MAX_CONCURRENCY = 3
 

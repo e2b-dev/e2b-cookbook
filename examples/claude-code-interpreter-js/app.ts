@@ -8,8 +8,8 @@ import * as dotenv from 'dotenv'
 
 dotenv.config()
 
-//const MODEL_NAME = 'claude-3-opus-20240229'
-const MODEL_NAME = 'claude-3-5-sonnet-20241022'
+//const MODEL_NAME = 'claude-opus-5'
+const MODEL_NAME = 'claude-sonnet-5'
 
 const SYSTEM_PROMPT = `
 ## your job & context

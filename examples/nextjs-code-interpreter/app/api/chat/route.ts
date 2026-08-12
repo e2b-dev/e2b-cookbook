@@ -44,7 +44,7 @@ Subsequent calls to the tool will keep the state of the interpreter.`,
 export async function POST(req: Request) {
   const { messages, sessionID } = await req.json();
 
-  const model = 'gpt-4-turbo';
+  const model = 'gpt-5.6-terra';
 
   const response = await openai.chat.completions.create({
     model,

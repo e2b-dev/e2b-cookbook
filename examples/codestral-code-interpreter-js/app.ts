@@ -5,7 +5,7 @@ import MistralClient from '@mistralai/mistralai'
 
 dotenv.config()
 
-const MODEL_NAME = 'codestral-latest'
+const MODEL_NAME = 'codestral-25-08'
 const SYSTEM_PROMPT = `
 You're a python data scientist that is analyzing daily temperature of major cities. You are given tasks to complete and you run Python code to solve them.
 

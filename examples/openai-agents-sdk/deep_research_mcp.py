@@ -35,7 +35,7 @@ except Exception as exc:  # pragma: no cover - import path depends on optional e
     ) from exc
 
 
-DEFAULT_MODEL = "gpt-5.4"
+DEFAULT_MODEL = "gpt-5.6-terra"
 DEFAULT_TIMEOUT_SECONDS = 900
 DEFAULT_QUERY = (
     "Research browser automation infrastructure for AI agents. "

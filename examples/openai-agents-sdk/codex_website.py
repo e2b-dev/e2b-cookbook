@@ -20,7 +20,7 @@ from examples.sandbox.misc.example_support import text_manifest
 DEFAULT_TEMPLATE = "codex"
 DEFAULT_TIMEOUT_SECONDS = 900
 DEFAULT_PREVIEW_PORT = 8000
-DEFAULT_MODEL = "gpt-5.4"
+DEFAULT_MODEL = "gpt-5.6-terra"
 SITE_DIR = "site"
 
 

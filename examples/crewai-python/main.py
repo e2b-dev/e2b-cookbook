@@ -6,7 +6,7 @@ from crewai import Agent, Crew, Process, Task
 from crewai_tools import E2BPythonTool
 from dotenv import load_dotenv
 
-DEFAULT_MODEL = "openai/gpt-4.1-mini"
+DEFAULT_MODEL = "openai/gpt-5.6-luna"
 SANDBOX_TIMEOUT_SECONDS = 600
 
 ANALYSIS_TASK = """

@@ -20,12 +20,12 @@ if (!E2B_API_KEY) {
 
 // Choose from the codegen models:
 
-const MODEL_NAME = 'meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo'
-// const MODEL_NAME = 'meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo'
-// const MODEL_NAME = 'meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo'
-// const MODEL_NAME = 'Qwen/Qwen2-72B-Instruct'
-// const MODEL_NAME = "codellama/CodeLlama-70b-Instruct-hf"
-// const MODEL_NAME = "deepseek-ai/deepseek-coder-33b-instruct"
+const MODEL_NAME = 'meta-llama/Llama-3.3-70B-Instruct-Turbo'
+// const MODEL_NAME = 'Qwen/Qwen3.7-Plus'
+// const MODEL_NAME = 'Qwen/Qwen2.5-7B-Instruct-Turbo'
+// const MODEL_NAME = 'Qwen/Qwen3.6-Plus'
+// const MODEL_NAME = "deepseek-ai/DeepSeek-V4-Flash-0731"
+// const MODEL_NAME = "deepseek-ai/DeepSeek-V4-Pro"
 
 // See the complete list of Together AI models here: https://api.together.ai/models.
 

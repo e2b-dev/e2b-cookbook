@@ -29,7 +29,7 @@ async function runGroqExaExample() {
   const researchPrompt = 'What happened last week in AI? Use Exa to search for recent AI developments and provide a comprehensive summary.';
 
   const response = await client.responses.create({
-    model: 'moonshotai/kimi-k2-instruct-0905',
+    model: 'openai/gpt-oss-120b',
     input: researchPrompt,
     tools: [
       {

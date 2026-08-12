@@ -9,7 +9,7 @@ import { buffer } from 'stream/consumers'
 dotenv.config()
 
 
-const MODEL_NAME = 'gpt-4o'
+const MODEL_NAME = 'gpt-5.6-terra'
 const SYSTEM_PROMPT = `
 ## your job & context
 you are a python data scientist. you are given tasks to complete and you run python code to solve them.

@@ -41,19 +41,19 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td>-</td>
     </tr>
     <tr>
-      <td>o1, o3-mini</td>
+      <td>GPT-5.6</td>
       <td>Data analysis and visualization of a CSV</td>
       <td><a href="./examples/openai-python">Python</a></td>
       <td><a href="./examples/openai-js">TypeScript</a></td>
     </tr>
     <tr>
-      <td>GPT-4o</td>
+      <td>GPT-5.6</td>
       <td>Code interpreter and reasoning on image data</td>
       <td><a href="./examples/gpt-4o-python">Python</a></td>
       <td><a href="./examples/gpt-4o-js">TypeScript</a></td>
     </tr>
     <tr>
-      <td>o1, o3-mini, GPT-4</td>
+      <td>GPT-5.6</td>
       <td>Code interpreter for ML on dataset</td>
       <td><a href="./examples/o1-and-gpt-4-python">Python</a></td>
       <td><a href="./examples/o1-and-gpt-4-js">TypeScript</a></td>
@@ -66,7 +66,7 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
     </tr>
     <tr>
       <td rowspan="3">Anthropic</td>
-      <td>Claude 3 Opus</td>
+      <td>Claude Opus 5</td>
       <td>Code interpreter</td>
       <td><a href="./examples/claude-code-interpreter-python">Python</a></td>
       <td><a href="./examples/claude-code-interpreter-js">TypeScript</a></td>
@@ -253,9 +253,9 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
 
 **Example use cases**
 
-- Upload dataset and analyze it with Llama 3 - [Python](./examples/upload-dataset-code-interpreter)
-- Scrape Airbnb and analyze data with Claude 3 Opus and Firecrawl - [TypeScript](./examples/firecrawl-scrape-and-analyze-airbnb-data)
-- Visualize website topics with Claude 3.5 Sonnet and Firecrawl - [Python](./examples/claude-visualize-website-topics)
+- Upload dataset and analyze it with Llama 3.3 - [Python](./examples/upload-dataset-code-interpreter)
+- Scrape Airbnb and analyze data with Claude Opus 5 and Firecrawl - [TypeScript](./examples/firecrawl-scrape-and-analyze-airbnb-data)
+- Visualize website topics with Claude Sonnet 5 and Firecrawl - [Python](./examples/claude-visualize-website-topics)
 - Next.js app with LLM + Code Interpreter and streaming - [TypeScript](./examples/nextjs-code-interpreter)
 - How to run a Docker container in E2B - [Python/TypeScript](./examples/docker-in-e2b)
 - How to run Playwright in E2B - [TypeScript](./examples/playwright-in-e2b)

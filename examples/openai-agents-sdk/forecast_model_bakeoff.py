@@ -24,7 +24,7 @@ from agents.extensions.sandbox import E2BSandboxClient, E2BSandboxClientOptions,
 from examples.sandbox.misc.example_support import text_manifest, tool_call_name
 from examples.sandbox.misc.workspace_shell import WorkspaceShellCapability
 
-DEFAULT_MODEL = "gpt-5.4-mini"
+DEFAULT_MODEL = "gpt-5.6-luna"
 DEFAULT_TIMEOUT_SECONDS = 900
 DEFAULT_SERIES_ID = "PAYEMS"
 DEFAULT_HORIZON = 12

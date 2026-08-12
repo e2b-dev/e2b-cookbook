@@ -1,10 +1,10 @@
 # OpenAI Code Interpreter in JS/TS
-This is an example that tests the capabilities of OpenAI's models. You can choose from models like o1 or o3-mini. We let the LLM write the code to train a machine learning model on a dataset from Kaggle. We use the E2B Code Interpreter SDK for running the LLM-generated code tasks in a secure and isolated cloud environment.
+This is an example that tests the capabilities of OpenAI's models. You can choose from models like o1 or gpt-5.6-sol. We let the LLM write the code to train a machine learning model on a dataset from Kaggle. We use the E2B Code Interpreter SDK for running the LLM-generated code tasks in a secure and isolated cloud environment.
 
 
 ## Tech Stack
 - [E2B Code Interpreter SDK]((https://github.com/e2b-dev/code-interpreter)) for running the LLM-generated code
-- [OpenAI's GPT-4o](https://openai.com/index/hello-gpt-4o/) as an LLM
+- [OpenAI's GPT-5.6](https://openai.com/index/hello-gpt-4o/) as an LLM
 - JavaScript/TypeScript
 
 ## Setup

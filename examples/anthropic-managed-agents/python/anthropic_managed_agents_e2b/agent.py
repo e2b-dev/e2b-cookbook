@@ -6,7 +6,7 @@ import anthropic
 
 SANDBOX_TOOLS = ("bash", "read", "write", "edit", "glob", "grep")
 WEB_TOOLS = ("web_fetch", "web_search")
-DEFAULT_MODEL = "claude-sonnet-4-6"
+DEFAULT_MODEL = "claude-sonnet-5"
 DEFAULT_SYSTEM_PROMPT = (
     "You have a Linux sandbox. You are already in the working directory. "
     "Agent skills are downloaded under skills/<name>/. "

@@ -103,7 +103,7 @@ async function uploadDataset(codeInterpreter: Sandbox) {
   console.log("Uploaded train.csv at", trainCsvPath);
 }
 
-// Function to interact with both models: o1 and gpt-4o
+// Function to interact with both models: o1 and gpt-5.6-terra
 async function chat(
   codeInterpreter: Sandbox,
   userMessage: string,
@@ -113,11 +113,11 @@ async function chat(
   );
 
 
-  // First, get the plan from o1-mini
+  // First, get the plan from gpt-5.6-sol
   try {
     const responseO1 = await openai.chat.completions.create({
-      model: "o3-mini", // Choose different model by uncommenting
-      //model: "o1-mini",
+      model: "gpt-5.6-sol", // Choose different model by uncommenting
+      //model: "gpt-5.6-sol",
       messages: [
         { role: "user", content: O1_PROMPT },
         { role: "user", content: userMessage },
@@ -129,9 +129,9 @@ async function chat(
       throw Error(`Chat content is null.`);
     }
 
-    // Then, use gpt-4o to extract code
+    // Then, use gpt-5.6-terra to extract code
     const response4o = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-5.6-terra",
       messages: [
         { role: "system", content: GPT_4O_PROMPT },
         { role: "user", content: `${GPT_4O_PROMPT}\n${contentO1}` },
@@ -143,9 +143,9 @@ async function chat(
       throw Error(`Chat content is null.`);
     }
 
-    console.log("Code from gpt-4o:", content4o);
+    console.log("Code from gpt-5.6-terra:", content4o);
 
-    // Extract Python code from the gpt-4o response
+    // Extract Python code from the gpt-5.6-terra response
     const pythonCode = matchCodeBlocks(content4o);
 
     if (pythonCode == "") {

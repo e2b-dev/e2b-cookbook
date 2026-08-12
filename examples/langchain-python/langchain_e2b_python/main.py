@@ -39,8 +39,8 @@ def format_to_tool_messages(
 
 def main():
     # 1. Pick your favorite llm
-    llm = ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0)
-    # llm = ChatGroq(temperature=0, model_name="llama3-70b-8192")
+    llm = ChatOpenAI(model="gpt-5.6-terra", temperature=0)
+    # llm = ChatGroq(temperature=0, model_name="llama-3.3-70b-versatile")
 
     # 2. Initialize the code interpreter tool
     code_interpreter = CodeInterpreterFunctionTool()

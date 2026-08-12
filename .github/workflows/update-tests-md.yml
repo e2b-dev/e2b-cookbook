@@ -33,10 +33,10 @@ jobs:
 
     # Kept as continue-on-error so the reporting steps below still run on failure.
     # The "Fail if any example failed" step at the end is what turns the job red.
-    - name: Run Jest tests and save results
+    # The runner writes ./tests/results.json itself.
+    - name: Run the examples and save results
       id: tests
-      run: |
-        npm test -- --json --outputFile=./tests/results.json
+      run: npm test
       continue-on-error: true
 
     - name: Upload test results as an artifact

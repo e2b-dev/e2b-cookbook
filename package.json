@@ -3,25 +3,16 @@
     "type": "module",
     "version": "1.0.0",
     "scripts": {
-        "test": "jest --maxConcurrency=5"
-    },
-    "jest": {
-        "preset": "ts-jest",
-        "testEnvironment": "node",
-        "roots": [
-            "<rootDir>/tests"
-        ]
+        "test": "tsx tests/run-examples.ts"
     },
     "devDependencies": {
-        "@types/jest": "^29.0.0",
-        "jest": "^29.0.0",
-        "ts-jest": "^29.0.0",
-        "ts-node": "^10.9.2"
+        "@types/node": "^22.10.2",
+        "tsx": "^4.19.2",
+        "typescript": "^5.9.3"
     },
     "dependencies": {
         "dotenv": "^16.4.5",
         "e2b": "^2.38.3",
-        "ignore": "^6.0.2",
-        "typescript": "^5.9.3"
+        "ignore": "^6.0.2"
     }
 }

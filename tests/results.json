@@ -1,0 +1,23 @@
+{
+  "numTotalTests": 2,
+  "numPassedTests": 2,
+  "numFailedTests": 0,
+  "testResults": [
+    {
+      "assertionResults": [
+        {
+          "title": "hello-world-js",
+          "status": "passed",
+          "duration": 10929,
+          "failureMessages": []
+        },
+        {
+          "title": "hello-world-python",
+          "status": "passed",
+          "duration": 19575,
+          "failureMessages": []
+        }
+      ]
+    }
+  ]
+}

@@ -21,8 +21,8 @@
     "@e2b/code-interpreter": "^2.7.0",
     "dotenv": "^17.4.2",
     "express": "^5.1.0",
-    "http-proxy-middleware": "^4.2.0",
-    "open": "^11.0.0",
+    "http-proxy-middleware": "^3.0.5",
+    "open": "^10.2.0",
     "unique-names-generator": "^4.7.1"
   }
 }

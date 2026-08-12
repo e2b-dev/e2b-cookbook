@@ -53,8 +53,14 @@ def build_crew(python_tool: E2BPythonTool, model: str) -> Crew:
             "E2B sandbox."
         ),
         tools=[python_tool],
-        # gpt-5.6-* are reasoning models; function tools need reasoning_effort 'none'.
-        llm=LLM(model=model, reasoning_effort="none"),
+        # gpt-5.6-* are reasoning models: function tools are rejected unless
+        # reasoning effort is off. LiteLLM silently drops params for models its
+        # map does not know yet, so allowed_openai_params forces it through.
+        llm=LLM(
+            model=model,
+            reasoning_effort="none",
+            allowed_openai_params=["reasoning_effort"],
+        ),
         allow_delegation=False,
         max_iter=8,
         verbose=True,

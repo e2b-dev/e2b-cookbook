@@ -64,8 +64,6 @@ const scripts: { name: string; interpreter: Interpreter; file: string }[] = [
 //   anthropic-claude-code-in-sandbox-js, anthropic-claude-code-in-sandbox-python,
 //   openai-codex-in-sandbox-js, openai-codex-in-sandbox-python, playwright-in-e2b,
 //   mcp-custom-template-js (fails with "template 'browserbase-mcp-gateway' not found")
-// Starts a long-running server and never exits, so it can only ever time out here:
-//   agentkit-coding-agent
 // Blocked upstream: the third-party `sandbox-agent` package (0.4.2, latest) calls
 // Sandbox.betaCreate(), which the E2B SDK removed between 2.20 and 2.30. It cannot
 // run against any current SDK, and was already failing on main for this reason:
@@ -74,10 +72,10 @@ const scripts: { name: string; interpreter: Interpreter; file: string }[] = [
 //   anthropic-managed-agents (javascript/ + python/), docker-in-e2b (js/ + python/)
 // No single entrypoint:
 //   openai-agents-sdk (11 standalone scripts, no manifest)
-// Needs its own toolchain (the `eve` CLI, Node >=24):
-//   flue-feedback-analyst-js, vercel-eve-feedback-analyst-js
-// No integration test for a Next.js app yet:
-//   nextjs-code-interpreter
+// Runs a long-lived agent/server process rather than a script that exits, so
+// this runner can only ever time out on them:
+//   flue-feedback-analyst-js, vercel-eve-feedback-analyst-js,
+//   nextjs-code-interpreter (next start), agentkit-coding-agent
 
 const SANDBOX_TEST_DIRECTORY = '/home/user/example'
 const LOGS_DIRECTORY = 'logs'

@@ -27,13 +27,3 @@ The `evaluateCode` method is the main method that takes Python `code` to be exec
 After executing the code it will disconnect from the sandbox and call the `.keelAlive` method to ensure that the sandbox can be reused for the specified duration.
 
 The code execution is stateful (using Jupyter Notebook underneath) and per session — you can refer to variables from the previous execution, define functions that you will use later, etc.
-
-## Known limitation: Vercel AI SDK version
-
-This example is still on Vercel AI SDK v3 (`ai@^3.1.1`, `@ai-sdk/openai@^0.0.9`) and therefore
-pins `openai@^4.42.0` to satisfy that peer range, while the rest of the cookbook is on `openai@^7`.
-
-Moving to AI SDK v5+ is a rewrite rather than a bump: `OpenAIStream`, `StreamingTextResponse`,
-`ToolCallPayload`, `experimental_onToolCall` and `appendToolCallMessage` are all gone, replaced by
-`streamText` plus `toUIMessageStreamResponse()`, and the `useChat` client in `app/page.tsx` changes
-with it. That needs to be done and then actually run in a browser, so it belongs in its own PR.

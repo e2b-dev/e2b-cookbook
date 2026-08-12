@@ -1,129 +1,70 @@
+import { openai } from '@ai-sdk/openai';
 import {
-  OpenAIStream,
-  StreamingTextResponse,
-  Tool,
-  ToolCallPayload,
-  StreamData,
-  CreateMessage,
+  convertToModelMessages,
+  stepCountIs,
+  streamText,
+  tool,
+  type UIMessage,
 } from 'ai';
-import OpenAI from 'openai';
-import { evaluateCode, nonEmpty } from './codeInterpreter';
+import { z } from 'zod';
 
-// Create an OpenAI API client (that's edge friendly!)
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || '',
-});
+import { evaluateCode, nonEmpty } from './codeInterpreter';
 
 export const dynamic = 'force-dynamic';
 
-// You can also use edge runtime
-// export const runtime = 'edge';
+// The model runs a tool, waits for the sandbox, then answers, so give it room.
+export const maxDuration = 60;
 
-const tools: Tool[] = [
-  {
-    type: 'function',
-    function: {
-      name: 'execute_python_code',
-      description: 'Execute python code in Jupyter Notebook via code interpreter.',
-      parameters: {
-        type: 'object',
-        properties: {
-          code: {
-            type: 'string',
-            description: `Python code that will be directly executed via Jupyter Notebook.
-The stdout, stderr and results will be returned as a JSON object.
-Subsequent calls to the tool will keep the state of the interpreter.`,
-          },
-        },
-        required: ['code'],
-      },
-    },
-  },
-];
+const MODEL = 'gpt-5.6-terra';
 
 export async function POST(req: Request) {
-  const { messages, sessionID } = await req.json();
+  const { messages, sessionID }: { messages: UIMessage[]; sessionID: string } =
+    await req.json();
 
-  const model = 'gpt-5.6-terra';
+  const result = streamText({
+    model: openai(MODEL),
+    messages: await convertToModelMessages(messages),
+    // gpt-5.6-* are reasoning models. Function tools on them require reasoning
+    // effort to be off, otherwise the API rejects the request.
+    providerOptions: { openai: { reasoningEffort: 'none' } },
+    // Let the model call the tool and then answer with the result. Without this
+    // the stream stops at the tool call and the user never sees a reply.
+    stopWhen: stepCountIs(5),
+    tools: {
+      execute_python_code: tool({
+        description:
+          'Execute python code in a Jupyter notebook via the E2B code interpreter. ' +
+          'Subsequent calls keep the state of the interpreter.',
+        inputSchema: z.object({
+          code: z
+            .string()
+            .describe(
+              'Python code that will be executed in a Jupyter notebook. ' +
+                'stdout, stderr and results are returned.',
+            ),
+        }),
+        execute: async ({ code }) => {
+          const evaluation = await evaluateCode(sessionID, code);
 
-  const response = await openai.chat.completions.create({
-    model,
-    stream: true,
-    messages,
-    tools,
-    tool_choice: 'auto',
-  });
-
-  const data = new StreamData();
-  const stream = OpenAIStream(response, {
-    experimental_onToolCall: async (
-      call: ToolCallPayload,
-      appendToolCallMessage,
-    ) => {
-      const newMessages: CreateMessage[] = [];
-
-      for (const toolCall of call.tools) {
-        if (toolCall.func.name === 'execute_python_code') {
-          const evaluation = await evaluateCode(
-            sessionID, toolCall.func.arguments.code as string,
-          );
-
-          data.append({
-            messageIdx: messages.length,
-            function_name: "execute_python_code",
-            parameters: {
-              code: toolCall.func.arguments.code as string
-            },
-            tool_call_id: toolCall.id,
-            evaluation: {
-              stdout: evaluation.stdout,
-              stderr: evaluation.stderr,
-              ...(evaluation.error && {
-                error: {
-                  traceback: evaluation.error.traceback,
-                  name: evaluation.error.name,
-                  value: evaluation.error.value,
-                }
-              }),
-              results: evaluation.results.map(t => JSON.parse(JSON.stringify(t))),
-            }
-          });
-
-          const msgs = appendToolCallMessage({
-            tool_call_id: toolCall.id,
-            function_name: 'execute_python_code',
-            tool_call_result: {
-              stdout: evaluation.stdout,
-              stderr: evaluation.stderr,
-              ...(evaluation.error && {
+          return {
+            code,
+            stdout: evaluation.stdout,
+            stderr: evaluation.stderr,
+            ...(evaluation.error && {
+              error: {
                 traceback: evaluation.error.traceback,
                 name: evaluation.error.name,
                 value: evaluation.error.value,
-              }),
-              // Pass only text results to the LLM (to avoid passing encoded media files)
-              results: evaluation.results.map(result => result.text).filter(nonEmpty),
-            },
-          });
-
-          newMessages.push(...msgs);
-        }
-      }
-
-      return openai.chat.completions.create({
-        messages: [...messages, ...newMessages],
-        model,
-        stream: true,
-        tools,
-        tool_choice: 'auto',
-      });
-    },
-    onCompletion(completion) {
-      console.log('completion', completion);
-    },
-    async onFinal(completion) {
-      await data.close();
+              },
+            }),
+            // Only text results go back to the model, so encoded media (charts,
+            // images) never ends up in the prompt.
+            results: evaluation.results.map((r) => r.text).filter(nonEmpty),
+          };
+        },
+      }),
     },
   });
 
-  return new StreamingTextResponse(stream, {}, data);
+  return result.toUIMessageStreamResponse();
 }

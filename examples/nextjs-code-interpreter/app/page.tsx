@@ -1,100 +1,135 @@
 'use client';
 
 import { useState } from 'react';
-import { generateId } from 'ai';
-import { Message, useChat } from 'ai/react';
+import { useChat } from '@ai-sdk/react';
+import { DefaultChatTransport, generateId, type UIMessage } from 'ai';
+
 import Spinner from './Spinner';
 
-// Specific to the e2b code interpreter
-interface ToolCallResult {
-  messageIdx: number;
-  tool_call_id: string;
-  function_name: string;
-  parameters: {
-    code: string;
+// What the execute_python_code tool returns from app/api/chat/route.ts.
+interface CodeInterpreterOutput {
+  code: string;
+  stdout: string[];
+  stderr: string[];
+  error?: {
+    traceback: string;
+    name: string;
+    value: string;
   };
-  evaluation: {
-    stdout: string[];
-    stderr: string[];
-    error?: {
-      traceback: string;
-      name: string;
-      value: string;
-    };
-    results: any[];
-  };
+  results: string[];
 }
 
-function ToolResult({ toolCallResult }: { toolCallResult: ToolCallResult }) {
+function ToolResult({ output }: { output: CodeInterpreterOutput }) {
   return (
     <div className="flex flex-col border-blue-400 border rounded-md p-2 mb-4 space-y-1 text-blue-700">
-      <strong>{toolCallResult.function_name}:</strong>
-      <pre>{toolCallResult.parameters.code}</pre>
-      {toolCallResult.evaluation.stdout.length > 0 && <div>Stdout: {toolCallResult.evaluation.stdout.join('\n')}</div>}
-      {toolCallResult.evaluation.stderr.length > 0 && <div>Stderr: {toolCallResult.evaluation.stderr.join('\n')}</div>}
-      {toolCallResult.evaluation.error && (
+      <strong>execute_python_code:</strong>
+      <pre className="whitespace-pre-wrap">{output.code}</pre>
+      {output.stdout.length > 0 && <div>Stdout: {output.stdout.join('\n')}</div>}
+      {output.stderr.length > 0 && <div>Stderr: {output.stderr.join('\n')}</div>}
+      {output.error && (
         <div>
-          <div>Error Name: {toolCallResult.evaluation.error.name}</div>
-          <div>Error Value: {toolCallResult.evaluation.error.value}</div>
+          <div>Error Name: {output.error.name}</div>
+          <div>Error Value: {output.error.value}</div>
           <div>Error Traceback:</div>
-          <pre>{toolCallResult.evaluation.error.traceback}</pre>
+          <pre className="whitespace-pre-wrap">{output.error.traceback}</pre>
         </div>
       )}
-      {toolCallResult.evaluation.results.length > 0 && <div>Results:</div>}
-      {toolCallResult.evaluation.results.length > 0 && <pre>{JSON.stringify(toolCallResult.evaluation.results, null, 2)}</pre>}
+      {output.results.length > 0 && (
+        <>
+          <div>Results:</div>
+          <pre className="whitespace-pre-wrap">{output.results.join('\n')}</pre>
+        </>
+      )}
     </div>
   );
 }
 
-export default function Chat() {
-  const [sessionID] = useState(generateId(4));
+const roleToColorMap: Record<UIMessage['role'], string> = {
+  system: 'red',
+  user: 'black',
+  assistant: 'green',
+};
 
-  const { messages, input, handleInputChange, handleSubmit, data, isLoading } = useChat({
-    api: '/api/chat',
-    body: {
-      sessionID,
-    },
+export default function Chat() {
+  const [sessionID] = useState(() => generateId());
+  const [input, setInput] = useState('');
+
+  // v5 moved transport config out of useChat's top level and dropped the
+  // built-in input state, so the textbox is plain React state now.
+  const { messages, sendMessage, status } = useChat({
+    transport: new DefaultChatTransport({
+      api: '/api/chat',
+      body: { sessionID },
+    }),
   });
 
-  const toolCallsResults = data ? (data as unknown as ToolCallResult[]) : [];
-
-  // Generate a map of message role to text color
-  const roleToColorMap: Record<Message['role'], string> = {
-    system: 'red',
-    user: 'black',
-    function: 'blue',
-    tool: 'purple',
-    assistant: 'green',
-    data: 'orange',
-  };
+  const isLoading = status === 'submitted' || status === 'streaming';
 
   return (
     <div className="flex flex-col w-full max-w-md py-24 mx-auto stretch">
-      {messages.length > 0
-        ? messages.map((m: Message, i) => (
-          <div
-            key={m.id}
-            className="whitespace-pre-wrap"
-            style={{ color: roleToColorMap[m.role] }}
-          >
-            {toolCallsResults.filter(t => t.messageIdx === i).map(t => (
-              <ToolResult key={t.tool_call_id} toolCallResult={t} />
-            ))}
-            <strong>{`${m.role}: `}</strong>
-            {m.content || JSON.stringify(m.tool_calls)}
-            <br />
-            <br />
-          </div>
-        ))
-        : null}
+      {messages.map((message) => (
+        <div
+          key={message.id}
+          className="whitespace-pre-wrap"
+          style={{ color: roleToColorMap[message.role] }}
+        >
+          <strong>{`${message.role}: `}</strong>
+          {/* A v5 message is a list of parts: text, tool calls, reasoning. */}
+          {message.parts.map((part, i) => {
+            if (part.type === 'text') {
+              return <span key={i}>{part.text}</span>;
+            }
+            if (part.type === 'tool-execute_python_code') {
+              if (part.state === 'output-available') {
+                return (
+                  <ToolResult
+                    key={i}
+                    output={part.output as CodeInterpreterOutput}
+                  />
+                );
+              }
+              if (part.state === 'output-error') {
+                return (
+                  <div key={i} className="text-red-600">
+                    Tool error: {part.errorText}
+                  </div>
+                );
+              }
+              return (
+                <div key={i} className="text-blue-400">
+                  Running code...
+                </div>
+              );
+            }
+            return null;
+          })}
+          <br />
+          <br />
+        </div>
+      ))}
+
       <div id="chart-goes-here"></div>
-      {isLoading && <div className="fixed bottom-24 flex justify-center w-full max-w-md"><Spinner /></div>}
-      <form onSubmit={handleSubmit}>
+
+      {isLoading && (
+        <div className="fixed bottom-24 flex justify-center w-full max-w-md">
+          <Spinner />
+        </div>
+      )}
+
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (!input.trim()) return;
+          sendMessage({ text: input });
+          setInput('');
+        }}
+      >
         <input
           className="fixed bottom-0 w-full max-w-md p-2 mb-8 border border-gray-300 rounded shadow-xl"
           value={input}
           placeholder="Say something..."
-          onChange={handleInputChange}
+          onChange={(e) => setInput(e.target.value)}
+          disabled={isLoading}
         />
       </form>
     </div>

@@ -1,5 +1,6 @@
 import fs from 'node:fs'
 import OpenAI from 'openai'
+import type { ChatCompletionTool } from 'openai/resources/chat/completions'
 import { Sandbox, Result } from '@e2b/code-interpreter'
 import { OutputMessage } from '@e2b/code-interpreter'
 import * as dotenv from 'dotenv'
@@ -35,7 +36,7 @@ Information about the temperature dataset:
 - you can run any python code you want, everything is running in a secure sandbox environment.
 `
 
-const tools = [
+const tools: ChatCompletionTool[] = [
     {
         type: 'function',
         function: {
@@ -99,6 +100,8 @@ async function chatWithLLM(codeInterpreter: Sandbox, userMessage: string): Promi
 
     if (message.tool_calls) {
         const toolCall = message.tool_calls[0]
+        // v7 widened tool_calls to a union of function and custom tool calls.
+        if (toolCall.type !== 'function') throw new Error('Expected a function tool call.')
         console.log(`\nTool Used: ${toolCall.function.name}\nTool Input: ${toolCall.function.arguments}`)
 
         const codeInterpreterResults = await processToolCall(codeInterpreter, toolCall)
@@ -116,10 +119,10 @@ async function uploadDataset(codeInterpreter: Sandbox): Promise<string> {
         throw new Error('Dataset file not found')
     }
 
-    const fileBuffer = fs.readFileSync(datasetPath)
+    const fileContent = fs.readFileSync(datasetPath, 'utf-8')
 
     try {
-        const remotePath = await codeInterpreter.files.write('city_temperature.csv', fileBuffer)
+        const { path: remotePath } = await codeInterpreter.files.write('city_temperature.csv', fileContent)
         if (!remotePath) {
             throw new Error('Failed to upload dataset')
         }

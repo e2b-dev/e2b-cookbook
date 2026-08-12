@@ -2,6 +2,7 @@ import fs from 'node:fs'
 import { Sandbox, Result, OutputMessage } from '@e2b/code-interpreter'
 import * as dotenv from 'dotenv'
 import Together from 'together-ai/index.mjs'
+import type { ChatCompletionMessageParam } from 'together-ai/resources/chat/completions.mjs'
 
 dotenv.config()
 
@@ -121,7 +122,7 @@ async function codeInterpret(codeInterpreter: Sandbox, code: string): Promise<Re
 async function chat(codeInterpreter: Sandbox, userMessage: string): Promise<Result[]> {
     console.log(`\n${'='.repeat(50)}\nUser Message: ${userMessage}\n${'='.repeat(50)}`)
 
-    const messages = [
+    const messages: ChatCompletionMessageParam[] = [
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user', content: userMessage }
     ]
@@ -159,10 +160,10 @@ async function uploadDataset(codeInterpreter: Sandbox): Promise<string> {
         throw new Error('Dataset file not found')
     }
 
-    const fileBuffer = fs.readFileSync(datasetPath)
+    const fileContent = fs.readFileSync(datasetPath, 'utf-8')
 
     try {
-        const remotePath = await codeInterpreter.files.write('data.csv', fileBuffer)
+        const { path: remotePath } = await codeInterpreter.files.write('data.csv', fileContent)
         if (!remotePath) {
             throw new Error('Failed to upload dataset')
         }

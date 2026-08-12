@@ -17,7 +17,7 @@
     "upload-file": "tsx src/cli.ts upload-file"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.97.1",
+    "@anthropic-ai/sdk": "^0.116.0",
     "dotenv": "^17.2.3",
     "e2b": "^2.38.3"
   },

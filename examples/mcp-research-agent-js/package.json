@@ -28,7 +28,7 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "@openai/agents": "^0.1.9",
+    "@openai/agents": "^0.15.0",
     "e2b": "^2.38.3",
     "dotenv": "^16.4.5"
   }

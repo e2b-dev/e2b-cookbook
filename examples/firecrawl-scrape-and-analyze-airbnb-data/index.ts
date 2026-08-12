@@ -44,7 +44,7 @@ async function chat(
     )
 
     if (toolName === 'execute_python') {
-      const code = toolInput.code
+      const code = (toolInput as { code: string }).code
       return codeInterpret(codeInterpreter, code)
     }
     return undefined

@@ -1,6 +1,6 @@
 import { Sandbox, Result } from '@e2b/code-interpreter'
 import { Groq } from 'groq-sdk'
-import { CompletionCreateParams } from 'groq-sdk/src/resources/chat/completions'
+import type { ChatCompletionTool, ChatCompletionMessageParam } from 'groq-sdk/resources/chat/completions'
 import fs from 'node:fs'
 import dotenv from 'dotenv'
 dotenv.config()
@@ -33,7 +33,7 @@ const TASK =
   'Visualize a distribution of height of men based on the latest data you know'
 
 // Define e2b code interpreter as a tool for the model
-const tools: Array<CompletionCreateParams.Tool> = [
+const tools: Array<ChatCompletionTool> = [
   {
     type: 'function',
     function: {
@@ -84,9 +84,9 @@ async function chatWithLlama(
   e2b_code_interpreter: Sandbox,
   user_message: string,
 ): Promise<Result[]> {
-  console.log(`\n${'=' * 50}\nUser message: ${user_message}\n${'=' * 50}`)
+  console.log(`\n${'='.repeat(50)}\nUser message: ${user_message}\n${'='.repeat(50)}`)
 
-  const messages = [
+  const messages: ChatCompletionMessageParam[] = [
     { role: 'system', content: SYSTEM_PROMPT },
     { role: 'user', content: user_message },
   ]
@@ -139,7 +139,7 @@ console.log('Result has following formats:', first_result.formats())
 // E.g we can render the image
 fs.writeFileSync(
   'height_distribution.png',
-  Buffer.from(first_result.png, 'base64'),
+  new Uint8Array(Buffer.from(first_result.png, 'base64')),
 )
 
 console.log('Execution completed successfully')

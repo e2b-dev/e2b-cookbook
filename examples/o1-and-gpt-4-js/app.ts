@@ -94,12 +94,12 @@ async function uploadDataset(codeInterpreter: Sandbox) {
     "Uploading testing and training datasets to Code Interpreter sandbox...",
   );
 
-  const testCsv = fs.readFileSync("./test.csv");
-  const testCsvPath = await codeInterpreter.files.write("test.csv", testCsv);
+  const testCsv = fs.readFileSync("./test.csv", "utf-8");
+  const { path: testCsvPath } = await codeInterpreter.files.write("test.csv", testCsv);
   console.log("Uploaded test.csv at", testCsvPath);
 
-  const trainCsv = fs.readFileSync("./train.csv");
-  const trainCsvPath = await codeInterpreter.files.write("train.csv", trainCsv);
+  const trainCsv = fs.readFileSync("./train.csv", "utf-8");
+  const { path: trainCsvPath } = await codeInterpreter.files.write("train.csv", trainCsv);
   console.log("Uploaded train.csv at", trainCsvPath);
 }
 

@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@e2b/code-interpreter": "^2.7.0",
-    "@anthropic-ai/sdk": "^0.28.0",
+    "@anthropic-ai/sdk": "^0.116.0",
     "dotenv": "^16.4.5"
   }
 }

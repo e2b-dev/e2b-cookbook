@@ -109,13 +109,10 @@ async function chat(codeInterpreter: Sandbox, userMessage: string, base64_image?
         for (const choice of response.choices) {
           if (choice.message.tool_calls && choice.message.tool_calls.length > 0) {
             for (const toolCall of choice.message.tool_calls) {
+                // v7 widened tool_calls to a union of function and custom tool calls.
+                if (toolCall.type !== 'function') continue
                 if (toolCall.function.name === 'execute_python') {
-                    let code: string
-                    if (typeof toolCall.function.arguments === 'object' && 'code' in toolCall.function.arguments) {
-                        code = (toolCall.function.arguments as { code: string }).code
-                    } else {
-                        code = JSON.parse(toolCall.function.arguments).code
-                    }
+                    const code: string = JSON.parse(toolCall.function.arguments ?? '{}').code
                     console.log('CODE TO RUN') 
                     console.log(code)
                     const codeInterpreterResults = await codeInterpret(codeInterpreter, code)

@@ -97,10 +97,10 @@ async function uploadDataset(codeInterpreter: Sandbox): Promise<string> {
     }
 
     // Read the file into a buffer
-    const fileBuffer = fs.readFileSync(datasetPath)
+    const fileContent = fs.readFileSync(datasetPath, 'utf-8')
 
     try {
-        const remotePath = await codeInterpreter.files.write('city_temperature.csv', fileBuffer) // Pass the buffer and filename
+        const { path: remotePath } = await codeInterpreter.files.write('city_temperature.csv', fileContent)
         if (!remotePath) {
             throw new Error('Failed to upload dataset')
         }

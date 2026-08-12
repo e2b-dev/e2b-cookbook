@@ -15,7 +15,7 @@
     "dotenv": "^16.4.7",
     "e2b": "^2.38.3",
     "fs": "^0.0.1-security",
-    "ibm-cloud-sdk-core": "^5.3.2"
+    "ibm-cloud-sdk-core": "^5.6.0"
   },
   "devDependencies": {
     "tsx": "^4.19.3"

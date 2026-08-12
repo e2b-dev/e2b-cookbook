@@ -14,3 +14,7 @@ CREWAI_ATTRIBUTION.patch
 
 # TypeScript incremental build cache
 *.tsbuildinfo
+
+# test runner artifacts
+tests/results.json
+tests/Tests.txt

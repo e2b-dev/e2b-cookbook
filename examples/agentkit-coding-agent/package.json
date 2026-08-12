@@ -8,7 +8,7 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@e2b/code-interpreter": "^2.3.1",
+    "@e2b/code-interpreter": "^2.7.0",
     "@inngest/agent-kit": "^0.13.2",
     "inngest": "3.46.0",
     "dotenv": "^17.2.3",

@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "dotenv": "^16.5.0",
-    "e2b": "^2.3.0"
+    "e2b": "^2.38.3"
   },
   "devDependencies": {
     "tsx": "^4.20.3"

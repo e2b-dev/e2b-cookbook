@@ -1,23 +1,23 @@
 {
-	"name": "flue-feedback-analyst-js",
-	"private": true,
-	"type": "module",
-	"description": "Feedback analyst agent built on Flue, running inside an E2B sandbox — REPL and one-shot entry points.",
-	"scripts": {
-		"typecheck": "tsc --noEmit",
-		"dev": "node --env-file=.env --experimental-transform-types scripts/dev.ts",
-		"sample": "node --env-file=.env --experimental-transform-types scripts/synthesize-e2b.ts \"$(cat examples/sample-input.md)\""
-	},
-	"dependencies": {
-		"@flue/runtime": "^2.0.3",
-		"e2b": "^2.38.0",
-		"valibot": "^1.4.0"
-	},
-	"devDependencies": {
-		"@types/node": "^24.10.1",
-		"typescript": "^5.9.0"
-	},
-	"engines": {
-		"node": ">=22"
-	}
+  "name": "flue-feedback-analyst-js",
+  "private": true,
+  "type": "module",
+  "description": "Feedback analyst agent built on Flue, running inside an E2B sandbox \u2014 REPL and one-shot entry points.",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "dev": "node --env-file=.env --experimental-transform-types scripts/dev.ts",
+    "sample": "node --env-file=.env --experimental-transform-types scripts/synthesize-e2b.ts \"$(cat examples/sample-input.md)\""
+  },
+  "dependencies": {
+    "@flue/runtime": "^2.0.3",
+    "e2b": "^2.38.3",
+    "valibot": "^1.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "typescript": "^5.9.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
 }

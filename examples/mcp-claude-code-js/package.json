@@ -7,7 +7,13 @@
     "start": "tsx index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["e2b", "mcp", "claude", "cli", "anthropic"],
+  "keywords": [
+    "e2b",
+    "mcp",
+    "claude",
+    "cli",
+    "anthropic"
+  ],
   "license": "MIT",
   "author": {
     "name": "FoundryLabs, Inc.",
@@ -20,7 +26,7 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "e2b": "^2.3.4",
+    "e2b": "^2.38.3",
     "dotenv": "^16.4.5"
   }
 }

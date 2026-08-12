@@ -4,7 +4,7 @@ from e2b import Sandbox
 load_dotenv()
 
 template_name = 'openai-codex'
-sbx = Sandbox(
+sbx = Sandbox.create(
     template_name,
     envs={
         "OPENAI_API_KEY": "<your api key>",

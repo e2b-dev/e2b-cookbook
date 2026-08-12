@@ -34,7 +34,7 @@ class CodeInterpreterFunctionTool:
             raise Exception(
                 "Code Interpreter tool called while E2B_API_KEY environment variable is not set. Please get your E2B api key here https://e2b.dev/docs and set the E2B_API_KEY environment variable."
             )
-        self.code_interpreter = Sandbox()
+        self.code_interpreter = Sandbox.create()
 
     def close(self):
         self.code_interpreter.kill()

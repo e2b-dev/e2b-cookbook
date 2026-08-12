@@ -18,6 +18,12 @@ jobs:
       FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
       GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
       TOGETHER_API_KEY: ${{ secrets.TOGETHER_API_KEY }}
+      # utils.ts already forwards these into the sandbox, but the workflow never
+      # defined them, so watsonx-ai-code-interpreter-js failed on "Missing
+      # required parameters: apikey" rather than on anything to do with the code.
+      WATSONX_API_KEY: ${{ secrets.WATSONX_API_KEY }}
+      WATSONX_PROJECT_ID: ${{ secrets.WATSONX_PROJECT_ID }}
+      WATSONX_URL: ${{ secrets.WATSONX_URL }}
 
     steps:
     - name: Checkout code

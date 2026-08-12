@@ -91,6 +91,9 @@ async function chatWithLLM(codeInterpreter: Sandbox, userMessage: string): Promi
             { role: 'system', content: SYSTEM_PROMPT },
             { role: 'user', content: userMessage }
         ],
+        // gpt-5.6-* are reasoning models; function tools on chat.completions
+        // require reasoning_effort 'none' (or the /v1/responses API).
+        reasoning_effort: 'none',
         tools: tools,
         tool_choice: 'auto'
     })

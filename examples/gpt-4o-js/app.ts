@@ -102,6 +102,9 @@ async function chat(codeInterpreter: Sandbox, userMessage: string, base64_image?
         const response = await openai.chat.completions.create({
           model: MODEL_NAME,
           messages: messages,
+          // gpt-5.6-* are reasoning models; function tools on chat.completions
+          // require reasoning_effort 'none' (or the /v1/responses API).
+          reasoning_effort: 'none',
           tools: tools,
           tool_choice: 'auto'
         })

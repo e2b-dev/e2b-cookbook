@@ -14,7 +14,7 @@ load_dotenv()
 
 def main():
     # Pick your favourite LLM
-    llm = ChatOpenAI(model="gpt-5.6-luna", temperature=0)
+    llm = ChatOpenAI(model="gpt-5.6-luna", temperature=0, reasoning_effort="none")
 
     # Initialize CodeInterpreterTool - defined in code_interpreter_tool.py
     with CodeInterpreterTool() as interpreter:

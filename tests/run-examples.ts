@@ -46,16 +46,13 @@ const scripts: { name: string; interpreter: Interpreter; file: string }[] = [
   { name: 'watsonx-ai-code-interpreter-python', interpreter: 'jupyter', file: './examples/watsonx-ai-code-interpreter-python/granite_code_interpreter_py.ipynb' },
   { name: 'mcp-client-js', interpreter: 'npm', file: './examples/mcp-client-js/' },
   { name: 'mcp-custom-server-js', interpreter: 'npm', file: './examples/mcp-custom-server-js/' },
-  { name: 'mcp-custom-template-js', interpreter: 'npm', file: './examples/mcp-custom-template-js/' },
   { name: 'mcp-research-agent-js', interpreter: 'npm', file: './examples/mcp-research-agent-js/' },
   { name: 'mcp-claude-code-js', interpreter: 'npm', file: './examples/mcp-claude-code-js/' },
   { name: 'mcp-browserbase-js', interpreter: 'npm', file: './examples/mcp-browserbase-js/' },
   { name: 'mcp-groq-exa-js', interpreter: 'npm', file: './examples/mcp-groq-exa-js/' },
-  { name: 'sandbox-agent-sdk-js', interpreter: 'npm', file: './examples/sandbox-agent-sdk-js/' },
   { name: 'openai-js', interpreter: 'npm', file: './examples/openai-js/' },
   { name: 'openai-python', interpreter: 'jupyter', file: './examples/openai-python/openai.ipynb' },
   { name: 'watsonx-ai-code-interpreter-js', interpreter: 'npm', file: './examples/watsonx-ai-code-interpreter-js/' },
-  { name: 'agentkit-coding-agent', interpreter: 'npm', file: './examples/agentkit-coding-agent/' },
   { name: 'custom-sandbox-domain-proxy', interpreter: 'npm', file: './examples/custom-sandbox-domain-proxy/' },
   { name: 'crewai-python', interpreter: 'uv', file: './examples/crewai-python/' },
   { name: 'stirrup-python', interpreter: 'uv', file: './examples/stirrup-python/' },
@@ -65,7 +62,14 @@ const scripts: { name: string; interpreter: Interpreter; file: string }[] = [
 //
 // Needs a custom E2B template built first, which this runner does not do:
 //   anthropic-claude-code-in-sandbox-js, anthropic-claude-code-in-sandbox-python,
-//   openai-codex-in-sandbox-js, openai-codex-in-sandbox-python, playwright-in-e2b
+//   openai-codex-in-sandbox-js, openai-codex-in-sandbox-python, playwright-in-e2b,
+//   mcp-custom-template-js (fails with "template 'browserbase-mcp-gateway' not found")
+// Starts a long-running server and never exits, so it can only ever time out here:
+//   agentkit-coding-agent
+// Blocked upstream: the third-party `sandbox-agent` package (0.4.2, latest) calls
+// Sandbox.betaCreate(), which the E2B SDK removed between 2.20 and 2.30. It cannot
+// run against any current SDK, and was already failing on main for this reason:
+//   sandbox-agent-sdk-js
 // Multiple projects in one directory, which the one-project-per-dir runner cannot express:
 //   anthropic-managed-agents (javascript/ + python/), docker-in-e2b (js/ + python/)
 // No single entrypoint:

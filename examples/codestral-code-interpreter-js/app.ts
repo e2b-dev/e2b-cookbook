@@ -6,7 +6,7 @@ import type { ChatCompletionRequest } from '@mistralai/mistralai/models/componen
 
 dotenv.config()
 
-const MODEL_NAME = 'codestral-25-08'
+const MODEL_NAME = 'codestral-2508'
 const SYSTEM_PROMPT = `
 You're a python data scientist that is analyzing daily temperature of major cities. You are given tasks to complete and you run Python code to solve them.
 

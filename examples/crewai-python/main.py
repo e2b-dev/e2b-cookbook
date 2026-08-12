@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 
-from crewai import Agent, Crew, Process, Task
+from crewai import Agent, Crew, Process, Task, LLM
 from crewai_tools import E2BPythonTool
 from dotenv import load_dotenv
 
@@ -53,7 +53,8 @@ def build_crew(python_tool: E2BPythonTool, model: str) -> Crew:
             "E2B sandbox."
         ),
         tools=[python_tool],
-        llm=model,
+        # gpt-5.6-* are reasoning models; function tools need reasoning_effort 'none'.
+        llm=LLM(model=model, reasoning_effort="none"),
         allow_delegation=False,
         max_iter=8,
         verbose=True,

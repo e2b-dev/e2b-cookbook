@@ -39,10 +39,28 @@ const scripts = [
   { name: 'mcp-browserbase-js', interpreter: 'npm', file: './examples/mcp-browserbase-js/' },
   { name: 'mcp-groq-exa-js', interpreter: 'npm', file: './examples/mcp-groq-exa-js/' },
   { name: 'sandbox-agent-sdk-js', interpreter: 'npm', file: './examples/sandbox-agent-sdk-js/' },
+  { name: 'openai-js', interpreter: 'npm', file: './examples/openai-js/' },
+  { name: 'openai-python', interpreter: 'jupyter', file: './examples/openai-python/openai.ipynb' },
+  { name: 'watsonx-ai-code-interpreter-js', interpreter: 'npm', file: './examples/watsonx-ai-code-interpreter-js/' },
+  { name: 'agentkit-coding-agent', interpreter: 'npm', file: './examples/agentkit-coding-agent/' },
+  { name: 'custom-sandbox-domain-proxy', interpreter: 'npm', file: './examples/custom-sandbox-domain-proxy/' },
+  { name: 'crewai-python', interpreter: 'uv', file: './examples/crewai-python/' },
+  { name: 'stirrup-python', interpreter: 'uv', file: './examples/stirrup-python/' },
 ];
 
-// We don't have integration tests for NextJS yet:
-//{ name: 'nextjs-code-interpreter', interpreter: 'npm', file: './examples/nextjs-code-interpreter/' }
+// Deliberately not covered, and why. Anything not listed here should be added above.
+//
+// Needs a custom E2B template built first, which this runner does not do:
+//   anthropic-claude-code-in-sandbox-js, anthropic-claude-code-in-sandbox-python,
+//   openai-codex-in-sandbox-js, openai-codex-in-sandbox-python, playwright-in-e2b
+// Multiple projects in one directory, which the one-project-per-dir runner cannot express:
+//   anthropic-managed-agents (javascript/ + python/), docker-in-e2b (js/ + python/)
+// No single entrypoint:
+//   openai-agents-sdk (11 standalone scripts, no manifest)
+// Needs its own toolchain (the `eve` CLI, Node >=24):
+//   flue-feedback-analyst-js, vercel-eve-feedback-analyst-js
+// No integration test for a Next.js app yet:
+//   nextjs-code-interpreter
 
 // Constants for the test process
 const SANDBOX_TEST_DIRECTORY = '/home/user/example';
@@ -53,7 +71,19 @@ const COMMAND_TIMEOUT = 150_000;
 // Return the command needed for a given test
 function testScript(interpreter, notebookPath) {
   const INSTALL_POETRY_COMMAND = 'curl -sSL https://install.python-poetry.org | python3 -';
+  const INSTALL_UV_COMMAND = 'curl -LsSf https://astral.sh/uv/install.sh | sh';
   const SET_PATH_COMMAND = 'PATH=/home/user/.local/bin/:$PATH'
+
+  // Commands to test a uv / PEP-621 project. Entrypoint is main.py by convention.
+  if (interpreter === "uv") {
+    return [
+      INSTALL_UV_COMMAND,
+      SET_PATH_COMMAND,
+      `cd ${SANDBOX_TEST_DIRECTORY}`,
+      "uv sync",
+      "uv run main.py"
+    ];
+  }
 
   // Commands to test a Jupyter notebook in a Poetry environment.
   if (interpreter === "jupyter") {
@@ -116,13 +146,16 @@ describe('Integration test for multiple scripts in e2b sandbox', () => {
         // Create a new E2B sandbox
         const sandbox = await Sandbox.create({ timeoutMs: SANDBOX_TIMEOUT });
 
+        // Set the log path. Declared outside the try so the catch below can write to it:
+        // commands.run throws CommandExitError on a non-zero exit, so a failing example
+        // lands in the catch and its output would otherwise be lost.
+        const logFilePath = path.join(logsDir, `${name}.txt`);
+
         try {
 
           // Upload the example directory to the sandbox.
           await uploadPathToPath(examplePath, SANDBOX_TEST_DIRECTORY, sandbox);
 
-          // Set the log path
-          const logFilePath = path.join(logsDir, `${name}.txt`);
           let stdoutData = "";
           let stderrData = "";
 
@@ -164,6 +197,11 @@ describe('Integration test for multiple scripts in e2b sandbox', () => {
           }
         } catch (error) {
           console.log(`Attempt ${attempts}/${maxAttempts}: An error occurred while running the test for ${name}`, error);
+          await fs.appendFile(
+            logFilePath,
+            `\nAttempt ${attempts}/${maxAttempts}: ${name} threw\n${error?.stack ?? error}\n` +
+            `stderr: ${(error as any)?.result?.stderr ?? (error as any)?.stderr ?? '(none)'}\n`
+          );
         } finally {
           // Kill the sandbox
           await sandbox.kill();

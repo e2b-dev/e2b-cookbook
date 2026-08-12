@@ -21,37 +21,52 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v5
 
     - name: Set up Node.js
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v5
       with:
-        node-version: '20'
+        node-version: '22'
 
     - name: Install dependencies
       run: npm install
 
+    # Kept as continue-on-error so the reporting steps below still run on failure.
+    # The "Fail if any example failed" step at the end is what turns the job red.
     - name: Run Jest tests and save results
+      id: tests
       run: |
         npm test -- --json --outputFile=./tests/results.json
-      continue-on-error: true  # Ensures the job continues even if tests fail
+      continue-on-error: true
 
     - name: Upload test results as an artifact
+      if: always()
       uses: actions/upload-artifact@v4
       with:
         name: test-results
         path: ./tests/results.json
 
+    - name: Upload per-example logs as an artifact
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: example-logs
+        path: ./logs
+        if-no-files-found: warn
+
     - name: Update Tests.md with test results
+      if: always()
       run: node ./tests/updateTestsMd.js  # Your custom script to update Tests.md with test results
 
     - name: Upload markdown report as an artifact
+      if: always()
       uses: actions/upload-artifact@v4
       with:
         name: test-results-md
         path: ./tests/Tests.txt
 
     - name: Read Tests.txt for Slack message
+      if: always()
       id: read_tests
       run: |
         TESTS_CONTENT=$(cat ./tests/Tests.txt)
@@ -60,12 +75,20 @@ jobs:
         echo "EOF" >> $GITHUB_ENV
 
     - name: Notify Slack with test results
+      if: always()
       uses: rtCamp/action-slack-notify@v2
       env:
-        SLACK_COLOR: "#36a64f"
+        SLACK_COLOR: ${{ steps.tests.outcome == 'success' && '#36a64f' || '#d00000' }}
         SLACK_MESSAGE: |
           *Test Results:*
           ${{ env.TESTS_CONTENT }}
         SLACK_TITLE: Test Results Update
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         SLACK_CHANNEL: ${{ vars.SLACK_CHANNEL }}
+
+    # Without this the workflow reported success while examples were failing.
+    - name: Fail if any example failed
+      if: steps.tests.outcome == 'failure'
+      run: |
+        echo "One or more examples failed. See the test-results and example-logs artifacts."
+        exit 1

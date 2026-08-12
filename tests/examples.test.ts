@@ -71,7 +71,9 @@ const COMMAND_TIMEOUT = 150_000;
 // Return the command needed for a given test
 function testScript(interpreter, notebookPath) {
   const INSTALL_POETRY_COMMAND = 'curl -sSL https://install.python-poetry.org | python3 -';
-  const INSTALL_UV_COMMAND = 'curl -LsSf https://astral.sh/uv/install.sh | sh';
+  // Installed from PyPI rather than `curl | sh`: this sandbox is handed provider API
+  // keys a moment later, so we do not want an unpinned remote script in that path.
+  const INSTALL_UV_COMMAND = 'pip install --quiet uv';
   const SET_PATH_COMMAND = 'PATH=/home/user/.local/bin/:$PATH'
 
   // Commands to test a uv / PEP-621 project. Entrypoint is main.py by convention.

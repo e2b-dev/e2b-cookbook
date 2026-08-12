@@ -14,8 +14,8 @@ const E2B_API_KEY = process.env.E2B_API_KEY
 
 // Choose the model
 // You can use 8b or 70b version
-// const MODEL_NAME = "llama3-8b-8192"
-const MODEL_NAME = 'llama3-70b-8192'
+// const MODEL_NAME = "llama-3.1-8b-instant"
+const MODEL_NAME = 'llama-3.3-70b-versatile'
 
 // Provide system prompt
 const SYSTEM_PROMPT = `you are a python data scientist. you are given tasks to complete and you run python code to solve them.

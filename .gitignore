@@ -11,3 +11,6 @@ next-env.d.ts
 DECISIONS.md
 CREWAI_DOCS_DRAFT.mdx
 CREWAI_ATTRIBUTION.patch
+
+# TypeScript incremental build cache
+*.tsbuildinfo

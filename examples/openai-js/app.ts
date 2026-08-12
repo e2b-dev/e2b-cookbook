@@ -7,8 +7,8 @@ import * as dotenv from 'dotenv'
 
 dotenv.config()
 
-const MODEL_NAME = 'gpt-5.6-sol' // Choose different model by uncommenting. You can choose from models with function-calling support, such as o1 or gpt-5.6-sol.
-// const MODEL_NAME = 'gpt-5.6-sol'
+const MODEL_NAME = 'gpt-5.6-terra' // Choose different model by uncommenting. You can choose from models with function-calling support, such as o1 or gpt-5.6-terra.
+// const MODEL_NAME = 'gpt-5.6-terra'
 
 const SYSTEM_PROMPT = `
 ## your job & context
@@ -152,6 +152,11 @@ async function run() {
         )
         const result = codeInterpreterResults[0]
         console.log('Result:', result)
+        // The model does not always emit a chart, so there may be no result at all.
+        if (!result) {
+            console.log('No results returned from the code interpreter.')
+            return
+        }
         if (result.png) {
             fs.writeFileSync('temperature_analysis.png', Buffer.from(result.png, 'base64'))
         }

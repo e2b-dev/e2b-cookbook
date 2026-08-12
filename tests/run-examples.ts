@@ -43,19 +43,14 @@ const scripts: { name: string; interpreter: Interpreter; file: string }[] = [
   { name: 'groq-code-interpreter-js', interpreter: 'npm', file: './examples/groq-code-interpreter-js/' },
   { name: 'claude-code-interpreter-python', interpreter: 'jupyter', file: './examples/claude-code-interpreter-python/claude_code_interpreter.ipynb' },
   { name: 'claude-visualize-website-topics', interpreter: 'jupyter', file: './examples/claude-visualize-website-topics/claude-visualize-website-topics.ipynb' },
-  { name: 'watsonx-ai-code-interpreter-python', interpreter: 'jupyter', file: './examples/watsonx-ai-code-interpreter-python/granite_code_interpreter_py.ipynb' },
   { name: 'mcp-client-js', interpreter: 'npm', file: './examples/mcp-client-js/' },
   { name: 'mcp-custom-server-js', interpreter: 'npm', file: './examples/mcp-custom-server-js/' },
-  { name: 'mcp-research-agent-js', interpreter: 'npm', file: './examples/mcp-research-agent-js/' },
   { name: 'mcp-claude-code-js', interpreter: 'npm', file: './examples/mcp-claude-code-js/' },
-  { name: 'mcp-browserbase-js', interpreter: 'npm', file: './examples/mcp-browserbase-js/' },
   { name: 'mcp-groq-exa-js', interpreter: 'npm', file: './examples/mcp-groq-exa-js/' },
   { name: 'openai-js', interpreter: 'npm', file: './examples/openai-js/' },
   { name: 'openai-python', interpreter: 'jupyter', file: './examples/openai-python/openai.ipynb' },
-  { name: 'watsonx-ai-code-interpreter-js', interpreter: 'npm', file: './examples/watsonx-ai-code-interpreter-js/' },
   { name: 'custom-sandbox-domain-proxy', interpreter: 'npm', file: './examples/custom-sandbox-domain-proxy/' },
   { name: 'crewai-python', interpreter: 'uv', file: './examples/crewai-python/' },
-  { name: 'stirrup-python', interpreter: 'uv', file: './examples/stirrup-python/' },
 ]
 
 // Deliberately not covered, and why. Anything not listed here should be added above.
@@ -72,6 +67,14 @@ const scripts: { name: string; interpreter: Interpreter; file: string }[] = [
 //   anthropic-managed-agents (javascript/ + python/), docker-in-e2b (js/ + python/)
 // No single entrypoint:
 //   openai-agents-sdk (11 standalone scripts, no manifest)
+// Needs a provider secret this repo does not have. `gh secret list` shows only
+// ANTHROPIC, E2B, FIRECRAWL, FIREWORKS, GROQ, MISTRAL, OPENAI and TOGETHER, so
+// these can only ever fail on a missing key rather than on anything real. Add
+// the secret and move them back up:
+//   watsonx-ai-code-interpreter-js / -python (WATSONX_API_KEY, _PROJECT_ID, _URL)
+//   mcp-browserbase-js (BROWSERBASE_API_KEY, BROWSERBASE_PROJECT_ID, GEMINI_API_KEY)
+//   mcp-research-agent-js (EXA_API_KEY)
+//   stirrup-python (its own auth header)
 // Runs a long-lived agent/server process rather than a script that exits, so
 // this runner can only ever time out on them:
 //   flue-feedback-analyst-js, vercel-eve-feedback-analyst-js,

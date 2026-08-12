@@ -113,11 +113,11 @@ async function chat(
   );
 
 
-  // First, get the plan from gpt-5.6-sol
+  // First, get the plan from gpt-5.6-terra
   try {
     const responseO1 = await openai.chat.completions.create({
-      model: "gpt-5.6-sol", // Choose different model by uncommenting
-      //model: "gpt-5.6-sol",
+      model: "gpt-5.6-terra", // Choose different model by uncommenting
+      //model: "gpt-5.6-terra",
       messages: [
         { role: "user", content: O1_PROMPT },
         { role: "user", content: userMessage },

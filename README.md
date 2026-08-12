@@ -158,12 +158,6 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td>-</td>
     </tr>
     <tr>
-      <td>Autogen</td>
-      <td>Autogen with secure sandboxed for code interpreting</td>
-      <td><a href="./examples/autogen-python">Python</a></td>
-      <td>-</td>
-    </tr>
-    <tr>
     <td>▲ Vercel AI SDK</td>
       <td>Next.js + AI SDK + Code Interpreter</td>
       <td>-</td>

@@ -12,12 +12,12 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^22.13.4",
+    "@types/node": "^26.2.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.19.2"
   },
   "dependencies": {
-    "dotenv": "^16.4.7",
+    "dotenv": "^17.4.2",
     "e2b": "^2.38.3"
   }
 }

@@ -11,16 +11,16 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^20.12.12",
+    "@types/node": "^26.2.0",
     "prettier": "3.2.5",
     "tsx": "^4.7.3",
-    "typescript": "^5.4.5"
+    "typescript": "^7.0.2"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.116.0",
     "@e2b/code-interpreter": "^2.7.0",
     "@mendable/firecrawl-js": "^4.32.1",
     "buffer": "^6.0.3",
-    "dotenv": "^16.4.5"
+    "dotenv": "^17.4.2"
   }
 }

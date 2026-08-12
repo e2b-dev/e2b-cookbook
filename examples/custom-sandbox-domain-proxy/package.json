@@ -12,17 +12,17 @@
   "license": "ISC",
   "devDependencies": {
     "@types/express": "^5.0.3",
-    "@types/node": "^20.12.11",
+    "@types/node": "^26.2.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.9.3",
-    "typescript": "^5.4.5"
+    "typescript": "^7.0.2"
   },
   "dependencies": {
     "@e2b/code-interpreter": "^2.7.0",
-    "dotenv": "^16.4.5",
+    "dotenv": "^17.4.2",
     "express": "^5.1.0",
-    "http-proxy-middleware": "^3.0.5",
-    "open": "^10.2.0",
+    "http-proxy-middleware": "^4.2.0",
+    "open": "^11.0.0",
     "unique-names-generator": "^4.7.1"
   }
 }

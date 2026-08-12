@@ -11,7 +11,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "dotenv": "^16.5.0",
+    "dotenv": "^17.4.2",
     "e2b": "^2.38.3",
     "tsx": "^4.19.4"
   }

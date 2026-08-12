@@ -10,14 +10,14 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^20.12.11",
+    "@types/node": "^26.2.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.9.3",
-    "typescript": "^5.4.5"
+    "typescript": "^7.0.2"
   },
   "dependencies": {
     "@e2b/code-interpreter": "^2.7.0",
-    "dotenv": "^16.4.5",
+    "dotenv": "^17.4.2",
     "openai": "^7.4.0"
   }
 }

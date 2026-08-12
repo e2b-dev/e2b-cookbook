@@ -1,0 +1,17 @@
+{
+  "name": "claude-agent-sdk-in-sandbox",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "e2b:build:dev": "npx tsx src/build.dev.ts",
+    "e2b:build:prod": "npx tsx src/build.prod.ts"
+  },
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "e2b": "^2.6.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.3"
+  }
+}

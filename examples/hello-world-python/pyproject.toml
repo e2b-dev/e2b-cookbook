@@ -7,7 +7,10 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
+# e2b 2.38.0 dropped the http2 kwarg from get_transport(), which every current
+# e2b-code-interpreter release still passes. Cap e2b until that is fixed upstream.
 e2b-code-interpreter = "^2.9.0"
+e2b = ">=2.26,<2.38"
 python-dotenv = "^1.0.1"
 
 

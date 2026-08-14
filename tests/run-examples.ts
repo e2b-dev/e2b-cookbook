@@ -26,6 +26,10 @@ const scripts: {
   name: string
   interpreter: Interpreter
   file: string
+  // Providers that rate-limit per organisation. Examples sharing a provider are
+  // serialised against each other: three Groq examples running concurrently
+  // exhausted the org quota and all three 429'd, retries included.
+  provider?: string
   // What to pass after `uv run` / `poetry run`. Defaults to main.py for uv and
   // the `start` console script for poetry. Can be a path, a script name, or
   // `python -m pkg.mod` for packages whose entry uses absolute imports.
@@ -35,25 +39,25 @@ const scripts: {
   { name: 'claude-code-interpreter-js', interpreter: 'npm', file: './examples/claude-code-interpreter-js/' },
   { name: 'firecrawl-scrape-and-analyze-airbnb-data', interpreter: 'npm', file: './examples/firecrawl-scrape-and-analyze-airbnb-data/' },
   { name: 'together-ai-code-interpreter-js', interpreter: 'npm', file: './examples/together-ai-code-interpreter-js' },
-  { name: 'groq-code-interpreter-python', interpreter: 'jupyter', file: './examples/groq-code-interpreter-python/llama_3_code_interpreter.ipynb' },
+  { name: 'groq-code-interpreter-python', provider: 'groq', interpreter: 'jupyter', file: './examples/groq-code-interpreter-python/llama_3_code_interpreter.ipynb' },
   { name: 'o1-code-interpreter-python', interpreter: 'jupyter', file: './examples/o1-and-gpt-4-python/o1.ipynb' },
   { name: 'codestral-code-interpreter-js', interpreter: 'npm', file: './examples/codestral-code-interpreter-js/' },
   { name: 'gpt-4o-code-interpreter-js', interpreter: 'npm', file: './examples/gpt-4o-js/' },
   { name: 'codestral-code-interpreter-python', interpreter: 'jupyter', file: './examples/codestral-code-interpreter-python/codestral_code_interpreter.ipynb' },
-  { name: 'upload-dataset-code-interpreter', interpreter: 'jupyter', file: './examples/upload-dataset-code-interpreter/llama_3_code_interpreter_upload_dataset.ipynb' },
+  { name: 'upload-dataset-code-interpreter', provider: 'groq', interpreter: 'jupyter', file: './examples/upload-dataset-code-interpreter/llama_3_code_interpreter_upload_dataset.ipynb' },
   { name: 'hello-world-python', interpreter: 'poetry', file: './examples/hello-world-python/' },
   { name: 'o1-code-interpreter-js', interpreter: 'npm', file: './examples/o1-and-gpt-4-js/' },
   { name: 'gpt-4o-code-interpreter', interpreter: 'jupyter', file: './examples/gpt-4o-python/gpt_4o.ipynb' },
   { name: 'together-ai-code-interpreter-python', interpreter: 'jupyter', file: './examples/together-ai-code-interpreter-python/together_with_e2b_code_interpreter.ipynb' },
   { name: 'langchain-python', interpreter: 'poetry', file: './examples/langchain-python/' },
   { name: 'langgraph-python', interpreter: 'poetry', file: './examples/langgraph-python/' },
-  { name: 'groq-code-interpreter-js', interpreter: 'npm', file: './examples/groq-code-interpreter-js/' },
+  { name: 'groq-code-interpreter-js', provider: 'groq', interpreter: 'npm', file: './examples/groq-code-interpreter-js/' },
   { name: 'claude-code-interpreter-python', interpreter: 'jupyter', file: './examples/claude-code-interpreter-python/claude_code_interpreter.ipynb' },
   { name: 'claude-visualize-website-topics', interpreter: 'jupyter', file: './examples/claude-visualize-website-topics/claude-visualize-website-topics.ipynb' },
   { name: 'mcp-client-js', interpreter: 'npm', file: './examples/mcp-client-js/' },
   { name: 'mcp-custom-server-js', interpreter: 'npm', file: './examples/mcp-custom-server-js/' },
   { name: 'mcp-claude-code-js', interpreter: 'npm', file: './examples/mcp-claude-code-js/' },
-  { name: 'mcp-groq-exa-js', interpreter: 'npm', file: './examples/mcp-groq-exa-js/' },
+  { name: 'mcp-groq-exa-js', provider: 'groq', interpreter: 'npm', file: './examples/mcp-groq-exa-js/' },
   { name: 'openai-js', interpreter: 'npm', file: './examples/openai-js/' },
   { name: 'openai-python', interpreter: 'jupyter', file: './examples/openai-python/openai.ipynb' },
   { name: 'custom-sandbox-domain-proxy', interpreter: 'npm', file: './examples/custom-sandbox-domain-proxy/' },
@@ -216,6 +220,24 @@ async function buildTemplates(logsDir: string, needed: Set<string>): Promise<str
   return failed
 }
 
+// One in-flight example per provider. The chain is per provider, so examples
+// with no provider tag - and examples of different providers - still run at the
+// full CONCURRENCY.
+const providerChain = new Map<string, Promise<void>>()
+
+async function withProviderLock<T>(provider: string | undefined, fn: () => Promise<T>): Promise<T> {
+  if (!provider) return fn()
+  const previous = providerChain.get(provider) ?? Promise.resolve()
+  let release!: () => void
+  providerChain.set(provider, previous.then(() => new Promise<void>((r) => (release = r))))
+  await previous
+  try {
+    return await fn()
+  } finally {
+    release()
+  }
+}
+
 // A deterministic failure will fail identically on every retry, so only retry
 // the transient ones. The old suite retried everything three times, which
 // tripled sandbox time and provider spend on already-doomed runs.
@@ -369,7 +391,7 @@ async function main() {
 
   const workers = Array.from({ length: Math.min(CONCURRENCY, queue.length) }, async () => {
     for (let next = queue.shift(); next; next = queue.shift()) {
-      results.push(await runOne(next, logsDir))
+      results.push(await withProviderLock(next.provider, () => runOne(next, logsDir)))
     }
   })
   await Promise.all(workers)

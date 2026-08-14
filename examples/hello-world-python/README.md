@@ -1,6 +1,6 @@
 # E2B Hello World for Python
 
-This example shows the minimal code for starting an [E2B Sandbox](https://e2b.dev/docs/quickstart), executing Python inside it and listing all files inside the root directory.
+This example shows the minimal code for starting an [E2B Sandbox](https://e2b.dev/docs/quickstart), running commands inside it and listing all files inside the root directory.
 
 ## Setup & run
 

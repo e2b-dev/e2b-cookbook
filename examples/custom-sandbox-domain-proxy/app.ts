@@ -1,4 +1,4 @@
-import { Sandbox } from '@e2b/code-interpreter'
+import Sandbox from 'e2b'
 import express from 'express'
 import { createProxyMiddleware } from 'http-proxy-middleware'
 import open from 'open'

@@ -53,13 +53,15 @@ def build_crew(python_tool: E2BPythonTool, model: str) -> Crew:
             "E2B sandbox."
         ),
         tools=[python_tool],
-        # gpt-5.6-* are reasoning models: function tools are rejected unless
-        # reasoning effort is off. This is set but does not currently reach the
-        # request - LiteLLM appears to drop it for models its map does not know
-        # yet - so this example still fails against gpt-5.6-*. Tracked as a
-        # known issue rather than worked around blindly; passing
-        # allowed_openai_params here is rejected by Completions.create().
-        llm=LLM(model=model, reasoning_effort="none"),
+        # gpt-5.6-* are reasoning models: function tools are rejected on
+        # /v1/chat/completions unless reasoning effort is off. CrewAI's native
+        # OpenAI provider only forwards reasoning_effort when it believes the
+        # model is a reasoning model, and it decides that with
+        # `"o1" in model.lower()` (crewai/llms/providers/openai/completion.py),
+        # so it drops the parameter for anything newer. The Responses API path
+        # sends it unconditionally, which is also what the API's own error
+        # message recommends, so this example asks for that route.
+        llm=LLM(model=model, reasoning_effort="none", api="responses"),
         allow_delegation=False,
         max_iter=8,
         verbose=True,

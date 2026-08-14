@@ -27,8 +27,12 @@ const scripts: {
   interpreter: Interpreter
   file: string
   // Providers that rate-limit per organisation. Examples sharing a provider are
-  // serialised against each other: three Groq examples running concurrently
-  // exhausted the org quota and all three 429'd, retries included.
+  // serialised against each other, which fixed one of the three Groq failures.
+  // The residual limit is not concurrency though: the Groq org is capped at
+  // 100k tokens per DAY on this tier ("tokens per day (TPD): Limit 100000,
+  // Used 99952 ... try again in 10m"), and four Groq examples several calls each
+  // can exhaust it - especially across repeated runs on one day. No retry policy
+  // fixes a daily cap; it needs a higher tier or fewer Groq examples per run.
   provider?: string
   // What to pass after `uv run` / `poetry run`. Defaults to main.py for uv and
   // the `start` console script for poetry. Can be a path, a script name, or
@@ -65,8 +69,6 @@ const scripts: {
   { name: 'playwright-in-e2b', interpreter: 'npm', file: './examples/playwright-in-e2b/' },
   { name: 'anthropic-claude-code-in-sandbox-js', interpreter: 'npm', file: './examples/anthropic-claude-code-in-sandbox-js/' },
   { name: 'anthropic-claude-code-in-sandbox-python', interpreter: 'uv', file: './examples/anthropic-claude-code-in-sandbox-python/', entrypoint: 'python -m anthropic_claude_code_in_sandbox.main' },
-  { name: 'openai-codex-in-sandbox-js', interpreter: 'npm', file: './examples/openai-codex-in-sandbox-js/' },
-  { name: 'openai-codex-in-sandbox-python', interpreter: 'uv', file: './examples/openai-codex-in-sandbox-python/', entrypoint: 'src/openai_codex_in_sandbox_python/main.py' },
   { name: 'mcp-custom-template-js', interpreter: 'npm', file: './examples/mcp-custom-template-js/' },
   { name: 'docker-in-e2b-js', interpreter: 'npm', file: './examples/docker-in-e2b/js/' },
   { name: 'docker-in-e2b-python', interpreter: 'poetry', file: './examples/docker-in-e2b/python/', entrypoint: 'python main.py' },
@@ -87,6 +89,15 @@ const scripts: {
 // sys.path.insert(...parents[4]) and imports examples.sandbox.misc.example_support,
 // so it expects to run inside the openai-agents-python repo, not here:
 //   openai-agents-sdk (11 standalone scripts, no manifest)
+// The Codex CLI the template installs (v0.147.0) no longer authenticates from
+// OPENAI_API_KEY in the environment: it reports "Missing bearer or basic
+// authentication in header" against wss://api.openai.com/v1/responses, i.e. no
+// auth header is sent at all, so it now expects `codex login` or an explicit
+// credential rather than an env var. The examples still pass the key as an env,
+// which was correct for older Codex. Fixing this needs someone who can iterate
+// against the current CLI - either pin Codex in the template or wire its current
+// auth - so it is not guessed at here:
+//   openai-codex-in-sandbox-js, openai-codex-in-sandbox-python
 // Calls a model the Fireworks account cannot reach: qwen2p5-coder-32b-instruct
 // returns 404 "Model not found, inaccessible, and/or not deployed", which does not
 // distinguish a retired model from one this account has not deployed. Needs someone

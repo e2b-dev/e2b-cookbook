@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "perplexity-e2b-search"
+version = "0.1.0"
+description = "Perplexity Search API + E2B sandbox example"
+authors = ["E2B Cookbook contributors"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.10"
+e2b-code-interpreter = "^1.1.1"
+python-dotenv = "^1.0.1"
+httpx = "^0.27.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+start = "perplexity_e2b_search.main:main"

@@ -39,6 +39,8 @@ const scripts = [
   { name: 'mcp-browserbase-js', interpreter: 'npm', file: './examples/mcp-browserbase-js/' },
   { name: 'mcp-groq-exa-js', interpreter: 'npm', file: './examples/mcp-groq-exa-js/' },
   { name: 'sandbox-agent-sdk-js', interpreter: 'npm', file: './examples/sandbox-agent-sdk-js/' },
+  { name: 'perplexity-search-js', interpreter: 'npm', file: './examples/perplexity-search-js/' },
+  { name: 'perplexity-search-python', interpreter: 'poetry', file: './examples/perplexity-search-python/' },
 ];
 
 // We don't have integration tests for NextJS yet:

@@ -16,6 +16,7 @@ export function getApiKeys(): Record<string, string> {
     WATSONX_PROJECT_ID: process.env.WATSONX_PROJECT_ID || '',
     WATSONX_URL: process.env.WATSONX_URL || '',
     WATSONX_API_KEY: process.env.WATSONX_API_KEY || '',
+    PERPLEXITY_API_KEY: process.env.PERPLEXITY_API_KEY || '',
   };
 }
 

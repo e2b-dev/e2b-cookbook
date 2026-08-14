@@ -1,0 +1,72 @@
+[
+  {
+    "title": "ADU - BACK YARD UNIT - $250 sq.ft.",
+    "location": "Hayward",
+    "property_type": "Apartment",
+    "price": 250,
+    "square_feet": 250
+  },
+  {
+    "title": "Location, Location, Location!",
+    "location": "Oakland",
+    "property_type": "Apartment",
+    "bedrooms": 1,
+    "bathrooms": 1
+  },
+  {
+    "title": "Forever Home Townhouse in Serene Neighborhood",
+    "location": "Fremont",
+    "property_type": "House",
+    "bedrooms": 3,
+    "bathrooms": 2
+  },
+  {
+    "title": "Condo 2 bed 2 bath Top Floor Corner View of East Bay Hills Quiet",
+    "location": "San Leandro",
+    "property_type": "Apartment",
+    "bedrooms": 2,
+    "bathrooms": 2
+  },
+  {
+    "title": "Gated community, Located in Hayward, 1 BD",
+    "location": "San Lorenzo",
+    "property_type": "Apartment",
+    "bedrooms": 1,
+    "bathrooms": 1
+  },
+  {
+    "title": "Cadence Apts: Modern Design, Top Amenities, Perfect Bay Location",
+    "location": "Hayward",
+    "property_type": "Apartment",
+    "bedrooms": 2,
+    "bathrooms": 2
+  },
+  {
+    "title": "Renovated 3bedroom 2bath single story home",
+    "location": "Brentwood",
+    "property_type": "House",
+    "bedrooms": 3,
+    "bathrooms": 2
+  },
+  {
+    "title": "Wood-Style Flooring, Large Closets, Workspaces",
+    "location": "Berkeley",
+    "property_type": "Apartment",
+    "bedrooms": 2,
+    "bathrooms": 1
+  },
+  {
+    "title": "3 bedroom 2 bath Walk to Bart Restaurants &Safeway",
+    "location": "El Cerrito",
+    "property_type": "House",
+    "bedrooms": 3,
+    "bathrooms": 2
+  },
+  {
+    "title": "In Dublin, 1/bd 1/ba, Air Conditioning",
+    "location": "Dublin",
+    "property_type": "Apartment",
+    "bedrooms": 1,
+    "bathrooms": 1
+  }
+]

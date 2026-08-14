@@ -1,0 +1,36 @@
+{
+  "name": "playwright-live-vnc-feed",
+  "version": "0.1.0",
+  "description": "Cookbook example: run a headed Playwright test in an E2B sandbox and stream the browser to a noVNC URL you can open in any tab. Battle-tested at qualitymax.io for live test debugging.",
+  "license": "Apache-2.0",
+  "author": "Ruslan Strazhnyk <strazhnyk@gmail.com>",
+  "type": "module",
+  "scripts": {
+    "example:watch": "tsx examples/01-watch-live-test.ts",
+    "example:hold": "tsx examples/02-hold-on-failure.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@e2b/code-interpreter": "^1.5.0",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "e2b",
+    "playwright",
+    "vnc",
+    "novnc",
+    "live-browser",
+    "remote-browser",
+    "sandbox",
+    "test-debugging",
+    "cookbook"
+  ]
+}

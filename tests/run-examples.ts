@@ -22,7 +22,13 @@ dotenv.config({ path: path.resolve(process.cwd(), '.env') })
 
 type Interpreter = 'npm' | 'poetry' | 'jupyter' | 'uv'
 
-const scripts: { name: string; interpreter: Interpreter; file: string }[] = [
+const scripts: {
+  name: string
+  interpreter: Interpreter
+  file: string
+  // uv projects whose entry is not ./main.py
+  entrypoint?: string
+}[] = [
   { name: 'hello-world-js', interpreter: 'npm', file: './examples/hello-world-js/' },
   { name: 'claude-code-interpreter-js', interpreter: 'npm', file: './examples/claude-code-interpreter-js/' },
   { name: 'firecrawl-scrape-and-analyze-airbnb-data', interpreter: 'npm', file: './examples/firecrawl-scrape-and-analyze-airbnb-data/' },
@@ -54,7 +60,7 @@ const scripts: { name: string; interpreter: Interpreter; file: string }[] = [
   { name: 'anthropic-claude-code-in-sandbox-js', interpreter: 'npm', file: './examples/anthropic-claude-code-in-sandbox-js/' },
   { name: 'anthropic-claude-code-in-sandbox-python', interpreter: 'uv', file: './examples/anthropic-claude-code-in-sandbox-python/' },
   { name: 'openai-codex-in-sandbox-js', interpreter: 'npm', file: './examples/openai-codex-in-sandbox-js/' },
-  { name: 'openai-codex-in-sandbox-python', interpreter: 'uv', file: './examples/openai-codex-in-sandbox-python/' },
+  { name: 'openai-codex-in-sandbox-python', interpreter: 'uv', file: './examples/openai-codex-in-sandbox-python/', entrypoint: 'src/openai_codex_in_sandbox_python/main.py' },
   { name: 'mcp-custom-template-js', interpreter: 'npm', file: './examples/mcp-custom-template-js/' },
   { name: 'docker-in-e2b-js', interpreter: 'npm', file: './examples/docker-in-e2b/js/' },
   { name: 'docker-in-e2b-python', interpreter: 'poetry', file: './examples/docker-in-e2b/python/' },
@@ -105,6 +111,11 @@ const CONCURRENCY = 5
 // it can do anything, and does not fit the shared budget.
 const TIMEOUT_OVERRIDES: Record<string, number> = {
   'mcp-custom-server-js': 600_000,
+  // Both hand a real task to an agent CLI (Codex, Playwright driving a browser)
+  // running inside the sandbox, which does not fit the shared budget.
+  'openai-codex-in-sandbox-js': 600_000,
+  'openai-codex-in-sandbox-python': 600_000,
+  'playwright-in-e2b': 300_000,
 }
 
 // Examples that run from a custom template need it built on the account first.
@@ -144,9 +155,16 @@ const TEMPLATE_BUILDS: TemplateBuild[] = [
 ]
 
 // A template build is minutes, not seconds, and the result persists on the
-// account, so we probe first and only build what is missing. Set
-// REBUILD_TEMPLATES=1 to force a rebuild (e.g. after changing a template
-// definition, which is the one case the probe cannot detect).
+// account, so we probe first and only build what is missing.
+//
+// The probe answers "does this alias exist", not "is it current", and that
+// distinction bites: the anthropic-claude-code template already existed on the CI
+// account, built with a Claude Code version whose default model is now retired,
+// so the example failed with `404 model: claude-sonnet-4-20250514` for a model id
+// that appears nowhere in this repo. Templates that bundle a fast-moving agent CLI
+// go stale by construction. REBUILD_TEMPLATES=1 forces a rebuild and is the only
+// way to refresh one - worth running periodically, not just after editing a
+// template definition.
 const TEMPLATE_BUILD_TIMEOUT = 900_000
 
 async function templateExists(alias: string): Promise<boolean> {
@@ -209,7 +227,7 @@ function isRetryable(output: string): boolean {
   return /rate limit|429|50[023]|deadline_exceeded|ETIMEDOUT|ECONNRESET|ENOTFOUND|EAI_AGAIN|temporarily unavailable|APIConnectionError|Connection error|connection reset|socket hang up|tool_use_failed|Failed to call a function/i.test(output)
 }
 
-function testScript(interpreter: Interpreter, notebookPath: string): string[] {
+function testScript(interpreter: Interpreter, notebookPath: string, entrypoint = 'main.py'): string[] {
   const INSTALL_POETRY_COMMAND = 'curl -sSL https://install.python-poetry.org | python3 -'
   // Installed from PyPI rather than `curl | sh`: this sandbox is handed provider
   // API keys a moment later, so an unpinned remote script does not belong here.
@@ -218,7 +236,7 @@ function testScript(interpreter: Interpreter, notebookPath: string): string[] {
 
   // A uv / PEP-621 project. Entrypoint is main.py by convention.
   if (interpreter === 'uv') {
-    return [INSTALL_UV_COMMAND, SET_PATH_COMMAND, `cd ${SANDBOX_TEST_DIRECTORY}`, 'uv sync', 'uv run main.py']
+    return [INSTALL_UV_COMMAND, SET_PATH_COMMAND, `cd ${SANDBOX_TEST_DIRECTORY}`, 'uv sync', `uv run ${entrypoint}`]
   }
 
   // A Jupyter notebook, executed in a Poetry environment.
@@ -234,7 +252,16 @@ function testScript(interpreter: Interpreter, notebookPath: string): string[] {
 
   // A Poetry project.
   if (interpreter === 'poetry') {
-    return [INSTALL_POETRY_COMMAND, SET_PATH_COMMAND, `cd ${SANDBOX_TEST_DIRECTORY}`, 'poetry install', 'poetry run start']
+    return [
+      INSTALL_POETRY_COMMAND,
+      SET_PATH_COMMAND,
+      `cd ${SANDBOX_TEST_DIRECTORY}`,
+      // --no-root: these are scripts, and installing the project itself trips on
+      // metadata that refers outside the uploaded directory (docker-in-e2b/python
+      // declares readme = "README.md", which lives in its parent).
+      'poetry install --no-root',
+      'poetry run start',
+    ]
   }
 
   // A NodeJS project.
@@ -248,7 +275,7 @@ function testScript(interpreter: Interpreter, notebookPath: string): string[] {
 type Outcome = { name: string; passed: boolean; durationMs: number; failure: string }
 
 async function runOne(
-  { name, interpreter, file: examplePath }: (typeof scripts)[number],
+  { name, interpreter, file: examplePath, entrypoint }: (typeof scripts)[number],
   logsDir: string,
 ): Promise<Outcome> {
   const startedAt = Date.now()
@@ -265,7 +292,7 @@ async function runOne(
       await uploadPathToPath(examplePath, SANDBOX_TEST_DIRECTORY, sandbox)
 
       const notebookPath = path.posix.join(SANDBOX_TEST_DIRECTORY, path.basename(examplePath))
-      const command = testScript(interpreter, notebookPath).join(' && ')
+      const command = testScript(interpreter, notebookPath, entrypoint).join(' && ')
 
       await sandbox.commands.run(command, {
         onStderr: async (output) => {

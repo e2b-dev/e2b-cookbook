@@ -7,7 +7,9 @@ import { Sandbox } from "e2b";
 dotenv.config();
 
 const sandbox = await Sandbox.create("playwright-chromium", {
-  timeoutMs: 15000,
+  // Launching Chromium, running the script and reading the output files back
+  // does not fit in 15s, which is what this used to ask for.
+  timeoutMs: 120_000,
 });
 console.log(`Created sandbox ${sandbox.sandboxId}`);
 

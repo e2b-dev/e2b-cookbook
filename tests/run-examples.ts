@@ -26,7 +26,9 @@ const scripts: {
   name: string
   interpreter: Interpreter
   file: string
-  // uv projects whose entry is not ./main.py
+  // What to pass after `uv run` / `poetry run`. Defaults to main.py for uv and
+  // the `start` console script for poetry. Can be a path, a script name, or
+  // `python -m pkg.mod` for packages whose entry uses absolute imports.
   entrypoint?: string
 }[] = [
   { name: 'hello-world-js', interpreter: 'npm', file: './examples/hello-world-js/' },
@@ -58,12 +60,12 @@ const scripts: {
   { name: 'crewai-python', interpreter: 'uv', file: './examples/crewai-python/' },
   { name: 'playwright-in-e2b', interpreter: 'npm', file: './examples/playwright-in-e2b/' },
   { name: 'anthropic-claude-code-in-sandbox-js', interpreter: 'npm', file: './examples/anthropic-claude-code-in-sandbox-js/' },
-  { name: 'anthropic-claude-code-in-sandbox-python', interpreter: 'uv', file: './examples/anthropic-claude-code-in-sandbox-python/' },
+  { name: 'anthropic-claude-code-in-sandbox-python', interpreter: 'uv', file: './examples/anthropic-claude-code-in-sandbox-python/', entrypoint: 'python -m anthropic_claude_code_in_sandbox.main' },
   { name: 'openai-codex-in-sandbox-js', interpreter: 'npm', file: './examples/openai-codex-in-sandbox-js/' },
   { name: 'openai-codex-in-sandbox-python', interpreter: 'uv', file: './examples/openai-codex-in-sandbox-python/', entrypoint: 'src/openai_codex_in_sandbox_python/main.py' },
   { name: 'mcp-custom-template-js', interpreter: 'npm', file: './examples/mcp-custom-template-js/' },
   { name: 'docker-in-e2b-js', interpreter: 'npm', file: './examples/docker-in-e2b/js/' },
-  { name: 'docker-in-e2b-python', interpreter: 'poetry', file: './examples/docker-in-e2b/python/' },
+  { name: 'docker-in-e2b-python', interpreter: 'poetry', file: './examples/docker-in-e2b/python/', entrypoint: 'python main.py' },
 ]
 
 // Deliberately not covered, and why. Anything not listed here should be added above.
@@ -227,7 +229,7 @@ function isRetryable(output: string): boolean {
   return /rate limit|429|50[023]|deadline_exceeded|ETIMEDOUT|ECONNRESET|ENOTFOUND|EAI_AGAIN|temporarily unavailable|APIConnectionError|Connection error|connection reset|socket hang up|tool_use_failed|Failed to call a function/i.test(output)
 }
 
-function testScript(interpreter: Interpreter, notebookPath: string, entrypoint = 'main.py'): string[] {
+function testScript(interpreter: Interpreter, notebookPath: string, entrypoint?: string): string[] {
   const INSTALL_POETRY_COMMAND = 'curl -sSL https://install.python-poetry.org | python3 -'
   // Installed from PyPI rather than `curl | sh`: this sandbox is handed provider
   // API keys a moment later, so an unpinned remote script does not belong here.
@@ -236,7 +238,7 @@ function testScript(interpreter: Interpreter, notebookPath: string, entrypoint =
 
   // A uv / PEP-621 project. Entrypoint is main.py by convention.
   if (interpreter === 'uv') {
-    return [INSTALL_UV_COMMAND, SET_PATH_COMMAND, `cd ${SANDBOX_TEST_DIRECTORY}`, 'uv sync', `uv run ${entrypoint}`]
+    return [INSTALL_UV_COMMAND, SET_PATH_COMMAND, `cd ${SANDBOX_TEST_DIRECTORY}`, 'uv sync', `uv run ${entrypoint ?? 'main.py'}`]
   }
 
   // A Jupyter notebook, executed in a Poetry environment.
@@ -260,7 +262,7 @@ function testScript(interpreter: Interpreter, notebookPath: string, entrypoint =
       // metadata that refers outside the uploaded directory (docker-in-e2b/python
       // declares readme = "README.md", which lives in its parent).
       'poetry install --no-root',
-      'poetry run start',
+      `poetry run ${entrypoint ?? 'start'}`,
     ]
   }
 

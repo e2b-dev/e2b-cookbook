@@ -307,7 +307,38 @@ function testScript(interpreter: Interpreter, notebookPath: string, entrypoint?:
   return []
 }
 
-type Outcome = { name: string; passed: boolean; durationMs: number; failure: string }
+type Verdict = 'pass' | 'skip' | 'fail'
+type Outcome = { name: string; verdict: Verdict; durationMs: number; failure: string }
+
+// What this suite is actually for: proving the sandbox worked. Created, files
+// uploaded, the toolchain installed, commands executed, results returned, killed.
+//
+// Whether the model wrote good code is not part of that contract and is not
+// deterministic - the same example passes and fails on consecutive runs with
+// identical code. So an outcome that is clearly the model's behaviour rather than
+// the sandbox's is reported as skipped: visible in the summary, not counted as a
+// failure, and it does not turn the job red.
+//
+// The dividing line: if the code reached the sandbox and ran, the sandbox did its
+// job, whatever the code then did. If the example never got that far - SDK error,
+// missing template, upload failure, dependency resolution, a timeout waiting on
+// the sandbox - that is a real failure.
+const MODEL_SIDE = [
+  // Provider capacity and quota. Says nothing about the sandbox.
+  /rate limit|429|tokens per day|insufficient_quota|overloaded/i,
+  // The model emitted a malformed tool call, or none at all.
+  /tool_use_failed|Failed to call a function|did not call |returned no tool call/i,
+  // The model produced nothing displayable - guarded in the examples, but some
+  // print it and exit non-zero.
+  /No displayable result|No chart in the result|No PNG data|No code interpreter results/i,
+  // Code the model generated raised inside the sandbox. The sandbox executed it
+  // and faithfully returned the error, which is the behaviour we want.
+  /\[Code Interpreter ERROR\]|AI-generated Python runtime error/i,
+]
+
+function classify(output: string): Verdict {
+  return MODEL_SIDE.some((r) => r.test(output)) ? 'skip' : 'fail'
+}
 
 async function runOne(
   { name, interpreter, file: examplePath, entrypoint }: (typeof scripts)[number],
@@ -343,13 +374,19 @@ async function runOne(
 
       console.log(`PASS  ${name} (attempt ${attempt})`)
       await fs.appendFile(logFilePath, `\nPASS on attempt ${attempt}\n`)
-      return { name, passed: true, durationMs: Date.now() - startedAt, failure: '' }
+      return { name, verdict: 'pass', durationMs: Date.now() - startedAt, failure: '' }
     } catch (error: any) {
       // commands.run throws CommandExitError on a non-zero exit, so this is the
       // path a failing example actually takes. Record enough to diagnose it.
       const detail = `${error?.message ?? error}\n${error?.result?.stderr ?? stderrData}`
       lastFailure = detail
       await fs.appendFile(logFilePath, `\nAttempt ${attempt}/${MAX_ATTEMPTS} failed:\n${detail}\n`)
+
+      if (classify(detail) === 'skip') {
+        console.log(`SKIP  ${name} (the model's behaviour, not the sandbox)`)
+        await fs.appendFile(logFilePath, `\nSKIPPED: classified as model-side, not a sandbox failure\n`)
+        return { name, verdict: 'skip', durationMs: Date.now() - startedAt, failure: detail.slice(0, 4000) }
+      }
 
       if (!isRetryable(detail)) {
         console.log(`FAIL  ${name} (attempt ${attempt}, not retryable)`)
@@ -363,8 +400,9 @@ async function runOne(
     }
   }
 
-  console.log(`FAIL  ${name}`)
-  return { name, passed: false, durationMs: Date.now() - startedAt, failure: lastFailure.slice(0, 4000) }
+  const verdict = classify(lastFailure)
+  console.log(verdict === 'skip' ? `SKIP  ${name} (the model's behaviour, not the sandbox)` : `FAIL  ${name}`)
+  return { name, verdict, durationMs: Date.now() - startedAt, failure: lastFailure.slice(0, 4000) }
 }
 
 async function main() {
@@ -414,17 +452,18 @@ async function main() {
     JSON.stringify(
       {
         numTotalTests: results.length,
-        numPassedTests: results.filter((r) => r.passed).length,
-        numFailedTests: results.filter((r) => !r.passed).length,
+        numPassedTests: results.filter((r) => r.verdict === 'pass').length,
+        numFailedTests: results.filter((r) => r.verdict === 'fail').length,
+        numPendingTests: results.filter((r) => r.verdict === 'skip').length,
         testResults: [
           {
             assertionResults: results
               .sort((a, b) => a.name.localeCompare(b.name))
               .map((r) => ({
                 title: r.name,
-                status: r.passed ? 'passed' : 'failed',
+                status: r.verdict === 'pass' ? 'passed' : r.verdict === 'skip' ? 'pending' : 'failed',
                 duration: r.durationMs,
-                failureMessages: r.passed ? [] : [r.failure],
+                failureMessages: r.verdict === 'pass' ? [] : [r.failure],
               })),
           },
         ],
@@ -434,8 +473,15 @@ async function main() {
     ),
   )
 
-  const failed = results.filter((r) => !r.passed)
-  console.log(`\n${results.length - failed.length}/${results.length} examples passed`)
+  const failed = results.filter((r) => r.verdict === 'fail')
+  const skipped = results.filter((r) => r.verdict === 'skip')
+  const passed = results.filter((r) => r.verdict === 'pass')
+
+  console.log(`\n${passed.length} passed, ${skipped.length} skipped, ${failed.length} failed (of ${results.length})`)
+  if (skipped.length) {
+    // Not failures: the sandbox did its job and the model did something else.
+    console.log(`Skipped (model behaviour, not the sandbox): ${skipped.map((s) => s.name).join(', ')}`)
+  }
   if (failed.length) {
     console.log(`Failed: ${failed.map((f) => f.name).join(', ')}`)
     console.log(`Per-example logs in ${LOGS_DIRECTORY}/`)

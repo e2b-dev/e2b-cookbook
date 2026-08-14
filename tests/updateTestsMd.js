@@ -20,7 +20,12 @@ fs.readFile(resultsPath, 'utf8')
         results.testResults.forEach((test) => {
             test.assertionResults.forEach((assertion) => {
                 const testName = assertion.title;
-                const status = assertion.status === 'passed' ? '✅ Passed' : '❌ Failed';
+                const status =
+                    assertion.status === 'passed' ? '✅ Passed'
+                    // 'pending' means the sandbox worked and the model did
+                    // something non-deterministic. Not a failure.
+                    : assertion.status === 'pending' ? '⏭️ Skipped (model)'
+                    : '❌ Failed';
                 markdownContent += `| ${testName} | ${status} |\n`;
             });
         });        

@@ -95,7 +95,7 @@ const CONCURRENCY = 5
 // clones and builds a filesystem MCP server from GitHub inside the sandbox before
 // it can do anything, and does not fit the shared budget.
 const TIMEOUT_OVERRIDES: Record<string, number> = {
-  'mcp-custom-server-js': 300_000,
+  'mcp-custom-server-js': 600_000,
 }
 
 // A deterministic failure will fail identically on every retry, so only retry
@@ -189,8 +189,9 @@ async function runOne(
         console.log(`FAIL  ${name} (attempt ${attempt}, not retryable)`)
         break
       }
-      console.log(`RETRY ${name} (attempt ${attempt} hit a transient error)`)
-      await new Promise((r) => setTimeout(r, 10_000))
+      const backoffMs = 10_000 * 3 ** (attempt - 1)   // 10s, 30s, 90s
+      console.log(`RETRY ${name} in ${backoffMs / 1000}s (attempt ${attempt} hit a transient error)`)
+      await new Promise((r) => setTimeout(r, backoffMs))
     } finally {
       await sandbox.kill().catch(() => {})
     }

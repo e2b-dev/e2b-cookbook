@@ -259,3 +259,4 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
 - Next.js app with LLM + Code Interpreter and streaming - [TypeScript](./examples/nextjs-code-interpreter)
 - How to run a Docker container in E2B - [Python/TypeScript](./examples/docker-in-e2b)
 - How to run Playwright in E2B - [TypeScript](./examples/playwright-in-e2b)
+- Deep-research browser agent — AI SDK agent on the host, Browserbase `browse` CLI as a sandbox tool - [TypeScript](./examples/browsecli-in-e2b)

@@ -1,0 +1,46 @@
+{
+  "name": "self-healing-playwright-tests",
+  "version": "0.1.0",
+  "description": "Cookbook example: self-healing browser tests on E2B sandboxes with Vercel AI SDK and multi-model fallback (Claude / GPT / Gemini).",
+  "license": "Apache-2.0",
+  "author": "Ruslan Strazhnyk <strazhnyk@gmail.com>",
+  "type": "module",
+  "scripts": {
+    "example:basic": "tsx examples/01-basic-test.ts",
+    "example:healing": "tsx examples/02-self-healing.ts",
+    "example:fallback": "tsx examples/03-multi-model-fallback.ts",
+    "example:suite": "tsx examples/04-parallel-suite.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "^1.2.0",
+    "@ai-sdk/google": "^1.2.0",
+    "@ai-sdk/openai": "^1.2.0",
+    "@e2b/code-interpreter": "^1.5.0",
+    "ai": "^4.3.0",
+    "dotenv": "^16.4.5",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "e2b",
+    "ai-sdk",
+    "vercel-ai-sdk",
+    "playwright",
+    "self-healing-tests",
+    "ai-agents",
+    "multi-model",
+    "claude",
+    "gpt",
+    "gemini",
+    "cookbook",
+    "sandbox"
+  ]
+}

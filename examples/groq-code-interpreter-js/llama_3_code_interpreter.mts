@@ -132,6 +132,10 @@ if (!code_results) {
 
 // We can now access the results from the code interpreter
 const first_result = code_results[0]
+if (!first_result) {
+  console.log('No displayable result returned. The model may not have rendered a plot.')
+  process.exit(0)
+}
 
 // We can access the formats of the result
 console.log('Result has following formats:', first_result.formats())

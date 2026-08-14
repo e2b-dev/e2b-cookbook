@@ -117,6 +117,13 @@ async function run() {
         )
         const result = codeInterpreterResults[0]
         console.log('Result:', result)
+        // `results` only holds Jupyter display output, so it is empty whenever the
+        // model's code printed instead of rendering, or put the plot in a second
+        // tool call this single-turn example never runs.
+        if (!result) {
+            console.log('No displayable result returned. The model may not have rendered a plot.')
+            return
+        }
         if (result.png) {
             fs.writeFileSync('image.png', Buffer.from(result.png, 'base64'))
         }

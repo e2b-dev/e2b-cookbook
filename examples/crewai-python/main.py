@@ -54,13 +54,12 @@ def build_crew(python_tool: E2BPythonTool, model: str) -> Crew:
         ),
         tools=[python_tool],
         # gpt-5.6-* are reasoning models: function tools are rejected unless
-        # reasoning effort is off. LiteLLM silently drops params for models its
-        # map does not know yet, so allowed_openai_params forces it through.
-        llm=LLM(
-            model=model,
-            reasoning_effort="none",
-            allowed_openai_params=["reasoning_effort"],
-        ),
+        # reasoning effort is off. This is set but does not currently reach the
+        # request - LiteLLM appears to drop it for models its map does not know
+        # yet - so this example still fails against gpt-5.6-*. Tracked as a
+        # known issue rather than worked around blindly; passing
+        # allowed_openai_params here is rejected by Completions.create().
+        llm=LLM(model=model, reasoning_effort="none"),
         allow_delegation=False,
         max_iter=8,
         verbose=True,

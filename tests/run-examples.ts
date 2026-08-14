@@ -101,8 +101,14 @@ const TIMEOUT_OVERRIDES: Record<string, number> = {
 // A deterministic failure will fail identically on every retry, so only retry
 // the transient ones. The old suite retried everything three times, which
 // tripled sandbox time and provider spend on already-doomed runs.
+//
+// tool_use_failed is the exception to "400s are deterministic": it means the
+// model emitted a malformed tool call (Groq's llama-3.3 sometimes returns
+// `<function=name,{...}</function>` instead of tool-call JSON). That varies run
+// to run with identical code, so it is worth retrying, unlike a bad model id or
+// an unsupported parameter.
 function isRetryable(output: string): boolean {
-  return /rate limit|429|50[023]|deadline_exceeded|ETIMEDOUT|ECONNRESET|ENOTFOUND|EAI_AGAIN|temporarily unavailable|APIConnectionError|Connection error|connection reset|socket hang up/i.test(output)
+  return /rate limit|429|50[023]|deadline_exceeded|ETIMEDOUT|ECONNRESET|ENOTFOUND|EAI_AGAIN|temporarily unavailable|APIConnectionError|Connection error|connection reset|socket hang up|tool_use_failed|Failed to call a function/i.test(output)
 }
 
 function testScript(interpreter: Interpreter, notebookPath: string): string[] {

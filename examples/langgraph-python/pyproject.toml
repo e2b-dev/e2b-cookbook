@@ -6,14 +6,12 @@ authors = ["Vasek Mlejnsky <vasek@e2b.dev>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11"
-langgraph = "0.2.32"
-e2b-code-interpreter = "^1.0.1"
-langchain = "0.3.1"
-python-dotenv = "^1.0.1"
-langchain-groq = "0.2.0"
-langchainhub = "0.1.21"
-langchain-openai = "0.2.1"
+python = "^3.10"
+langgraph = "^1.0.6"
+e2b-code-interpreter = "^2.4.1"
+langchain = "^1.2.6"
+python-dotenv = "^1.2.1"
+langchain-openai = "^1.1.7"
 
 [build-system]
 requires = ["poetry-core"]

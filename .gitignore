@@ -18,3 +18,4 @@ CREWAI_ATTRIBUTION.patch
 # test runner artifacts
 tests/results.json
 tests/Tests.txt
+tests/slack-payload.json

@@ -1,0 +1,11 @@
+[project]
+name = "bu-agent-sdk-python"
+version = "0.1.0"
+description = "Data analysis agent using bu-agent-sdk with E2B Code Interpreter"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "bu-agent-sdk",
+    "e2b-code-interpreter",
+    "python-dotenv",
+]

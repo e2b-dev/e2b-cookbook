@@ -27,7 +27,6 @@ const scripts: { name: string; interpreter: Interpreter; file: string }[] = [
   { name: 'claude-code-interpreter-js', interpreter: 'npm', file: './examples/claude-code-interpreter-js/' },
   { name: 'firecrawl-scrape-and-analyze-airbnb-data', interpreter: 'npm', file: './examples/firecrawl-scrape-and-analyze-airbnb-data/' },
   { name: 'together-ai-code-interpreter-js', interpreter: 'npm', file: './examples/together-ai-code-interpreter-js' },
-  { name: 'fireworks-code-interpreter-python', interpreter: 'jupyter', file: './examples/fireworks-code-interpreter-python/qwen_code_interpreter.ipynb' },
   { name: 'groq-code-interpreter-python', interpreter: 'jupyter', file: './examples/groq-code-interpreter-python/llama_3_code_interpreter.ipynb' },
   { name: 'o1-code-interpreter-python', interpreter: 'jupyter', file: './examples/o1-and-gpt-4-python/o1.ipynb' },
   { name: 'codestral-code-interpreter-js', interpreter: 'npm', file: './examples/codestral-code-interpreter-js/' },
@@ -67,6 +66,11 @@ const scripts: { name: string; interpreter: Interpreter; file: string }[] = [
 //   anthropic-managed-agents (javascript/ + python/), docker-in-e2b (js/ + python/)
 // No single entrypoint:
 //   openai-agents-sdk (11 standalone scripts, no manifest)
+// Calls a model the Fireworks account cannot reach: qwen2p5-coder-32b-instruct
+// returns 404 "Model not found, inaccessible, and/or not deployed", which does not
+// distinguish a retired model from one this account has not deployed. Needs someone
+// with the Fireworks account to pick a current model, then move it back up:
+//   fireworks-code-interpreter-python
 // Needs a provider secret this repo does not have. `gh secret list` shows only
 // ANTHROPIC, E2B, FIRECRAWL, FIREWORKS, GROQ, MISTRAL, OPENAI and TOGETHER, so
 // these can only ever fail on a missing key rather than on anything real. Add
@@ -87,11 +91,18 @@ const COMMAND_TIMEOUT = 150_000
 const MAX_ATTEMPTS = 3
 const CONCURRENCY = 5
 
+// Examples that legitimately need longer than COMMAND_TIMEOUT. mcp-custom-server-js
+// clones and builds a filesystem MCP server from GitHub inside the sandbox before
+// it can do anything, and does not fit the shared budget.
+const TIMEOUT_OVERRIDES: Record<string, number> = {
+  'mcp-custom-server-js': 300_000,
+}
+
 // A deterministic failure will fail identically on every retry, so only retry
 // the transient ones. The old suite retried everything three times, which
 // tripled sandbox time and provider spend on already-doomed runs.
 function isRetryable(output: string): boolean {
-  return /rate limit|429|50[023]|deadline_exceeded|ETIMEDOUT|ECONNRESET|temporarily unavailable/i.test(output)
+  return /rate limit|429|50[023]|deadline_exceeded|ETIMEDOUT|ECONNRESET|ENOTFOUND|EAI_AGAIN|temporarily unavailable|APIConnectionError|Connection error|connection reset|socket hang up/i.test(output)
 }
 
 function testScript(interpreter: Interpreter, notebookPath: string): string[] {
@@ -141,7 +152,9 @@ async function runOne(
   let lastFailure = ''
 
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-    const sandbox = await Sandbox.create({ timeoutMs: SANDBOX_TIMEOUT })
+    const sandbox = await Sandbox.create({
+      timeoutMs: Math.max(SANDBOX_TIMEOUT, (TIMEOUT_OVERRIDES[name] ?? COMMAND_TIMEOUT) + 60_000),
+    })
     let stderrData = ''
 
     try {
@@ -159,7 +172,7 @@ async function runOne(
           await fs.appendFile(logFilePath, output)
         },
         envs: getApiKeys(),
-        timeoutMs: COMMAND_TIMEOUT,
+        timeoutMs: TIMEOUT_OVERRIDES[name] ?? COMMAND_TIMEOUT,
       })
 
       console.log(`PASS  ${name} (attempt ${attempt})`)

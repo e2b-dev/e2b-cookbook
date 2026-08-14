@@ -50,21 +50,30 @@ const scripts: { name: string; interpreter: Interpreter; file: string }[] = [
   { name: 'openai-python', interpreter: 'jupyter', file: './examples/openai-python/openai.ipynb' },
   { name: 'custom-sandbox-domain-proxy', interpreter: 'npm', file: './examples/custom-sandbox-domain-proxy/' },
   { name: 'crewai-python', interpreter: 'uv', file: './examples/crewai-python/' },
+  { name: 'playwright-in-e2b', interpreter: 'npm', file: './examples/playwright-in-e2b/' },
+  { name: 'anthropic-claude-code-in-sandbox-js', interpreter: 'npm', file: './examples/anthropic-claude-code-in-sandbox-js/' },
+  { name: 'anthropic-claude-code-in-sandbox-python', interpreter: 'uv', file: './examples/anthropic-claude-code-in-sandbox-python/' },
+  { name: 'openai-codex-in-sandbox-js', interpreter: 'npm', file: './examples/openai-codex-in-sandbox-js/' },
+  { name: 'openai-codex-in-sandbox-python', interpreter: 'uv', file: './examples/openai-codex-in-sandbox-python/' },
+  { name: 'mcp-custom-template-js', interpreter: 'npm', file: './examples/mcp-custom-template-js/' },
+  { name: 'docker-in-e2b-js', interpreter: 'npm', file: './examples/docker-in-e2b/js/' },
+  { name: 'docker-in-e2b-python', interpreter: 'poetry', file: './examples/docker-in-e2b/python/' },
 ]
 
 // Deliberately not covered, and why. Anything not listed here should be added above.
 //
-// Needs a custom E2B template built first, which this runner does not do:
-//   anthropic-claude-code-in-sandbox-js, anthropic-claude-code-in-sandbox-python,
-//   openai-codex-in-sandbox-js, openai-codex-in-sandbox-python, playwright-in-e2b,
-//   mcp-custom-template-js (fails with "template 'browserbase-mcp-gateway' not found")
 // Blocked upstream: the third-party `sandbox-agent` package (0.4.2, latest) calls
 // Sandbox.betaCreate(), which the E2B SDK removed between 2.20 and 2.30. It cannot
 // run against any current SDK, and was already failing on main for this reason:
 //   sandbox-agent-sdk-js
-// Multiple projects in one directory, which the one-project-per-dir runner cannot express:
-//   anthropic-managed-agents (javascript/ + python/), docker-in-e2b (js/ + python/)
-// No single entrypoint:
+// Multiple projects in one directory. docker-in-e2b is covered as two entries
+// pointing at its js/ and python/ subdirectories; anthropic-managed-agents is not,
+// because its subprojects are multi-command CLI toolkits (build-template,
+// create-agent, send, start-worker) with no single thing to assert:
+//   anthropic-managed-agents (javascript/ + python/)
+// No single entrypoint, and not runnable standalone: basic.py does
+// sys.path.insert(...parents[4]) and imports examples.sandbox.misc.example_support,
+// so it expects to run inside the openai-agents-python repo, not here:
 //   openai-agents-sdk (11 standalone scripts, no manifest)
 // Calls a model the Fireworks account cannot reach: qwen2p5-coder-32b-instruct
 // returns 404 "Model not found, inaccessible, and/or not deployed", which does not
@@ -96,6 +105,95 @@ const CONCURRENCY = 5
 // it can do anything, and does not fit the shared budget.
 const TIMEOUT_OVERRIDES: Record<string, number> = {
   'mcp-custom-server-js': 600_000,
+}
+
+// Examples that run from a custom template need it built on the account first.
+// Only the prod builds are listed: every `:dev` script builds a `<alias>-dev`
+// template that no example actually creates a sandbox from.
+//
+// Two aliases are shared, which is why builds are keyed by alias rather than by
+// example: anthropic-claude-code is built by both the js and python siblings,
+// e2b-with-docker by both docker-in-e2b subprojects, and
+// openai-codex-in-sandbox-js has no build script at all - it relies on the
+// python sibling's. Building per example would race two builds of one alias.
+type TemplateBuild = {
+  alias: string
+  dir: string
+  interpreter: Interpreter
+  build: string
+}
+
+// example name -> template alias it creates a sandbox from
+const TEMPLATE_USED_BY: Record<string, string> = {
+  'playwright-in-e2b': 'playwright-chromium',
+  'anthropic-claude-code-in-sandbox-js': 'anthropic-claude-code',
+  'anthropic-claude-code-in-sandbox-python': 'anthropic-claude-code',
+  'openai-codex-in-sandbox-js': 'openai-codex',
+  'openai-codex-in-sandbox-python': 'openai-codex',
+  'mcp-custom-template-js': 'browserbase-mcp-gateway',
+  'docker-in-e2b-js': 'e2b-with-docker',
+  'docker-in-e2b-python': 'e2b-with-docker',
+}
+
+const TEMPLATE_BUILDS: TemplateBuild[] = [
+  { alias: 'playwright-chromium', dir: './examples/playwright-in-e2b/', interpreter: 'npm', build: 'npm run e2b:build:prod' },
+  { alias: 'anthropic-claude-code', dir: './examples/anthropic-claude-code-in-sandbox-js/', interpreter: 'npm', build: 'npm run e2b:build:prod' },
+  { alias: 'e2b-with-docker', dir: './examples/docker-in-e2b/js/', interpreter: 'npm', build: 'npm run e2b:build:prod' },
+  { alias: 'browserbase-mcp-gateway', dir: './examples/mcp-custom-template-js/', interpreter: 'npm', build: 'npm run build' },
+  { alias: 'openai-codex', dir: './examples/openai-codex-in-sandbox-python/', interpreter: 'uv', build: 'uv run build_prod.py' },
+]
+
+// A template build is minutes, not seconds, and the result persists on the
+// account, so we probe first and only build what is missing. Set
+// REBUILD_TEMPLATES=1 to force a rebuild (e.g. after changing a template
+// definition, which is the one case the probe cannot detect).
+const TEMPLATE_BUILD_TIMEOUT = 900_000
+
+async function templateExists(alias: string): Promise<boolean> {
+  try {
+    const probe = await Sandbox.create(alias, { timeoutMs: 60_000 })
+    await probe.kill().catch(() => {})
+    return true
+  } catch {
+    return false
+  }
+}
+
+async function buildTemplates(logsDir: string, needed: Set<string>): Promise<string[]> {
+  const failed: string[] = []
+  const force = process.env.REBUILD_TEMPLATES === '1'
+
+  for (const spec of TEMPLATE_BUILDS.filter((t) => needed.has(t.alias))) {
+    if (!force && (await templateExists(spec.alias))) {
+      console.log(`TEMPLATE ${spec.alias} already exists, skipping build`)
+      continue
+    }
+    console.log(`TEMPLATE building ${spec.alias} (this takes minutes)`)
+    const logFilePath = path.join(logsDir, `template-${spec.alias}.txt`)
+    const sandbox = await Sandbox.create({ timeoutMs: TEMPLATE_BUILD_TIMEOUT + 60_000 })
+    try {
+      await uploadPathToPath(spec.dir, SANDBOX_TEST_DIRECTORY, sandbox)
+      const setup =
+        spec.interpreter === 'uv'
+          ? ['pip install --quiet uv', 'PATH=/home/user/.local/bin/:$PATH', `cd ${SANDBOX_TEST_DIRECTORY}`, 'uv sync']
+          : [`cd ${SANDBOX_TEST_DIRECTORY}`, 'npm install']
+      await sandbox.commands.run([...setup, spec.build].join(' && '), {
+        onStdout: async (o) => { await fs.appendFile(logFilePath, o) },
+        onStderr: async (o) => { await fs.appendFile(logFilePath, o) },
+        envs: getApiKeys(),
+        timeoutMs: TEMPLATE_BUILD_TIMEOUT,
+      })
+      console.log(`TEMPLATE ${spec.alias} built`)
+    } catch (error: any) {
+      const detail = `${error?.message ?? error}\n${error?.result?.stderr ?? ''}`
+      await fs.appendFile(logFilePath, `\nBuild failed:\n${detail}\n`)
+      console.log(`TEMPLATE ${spec.alias} FAILED to build - examples using it will fail`)
+      failed.push(spec.alias)
+    } finally {
+      await sandbox.kill().catch(() => {})
+    }
+  }
+  return failed
 }
 
 // A deterministic failure will fail identically on every retry, so only retry
@@ -223,6 +321,18 @@ async function main() {
     console.error(`No examples matched ${filters.join(', ')}`)
     process.exitCode = 1
     return
+  }
+
+  // Templates first: several examples create sandboxes from a custom template
+  // that has to exist on the account. Skipped when they already do.
+  const neededTemplates = new Set(
+    selected.map((s) => TEMPLATE_USED_BY[s.name]).filter(Boolean),
+  )
+  if (neededTemplates.size) {
+    const failedBuilds = await buildTemplates(logsDir, neededTemplates)
+    if (failedBuilds.length) {
+      console.log(`\n${failedBuilds.length} template build(s) failed: ${failedBuilds.join(', ')}`)
+    }
   }
 
   const queue = [...selected]

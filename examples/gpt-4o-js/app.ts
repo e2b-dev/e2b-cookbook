@@ -150,7 +150,7 @@ async function run() {
         if (result && result.png) {
             fs.writeFileSync('image_1.png', Buffer.from(result.png, 'base64'))
         } else {
-            console.log('No PNG data available.')
+            console.log('No chart in the result. The model may not have rendered one.')
             return
         }
 
@@ -167,7 +167,7 @@ async function run() {
         if (result2 && result2.png) {
             fs.writeFileSync('image_2.png', Buffer.from(result2.png, 'base64'))
         } else {
-            console.log('No PNG data available.')
+            console.log('No chart in the result. The model may not have rendered one.')
         }
     } catch (error) {
         console.error('An error occurred:', error)

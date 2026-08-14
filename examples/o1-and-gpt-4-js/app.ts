@@ -188,7 +188,7 @@ async function run() {
       if (result && result.png) {
         fs.writeFileSync("result.png", Buffer.from(result.png, "base64"));
       } else {
-        console.log("No image data available.");
+        console.log("No chart in the result. The model may not have rendered one.");
       }
     } else {
       console.log("No results returned.");

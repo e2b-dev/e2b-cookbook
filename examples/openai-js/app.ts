@@ -111,7 +111,9 @@ async function chatWithLLM(codeInterpreter: Sandbox, userMessage: string): Promi
         console.log(`Tool Result: ${codeInterpreterResults}`)
         return codeInterpreterResults
     }
-    throw new Error('Tool calls not found in message content.')
+    // Deliberately a failure: with no tool call there was no code to run, so the
+    // example demonstrated nothing. A missing *chart* is fine; missing code is not.
+    throw new Error('The model returned no tool call, so there was no code to execute.')
 }
 
 async function uploadDataset(codeInterpreter: Sandbox): Promise<string> {

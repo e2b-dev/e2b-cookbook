@@ -143,7 +143,7 @@ async function chat(codeInterpreter: Sandbox, userMessage: string): Promise<Resu
             const codeInterpreterResults = await codeInterpret(codeInterpreter, pythonCode)
             return codeInterpreterResults
         } else {
-            console.error('Failed to match any Python code in model\'s response')
+            console.log('No Python code block in the model\'s response.')
             return []
         }
     } catch (error) {
@@ -196,7 +196,7 @@ async function run() {
             fs.writeFileSync('image_1.png', Buffer.from(result.png, 'base64'))
             console.log('Success: Image generated and saved as image_1.png')
         } else {
-            console.error('Error: No PNG data available.')
+            console.log('No chart in the result. The model may not have rendered one.')
         }
 
     } catch (error) {

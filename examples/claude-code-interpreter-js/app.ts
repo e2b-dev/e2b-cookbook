@@ -103,7 +103,9 @@ async function chatWithClaude(codeInterpreter: Sandbox, userMessage: string): Pr
         console.log(`Tool Result: ${codeInterpreterResults}`)
         return codeInterpreterResults
     }
-    throw new Error('Tool use block not found in message content.')
+    // Deliberately a failure: with no tool call there was no code to run, so the
+    // example demonstrated nothing. A missing *chart* is fine; missing code is not.
+    throw new Error(`Claude did not call execute_python (stop_reason: ${message.stop_reason}).`)
 }
 
 

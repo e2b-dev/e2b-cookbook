@@ -137,7 +137,7 @@ async function run() {
             fs.writeFileSync('image_1.png', Buffer.from(result.png, 'base64'))
             console.log('Success: Image generated and saved as image_1.png')
         } else {
-            console.log('Error: No PNG data available.')
+            console.log('No chart in the result. The model may not have rendered one.')
         }
 
     } catch (error) {

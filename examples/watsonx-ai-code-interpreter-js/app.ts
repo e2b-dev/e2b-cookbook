@@ -63,7 +63,12 @@ const prompt = SYSTEM_PROMPT + userMessage + "\n";
 // Generate response using the Watson SDK
 console.log("Generating response from WatsonX...");
 const response = await watsonxAIService.generateText({ input: prompt, ...params });
-const content = response.result.results[0].generated_text;
+const generation = response.result.results?.[0];
+if (!generation) {
+  console.log("WatsonX returned no generations. Nothing to run.");
+  process.exit(1);
+}
+const content = generation.generated_text;
 
 console.log(`Model response:`);
 console.log(`${"=".repeat(50)}\n${content}\n${"=".repeat(50)}`);

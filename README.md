@@ -124,6 +124,13 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td><a href="./examples/watsonx-ai-code-interpreter-python">Python</a></td>
       <td><a href="./examples/watsonx-ai-code-interpreter-js">TypeScript</a></td>
     </tr>
+    <tr>
+      <td>DaoXE</td>
+      <td>Multi-model multi-protocol gateway (OpenAI-compatible + Anthropic Messages)</td>
+      <td>Code interpreter via OpenAI-compatible base URL</td>
+      <td><a href="./examples/daoxe-code-interpreter-python">Python</a></td>
+      <td><a href="./examples/daoxe-code-interpreter-js">TypeScript</a></td>
+    </tr>
   </tbody>
 </table>
 

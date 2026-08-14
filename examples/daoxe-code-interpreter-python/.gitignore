@@ -1,0 +1,4 @@
+.env
+.ipynb_checkpoints
+height_distribution.png
+__pycache__

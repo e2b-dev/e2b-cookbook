@@ -1,0 +1,24 @@
+{
+  "name": "daoxe-code-interpreter-js",
+  "version": "1.0.0",
+  "description": "E2B Code Interpreter with DaoXE multi-model multi-protocol API gateway (OpenAI-compatible base URL).",
+  "type": "module",
+  "main": "app.ts",
+  "scripts": {
+    "start": "tsx app.ts"
+  },
+  "keywords": ["e2b", "daoxe", "code-interpreter", "openai-compatible"],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.12.11",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.9.3",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "@e2b/code-interpreter": "^1.0.1",
+    "dotenv": "^16.4.5",
+    "openai": "^4.46.1"
+  }
+}

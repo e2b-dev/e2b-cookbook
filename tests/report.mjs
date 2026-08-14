@@ -11,7 +11,12 @@
  * not. The message itself is composed in Workflow Builder from these variables.
  *
  * Declare these on the trigger, all type Text:
- *   status summary failed skipped branch commit run_url
+ *   outcome status summary failed skipped branch commit run_url
+ *
+ * `outcome` is the one to branch on: pass | skip | fail | crash, no emoji and no
+ * sentinel string to compare against. `status` is the human-facing version and
+ * `failed` is a name list, so conditioning on either means matching an emoji or
+ * the literal "none".
  *
  * Posting is a plain curl rather than a third-party action, so the webhook secret
  * is never handed to someone else's code.
@@ -57,6 +62,7 @@ function list(names, limit = 12) {
 function variables({ passed, skipped, failed, total, crashed }) {
   if (crashed) {
     return {
+      outcome: 'crash',
       status: '❌ runner crashed',
       summary: 'No results were written, so no example was judged.',
       failed: crashed,
@@ -67,6 +73,8 @@ function variables({ passed, skipped, failed, total, crashed }) {
     }
   }
   return {
+    // Branch on this. Deliberately plain: no emoji, no "none" sentinel.
+    outcome: failed.length ? 'fail' : skipped.length ? 'skip' : 'pass',
     status: failed.length ? '❌ failed' : skipped.length ? '⚠️ passed with skips' : '✅ passed',
     summary: `${passed.length} passed · ${skipped.length} skipped · ${failed.length} failed (of ${total})`,
     failed: list(failed),

@@ -2,11 +2,19 @@
  * Turn tests/results.json into the two things the workflow reports with:
  *
  *   tests/Tests.txt          - the per-example table, uploaded as an artifact
- *   tests/slack-payload.json - a Slack Block Kit message, POSTed to a webhook
+ *   tests/slack-payload.json - the webhook body
  *
- * Posting is a plain curl to an incoming webhook rather than a third-party
- * action, so the webhook secret is never handed to someone else's code and the
- * payload is whatever we put in the file.
+ * The body targets a Slack Workflow Builder webhook trigger, which accepts a
+ * FLAT object of the Data Variables declared on the trigger - no nesting, no
+ * arrays, and every value a string. That is why this is not Block Kit: an
+ * incoming webhook would take {text, blocks}, a Workflow Builder trigger will
+ * not. The message itself is composed in Workflow Builder from these variables.
+ *
+ * Declare these on the trigger, all type Text:
+ *   status summary failed skipped branch commit run_url
+ *
+ * Posting is a plain curl rather than a third-party action, so the webhook secret
+ * is never handed to someone else's code.
  *
  * If results.json is missing or unreadable the runner crashed before writing it.
  * That has to be reported too - silence is the failure mode this whole PR exists
@@ -36,75 +44,37 @@ const runUrl =
 
 const LABEL = { passed: '✅ Passed', pending: '⏭️ Skipped', failed: '❌ Failed' }
 
+// Workflow Builder rejects a missing key and renders an empty one as a blank gap,
+// so every variable is always present and never an empty string.
+const NONE = 'none'
+
 function list(names, limit = 12) {
+  if (!names.length) return NONE
   if (names.length <= limit) return names.join(', ')
   return `${names.slice(0, limit).join(', ')} and ${names.length - limit} more`
 }
 
-function blocks({ passed, skipped, failed, total, crashed }) {
-  const out = []
-
+function variables({ passed, skipped, failed, total, crashed }) {
   if (crashed) {
-    out.push(
-      { type: 'header', text: { type: 'plain_text', text: '❌ Cookbook examples: runner crashed' } },
-      {
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: `No results were written, so no example was judged. ${crashed}`,
-        },
-      },
-    )
-  } else {
-    const icon = failed.length ? '❌' : skipped.length ? '⚠️' : '✅'
-    out.push(
-      { type: 'header', text: { type: 'plain_text', text: `${icon} Cookbook examples` } },
-      {
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text:
-            `*${passed.length} passed · ${skipped.length} skipped · ${failed.length} failed*` +
-            ` (of ${total})`,
-        },
-      },
-    )
-
-    if (failed.length) {
-      out.push({
-        type: 'section',
-        text: { type: 'mrkdwn', text: `*Failed*\n${list(failed)}` },
-      })
-    }
-    if (skipped.length) {
-      out.push({
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text:
-            `*Skipped*\n${list(skipped)}\n` +
-            '_The sandbox worked; the model did something non-deterministic ' +
-            '(no chart, malformed tool call, provider quota). Not a failure._',
-        },
-      })
+    return {
+      status: '❌ runner crashed',
+      summary: 'No results were written, so no example was judged.',
+      failed: crashed,
+      skipped: NONE,
+      branch: GITHUB_REF_NAME || NONE,
+      commit: GITHUB_SHA ? GITHUB_SHA.slice(0, 7) : NONE,
+      run_url: runUrl || NONE,
     }
   }
-
-  const context = [GITHUB_REF_NAME && `\`${GITHUB_REF_NAME}\``, GITHUB_SHA && `\`${GITHUB_SHA.slice(0, 7)}\``]
-    .filter(Boolean)
-    .join(' · ')
-  if (context || runUrl) {
-    out.push({
-      type: 'context',
-      elements: [
-        {
-          type: 'mrkdwn',
-          text: [context, runUrl && `<${runUrl}|run + per-example logs>`].filter(Boolean).join(' · '),
-        },
-      ],
-    })
+  return {
+    status: failed.length ? '❌ failed' : skipped.length ? '⚠️ passed with skips' : '✅ passed',
+    summary: `${passed.length} passed · ${skipped.length} skipped · ${failed.length} failed (of ${total})`,
+    failed: list(failed),
+    skipped: list(skipped),
+    branch: GITHUB_REF_NAME || NONE,
+    commit: GITHUB_SHA ? GITHUB_SHA.slice(0, 7) : NONE,
+    run_url: runUrl || NONE,
   }
-  return out
 }
 
 async function main() {
@@ -115,10 +85,7 @@ async function main() {
     const note = `Could not read tests/results.json: ${err.message}`
     console.error(note)
     await fs.writeFile(tablePath, `${note}\n`)
-    await fs.writeFile(
-      payloadPath,
-      JSON.stringify({ text: 'Cookbook examples: runner crashed', blocks: blocks({ crashed: note }) }, null, 2),
-    )
+    await fs.writeFile(payloadPath, JSON.stringify(variables({ crashed: note }), null, 2))
     return
   }
 
@@ -135,12 +102,10 @@ async function main() {
 
   await fs.writeFile(tablePath, `${summary}\n\n${table}\n`)
 
-  const payload = {
-    // Fallback for notifications and clients that ignore blocks.
-    text: `Cookbook examples: ${summary}`,
-    blocks: blocks({ passed, skipped, failed, total: assertions.length }),
-  }
-  await fs.writeFile(payloadPath, JSON.stringify(payload, null, 2))
+  await fs.writeFile(
+    payloadPath,
+    JSON.stringify(variables({ passed, skipped, failed, total: assertions.length }), null, 2),
+  )
 
   console.log(summary)
   console.log(table)

@@ -329,9 +329,18 @@ type Outcome = { name: string; verdict: Verdict; durationMs: number; failure: st
 // job, whatever the code then did. If the example never got that far - SDK error,
 // missing template, upload failure, dependency resolution, a timeout waiting on
 // the sandbox - that is a real failure.
+// An exhausted account is not model behaviour, it is a configuration problem that
+// stays broken until a human tops up, so it must fail rather than skip. It arrives
+// as a 429 like a rate limit does, which is exactly how it slipped through: nine
+// examples skipped on "You have no credits remaining" and the run went green.
+// Checked before MODEL_SIDE, because these strings also match it.
+const ACCOUNT_SIDE = [
+  /no credits remaining|insufficient_quota|exceeded your current quota|billing|payment required|402/i,
+]
+
 const MODEL_SIDE = [
-  // Provider capacity and quota. Says nothing about the sandbox.
-  /rate limit|429|tokens per day|insufficient_quota|overloaded/i,
+  // Transient provider capacity, and windowed quotas that recover on their own.
+  /rate limit|429|tokens per day|overloaded/i,
   // The model emitted a malformed tool call, or none at all.
   /tool_use_failed|Failed to call a function|did not call |returned no tool call/i,
   // The model produced nothing displayable - guarded in the examples, but some
@@ -343,6 +352,7 @@ const MODEL_SIDE = [
 ]
 
 function classify(output: string): Verdict {
+  if (ACCOUNT_SIDE.some((r) => r.test(output))) return 'fail'
   return MODEL_SIDE.some((r) => r.test(output)) ? 'skip' : 'fail'
 }
 

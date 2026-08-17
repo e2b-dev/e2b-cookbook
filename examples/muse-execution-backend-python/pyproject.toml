@@ -1,0 +1,26 @@
+[project]
+name = "muse-execution-backend-python"
+version = "0.1.0"
+description = "Use E2B as the execution backend for a Meta Muse Spark coding agent"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "e2b>=2.32.0",
+    "openai>=1.0.0",
+    "python-dotenv>=1.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/muse_execution_backend"]

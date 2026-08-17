@@ -84,6 +84,13 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td>-</td>
     </tr>
     <tr>
+      <td>Meta</td>
+      <td>Muse Spark</td>
+      <td>Coding agent with E2B as its execution backend</td>
+      <td><a href="./examples/muse-execution-backend-python">Python</a></td>
+      <td>-</td>
+    </tr>
+    <tr>
       <td>Mistral</td>
       <td>Codestral</td>
       <td>Code interpreter</td>

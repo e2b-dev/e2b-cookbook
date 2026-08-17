@@ -60,6 +60,13 @@ const LABEL = { passed: '✅ Passed', pending: '⏭️ Skipped', failed: '❌ Fa
 // so every variable is always present and never an empty string.
 const NONE = 'none'
 
+const LINK_MRKDWN = true
+const runLink = !runUrl
+  ? ''
+  : LINK_MRKDWN
+    ? `<${runUrl}|view run>`
+    : runUrl
+
 function list(names, limit = 12) {
   if (!names.length) return NONE
   if (names.length <= limit) return names.join(', ')
@@ -74,7 +81,7 @@ function variables({ passed, skipped, failed, rateLimited = [], total, crashed }
       headline: '░░░░░░░░░░░░░░░░░░░░  0/0 ran clean',
       counts: '❌ runner crashed',
       details: crashed,
-      footer: [GITHUB_REF_NAME, GITHUB_SHA && GITHUB_SHA.slice(0, 7), runUrl].filter(Boolean).join(' · '),
+      footer: [GITHUB_REF_NAME, GITHUB_SHA && GITHUB_SHA.slice(0, 7), runLink].filter(Boolean).join(' · '),
       summary: 'No results were written, so no example was judged.',
       failed: crashed,
       skipped: NONE,
@@ -133,7 +140,7 @@ function variables({ passed, skipped, failed, rateLimited = [], total, crashed }
     headline,
     counts,
     details: lines.join('\n'),
-    footer: [GITHUB_REF_NAME, GITHUB_SHA && GITHUB_SHA.slice(0, 7), runUrl].filter(Boolean).join(' · '),
+    footer: [GITHUB_REF_NAME, GITHUB_SHA && GITHUB_SHA.slice(0, 7), runLink].filter(Boolean).join(' · '),
     // Kept for anyone composing their own layout.
     summary:
       `${passed.length} passed · ${skipped.length} skipped · ${failed.length} failed (of ${total})` +

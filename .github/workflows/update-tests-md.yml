@@ -3,6 +3,14 @@ name: Update Tests Results
 on:
   workflow_dispatch:
     inputs:
+      preview_message:
+        description: >-
+          Post a sample Slack message and run nothing. Use this to check the
+          Workflow Builder template without waiting on 31 examples and paying four
+          providers for the privilege.
+        type: choice
+        default: 'off'
+        options: ['off', 'ok', 'failure']
       rebuild_templates:
         description: >-
           Rebuild the custom E2B templates instead of reusing existing ones.
@@ -52,8 +60,15 @@ jobs:
     # The runner writes ./tests/results.json itself.
     - name: Run the examples and save results
       id: tests
+      if: inputs.preview_message == '' || inputs.preview_message == 'off'
       run: npm test
       continue-on-error: true
+
+    # Preview mode: synthesise the results instead of running anything, so the
+    # Slack message can be checked in seconds.
+    - name: Synthesise results for a preview
+      if: inputs.preview_message == 'ok' || inputs.preview_message == 'failure'
+      run: node ./tests/preview.mjs ${{ inputs.preview_message }}
 
     - name: Upload test results as an artifact
       if: always()
@@ -103,7 +118,7 @@ jobs:
 
     # Without this the workflow reported success while examples were failing.
     - name: Fail if any example failed
-      if: steps.tests.outcome == 'failure'
+      if: steps.tests.outcome == 'failure' && inputs.preview_message != 'ok' && inputs.preview_message != 'failure'
       run: |
         echo "One or more examples failed. See the test-results and example-logs artifacts."
         exit 1

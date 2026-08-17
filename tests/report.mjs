@@ -11,7 +11,7 @@
  * not. The message itself is composed in Workflow Builder from these variables.
  *
  * Declare these on the trigger, all type Text:
- *   outcome status headline details footer
+ *   outcome status headline counts details footer
  *   failed skipped rate_limited branch commit run_url
  *
  * Workflow Builder cannot do conditionals, so a template of one line per category
@@ -71,7 +71,8 @@ function variables({ passed, skipped, failed, rateLimited = [], total, crashed }
     return {
       outcome: 'crash',
       status: '❌ runner crashed',
-      headline: 'No results were written, so no example was judged.',
+      headline: '░░░░░░░░░░░░░░░░░░░░  0/0 ran clean',
+      counts: '❌ runner crashed',
       details: crashed,
       footer: [GITHUB_REF_NAME, GITHUB_SHA && GITHUB_SHA.slice(0, 7), runUrl].filter(Boolean).join(' · '),
       summary: 'No results were written, so no example was judged.',
@@ -85,11 +86,39 @@ function variables({ passed, skipped, failed, rateLimited = [], total, crashed }
   }
 
   const real = passed.length - rateLimited.length
-  const headline =
-    `${real}/${total} ran clean` +
-    (rateLimited.length ? `, ${rateLimited.length} rate limited` : '') +
-    (skipped.length ? `, ${skipped.length} skipped` : '') +
-    (failed.length ? `, ${failed.length} failed` : '')
+
+  // Block characters and emoji are the only visuals a Workflow Builder Text
+  // variable can carry - no Block Kit on this trigger type - so the bar is drawn
+  // with them. One glyph per state, proportional to the counts, 20 cells wide so
+  // it does not wrap on mobile.
+  const BAR_WIDTH = 20
+  const segments = [
+    ['█', real],
+    ['▓', rateLimited.length],
+    ['▒', skipped.length],
+    ['░', failed.length],
+  ].map(([glyph, n]) => [glyph, n, Math.round((n / Math.max(total, 1)) * BAR_WIDTH)])
+
+  // Rounding rarely sums to BAR_WIDTH. Give the difference to the largest segment
+  // rather than padding the end, which appended a clean block after the failures
+  // and made a bad run look like it recovered.
+  const drift = BAR_WIDTH - segments.reduce((n, [, , cells]) => n + cells, 0)
+  const biggest = segments.reduce((a, b) => (b[1] > a[1] ? b : a), segments[0])
+  biggest[2] = Math.max(0, biggest[2] + drift)
+
+  const bar = segments.map(([glyph, , cells]) => glyph.repeat(cells)).join('')
+
+  const headline = `${bar}  ${real}/${total} ran clean`
+
+  // A counts row, zeros omitted so a healthy run stays short.
+  const counts = [
+    real && `✅ ${real} clean`,
+    rateLimited.length && `⏳ ${rateLimited.length} rate limited`,
+    skipped.length && `⏭️ ${skipped.length} skipped`,
+    failed.length && `❌ ${failed.length} failed`,
+  ]
+    .filter(Boolean)
+    .join('   ')
 
   // Only the lines that apply. A clean run gets one line, not three saying "none".
   const lines = []
@@ -102,6 +131,7 @@ function variables({ passed, skipped, failed, rateLimited = [], total, crashed }
     outcome: failed.length ? 'fail' : skipped.length ? 'skip' : 'pass',
     status: failed.length ? '❌ failed' : skipped.length ? '⚠️ passed with skips' : '✅ passed',
     headline,
+    counts,
     details: lines.join('\n'),
     footer: [GITHUB_REF_NAME, GITHUB_SHA && GITHUB_SHA.slice(0, 7), runUrl].filter(Boolean).join(' · '),
     // Kept for anyone composing their own layout.

@@ -2,6 +2,23 @@ name: Update Tests Results
 
 on:
   workflow_dispatch:
+    inputs:
+      preview_message:
+        description: >-
+          Post a sample Slack message and run nothing. Use this to check the
+          Workflow Builder template without waiting on 31 examples and paying four
+          providers for the privilege.
+        type: choice
+        default: 'off'
+        options: ['off', 'ok', 'failure']
+      rebuild_templates:
+        description: >-
+          Rebuild the custom E2B templates instead of reusing existing ones.
+          The normal probe only checks that an alias exists, not that it is
+          current, so a template bundling an agent CLI (Claude Code, Codex) goes
+          stale silently. Run this periodically.
+        type: boolean
+        default: false
   schedule:
     - cron: '0 0 * * 1'  # Runs every Monday at 00:00 UTC
 
@@ -18,54 +35,90 @@ jobs:
       FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
       GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
       TOGETHER_API_KEY: ${{ secrets.TOGETHER_API_KEY }}
+      REBUILD_TEMPLATES: ${{ inputs.rebuild_templates && '1' || '' }}
+      # utils.ts forwards these into the sandbox but the workflow never defined
+      # them. NOTE: these secrets are not set on the repo yet, so they resolve to
+      # empty and the watsonx examples stay out of the test list until they are.
+      WATSONX_API_KEY: ${{ secrets.WATSONX_API_KEY }}
+      WATSONX_PROJECT_ID: ${{ secrets.WATSONX_PROJECT_ID }}
+      WATSONX_URL: ${{ secrets.WATSONX_URL }}
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v5
 
     - name: Set up Node.js
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v5
       with:
-        node-version: '20'
+        node-version: '22'
 
     - name: Install dependencies
       run: npm install
 
-    - name: Run Jest tests and save results
-      run: |
-        npm test -- --json --outputFile=./tests/results.json
-      continue-on-error: true  # Ensures the job continues even if tests fail
+    # Kept as continue-on-error so the reporting steps below still run on failure.
+    # The "Fail if any example failed" step at the end is what turns the job red.
+    # The runner writes ./tests/results.json itself.
+    - name: Run the examples and save results
+      id: tests
+      if: inputs.preview_message == '' || inputs.preview_message == 'off'
+      run: npm test
+      continue-on-error: true
+
+    # Preview mode: synthesise the results instead of running anything, so the
+    # Slack message can be checked in seconds.
+    - name: Synthesise results for a preview
+      if: inputs.preview_message == 'ok' || inputs.preview_message == 'failure'
+      run: node ./tests/preview.mjs ${{ inputs.preview_message }}
 
     - name: Upload test results as an artifact
+      if: always()
       uses: actions/upload-artifact@v4
       with:
         name: test-results
         path: ./tests/results.json
 
-    - name: Update Tests.md with test results
-      run: node ./tests/updateTestsMd.js  # Your custom script to update Tests.md with test results
+    - name: Upload per-example logs as an artifact
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: example-logs
+        path: ./logs
+        if-no-files-found: warn
 
-    - name: Upload markdown report as an artifact
+    - name: Build the report
+      if: always()
+      run: node ./tests/report.mjs
+      env:
+        GITHUB_SERVER_URL: ${{ github.server_url }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        GITHUB_RUN_ID: ${{ github.run_id }}
+        GITHUB_REF_NAME: ${{ github.ref_name }}
+        GITHUB_SHA: ${{ github.sha }}
+
+    - name: Upload the report as an artifact
+      if: always()
       uses: actions/upload-artifact@v4
       with:
         name: test-results-md
         path: ./tests/Tests.txt
 
-    - name: Read Tests.txt for Slack message
-      id: read_tests
-      run: |
-        TESTS_CONTENT=$(cat ./tests/Tests.txt)
-        echo "TESTS_CONTENT<<EOF" >> $GITHUB_ENV
-        echo "$TESTS_CONTENT" >> $GITHUB_ENV
-        echo "EOF" >> $GITHUB_ENV
-
-    - name: Notify Slack with test results
-      uses: rtCamp/action-slack-notify@v2
+    # Posted straight to an incoming webhook: the payload is the file we just
+    # generated, and the secret is never passed to a third-party action. Skipped
+    # rather than failed when no webhook is configured, so forks and manual runs
+    # do not go red over a missing secret.
+    - name: Notify Slack
+      if: always() && env.SLACK_WEBHOOK != ''
       env:
-        SLACK_COLOR: "#36a64f"
-        SLACK_MESSAGE: |
-          *Test Results:*
-          ${{ env.TESTS_CONTENT }}
-        SLACK_TITLE: Test Results Update
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-        SLACK_CHANNEL: ${{ vars.SLACK_CHANNEL }}
+      run: |
+        curl --fail --silent --show-error \
+          -X POST -H 'Content-type: application/json' \
+          --data @./tests/slack-payload.json \
+          "$SLACK_WEBHOOK"
+
+    # Without this the workflow reported success while examples were failing.
+    - name: Fail if any example failed
+      if: steps.tests.outcome == 'failure' && inputs.preview_message != 'ok' && inputs.preview_message != 'failure'
+      run: |
+        echo "One or more examples failed. See the test-results and example-logs artifacts."
+        exit 1

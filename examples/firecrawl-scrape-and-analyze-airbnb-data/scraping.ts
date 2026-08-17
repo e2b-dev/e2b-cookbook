@@ -1,6 +1,6 @@
 //@ts-ignore
 import * as fs from 'fs'
-import FirecrawlApp from '@mendable/firecrawl-js'
+import Firecrawl from '@mendable/firecrawl-js'
 import 'dotenv/config'
 import { config } from 'dotenv'
 import { z } from 'zod'
@@ -10,7 +10,7 @@ config()
 export async function scrapeAirbnb() {
   try {
     // Initialize the FirecrawlApp with your API key
-    const app = new FirecrawlApp({ apiKey: process.env.FIRECRAWL_API_KEY })
+    const app = new Firecrawl({ apiKey: process.env.FIRECRAWL_API_KEY })
 
     // Define the URL to crawl
     const listingsUrl =
@@ -29,18 +29,17 @@ export async function scrapeAirbnb() {
     })
 
     const params2 = {
-      pageOptions: {
-        onlyMainContent: false,
-      },
-      extractorOptions: { extractionSchema: paginationSchema },
+      onlyMainContent: false,
+      formats: [{ type: 'json' as const, schema: paginationSchema }],
       timeout: 50000, // if needed, sometimes airbnb stalls...
     }
 
     // Start crawling to get pagination links
-    const linksData = await app.scrapeUrl(listingsUrl, params2)
-    console.log(linksData.data['llm_extraction'])
+    const linksData = await app.scrape(listingsUrl, params2)
+    const linksExtraction = linksData.json as z.infer<typeof paginationSchema>
+    console.log(linksExtraction)
 
-    let paginationLinks = linksData.data['llm_extraction'].page_links.map(
+    let paginationLinks = linksExtraction.page_links.map(
       (link) => baseUrl + link.link
     )
 
@@ -65,16 +64,14 @@ export async function scrapeAirbnb() {
     })
 
     const params = {
-      pageOptions: {
-        onlyMainContent: false,
-      },
-      extractorOptions: { extractionSchema: schema },
+      onlyMainContent: false,
+      formats: [{ type: 'json' as const, schema }],
     }
 
     // Function to scrape a single URL
-    const scrapeListings = async (url) => {
-      const result = await app.scrapeUrl(url, params)
-      return result.data['llm_extraction'].listings
+    const scrapeListings = async (url: string) => {
+      const result = await app.scrape(url, params)
+      return (result.json as z.infer<typeof schema>).listings
     }
 
     // Scrape all pagination links in parallel

@@ -19,7 +19,7 @@ export async function createEnvironment(apiKey: string, name: string) {
   });
 }
 
-export async function createAgent(apiKey: string, name: string, model = "claude-sonnet-4-6") {
+export async function createAgent(apiKey: string, name: string, model = "claude-sonnet-5") {
   const client = new Anthropic({ apiKey });
   return client.beta.agents.create({
     name,

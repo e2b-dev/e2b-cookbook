@@ -16,16 +16,16 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "4.0.22",
+    "@ai-sdk/anthropic": "^4.0.38",
     "@e2b/eve-sandbox": "^0.1.1",
-    "ai": "^7.0.38",
-    "e2b": "^2.36.1",
-    "eve": "^0.30.6",
-    "nanoid": "5.1.11",
+    "ai": "^7.0.63",
+    "e2b": "^2.38.3",
+    "eve": "^0.38.3",
+    "nanoid": "^6.0.1",
     "zod": "4.4.3"
   },
   "devDependencies": {
-    "@types/node": "~26.1.2",
-    "typescript": "6.0.3"
+    "@types/node": "^26.2.0",
+    "typescript": "^7.0.2"
   }
 }

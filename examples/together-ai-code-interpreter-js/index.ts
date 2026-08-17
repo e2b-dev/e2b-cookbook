@@ -2,6 +2,7 @@ import fs from 'node:fs'
 import { Sandbox, Result, OutputMessage } from '@e2b/code-interpreter'
 import * as dotenv from 'dotenv'
 import Together from 'together-ai/index.mjs'
+import type { ChatCompletionMessageParam } from 'together-ai/resources/chat/completions.mjs'
 
 dotenv.config()
 
@@ -20,12 +21,12 @@ if (!E2B_API_KEY) {
 
 // Choose from the codegen models:
 
-const MODEL_NAME = 'meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo'
-// const MODEL_NAME = 'meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo'
-// const MODEL_NAME = 'meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo'
-// const MODEL_NAME = 'Qwen/Qwen2-72B-Instruct'
-// const MODEL_NAME = "codellama/CodeLlama-70b-Instruct-hf"
-// const MODEL_NAME = "deepseek-ai/deepseek-coder-33b-instruct"
+const MODEL_NAME = 'meta-llama/Llama-3.3-70B-Instruct-Turbo'
+// const MODEL_NAME = 'Qwen/Qwen3.7-Plus'
+// const MODEL_NAME = 'Qwen/Qwen2.5-7B-Instruct-Turbo'
+// const MODEL_NAME = 'Qwen/Qwen3.6-Plus'
+// const MODEL_NAME = "deepseek-ai/DeepSeek-V4-Flash-0731"
+// const MODEL_NAME = "deepseek-ai/DeepSeek-V4-Pro"
 
 // See the complete list of Together AI models here: https://api.together.ai/models.
 
@@ -121,7 +122,7 @@ async function codeInterpret(codeInterpreter: Sandbox, code: string): Promise<Re
 async function chat(codeInterpreter: Sandbox, userMessage: string): Promise<Result[]> {
     console.log(`\n${'='.repeat(50)}\nUser Message: ${userMessage}\n${'='.repeat(50)}`)
 
-    const messages = [
+    const messages: ChatCompletionMessageParam[] = [
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user', content: userMessage }
     ]
@@ -142,7 +143,7 @@ async function chat(codeInterpreter: Sandbox, userMessage: string): Promise<Resu
             const codeInterpreterResults = await codeInterpret(codeInterpreter, pythonCode)
             return codeInterpreterResults
         } else {
-            console.error('Failed to match any Python code in model\'s response')
+            console.log('No Python code block in the model\'s response.')
             return []
         }
     } catch (error) {
@@ -159,10 +160,10 @@ async function uploadDataset(codeInterpreter: Sandbox): Promise<string> {
         throw new Error('Dataset file not found')
     }
 
-    const fileBuffer = fs.readFileSync(datasetPath)
+    const fileContent = fs.readFileSync(datasetPath, 'utf-8')
 
     try {
-        const remotePath = await codeInterpreter.files.write('data.csv', fileBuffer)
+        const { path: remotePath } = await codeInterpreter.files.write('data.csv', fileContent)
         if (!remotePath) {
             throw new Error('Failed to upload dataset')
         }
@@ -195,7 +196,7 @@ async function run() {
             fs.writeFileSync('image_1.png', Buffer.from(result.png, 'base64'))
             console.log('Success: Image generated and saved as image_1.png')
         } else {
-            console.error('Error: No PNG data available.')
+            console.log('No chart in the result. The model may not have rendered one.')
         }
 
     } catch (error) {

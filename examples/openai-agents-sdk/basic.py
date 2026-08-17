@@ -33,7 +33,7 @@ except Exception as exc:  # pragma: no cover - import path depends on optional e
 
 
 DEFAULT_QUESTION = "Summarize this workspace in 2 short sentences."
-DEFAULT_MODEL = "gpt-5.4"
+DEFAULT_MODEL = "gpt-5.6-terra"
 DEFAULT_SANDBOX_TYPE = E2BSandboxType.E2B.value
 
 

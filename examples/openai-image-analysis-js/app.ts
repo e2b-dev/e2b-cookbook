@@ -9,7 +9,7 @@ import { buffer } from 'stream/consumers'
 dotenv.config()
 
 
-const MODEL_NAME = 'gpt-4o'
+const MODEL_NAME = 'gpt-5.6-terra'
 const SYSTEM_PROMPT = `
 ## your job & context
 you are a python data scientist. you are given tasks to complete and you run python code to solve them.
@@ -102,6 +102,9 @@ async function chat(codeInterpreter: Sandbox, userMessage: string, base64_image?
         const response = await openai.chat.completions.create({
           model: MODEL_NAME,
           messages: messages,
+          // gpt-5.6-* are reasoning models; function tools on chat.completions
+          // require reasoning_effort 'none' (or the /v1/responses API).
+          reasoning_effort: 'none',
           tools: tools,
           tool_choice: 'auto'
         })
@@ -109,13 +112,10 @@ async function chat(codeInterpreter: Sandbox, userMessage: string, base64_image?
         for (const choice of response.choices) {
           if (choice.message.tool_calls && choice.message.tool_calls.length > 0) {
             for (const toolCall of choice.message.tool_calls) {
+                // v7 widened tool_calls to a union of function and custom tool calls.
+                if (toolCall.type !== 'function') continue
                 if (toolCall.function.name === 'execute_python') {
-                    let code: string
-                    if (typeof toolCall.function.arguments === 'object' && 'code' in toolCall.function.arguments) {
-                        code = (toolCall.function.arguments as { code: string }).code
-                    } else {
-                        code = JSON.parse(toolCall.function.arguments).code
-                    }
+                    const code: string = JSON.parse(toolCall.function.arguments ?? '{}').code
                     console.log('CODE TO RUN') 
                     console.log(code)
                     const codeInterpreterResults = await codeInterpret(codeInterpreter, code)
@@ -150,7 +150,7 @@ async function run() {
         if (result && result.png) {
             fs.writeFileSync('image_1.png', Buffer.from(result.png, 'base64'))
         } else {
-            console.log('No PNG data available.')
+            console.log('No chart in the result. The model may not have rendered one.')
             return
         }
 
@@ -167,7 +167,7 @@ async function run() {
         if (result2 && result2.png) {
             fs.writeFileSync('image_2.png', Buffer.from(result2.png, 'base64'))
         } else {
-            console.log('No PNG data available.')
+            console.log('No chart in the result. The model may not have rendered one.')
         }
     } catch (error) {
         console.error('An error occurred:', error)

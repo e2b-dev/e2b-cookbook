@@ -8,16 +8,16 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@e2b/code-interpreter": "^2.3.1",
+    "@e2b/code-interpreter": "^2.7.0",
     "@inngest/agent-kit": "^0.13.2",
-    "inngest": "3.46.0",
-    "dotenv": "^17.2.3",
+    "inngest": "^4.18.0",
+    "dotenv": "^17.4.2",
     "nodemon": "^3.1.11",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3",
+    "typescript": "^7.0.2",
     "zod": "^4.1.13"
   },
   "devDependencies": {
-    "@types/node": "^24.10.1"
+    "@types/node": "^26.2.0"
   }
 }

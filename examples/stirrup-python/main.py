@@ -13,7 +13,7 @@ async def main():
 
     client = ChatCompletionsClient(
         base_url="https://openrouter.ai/api/v1",
-        model="anthropic/claude-sonnet-4.5",
+        model="anthropic/claude-sonnet-5",
     )
 
     code_exec = E2BCodeExecToolProvider(template="code-interpreter-v1")

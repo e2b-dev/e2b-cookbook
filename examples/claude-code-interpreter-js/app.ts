@@ -8,8 +8,8 @@ import * as dotenv from 'dotenv'
 
 dotenv.config()
 
-//const MODEL_NAME = 'claude-3-opus-20240229'
-const MODEL_NAME = 'claude-3-5-sonnet-20241022'
+//const MODEL_NAME = 'claude-opus-5'
+const MODEL_NAME = 'claude-sonnet-5'
 
 const SYSTEM_PROMPT = `
 ## your job & context
@@ -103,7 +103,9 @@ async function chatWithClaude(codeInterpreter: Sandbox, userMessage: string): Pr
         console.log(`Tool Result: ${codeInterpreterResults}`)
         return codeInterpreterResults
     }
-    throw new Error('Tool use block not found in message content.')
+    // Deliberately a failure: with no tool call there was no code to run, so the
+    // example demonstrated nothing. A missing *chart* is fine; missing code is not.
+    throw new Error(`Claude did not call execute_python (stop_reason: ${message.stop_reason}).`)
 }
 
 
@@ -117,6 +119,13 @@ async function run() {
         )
         const result = codeInterpreterResults[0]
         console.log('Result:', result)
+        // `results` only holds Jupyter display output, so it is empty whenever the
+        // model's code printed instead of rendering, or put the plot in a second
+        // tool call this single-turn example never runs.
+        if (!result) {
+            console.log('No displayable result returned. The model may not have rendered a plot.')
+            return
+        }
         if (result.png) {
             fs.writeFileSync('image.png', Buffer.from(result.png, 'base64'))
         }

@@ -1,13 +1,15 @@
 import fs from 'node:fs'
 import OpenAI from 'openai'
+import type { ChatCompletionTool } from 'openai/resources/chat/completions'
 import { Sandbox, Result } from '@e2b/code-interpreter'
 import { OutputMessage } from '@e2b/code-interpreter'
 import * as dotenv from 'dotenv'
 
 dotenv.config()
 
-const MODEL_NAME = 'o3-mini' // Choose different model by uncommenting. You can choose from models with function-calling support, such as o1 or o3-mini.
-// const MODEL_NAME = 'o1'
+const MODEL_NAME = 'gpt-5.6-terra' // Choose a different model by uncommenting. It needs function-calling support on
+// /v1/chat/completions - gpt-5.6-terra and gpt-5.6-luna do, gpt-5.6-sol does not.
+// const MODEL_NAME = 'gpt-5.6-terra'
 
 const SYSTEM_PROMPT = `
 ## your job & context
@@ -35,7 +37,7 @@ Information about the temperature dataset:
 - you can run any python code you want, everything is running in a secure sandbox environment.
 `
 
-const tools = [
+const tools: ChatCompletionTool[] = [
     {
         type: 'function',
         function: {
@@ -90,6 +92,9 @@ async function chatWithLLM(codeInterpreter: Sandbox, userMessage: string): Promi
             { role: 'system', content: SYSTEM_PROMPT },
             { role: 'user', content: userMessage }
         ],
+        // gpt-5.6-* are reasoning models; function tools on chat.completions
+        // require reasoning_effort 'none' (or the /v1/responses API).
+        reasoning_effort: 'none',
         tools: tools,
         tool_choice: 'auto'
     })
@@ -99,13 +104,17 @@ async function chatWithLLM(codeInterpreter: Sandbox, userMessage: string): Promi
 
     if (message.tool_calls) {
         const toolCall = message.tool_calls[0]
+        // v7 widened tool_calls to a union of function and custom tool calls.
+        if (toolCall.type !== 'function') throw new Error('Expected a function tool call.')
         console.log(`\nTool Used: ${toolCall.function.name}\nTool Input: ${toolCall.function.arguments}`)
 
         const codeInterpreterResults = await processToolCall(codeInterpreter, toolCall)
         console.log(`Tool Result: ${codeInterpreterResults}`)
         return codeInterpreterResults
     }
-    throw new Error('Tool calls not found in message content.')
+    // Deliberately a failure: with no tool call there was no code to run, so the
+    // example demonstrated nothing. A missing *chart* is fine; missing code is not.
+    throw new Error('The model returned no tool call, so there was no code to execute.')
 }
 
 async function uploadDataset(codeInterpreter: Sandbox): Promise<string> {
@@ -116,10 +125,10 @@ async function uploadDataset(codeInterpreter: Sandbox): Promise<string> {
         throw new Error('Dataset file not found')
     }
 
-    const fileBuffer = fs.readFileSync(datasetPath)
+    const fileContent = fs.readFileSync(datasetPath, 'utf-8')
 
     try {
-        const remotePath = await codeInterpreter.files.write('city_temperature.csv', fileBuffer)
+        const { path: remotePath } = await codeInterpreter.files.write('city_temperature.csv', fileContent)
         if (!remotePath) {
             throw new Error('Failed to upload dataset')
         }
@@ -146,6 +155,11 @@ async function run() {
         )
         const result = codeInterpreterResults[0]
         console.log('Result:', result)
+        // The model does not always emit a chart, so there may be no result at all.
+        if (!result) {
+            console.log('No results returned from the code interpreter.')
+            return
+        }
         if (result.png) {
             fs.writeFileSync('temperature_analysis.png', Buffer.from(result.png, 'base64'))
         }

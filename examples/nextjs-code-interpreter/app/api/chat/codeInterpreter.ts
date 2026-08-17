@@ -52,10 +52,18 @@ export async function evaluateCode(
  * @returns The sandbox for the given session ID.
  */
 async function getSandbox(sessionID: string) {
-  const sandboxes = await Sandbox.list();
+  // Sandbox.list() returns a paginator in SDK v2, and it can filter server-side,
+  // so we ask for the one running sandbox with this session ID rather than
+  // listing everything and searching client-side.
+  const [running] = await Sandbox.list({
+    query: {
+      metadata: { sessionID },
+      state: ['running'],
+    },
+    limit: 1,
+  }).nextItems();
 
-  // We check if the sandbox is already running for the given session ID.
-  const sandboxID = sandboxes.find(sandbox => sandbox.metadata?.sessionID === sessionID)?.sandboxId;
+  const sandboxID = running?.sandboxId;
 
   // If the sandbox is already running, we reconnect to it.
   if (sandboxID) {

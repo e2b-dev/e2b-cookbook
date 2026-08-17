@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "esModuleInterop": true,
+    "skipLibCheck": true,
     "target": "esnext"
   }
 }

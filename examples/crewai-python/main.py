@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import os
 
-from crewai import Agent, Crew, Process, Task
+from crewai import Agent, Crew, Process, Task, LLM
 from crewai_tools import E2BPythonTool
 from dotenv import load_dotenv
 
-DEFAULT_MODEL = "openai/gpt-4.1-mini"
+DEFAULT_MODEL = "openai/gpt-5.6-luna"
 SANDBOX_TIMEOUT_SECONDS = 600
 
 ANALYSIS_TASK = """
@@ -53,7 +53,15 @@ def build_crew(python_tool: E2BPythonTool, model: str) -> Crew:
             "E2B sandbox."
         ),
         tools=[python_tool],
-        llm=model,
+        # gpt-5.6-* are reasoning models: function tools are rejected on
+        # /v1/chat/completions unless reasoning effort is off. CrewAI's native
+        # OpenAI provider only forwards reasoning_effort when it believes the
+        # model is a reasoning model, and it decides that with
+        # `"o1" in model.lower()` (crewai/llms/providers/openai/completion.py),
+        # so it drops the parameter for anything newer. The Responses API path
+        # sends it unconditionally, which is also what the API's own error
+        # message recommends, so this example asks for that route.
+        llm=LLM(model=model, reasoning_effort="none", api="responses"),
         allow_delegation=False,
         max_iter=8,
         verbose=True,

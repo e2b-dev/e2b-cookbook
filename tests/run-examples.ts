@@ -8,8 +8,8 @@
  * e2b SDK: e2b depends on chalk 5 and four other ESM-only packages, and while
  * Node 22+ resolves those fine from both CJS and ESM, Jest's own runtime does
  * not implement `require(esm)`. Rather than fight that, the runner is a plain
- * script. It still writes tests/results.json in the shape updateTestsMd.js
- * expects, so the reporting and Slack steps are unchanged.
+ * script. It still writes tests/results.json, which tests/report.mjs turns into
+ * the artifact table and the Slack payload.
  */
 import { promises as fs } from 'fs'
 import path from 'path'
@@ -27,12 +27,11 @@ const scripts: {
   interpreter: Interpreter
   file: string
   // Providers that rate-limit per organisation. Examples sharing a provider are
-  // serialised against each other, which fixed one of the three Groq failures.
-  // The residual limit is not concurrency though: the Groq org is capped at
-  // 100k tokens per DAY on this tier ("tokens per day (TPD): Limit 100000,
-  // Used 99952 ... try again in 10m"), and four Groq examples several calls each
-  // can exhaust it - especially across repeated runs on one day. No retry policy
-  // fixes a daily cap; it needs a higher tier or fewer Groq examples per run.
+  // serialised against each other, so they never compete for the same quota
+  // window. That is not enough on its own: the Groq org is capped at 100k tokens
+  // per DAY on this tier ("tokens per day (TPD): Limit 100000, Used 99952"), which
+  // no retry policy can work around, so the Groq example count is deliberately
+  // held at two. See the exclusion note below before adding a third.
   provider?: string
   // What to pass after `uv run` / `poetry run`. Defaults to main.py for uv and
   // the `start` console script for poetry. Can be a path, a script name, or
@@ -48,14 +47,12 @@ const scripts: {
   { name: 'codestral-code-interpreter-js', interpreter: 'npm', file: './examples/codestral-code-interpreter-js/' },
   { name: 'gpt-4o-code-interpreter-js', interpreter: 'npm', file: './examples/gpt-4o-js/' },
   { name: 'codestral-code-interpreter-python', interpreter: 'jupyter', file: './examples/codestral-code-interpreter-python/codestral_code_interpreter.ipynb' },
-  { name: 'upload-dataset-code-interpreter', provider: 'groq', interpreter: 'jupyter', file: './examples/upload-dataset-code-interpreter/llama_3_code_interpreter_upload_dataset.ipynb' },
   { name: 'hello-world-python', interpreter: 'poetry', file: './examples/hello-world-python/' },
   { name: 'o1-code-interpreter-js', interpreter: 'npm', file: './examples/o1-and-gpt-4-js/' },
   { name: 'gpt-4o-code-interpreter', interpreter: 'jupyter', file: './examples/gpt-4o-python/gpt_4o.ipynb' },
   { name: 'together-ai-code-interpreter-python', interpreter: 'jupyter', file: './examples/together-ai-code-interpreter-python/together_with_e2b_code_interpreter.ipynb' },
   { name: 'langchain-python', interpreter: 'poetry', file: './examples/langchain-python/' },
   { name: 'langgraph-python', interpreter: 'poetry', file: './examples/langgraph-python/' },
-  { name: 'groq-code-interpreter-js', provider: 'groq', interpreter: 'npm', file: './examples/groq-code-interpreter-js/' },
   { name: 'claude-code-interpreter-python', interpreter: 'jupyter', file: './examples/claude-code-interpreter-python/claude_code_interpreter.ipynb' },
   { name: 'claude-visualize-website-topics', interpreter: 'jupyter', file: './examples/claude-visualize-website-topics/claude-visualize-website-topics.ipynb' },
   { name: 'mcp-client-js', interpreter: 'npm', file: './examples/mcp-client-js/' },
@@ -98,6 +95,15 @@ const scripts: {
 // against the current CLI - either pin Codex in the template or wire its current
 // auth - so it is not guessed at here:
 //   openai-codex-in-sandbox-js, openai-codex-in-sandbox-python
+// Dropped to fit the Groq quota, NOT because they are broken - both pass when the
+// day's budget allows, and they should be restored if the tier is raised. The org
+// is capped at 100k tokens per day and four Groq examples several calls each do not
+// fit, so the two carrying the least distinct information come out:
+// groq-code-interpreter-js is the same demo as its Python twin, which stays, and
+// upload-dataset-code-interpreter is a third Groq chart demo.
+// groq-code-interpreter-python and mcp-groq-exa-js remain, covering the two
+// different SDK surfaces:
+//   groq-code-interpreter-js, upload-dataset-code-interpreter
 // Calls a model the Fireworks account cannot reach: qwen2p5-coder-32b-instruct
 // returns 404 "Model not found, inaccessible, and/or not deployed", which does not
 // distinguish a retired model from one this account has not deployed. Needs someone

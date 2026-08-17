@@ -103,7 +103,7 @@ async function uploadDataset(codeInterpreter: Sandbox) {
   console.log("Uploaded train.csv at", trainCsvPath);
 }
 
-// Function to interact with both models: o1 and gpt-5.6-terra
+// Function to interact with both models
 async function chat(
   codeInterpreter: Sandbox,
   userMessage: string,

@@ -49,14 +49,14 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
     <tr>
       <td>GPT-5.6</td>
       <td>Code interpreter and reasoning on image data</td>
-      <td><a href="./examples/gpt-4o-python">Python</a></td>
-      <td><a href="./examples/gpt-4o-js">TypeScript</a></td>
+      <td><a href="./examples/openai-image-analysis-python">Python</a></td>
+      <td><a href="./examples/openai-image-analysis-js">TypeScript</a></td>
     </tr>
     <tr>
       <td>GPT-5.6</td>
       <td>Code interpreter for ML on dataset</td>
-      <td><a href="./examples/o1-and-gpt-4-python">Python</a></td>
-      <td><a href="./examples/o1-and-gpt-4-js">TypeScript</a></td>
+      <td><a href="./examples/openai-ml-dataset-python">Python</a></td>
+      <td><a href="./examples/openai-ml-dataset-js">TypeScript</a></td>
     </tr>
     <tr>
       <td>Codex CLI</td>
@@ -94,7 +94,7 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td>Groq</td>
       <td>Llama 3</td>
       <td>Code interpreter via function calling</td>
-      <td><a href="./examples/groq-code-interpreter-python/llama_3_code_interpreter.ipynb">Python</a></td>
+      <td><a href="./examples/groq-code-interpreter-python/groq_code_interpreter.ipynb">Python</a></td>
       <td><a href="./examples/groq-code-interpreter-js">TypeScript</a></td>
     </tr>
     <tr>

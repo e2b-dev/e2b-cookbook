@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "tsx llama_3_code_interpreter.mts"
+    "start": "tsx groq_code_interpreter.mts"
   },
   "dependencies": {
     "@e2b/code-interpreter": "^2.7.0",

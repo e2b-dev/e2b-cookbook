@@ -7,7 +7,8 @@ import * as dotenv from 'dotenv'
 
 dotenv.config()
 
-const MODEL_NAME = 'gpt-5.6-terra' // Choose different model by uncommenting. You can choose from models with function-calling support, such as o1 or gpt-5.6-terra.
+const MODEL_NAME = 'gpt-5.6-terra' // Choose a different model by uncommenting. It needs function-calling support on
+// /v1/chat/completions - gpt-5.6-terra and gpt-5.6-luna do, gpt-5.6-sol does not.
 // const MODEL_NAME = 'gpt-5.6-terra'
 
 const SYSTEM_PROMPT = `

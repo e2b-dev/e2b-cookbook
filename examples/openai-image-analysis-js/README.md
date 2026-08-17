@@ -1,5 +1,5 @@
-# OpenAI o1 Code Interpreter in JS/TS
-This is an example that tests the capabilities of OpenAI's o1 model. We let it write the code to train a machine learning model on a dataset from Kaggle. We use the E2B Code Interpreter SDK for running the LLM-generated code tasks in a secure and isolated cloud environment.
+# OpenAI image analysis with Code Interpreter (JS/TS)
+This is an example that tests the capabilities of the OpenAI's GPT-5.6 model. We let it generate a chart and reason about it. We use the E2B Code Interpreter SDK for running the LLM-generated code tasks in a secure and isolated cloud environment.
 
 
 ## Tech Stack
@@ -24,9 +24,10 @@ npm i
 npm run start
 ```
 
-After running the program, you should get the results of a chart visualizing the learning curve of the model trained by o1, saved as `result.png`. You can alternatively ask it to plot other charts, like a confusion matrix or the decision tree itself.
+After running the program, you should get the results of two charts visualizing the height distribution and the distribution function, saved as `image_1.png` and `image_2.png` files.
 
-![Example of the output](result.png)
+![Example of the output](image_1.png)
+![Example of the output](image_2.png)
 
 If you encounter any problems, please let us know at our [Discord]((https://discord.com/invite/U7KEcGErtQ)).
 If you want to let the world know about what you're building with E2B, tag [@e2b_dev](https://twitter.com/e2b_dev) on X (Twitter).

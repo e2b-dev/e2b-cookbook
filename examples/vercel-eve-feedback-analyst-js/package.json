@@ -1,0 +1,31 @@
+{
+  "name": "vercel-eve-feedback-analyst-js",
+  "version": "1.0.0",
+  "type": "module",
+  "imports": {
+    "#*": "./agent/*",
+    "#evals/*": "./evals/*"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build": "eve build",
+    "dev": "eve dev --logs sandbox",
+    "start": "eve start",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "^4.0.38",
+    "@e2b/eve-sandbox": "^0.1.1",
+    "ai": "^7.0.63",
+    "e2b": "^2.38.3",
+    "eve": "^0.38.3",
+    "nanoid": "^6.0.1",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "typescript": "^7.0.2"
+  }
+}

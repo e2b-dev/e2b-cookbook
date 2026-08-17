@@ -27,7 +27,7 @@ from examples.sandbox.misc.example_support import text_manifest, tool_call_name
 from examples.sandbox.misc.workspace_apply_patch import WorkspaceApplyPatchCapability
 from examples.sandbox.misc.workspace_shell import WorkspaceShellCapability
 
-DEFAULT_MODEL = "gpt-5.4-mini"
+DEFAULT_MODEL = "gpt-5.6-luna"
 DEFAULT_TIMEOUT_SECONDS = 900
 DEFAULT_FRONTEND_PORT = 8765
 

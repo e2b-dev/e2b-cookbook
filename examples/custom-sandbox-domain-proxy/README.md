@@ -40,3 +40,11 @@ Press `Ctrl+C` to stop and cleanup.
 
 ## Learn More
 [E2B Documentation](https://e2b.dev/docs)
+
+## A note on dependency versions
+
+`http-proxy-middleware` is held at `^3.x` and `open` at `^10.x` on purpose.
+Version 4 of `http-proxy-middleware` requires Node `^22.15.0 || ^24.0.0 || >=26.0.0`
+and reaches for `styleText` from `node:util` (Node 20.12+), while the default E2B
+sandbox image currently ships Node 20.9. Bump these once the base image moves past
+Node 22.

@@ -6,7 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "anthropic[webhooks]>=0.103.0",
-    "e2b>=2.21.0",
+    "e2b>=2.38.0,<3",
     "fastapi>=0.116.0",
     "python-dotenv>=1.0.0",
     "uvicorn>=0.35.0",

@@ -20,7 +20,7 @@ def create_environment(api_key: str, name: str):
     )
 
 
-def create_agent(api_key: str, name: str, model: str = "claude-sonnet-4-6"):
+def create_agent(api_key: str, name: str, model: str = "claude-sonnet-5"):
     client = anthropic.Anthropic(api_key=api_key)
     return client.beta.agents.create(
         name=name,

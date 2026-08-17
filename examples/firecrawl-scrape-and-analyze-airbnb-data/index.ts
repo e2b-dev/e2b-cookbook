@@ -44,7 +44,7 @@ async function chat(
     )
 
     if (toolName === 'execute_python') {
-      const code = toolInput.code
+      const code = (toolInput as { code: string }).code
       return codeInterpret(codeInterpreter, code)
     }
     return undefined
@@ -103,6 +103,10 @@ async function run() {
   }
 
   const firstResult = codeOutput.results[0]
+  if (!firstResult) {
+    console.log('No displayable result returned. The model may not have rendered a chart.')
+    return
+  }
   console.log(firstResult.text)
 
   if (firstResult.png) {

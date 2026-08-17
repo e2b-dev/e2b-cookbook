@@ -38,7 +38,7 @@ async function runBrowserbaseExample() {
   // Create OpenAI agent
   const agent = new Agent({
     name: 'Web Automation Assistant',
-    model: 'gpt-4o', // Using gpt-4o for compatibility
+    model: 'gpt-5.6-terra', // Using gpt-5.6-terra for compatibility
     mcpServers: [mcpServer],
   });
 

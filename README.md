@@ -41,22 +41,22 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td>-</td>
     </tr>
     <tr>
-      <td>o1, o3-mini</td>
+      <td>GPT-5.6</td>
       <td>Data analysis and visualization of a CSV</td>
       <td><a href="./examples/openai-python">Python</a></td>
       <td><a href="./examples/openai-js">TypeScript</a></td>
     </tr>
     <tr>
-      <td>GPT-4o</td>
+      <td>GPT-5.6</td>
       <td>Code interpreter and reasoning on image data</td>
-      <td><a href="./examples/gpt-4o-python">Python</a></td>
-      <td><a href="./examples/gpt-4o-js">TypeScript</a></td>
+      <td><a href="./examples/openai-image-analysis-python">Python</a></td>
+      <td><a href="./examples/openai-image-analysis-js">TypeScript</a></td>
     </tr>
     <tr>
-      <td>o1, o3-mini, GPT-4</td>
+      <td>GPT-5.6</td>
       <td>Code interpreter for ML on dataset</td>
-      <td><a href="./examples/o1-and-gpt-4-python">Python</a></td>
-      <td><a href="./examples/o1-and-gpt-4-js">TypeScript</a></td>
+      <td><a href="./examples/openai-ml-dataset-python">Python</a></td>
+      <td><a href="./examples/openai-ml-dataset-js">TypeScript</a></td>
     </tr>
     <tr>
       <td>Codex CLI</td>
@@ -66,7 +66,7 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
     </tr>
     <tr>
       <td rowspan="3">Anthropic</td>
-      <td>Claude 3 Opus</td>
+      <td>Claude Opus 5</td>
       <td>Code interpreter</td>
       <td><a href="./examples/claude-code-interpreter-python">Python</a></td>
       <td><a href="./examples/claude-code-interpreter-js">TypeScript</a></td>
@@ -101,7 +101,7 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td>Groq</td>
       <td>Llama 3</td>
       <td>Code interpreter via function calling</td>
-      <td><a href="./examples/groq-code-interpreter-python/llama_3_code_interpreter.ipynb">Python</a></td>
+      <td><a href="./examples/groq-code-interpreter-python/groq_code_interpreter.ipynb">Python</a></td>
       <td><a href="./examples/groq-code-interpreter-js">TypeScript</a></td>
     </tr>
     <tr>
@@ -159,9 +159,9 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td>-</td>
     </tr>
     <tr>
-      <td>Autogen</td>
-      <td>Autogen with secure sandboxed for code interpreting</td>
-      <td><a href="./examples/autogen-python">Python</a></td>
+      <td>CrewAI</td>
+      <td>CrewAI agent with sandboxed Python execution</td>
+      <td><a href="./examples/crewai-python">Python</a></td>
       <td>-</td>
     </tr>
     <tr>
@@ -169,6 +169,18 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td>Next.js + AI SDK + Code Interpreter</td>
       <td>-</td>
       <td><a href="./examples/nextjs-code-interpreter">TypeScript</a></td>
+    </tr>
+    <tr>
+    <td>▲ <a href="https://eve.dev/docs">Vercel eve</a></td>
+      <td>Feedback analyst agent whose sandbox backend is E2B, publishing an HTML report from the sandbox</td>
+      <td>-</td>
+      <td><a href="./examples/vercel-eve-feedback-analyst-js">TypeScript</a></td>
+    </tr>
+    <tr>
+    <td><a href="https://flueframework.com">Flue</a></td>
+      <td>Feedback analyst agent running entirely inside an E2B sandbox, publishing an HTML report from the sandbox</td>
+      <td>-</td>
+      <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/flue-feedback-analyst-js">TypeScript</a></td>
     </tr>
     <tr>
     <td>AgentKit</td>
@@ -242,9 +254,39 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
 
 **Example use cases**
 
-- Upload dataset and analyze it with Llama 3 - [Python](./examples/upload-dataset-code-interpreter)
-- Scrape Airbnb and analyze data with Claude 3 Opus and Firecrawl - [TypeScript](./examples/firecrawl-scrape-and-analyze-airbnb-data)
-- Visualize website topics with Claude 3.5 Sonnet and Firecrawl - [Python](./examples/claude-visualize-website-topics)
+- Upload dataset and analyze it with Llama 3.3 - [Python](./examples/upload-dataset-code-interpreter)
+- Scrape Airbnb and analyze data with Claude Opus 5 and Firecrawl - [TypeScript](./examples/firecrawl-scrape-and-analyze-airbnb-data)
+- Visualize website topics with Claude Sonnet 5 and Firecrawl - [Python](./examples/claude-visualize-website-topics)
 - Next.js app with LLM + Code Interpreter and streaming - [TypeScript](./examples/nextjs-code-interpreter)
 - How to run a Docker container in E2B - [Python/TypeScript](./examples/docker-in-e2b)
 - How to run Playwright in E2B - [TypeScript](./examples/playwright-in-e2b)
+- Map custom subdomains to your sandboxes - [TypeScript](./examples/custom-sandbox-domain-proxy)
+- Feedback analyst agent on Flue, publishing an HTML report from a sandbox - [TypeScript](./examples/flue-feedback-analyst-js)
+
+## Running the examples as a test suite
+
+Every example is exercised nightly against live E2B by `tests/run-examples.ts`: each
+one is uploaded into a fresh sandbox, installed with its own toolchain (npm, uv,
+Poetry, or nbconvert for notebooks) and run. An example passes if it exits 0.
+
+```bash
+npm install
+npm test                      # all of them
+npm test -- hello-world       # substring filter, one or a few
+```
+
+You need an `E2B_API_KEY` plus whichever provider key the examples you are running
+use - see `.env.example`. `hello-world-js` and `hello-world-python` need only the E2B
+key, so they are the ones to try first.
+
+**What counts as a failure.** The suite checks the sandbox, not the model. A provider
+rate limit or an exhausted quota counts as OK, because the sandbox still built,
+installed and ran; non-deterministic model behaviour - no chart produced, a malformed
+tool call, generated code raising inside the sandbox - is reported as skipped. Real
+failures are the things that are actually broken: missing templates, dependency
+resolution, wrong entrypoints, auth, retired model ids, sandbox timeouts.
+
+Some examples are deliberately not covered - they need a provider key this repo does
+not hold, a long-lived server the runner cannot assert on, or an upstream fix. Each
+exclusion is listed with its reason at the top of `tests/run-examples.ts`, so a gap is
+never silent.

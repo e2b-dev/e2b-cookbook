@@ -1,0 +1,171 @@
+{
+  "export": {
+    "source": "Product analytics — onboarding activation export",
+    "exported_at": "2026-08-05T09:14:31Z",
+    "window": { "from": "2026-06-22", "to": "2026-08-05" },
+    "timezone": "UTC",
+    "known_gaps": [
+      "The invite modal emits no view event, so drop-off inside the modal is invisible. Only invite_sent is recorded.",
+      "There is no event for an invite blocked by a missing payment method; those users look identical to users who never opened the modal.",
+      "Org role (owner/admin/developer) is not on any event, so funnel steps cannot be split by role.",
+      "Feedback respondents are not joined to analytics identities, so a survey answer cannot be traced to that account's funnel path.",
+      "The region property was added to sandbox_start on 2026-07-06; earlier weeks have no region breakdown."
+    ]
+  },
+  "funnels": [
+    {
+      "id": "onboarding_activation",
+      "name": "Onboarding activation",
+      "window": { "from": "2026-06-22", "to": "2026-08-05" },
+      "conversion_window_days": 14,
+      "steps": [
+        { "key": "signup_completed", "label": "Signed up", "count": 5842, "conversion_from_previous": null },
+        { "key": "api_key_created", "label": "Created an API key", "count": 4910, "conversion_from_previous": 0.841 },
+        { "key": "first_sandbox_started", "label": "Started first sandbox", "count": 3984, "conversion_from_previous": 0.811 },
+        { "key": "template_built", "label": "Built a template", "count": 2166, "conversion_from_previous": 0.544 },
+        { "key": "invite_sent", "label": "Invited a teammate", "count": 612, "conversion_from_previous": 0.283 },
+        { "key": "returned_week_2", "label": "Returned in week 2", "count": 1978, "conversion_from_previous": null }
+      ],
+      "weekly": [
+        {
+          "week_start": "2026-06-22",
+          "signup_completed": 861,
+          "api_key_created": 727,
+          "first_sandbox_started": 592,
+          "template_built": 318,
+          "invite_sent": 100,
+          "returned_week_2": 302,
+          "invite_rate_from_first_sandbox": 0.169
+        },
+        {
+          "week_start": "2026-06-29",
+          "signup_completed": 934,
+          "api_key_created": 781,
+          "first_sandbox_started": 634,
+          "template_built": 341,
+          "invite_sent": 103,
+          "returned_week_2": 318,
+          "invite_rate_from_first_sandbox": 0.162
+        },
+        {
+          "week_start": "2026-07-06",
+          "signup_completed": 1012,
+          "api_key_created": 856,
+          "first_sandbox_started": 703,
+          "template_built": 379,
+          "invite_sent": 99,
+          "returned_week_2": 349,
+          "invite_rate_from_first_sandbox": 0.141
+        },
+        {
+          "week_start": "2026-07-13",
+          "signup_completed": 998,
+          "api_key_created": 833,
+          "first_sandbox_started": 678,
+          "template_built": 372,
+          "invite_sent": 76,
+          "returned_week_2": 331,
+          "invite_rate_from_first_sandbox": 0.112
+        },
+        {
+          "week_start": "2026-07-20",
+          "signup_completed": 1043,
+          "api_key_created": 879,
+          "first_sandbox_started": 711,
+          "template_built": 392,
+          "invite_sent": 74,
+          "returned_week_2": 352,
+          "invite_rate_from_first_sandbox": 0.104
+        },
+        {
+          "week_start": "2026-07-27",
+          "signup_completed": 994,
+          "api_key_created": 834,
+          "first_sandbox_started": 666,
+          "template_built": 364,
+          "invite_sent": 73,
+          "returned_week_2": 326,
+          "invite_rate_from_first_sandbox": 0.11
+        }
+      ],
+      "breakdowns": {
+        "by_plan": [
+          { "plan": "hobby", "first_sandbox_started": 2810, "template_built": 1348, "invite_sent": 214, "invite_rate_from_first_sandbox": 0.076 },
+          { "plan": "pro", "first_sandbox_started": 1004, "template_built": 706, "invite_sent": 331, "invite_rate_from_first_sandbox": 0.33 },
+          { "plan": "enterprise_trial", "first_sandbox_started": 170, "template_built": 112, "invite_sent": 67, "invite_rate_from_first_sandbox": 0.394 }
+        ],
+        "by_sdk": [
+          { "sdk": "python", "first_sandbox_started": 2231, "template_built": 1266, "invite_sent": 358 },
+          { "sdk": "js", "first_sandbox_started": 1753, "template_built": 900, "invite_sent": 254 }
+        ]
+      }
+    }
+  ],
+  "trends": [
+    {
+      "id": "template_build_duration",
+      "name": "Template build duration (seconds)",
+      "unit": "seconds",
+      "weekly": [
+        { "week_start": "2026-06-22", "p50": 318, "p95": 664, "builds": 402 },
+        { "week_start": "2026-06-29", "p50": 305, "p95": 651, "builds": 431 },
+        { "week_start": "2026-07-06", "p50": 312, "p95": 640, "builds": 468 },
+        { "week_start": "2026-07-13", "p50": 298, "p95": 612, "builds": 455 },
+        { "week_start": "2026-07-20", "p50": 214, "p95": 431, "builds": 489 },
+        { "week_start": "2026-07-27", "p50": 194, "p95": 380, "builds": 462 }
+      ]
+    },
+    {
+      "id": "sandbox_start_latency",
+      "name": "Sandbox start latency (milliseconds)",
+      "unit": "milliseconds",
+      "weekly": [
+        { "week_start": "2026-06-22", "p50": 186, "p95": 1840, "p99": 4720 },
+        { "week_start": "2026-06-29", "p50": 191, "p95": 1910, "p99": 5310 },
+        { "week_start": "2026-07-06", "p50": 188, "p95": 1770, "p99": 4680 },
+        { "week_start": "2026-07-13", "p50": 183, "p95": 1720, "p99": 4410 },
+        { "week_start": "2026-07-20", "p50": 179, "p95": 1690, "p99": 4380 },
+        { "week_start": "2026-07-27", "p50": 176, "p95": 1650, "p99": 4290 }
+      ]
+    },
+    {
+      "id": "invite_acceptance",
+      "name": "Invites sent vs accepted",
+      "unit": "count",
+      "weekly": [
+        { "week_start": "2026-06-22", "sent": 100, "accepted": 71 },
+        { "week_start": "2026-06-29", "sent": 103, "accepted": 74 },
+        { "week_start": "2026-07-06", "sent": 99, "accepted": 68 },
+        { "week_start": "2026-07-13", "sent": 76, "accepted": 49 },
+        { "week_start": "2026-07-20", "sent": 74, "accepted": 47 },
+        { "week_start": "2026-07-27", "sent": 73, "accepted": 48 }
+      ]
+    }
+  ],
+  "service_health": {
+    "weekly_uptime": [
+      { "week_start": "2026-06-22", "uptime_pct": 99.98 },
+      { "week_start": "2026-06-29", "uptime_pct": 99.91 },
+      { "week_start": "2026-07-06", "uptime_pct": 99.97 },
+      { "week_start": "2026-07-13", "uptime_pct": 99.99 },
+      { "week_start": "2026-07-20", "uptime_pct": 99.98 },
+      { "week_start": "2026-07-27", "uptime_pct": 100.0 }
+    ],
+    "incidents": [
+      {
+        "date": "2026-07-02",
+        "duration_minutes": 88,
+        "regions": ["eu-central-1"],
+        "summary": "Elevated sandbox create failures in eu-central-1. Retries against us-east-1 succeeded.",
+        "status_page_updated": false,
+        "postmortem_note": "The status page was not updated during the event because the alert did not cross the global threshold."
+      }
+    ]
+  },
+  "annotations": [
+    { "date": "2026-06-30", "text": "Pricing page copy test started (50/50)." },
+    { "date": "2026-07-08", "text": "Workspace permissions revamp shipped: API keys scoped to a workspace, roles renamed to owner/admin/developer, invite requires a payment method on file." },
+    { "date": "2026-07-21", "text": "Template build cache improvements shipped." },
+    { "date": "2026-07-24", "text": "Docs: pause and resume page rewritten." }
+  ]
+}

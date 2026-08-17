@@ -7,7 +7,15 @@
     "start": "tsx index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["e2b", "mcp", "openai", "agent", "research", "arxiv", "duckduckgo"],
+  "keywords": [
+    "e2b",
+    "mcp",
+    "openai",
+    "agent",
+    "research",
+    "arxiv",
+    "duckduckgo"
+  ],
   "license": "MIT",
   "author": {
     "name": "FoundryLabs, Inc.",
@@ -15,13 +23,13 @@
     "url": "https://e2b.dev"
   },
   "devDependencies": {
-    "@types/node": "^20.16.6",
+    "@types/node": "^26.2.0",
     "tsx": "^4.7.3",
-    "typescript": "^5.4.5"
+    "typescript": "^7.0.2"
   },
   "dependencies": {
-    "@openai/agents": "^0.1.9",
-    "e2b": "^2.3.4",
-    "dotenv": "^16.4.5"
+    "@openai/agents": "^0.15.0",
+    "e2b": "^2.38.3",
+    "dotenv": "^17.4.2"
   }
 }

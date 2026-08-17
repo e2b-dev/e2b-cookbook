@@ -36,7 +36,7 @@ async function runResearchAgent() {
   // Create OpenAI agent
   const agent = new Agent({
     name: 'Research Assistant',
-    model: 'gpt-4o', // Using gpt-4o instead of gpt-5-nano-2025-08-07 for compatibility
+    model: 'gpt-5.6-terra', // Using gpt-5.6-terra instead of gpt-5-nano-2025-08-07 for compatibility
     mcpServers: [mcpServer],
   });
 

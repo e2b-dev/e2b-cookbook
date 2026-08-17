@@ -6,3 +6,16 @@ node_modules
 /logs
 .next
 next-env.d.ts
+
+# Local planning and cross-repository documentation drafts
+DECISIONS.md
+CREWAI_DOCS_DRAFT.mdx
+CREWAI_ATTRIBUTION.patch
+
+# TypeScript incremental build cache
+*.tsbuildinfo
+
+# test runner artifacts
+tests/results.json
+tests/Tests.txt
+tests/slack-payload.json

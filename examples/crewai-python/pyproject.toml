@@ -1,0 +1,20 @@
+[project]
+name = "crewai-python"
+version = "0.1.0"
+description = "Example of using CrewAI with E2B for sandboxed Python execution"
+readme = "README.md"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "crewai>=1.15.5,<2",
+    "crewai-tools[e2b]>=1.15.5,<2",
+    "python-dotenv>=1.1,<2",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4,<9",
+    "ruff>=0.12,<1",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]

@@ -21,7 +21,7 @@ from agents.sandbox.session import SandboxSession
 if __package__ is None or __package__ == "":
     sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-DEFAULT_MODEL = "gpt-5.4"
+DEFAULT_MODEL = "gpt-5.6-terra"
 DEFAULT_TEMPLATE = "e2b/openai-desktop"
 DEFAULT_TIMEOUT_SECONDS = 1800
 DEFAULT_DESKTOP_PORT = 6080

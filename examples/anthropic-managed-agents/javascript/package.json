@@ -17,13 +17,13 @@
     "upload-file": "tsx src/cli.ts upload-file"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.97.1",
-    "dotenv": "^17.2.3",
-    "e2b": "^2.21.0"
+    "@anthropic-ai/sdk": "^0.116.0",
+    "dotenv": "^17.4.2",
+    "e2b": "^2.38.3"
   },
   "devDependencies": {
-    "@types/node": "^24.10.1",
+    "@types/node": "^26.2.0",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^7.0.2"
   }
 }

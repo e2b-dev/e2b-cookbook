@@ -30,7 +30,7 @@ export const REMOTE_APP_SANDBOX_ROUTING_SCOPE = `${REMOTE_CONFIG_DIR}/app-sandbo
 
 export const SANDBOX_TOOLS = ["bash", "read", "write", "edit", "glob", "grep"] as const;
 export const WEB_TOOLS = ["web_fetch", "web_search"] as const;
-export const DEFAULT_MODEL = "claude-sonnet-4-6";
+export const DEFAULT_MODEL = "claude-sonnet-5";
 export const DEFAULT_SYSTEM_PROMPT =
   "You have a Linux sandbox. You are already in the working directory. " +
   "Agent skills are downloaded under skills/<name>/. " +

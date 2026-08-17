@@ -360,7 +360,11 @@ const MODEL_SIDE = [
   /No displayable result|No chart in the result|No PNG data|No code interpreter results/i,
   // Code the model generated raised inside the sandbox. The sandbox executed it
   // and faithfully returned the error, which is the behaviour we want.
-  /\[Code Interpreter ERROR\]|AI-generated Python runtime error/i,
+  // Anchored to a real emission: nbconvert echoes the failing cell's source into
+  // the log, so an unanchored match also fired on the notebook's own
+  // `print("[Code Interpreter ERROR]", exec.error)` line and misread a 404 as
+  // model behaviour.
+  /\[Code Interpreter ERROR\][^"')\n]{3,}|AI-generated Python runtime error/i,
 ]
 
 function classify(output: string): Verdict {

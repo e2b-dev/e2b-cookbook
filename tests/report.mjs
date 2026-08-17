@@ -60,7 +60,11 @@ const LABEL = { passed: '✅ Passed', pending: '⏭️ Skipped', failed: '❌ Fa
 // so every variable is always present and never an empty string.
 const NONE = 'none'
 
-const LINK_MRKDWN = true
+// Confirmed against a live preview: Workflow Builder does NOT render Slack mrkdwn
+// inside a Text variable - `<url|view run>` arrived with the angle brackets intact.
+// So the URL goes in bare, which Slack linkifies by itself, and onto its own line
+// so an 80-character actions URL stops swallowing the branch and commit.
+const LINK_MRKDWN = false
 const runLink = !runUrl
   ? ''
   : LINK_MRKDWN
@@ -81,7 +85,9 @@ function variables({ passed, skipped, failed, rateLimited = [], total, crashed }
       headline: '░░░░░░░░░░░░░░░░░░░░  0/0 ran clean',
       counts: '❌ runner crashed',
       details: crashed,
-      footer: [GITHUB_REF_NAME, GITHUB_SHA && GITHUB_SHA.slice(0, 7), runLink].filter(Boolean).join(' · '),
+      footer: [[GITHUB_REF_NAME, GITHUB_SHA && GITHUB_SHA.slice(0, 7)].filter(Boolean).join(' · '), runLink]
+        .filter(Boolean)
+        .join('\n'),
       summary: 'No results were written, so no example was judged.',
       failed: crashed,
       skipped: NONE,
@@ -140,7 +146,9 @@ function variables({ passed, skipped, failed, rateLimited = [], total, crashed }
     headline,
     counts,
     details: lines.join('\n'),
-    footer: [GITHUB_REF_NAME, GITHUB_SHA && GITHUB_SHA.slice(0, 7), runLink].filter(Boolean).join(' · '),
+    footer: [[GITHUB_REF_NAME, GITHUB_SHA && GITHUB_SHA.slice(0, 7)].filter(Boolean).join(' · '), runLink]
+      .filter(Boolean)
+      .join('\n'),
     // Kept for anyone composing their own layout.
     summary:
       `${passed.length} passed · ${skipped.length} skipped · ${failed.length} failed (of ${total})` +

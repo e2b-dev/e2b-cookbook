@@ -33,6 +33,10 @@ const scripts: {
   // no retry policy can work around, so the Groq example count is deliberately
   // held at two. See the exclusion note below before adding a third.
   provider?: string
+  // Install this Node version in the sandbox before running. The E2B base template
+  // ships Node 20.9 (checked, not assumed), so a dependency declaring a newer engine
+  // needs one fetched in. Pinned tarball rather than a piped installer script.
+  nodeVersion?: string
   // What to pass after `uv run` / `poetry run`. Defaults to main.py for uv and
   // the `start` console script for poetry. Can be a path, a script name, or
   // `python -m pkg.mod` for packages whose entry uses absolute imports.
@@ -61,7 +65,8 @@ const scripts: {
   { name: 'mcp-groq-exa-js', provider: 'groq', interpreter: 'npm', file: './examples/mcp-groq-exa-js/' },
   { name: 'openai-js', interpreter: 'npm', file: './examples/openai-js/' },
   { name: 'openai-python', interpreter: 'jupyter', file: './examples/openai-python/openai.ipynb' },
-  { name: 'custom-sandbox-domain-proxy', interpreter: 'npm', file: './examples/custom-sandbox-domain-proxy/' },
+  // http-proxy-middleware 4 requires Node ^22.15 || ^24 || >=26.
+  { name: 'custom-sandbox-domain-proxy', interpreter: 'npm', file: './examples/custom-sandbox-domain-proxy/', nodeVersion: '22.22.0' },
   { name: 'crewai-python', interpreter: 'uv', file: './examples/crewai-python/' },
   { name: 'playwright-in-e2b', interpreter: 'npm', file: './examples/playwright-in-e2b/' },
   { name: 'anthropic-claude-code-in-sandbox-js', interpreter: 'npm', file: './examples/anthropic-claude-code-in-sandbox-js/' },
@@ -268,7 +273,22 @@ function isRetryable(output: string): boolean {
   return /rate limit|429|50[023]|deadline_exceeded|ETIMEDOUT|ECONNRESET|ENOTFOUND|EAI_AGAIN|temporarily unavailable|APIConnectionError|Connection error|connection reset|socket hang up|tool_use_failed|Failed to call a function/i.test(output)
 }
 
-function testScript(interpreter: Interpreter, notebookPath: string, entrypoint?: string): string[] {
+function nodeInstall(version: string): string[] {
+  const dir = `node-v${version}-linux-x64`
+  return [
+    `curl -fsSL https://nodejs.org/dist/v${version}/${dir}.tar.xz -o /tmp/node.tar.xz`,
+    'tar -xf /tmp/node.tar.xz -C /home/user',
+    `PATH=/home/user/${dir}/bin:$PATH`,
+  ]
+}
+
+function testScript(
+  interpreter: Interpreter,
+  notebookPath: string,
+  entrypoint?: string,
+  nodeVersion?: string,
+): string[] {
+  const nodePrefix = nodeVersion ? nodeInstall(nodeVersion) : []
   const INSTALL_POETRY_COMMAND = 'curl -sSL https://install.python-poetry.org | python3 -'
   // Installed from PyPI rather than `curl | sh`: this sandbox is handed provider
   // API keys a moment later, so an unpinned remote script does not belong here.
@@ -307,7 +327,7 @@ function testScript(interpreter: Interpreter, notebookPath: string, entrypoint?:
 
   // A NodeJS project.
   if (interpreter === 'npm') {
-    return [`cd ${SANDBOX_TEST_DIRECTORY}`, 'npm install', 'npm run start']
+    return [...nodePrefix, `cd ${SANDBOX_TEST_DIRECTORY}`, 'npm install', 'npm run start']
   }
 
   return []
@@ -374,7 +394,7 @@ function classify(output: string): Verdict {
 }
 
 async function runOne(
-  { name, interpreter, file: examplePath, entrypoint }: (typeof scripts)[number],
+  { name, interpreter, file: examplePath, entrypoint, nodeVersion }: (typeof scripts)[number],
   logsDir: string,
 ): Promise<Outcome> {
   const startedAt = Date.now()
@@ -391,7 +411,7 @@ async function runOne(
       await uploadPathToPath(examplePath, SANDBOX_TEST_DIRECTORY, sandbox)
 
       const notebookPath = path.posix.join(SANDBOX_TEST_DIRECTORY, path.basename(examplePath))
-      const command = testScript(interpreter, notebookPath, entrypoint).join(' && ')
+      const command = testScript(interpreter, notebookPath, entrypoint, nodeVersion).join(' && ')
 
       await sandbox.commands.run(command, {
         onStderr: async (output) => {

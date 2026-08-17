@@ -411,7 +411,14 @@ async function runOne(
       lastFailure = detail
       await fs.appendFile(logFilePath, `\nAttempt ${attempt}/${MAX_ATTEMPTS} failed:\n${detail}\n`)
 
-      if (MODEL_SIDE.some((r) => r.test(detail))) {
+      // Go through classify() rather than testing MODEL_SIDE here, so precedence
+      // lives in exactly one place. Testing MODEL_SIDE directly meant an output
+      // containing both a 429 and a model-side pattern - which is what a rate
+      // limited notebook produces, since nbconvert reports the cell error too -
+      // short-circuited to skip before the rate limit was ever considered.
+      // Only a settled skip returns early; a rate limit falls through to the
+      // retries below, because its window often clears.
+      if (classify(detail) === 'skip') {
         console.log(`SKIP  ${name} (the model's behaviour, not the sandbox)`)
         await fs.appendFile(logFilePath, `\nSKIPPED: classified as model-side, not a sandbox failure\n`)
         return { name, verdict: 'skip', durationMs: Date.now() - startedAt, failure: detail.slice(0, 4000) }

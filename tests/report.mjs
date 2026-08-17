@@ -11,7 +11,7 @@
  * not. The message itself is composed in Workflow Builder from these variables.
  *
  * Declare these on the trigger, all type Text:
- *   outcome status summary failed skipped branch commit run_url
+ *   outcome status summary failed skipped rate_limited branch commit run_url
  *
  * `outcome` is the one to branch on: pass | skip | fail | crash, no emoji and no
  * sentinel string to compare against. `status` is the human-facing version and
@@ -59,7 +59,7 @@ function list(names, limit = 12) {
   return `${names.slice(0, limit).join(', ')} and ${names.length - limit} more`
 }
 
-function variables({ passed, skipped, failed, total, crashed }) {
+function variables({ passed, skipped, failed, rateLimited = [], total, crashed }) {
   if (crashed) {
     return {
       outcome: 'crash',
@@ -67,6 +67,7 @@ function variables({ passed, skipped, failed, total, crashed }) {
       summary: 'No results were written, so no example was judged.',
       failed: crashed,
       skipped: NONE,
+      rate_limited: NONE,
       branch: GITHUB_REF_NAME || NONE,
       commit: GITHUB_SHA ? GITHUB_SHA.slice(0, 7) : NONE,
       run_url: runUrl || NONE,
@@ -76,9 +77,12 @@ function variables({ passed, skipped, failed, total, crashed }) {
     // Branch on this. Deliberately plain: no emoji, no "none" sentinel.
     outcome: failed.length ? 'fail' : skipped.length ? 'skip' : 'pass',
     status: failed.length ? '❌ failed' : skipped.length ? '⚠️ passed with skips' : '✅ passed',
-    summary: `${passed.length} passed · ${skipped.length} skipped · ${failed.length} failed (of ${total})`,
+    summary:
+      `${passed.length} passed · ${skipped.length} skipped · ${failed.length} failed (of ${total})` +
+      (rateLimited.length ? ` · ${rateLimited.length} rate limited` : ''),
     failed: list(failed),
     skipped: list(skipped),
+    rate_limited: list(rateLimited),
     branch: GITHUB_REF_NAME || NONE,
     commit: GITHUB_SHA ? GITHUB_SHA.slice(0, 7) : NONE,
     run_url: runUrl || NONE,
@@ -102,17 +106,26 @@ async function main() {
   const passed = byStatus('passed')
   const skipped = byStatus('pending')
   const failed = byStatus('failed')
+  // Passes that were really the provider refusing. Counted OK on purpose, but
+  // named so a dry account is visible rather than indistinguishable from health.
+  const rateLimited = assertions.filter((a) => a.rateLimited).map((a) => a.title)
 
   const table = assertions
     .map((a) => `| ${a.title} | ${LABEL[a.status] ?? a.status} |`)
     .join('\n')
-  const summary = `${passed.length} passed · ${skipped.length} skipped · ${failed.length} failed (of ${assertions.length})`
+  const summary =
+    `${passed.length} passed · ${skipped.length} skipped · ${failed.length} failed (of ${assertions.length})` +
+    (rateLimited.length ? ` · ${rateLimited.length} rate limited` : '')
 
   await fs.writeFile(tablePath, `${summary}\n\n${table}\n`)
 
   await fs.writeFile(
     payloadPath,
-    JSON.stringify(variables({ passed, skipped, failed, total: assertions.length }), null, 2),
+    JSON.stringify(
+      variables({ passed, skipped, failed, rateLimited, total: assertions.length }),
+      null,
+      2,
+    ),
   )
 
   console.log(summary)

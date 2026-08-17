@@ -253,3 +253,33 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
 - Next.js app with LLM + Code Interpreter and streaming - [TypeScript](./examples/nextjs-code-interpreter)
 - How to run a Docker container in E2B - [Python/TypeScript](./examples/docker-in-e2b)
 - How to run Playwright in E2B - [TypeScript](./examples/playwright-in-e2b)
+- Map custom subdomains to your sandboxes - [TypeScript](./examples/custom-sandbox-domain-proxy)
+- Feedback analyst agent on Flue, publishing an HTML report from a sandbox - [TypeScript](./examples/flue-feedback-analyst-js)
+
+## Running the examples as a test suite
+
+Every example is exercised nightly against live E2B by `tests/run-examples.ts`: each
+one is uploaded into a fresh sandbox, installed with its own toolchain (npm, uv,
+Poetry, or nbconvert for notebooks) and run. An example passes if it exits 0.
+
+```bash
+npm install
+npm test                      # all of them
+npm test -- hello-world       # substring filter, one or a few
+```
+
+You need an `E2B_API_KEY` plus whichever provider key the examples you are running
+use - see `.env.example`. `hello-world-js` and `hello-world-python` need only the E2B
+key, so they are the ones to try first.
+
+**What counts as a failure.** The suite checks the sandbox, not the model. A provider
+rate limit or an exhausted quota counts as OK, because the sandbox still built,
+installed and ran; non-deterministic model behaviour - no chart produced, a malformed
+tool call, generated code raising inside the sandbox - is reported as skipped. Real
+failures are the things that are actually broken: missing templates, dependency
+resolution, wrong entrypoints, auth, retired model ids, sandbox timeouts.
+
+Some examples are deliberately not covered - they need a provider key this repo does
+not hold, a long-lived server the runner cannot assert on, or an upstream fix. Each
+exclusion is listed with its reason at the top of `tests/run-examples.ts`, so a gap is
+never silent.

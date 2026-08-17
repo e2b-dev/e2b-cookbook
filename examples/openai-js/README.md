@@ -4,7 +4,7 @@ This is an example that tests the capabilities of OpenAI's models. You can choos
 
 ## Tech Stack
 - [E2B Code Interpreter SDK]((https://github.com/e2b-dev/code-interpreter)) for running the LLM-generated code
-- [OpenAI's GPT-5.6](https://openai.com/index/hello-gpt-4o/) as an LLM
+- [OpenAI's GPT-5.6](https://openai.com/index/hello-GPT-5.6/) as an LLM
 - JavaScript/TypeScript
 
 ## Setup

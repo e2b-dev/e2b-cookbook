@@ -11,7 +11,14 @@
  * not. The message itself is composed in Workflow Builder from these variables.
  *
  * Declare these on the trigger, all type Text:
- *   outcome status summary failed skipped rate_limited branch commit run_url
+ *   outcome status headline details footer
+ *   failed skipped rate_limited branch commit run_url
+ *
+ * Workflow Builder cannot do conditionals, so a template of one line per category
+ * prints "Failed: none" and "Skipped: none" on a healthy run - two lines saying
+ * nothing - and cannot show the rate-limited names at all. `details` is therefore
+ * composed here: only the lines that apply, already formatted. A message of
+ * {{status}} / {{headline}} / {{details}} / {{footer}} needs no conditionals.
  *
  * `outcome` is the one to branch on: pass | skip | fail | crash, no emoji and no
  * sentinel string to compare against. `status` is the human-facing version and
@@ -64,6 +71,9 @@ function variables({ passed, skipped, failed, rateLimited = [], total, crashed }
     return {
       outcome: 'crash',
       status: '❌ runner crashed',
+      headline: 'No results were written, so no example was judged.',
+      details: crashed,
+      footer: [GITHUB_REF_NAME, GITHUB_SHA && GITHUB_SHA.slice(0, 7), runUrl].filter(Boolean).join(' · '),
       summary: 'No results were written, so no example was judged.',
       failed: crashed,
       skipped: NONE,
@@ -73,10 +83,32 @@ function variables({ passed, skipped, failed, rateLimited = [], total, crashed }
       run_url: runUrl || NONE,
     }
   }
+
+  const real = passed.length - rateLimited.length
+  const headline =
+    `${real}/${total} ran clean` +
+    (rateLimited.length ? `, ${rateLimited.length} rate limited` : '') +
+    (skipped.length ? `, ${skipped.length} skipped` : '') +
+    (failed.length ? `, ${failed.length} failed` : '')
+
+  // Only the lines that apply. A clean run gets one line, not three saying "none".
+  const lines = []
+  if (failed.length) lines.push(`❌ Failed: ${list(failed)}`)
+  if (rateLimited.length) {
+    lines.push(`⏳ Rate limited, counted OK: ${list(rateLimited)}`)
+  }
+  if (skipped.length) {
+    lines.push(`⏭️ Skipped, the model varied rather than the sandbox: ${list(skipped)}`)
+  }
+  if (!lines.length) lines.push('Nothing to report - every example ran and returned.')
+
   return {
-    // Branch on this. Deliberately plain: no emoji, no "none" sentinel.
     outcome: failed.length ? 'fail' : skipped.length ? 'skip' : 'pass',
     status: failed.length ? '❌ failed' : skipped.length ? '⚠️ passed with skips' : '✅ passed',
+    headline,
+    details: lines.join('\n'),
+    footer: [GITHUB_REF_NAME, GITHUB_SHA && GITHUB_SHA.slice(0, 7), runUrl].filter(Boolean).join(' · '),
+    // Kept for anyone composing their own layout.
     summary:
       `${passed.length} passed · ${skipped.length} skipped · ${failed.length} failed (of ${total})` +
       (rateLimited.length ? ` · ${rateLimited.length} rate limited` : ''),

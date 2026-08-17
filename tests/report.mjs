@@ -94,12 +94,8 @@ function variables({ passed, skipped, failed, rateLimited = [], total, crashed }
   // Only the lines that apply. A clean run gets one line, not three saying "none".
   const lines = []
   if (failed.length) lines.push(`❌ Failed: ${list(failed)}`)
-  if (rateLimited.length) {
-    lines.push(`⏳ Rate limited, counted OK: ${list(rateLimited)}`)
-  }
-  if (skipped.length) {
-    lines.push(`⏭️ Skipped, the model varied rather than the sandbox: ${list(skipped)}`)
-  }
+  if (rateLimited.length) lines.push(`⏳ Rate limited: ${list(rateLimited)}`)
+  if (skipped.length) lines.push(`⏭️ Skipped: ${list(skipped)}`)
   if (!lines.length) lines.push('Nothing to report - every example ran and returned.')
 
   return {

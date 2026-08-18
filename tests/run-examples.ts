@@ -122,6 +122,11 @@ const scripts: {
 //   mcp-browserbase-js (BROWSERBASE_API_KEY, BROWSERBASE_PROJECT_ID, GEMINI_API_KEY)
 //   mcp-research-agent-js (EXA_API_KEY)
 //   stirrup-python (its own auth header)
+// Orchestrates the external Crabbox CLI, which creates and reuses its own E2B
+// sandbox. Running it here would nest a live sandbox inside this runner, and the
+// suite does not install Crabbox. Its unit tests cover command order and cleanup;
+// the real provider lifecycle remains a separate, explicitly approved smoke:
+//   crabbox-e2b-python
 // Runs a long-lived agent/server process rather than a script that exits, so
 // this runner can only ever time out on them:
 //   flue-feedback-analyst-js, vercel-eve-feedback-analyst-js,

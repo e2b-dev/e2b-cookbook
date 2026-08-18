@@ -1,0 +1,7 @@
+[project]
+name = "crabbox-e2b-python"
+version = "0.1.0"
+description = "Reuse one warm E2B sandbox for an iterative Crabbox test loop"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []

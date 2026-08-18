@@ -1,0 +1,15 @@
+{
+  "name": "pi-code-interpreter",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Pi builds its own E2B code-interpreter extension, then uses it",
+  "scripts": {
+    "start": "tsx src/index.ts"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "e2b": "^2.39.0",
+    "tsx": "^4.19.4"
+  }
+}

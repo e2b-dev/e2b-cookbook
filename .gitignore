@@ -19,3 +19,4 @@ CREWAI_ATTRIBUTION.patch
 tests/results.json
 tests/Tests.txt
 tests/slack-payload.json
+examples/pi-code-interpreter-js/output/

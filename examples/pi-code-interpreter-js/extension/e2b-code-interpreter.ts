@@ -1,16 +1,3 @@
-/**
- * E2B Code Interpreter extension for Pi
- *
- * Registers a `run_python` tool backed by an E2B sandbox. Pi's built-in
- * tools run on your machine; this one gives the agent a stateful Python
- * runtime in an isolated cloud sandbox instead — a persistent Jupyter
- * kernel, pandas/matplotlib preinstalled, and nothing executing locally.
- *
- * One sandbox per Pi session: created lazily on the first tool call,
- * killed on session shutdown. Variables survive across calls. matplotlib
- * output is captured by the kernel and saved to ./output/ as PNGs.
- */
-
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import { Type } from "typebox";
 import { Sandbox, type Execution } from "@e2b/code-interpreter";
@@ -27,45 +14,50 @@ export default function e2bCodeInterpreter(pi: ExtensionAPI) {
 		try {
 			ctx.ui.setStatus("e2b", text);
 		} catch {
-			// no-op outside TUI mode
+			// Headless sessions do not expose TUI status controls.
 		}
 	}
 
-	// Create the sandbox on first use and stage ./data/ into it, so the
-	// corpus is available at ~/data/ inside the sandbox.
 	async function getSandbox(ctx: ExtensionContext): Promise<Sandbox> {
 		if (sandbox) return sandbox;
 
 		setStatus(ctx, "creating sandbox…");
-		sandbox = await Sandbox.create({ timeoutMs: SANDBOX_TIMEOUT_MS });
+		const createdSandbox = await Sandbox.create({ timeoutMs: SANDBOX_TIMEOUT_MS });
 
-		const dataDir = resolve(ctx.cwd, "data");
-		const files = await readdir(dataDir).catch(() => [] as string[]);
-		if (files.length > 0) {
-			await sandbox.files.write(
-				await Promise.all(
-					files.map(async (name) => ({
-						path: `data/${name}`,
-						data: await readFile(join(dataDir, name), "utf8"),
-					})),
-				),
-			);
+		try {
+			const dataDir = resolve(ctx.cwd, "data");
+			const files = await readdir(dataDir).catch(() => [] as string[]);
+			if (files.length > 0) {
+				await createdSandbox.files.write(
+					await Promise.all(
+						files.map(async (name) => ({
+							path: `data/${name}`,
+							data: await readFile(join(dataDir, name), "utf8"),
+						})),
+					),
+				);
+			}
+		} catch (error) {
+			await createdSandbox.kill().catch(() => {});
+			throw error;
 		}
 
-		setStatus(ctx, `sandbox ${sandbox.sandboxId}`);
-		return sandbox;
+		sandbox = createdSandbox;
+		setStatus(ctx, `sandbox ${createdSandbox.sandboxId}`);
+		return createdSandbox;
 	}
 
-	// Persist any PNGs the kernel captured (matplotlib figures, images)
-	// and return their local paths.
 	async function saveCharts(execution: Execution, cwd: string): Promise<string[]> {
+		const pngs = execution.results.flatMap((result) => (result.png ? [result.png] : []));
+		if (pngs.length === 0) return [];
+
+		const outputDir = join(cwd, "output");
+		await mkdir(outputDir, { recursive: true });
 		const saved: string[] = [];
-		for (const result of execution.results) {
-			if (!result.png) continue;
+		for (const png of pngs) {
 			chartCount += 1;
-			const path = join(cwd, "output", `chart-${String(chartCount).padStart(2, "0")}.png`);
-			await mkdir(join(cwd, "output"), { recursive: true });
-			await writeFile(path, Buffer.from(result.png, "base64"));
+			const path = join(outputDir, `chart-${String(chartCount).padStart(2, "0")}.png`);
+			await writeFile(path, Buffer.from(png, "base64"));
 			saved.push(path);
 		}
 		return saved;
@@ -92,21 +84,19 @@ export default function e2bCodeInterpreter(pi: ExtensionAPI) {
 		}),
 
 		async execute(_toolCallId, params, signal, onUpdate, ctx) {
-			const sbx = await getSandbox(ctx);
 			if (signal?.aborted) {
 				return { content: [{ type: "text", text: "Cancelled" }], details: {} };
 			}
+			const sbx = await getSandbox(ctx);
 
 			let streamed = "";
+			const stream = (line: string) => {
+				streamed += line;
+				onUpdate?.({ content: [{ type: "text", text: streamed }], details: {} });
+			};
 			const execution = await sbx.runCode(params.code, {
-				onStdout: (msg) => {
-					streamed += msg.line;
-					onUpdate?.({ content: [{ type: "text", text: streamed }], details: {} });
-				},
-				onStderr: (msg) => {
-					streamed += msg.line;
-					onUpdate?.({ content: [{ type: "text", text: streamed }], details: {} });
-				},
+				onStdout: (message) => stream(message.line),
+				onStderr: (message) => stream(message.line),
 			});
 
 			if (execution.error) {
@@ -134,9 +124,10 @@ export default function e2bCodeInterpreter(pi: ExtensionAPI) {
 	});
 
 	pi.on("session_shutdown", async () => {
-		if (sandbox) {
-			await sandbox.kill().catch(() => {});
-			sandbox = null;
-		}
+		const activeSandbox = sandbox;
+		sandbox = null;
+		// Best-effort cleanup: a flaky kill must not throw inside Pi's
+		// shutdown handler; the sandbox times out on its own regardless.
+		await activeSandbox?.kill().catch(() => {});
 	});
 }

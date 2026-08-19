@@ -242,6 +242,11 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td>AI research using Groq with Exa MCP server</td>
       <td><a href="./examples/mcp-groq-exa-js">TypeScript</a></td>
     </tr>
+    <tr>
+      <td>MCP Atomic Mail</td>
+      <td>Agent registers its own email inbox via proof-of-work using the Atomic Mail MCP server</td>
+      <td><a href="./examples/mcp-atomicmail-js">TypeScript</a></td>
+    </tr>
   </tbody>
 </table>
 

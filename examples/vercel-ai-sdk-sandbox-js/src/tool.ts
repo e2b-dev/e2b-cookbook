@@ -12,7 +12,7 @@ import { z } from 'zod'
 
 const model = process.env.ANTHROPIC_API_KEY
   ? anthropic('claude-sonnet-5')
-  : openai('gpt-5.2')
+  : openai('gpt-5.6-luna')
 
 const session = await createE2BSandbox({}).createSession()
 const sandbox = session.restricted()

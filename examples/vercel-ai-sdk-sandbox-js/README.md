@@ -37,7 +37,7 @@ machine.
 
 ```ts
 const agent = new HarnessAgent({
-  harness: createPi({ auth: 'openai', model: 'openai/gpt-5.6-luna' }),
+  harness: createPi({ auth, model }), // e.g. 'openai' + 'openai/gpt-5.6-luna'
   sandbox: createE2BSandbox({ timeoutMs: 10 * 60 * 1000 }),
 })
 ```

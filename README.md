@@ -158,6 +158,12 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td>-</td>
     </tr>
     <tr>
+      <td><a href="https://github.com/NousResearch/hermes-agent">Hermes Agent</a></td>
+      <td>Learn an incident-triage skill in one sandbox and apply it in a fresh session</td>
+      <td><a href="./examples/hermes-incident-playbook-python">Python</a></td>
+      <td>-</td>
+    </tr>
+    <tr>
     <td>▲ Vercel AI SDK</td>
       <td>Next.js + AI SDK + Code Interpreter</td>
       <td>-</td>
@@ -255,6 +261,7 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
 - How to run Playwright in E2B - [TypeScript](./examples/playwright-in-e2b)
 - Map custom subdomains to your sandboxes - [TypeScript](./examples/custom-sandbox-domain-proxy)
 - Feedback analyst agent on Flue, publishing an HTML report from a sandbox - [TypeScript](./examples/flue-feedback-analyst-js)
+- Teach Hermes an incident-triage playbook and reuse it in a fresh session - [Python](./examples/hermes-incident-playbook-python)
 
 ## Running the examples as a test suite
 

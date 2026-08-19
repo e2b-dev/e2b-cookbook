@@ -1,0 +1,27 @@
+{
+  "incident_id": "INC-1047",
+  "service": "checkout",
+  "started_at": "2026-08-18T11:05:00Z",
+  "release": "checkout-2026.08.18.2",
+  "baseline": {
+    "p95_ms": 245,
+    "error_rate": 0.005
+  },
+  "current": {
+    "p95_ms": 270,
+    "error_rate": 0.091
+  },
+  "errors_by_endpoint": {
+    "/checkout/confirm": 438,
+    "/checkout/preview": 3
+  },
+  "errors_by_release": {
+    "checkout-2026.08.18.1": 4,
+    "checkout-2026.08.18.2": 437
+  },
+  "dependencies": {
+    "payments_p95_ms": 190,
+    "inventory_p95_ms": 92
+  },
+  "release_started_at": "2026-08-18T10:58:00Z"
+}

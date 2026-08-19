@@ -1,11 +1,12 @@
 import fs from 'node:fs'
 import { Sandbox, Result, OutputMessage } from '@e2b/code-interpreter'
 import * as dotenv from 'dotenv'
-import MistralClient from '@mistralai/mistralai'
+import { Mistral } from '@mistralai/mistralai'
+import type { ChatCompletionRequest } from '@mistralai/mistralai/models/components'
 
 dotenv.config()
 
-const MODEL_NAME = 'codestral-latest'
+const MODEL_NAME = 'codestral-2508'
 const SYSTEM_PROMPT = `
 You're a python data scientist that is analyzing daily temperature of major cities. You are given tasks to complete and you run Python code to solve them.
 
@@ -37,7 +38,7 @@ Generally, you follow these rules:
 - you can run any python code you want, everything is running in a secure sandbox environment
 `
 
-const client = new MistralClient()
+const client = new Mistral({ apiKey: process.env.MISTRAL_API_KEY ?? '' })
 
 async function codeInterpret(codeInterpreter: Sandbox, code: string): Promise<Result[]> {
     console.log('Running code interpreter...')
@@ -58,18 +59,22 @@ async function codeInterpret(codeInterpreter: Sandbox, code: string): Promise<Re
 async function chat(codeInterpreter: Sandbox, userMessage: string): Promise<Result[]> {
     console.log(`\n${'='.repeat(50)}\nUser Message: ${userMessage}\n${'='.repeat(50)}`)
 
-    const messages = [
+    const messages: ChatCompletionRequest['messages'] = [
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user', content: userMessage }
     ]
 
     try {
-        const response = await client.chat({
+        const response = await client.chat.complete({
             model: MODEL_NAME,
-            messages: messages,
+            messages,
         })
 
-        const responseMessage = response.choices[0].message.content
+        // v1 renamed chat() to chat.complete() and content is now string | ContentChunk[].
+        const content = response.choices?.[0]?.message?.content
+        const responseMessage = typeof content === 'string'
+            ? content
+            : (content ?? []).map(chunk => (chunk.type === 'text' ? chunk.text : '')).join('')
         const codeBlockMatch = responseMessage.match(/```python\n([\s\S]*?)\n```/)
 
         if (codeBlockMatch && codeBlockMatch[1]) {
@@ -97,10 +102,10 @@ async function uploadDataset(codeInterpreter: Sandbox): Promise<string> {
     }
 
     // Read the file into a buffer
-    const fileBuffer = fs.readFileSync(datasetPath)
+    const fileContent = fs.readFileSync(datasetPath, 'utf-8')
 
     try {
-        const remotePath = await codeInterpreter.files.write('city_temperature.csv', fileBuffer) // Pass the buffer and filename
+        const { path: remotePath } = await codeInterpreter.files.write('city_temperature.csv', fileContent)
         if (!remotePath) {
             throw new Error('Failed to upload dataset')
         }
@@ -132,7 +137,7 @@ async function run() {
             fs.writeFileSync('image_1.png', Buffer.from(result.png, 'base64'))
             console.log('Success: Image generated and saved as image_1.png')
         } else {
-            console.log('Error: No PNG data available.')
+            console.log('No chart in the result. The model may not have rendered one.')
         }
 
     } catch (error) {

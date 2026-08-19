@@ -6,7 +6,7 @@ dotenv.config()
 const templateName = 'openai-codex'
 const sbx = await Sandbox.create(templateName, {
   envs: {
-    OPENAI_API_KEY: '<your api key>',
+    OPENAI_API_KEY: process.env.OPENAI_API_KEY ?? '',
   },
 })
 

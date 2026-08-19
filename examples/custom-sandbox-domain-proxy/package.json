@@ -1,0 +1,28 @@
+{
+  "name": "custom-sandbox-domain-proxy",
+  "version": "1.0.0",
+  "description": "Map custom subdomains to your E2B sandboxes. Access sandboxes at `my-app.yourdomain.com` instead of default URLs.",
+  "type": "module",
+  "main": "app.ts",
+  "scripts": {
+    "start": "tsx app.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^26.2.0",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.9.3",
+    "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "@e2b/code-interpreter": "^2.7.0",
+    "dotenv": "^17.4.2",
+    "express": "^5.1.0",
+    "http-proxy-middleware": "^4.2.0",
+    "open": "^11.0.1",
+    "unique-names-generator": "^4.7.1"
+  }
+}

@@ -1,0 +1,8 @@
+# Virtual environments
+.venv
+
+# Environment files
+.env
+
+# Output files
+output/**

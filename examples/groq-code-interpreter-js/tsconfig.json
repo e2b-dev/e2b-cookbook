@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "ES2022",
     "lib": ["esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -9,7 +9,7 @@
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "incremental": true,
@@ -17,6 +17,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["**/*.ts"],
+  "include": ["**/*.ts", "**/*.mts"],
   "exclude": ["node_modules"]
 }

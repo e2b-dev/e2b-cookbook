@@ -1,4 +1,4 @@
-# Llama 3 + function calling + E2B Code interpreter        
+# Llama 3.3 + function calling + E2B Code interpreter        
 **Powered by open-source [Code Interpreter SDK](https://github.com/e2b-dev/code-interpreter) by [E2B](https://e2b.dev/docs)**
 
 E2B's code interpreter SDK quickly creates a secure cloud sandbox powered by [Firecracker](https://github.com/firecracker-microvm/firecracker).

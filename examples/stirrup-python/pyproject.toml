@@ -1,0 +1,10 @@
+[project]
+name = "stirrup-python"
+version = "0.1.0"
+description = "Example of using Stirrup with an E2B sandox for safe LLM code execution"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "stirrup[e2b]",
+    "python-dotenv",
+]

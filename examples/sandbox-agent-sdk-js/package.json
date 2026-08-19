@@ -1,0 +1,19 @@
+{
+  "name": "sandbox-agent-sdk-js",
+  "version": "1.0.0",
+  "description": "Run Sandbox Agent inside an E2B sandbox and control it using the Sandbox Agent TypeScript SDK.",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@e2b/code-interpreter": "^2.7.0",
+    "dotenv": "^17.4.2",
+    "e2b": "^2.38.3",
+    "sandbox-agent": "^0.4.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "tsx": "^4.21.0"
+  }
+}

@@ -164,6 +164,12 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td><a href="./examples/nextjs-code-interpreter">TypeScript</a></td>
     </tr>
     <tr>
+    <td>▲ <a href="https://ai-sdk.dev">Vercel AI SDK</a></td>
+      <td>AI SDK sandbox provider: sandboxed tools via restricted sessions, and harness coding agents (Claude Code, Codex) running inside E2B</td>
+      <td>-</td>
+      <td><a href="./examples/vercel-ai-sdk-sandbox-js">TypeScript</a></td>
+    </tr>
+    <tr>
     <td>▲ <a href="https://eve.dev/docs">Vercel eve</a></td>
       <td>Feedback analyst agent whose sandbox backend is E2B, publishing an HTML report from the sandbox</td>
       <td>-</td>

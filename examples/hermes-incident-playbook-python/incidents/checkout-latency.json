@@ -1,0 +1,19 @@
+{
+  "incident_id": "INC-1042",
+  "service": "checkout",
+  "started_at": "2026-08-18T08:12:00Z",
+  "release": "checkout-2026.08.18.1",
+  "baseline": {
+    "p95_ms": 240,
+    "error_rate": 0.006
+  },
+  "current": {
+    "p95_ms": 1840,
+    "error_rate": 0.018
+  },
+  "dependencies": {
+    "payments_p95_ms": 1610,
+    "inventory_p95_ms": 95
+  },
+  "release_started_at": "2026-08-18T07:30:00Z"
+}

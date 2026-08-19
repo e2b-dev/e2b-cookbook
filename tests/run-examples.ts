@@ -122,6 +122,11 @@ const scripts: {
 //   mcp-browserbase-js (BROWSERBASE_API_KEY, BROWSERBASE_PROJECT_ID, GEMINI_API_KEY)
 //   mcp-research-agent-js (EXA_API_KEY)
 //   stirrup-python (its own auth header)
+// Orchestrates Hermes inside the separately published `hermes` template and
+// makes two provider calls so the agent can create and reuse a skill. Its unit
+// tests cover orchestration and cleanup; template/inference remains a separate,
+// explicitly approved smoke because this repository has no OpenRouter secret:
+//   hermes-incident-playbook-python
 // Runs a long-lived agent/server process rather than a script that exits, so
 // this runner can only ever time out on them:
 //   flue-feedback-analyst-js, vercel-eve-feedback-analyst-js,

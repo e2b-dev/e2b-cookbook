@@ -1,0 +1,9 @@
+[project]
+name = "hermes-incident-playbook-python"
+version = "0.1.0"
+description = "Teach Hermes an incident-triage skill and reuse it inside E2B"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "e2b>=2.39,<3",
+]

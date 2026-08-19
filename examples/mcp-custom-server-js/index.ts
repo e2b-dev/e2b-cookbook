@@ -78,10 +78,6 @@ async function run() {
   });
   console.log('Directory contents:', result.content);
 
-  // Cleanup
-  console.log('\nCleaning up sandbox...');
-  await sandbox.kill();
-  console.log('Sandbox closed successfully');
 }
 
 // Run the example

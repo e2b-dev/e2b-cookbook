@@ -1,0 +1,9 @@
+{
+  "name": "security disclosure",
+  "ticket": {
+    "severity": "security",
+    "account_tier": "free",
+    "affected_users": 1
+  },
+  "expected_queue": "priority"
+}

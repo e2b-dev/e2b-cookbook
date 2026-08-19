@@ -1,0 +1,10 @@
+provider: e2b
+target: linux
+
+e2b:
+  template: base
+  workdir: crabbox
+
+sync:
+  include:
+    - examples/crabbox-e2b-python

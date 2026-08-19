@@ -208,6 +208,27 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
   </tbody>
 </table>
 
+**Remote execution integrations**
+
+<table>
+  <thead>
+    <tr>
+      <th>Integration</th>
+      <th>Description</th>
+      <th>Python</th>
+      <th>TypeScript</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="https://github.com/openclaw/crabbox">Crabbox</a></td>
+      <td>Warm one E2B sandbox, sync local changes, and rerun a test suite on the same lease</td>
+      <td><a href="./examples/crabbox-e2b-python">Python</a></td>
+      <td>-</td>
+    </tr>
+  </tbody>
+</table>
+
 **Model Context Protocol (MCP)**
 
 <table>
@@ -267,6 +288,7 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
 - How to run Playwright in E2B - [TypeScript](./examples/playwright-in-e2b)
 - Map custom subdomains to your sandboxes - [TypeScript](./examples/custom-sandbox-domain-proxy)
 - Feedback analyst agent on Flue, publishing an HTML report from a sandbox - [TypeScript](./examples/flue-feedback-analyst-js)
+- Warm an E2B sandbox and rerun tests after adding a local regression case - [Python](./examples/crabbox-e2b-python)
 
 ## Running the examples as a test suite
 

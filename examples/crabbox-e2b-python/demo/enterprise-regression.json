@@ -1,0 +1,9 @@
+{
+  "name": "enterprise rollout blocker",
+  "ticket": {
+    "severity": "high",
+    "account_tier": "enterprise",
+    "affected_users": 25
+  },
+  "expected_queue": "priority"
+}

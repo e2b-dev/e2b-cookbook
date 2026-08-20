@@ -1,7 +1,7 @@
 ![E2B Cookbook Preview Light](/readme-assets/cookbook-light.png#gh-light-mode-only)
 ![E2B Cookbook Preview Dark](/readme-assets/cookbook-dark.png#gh-dark-mode-only)
 
-# ✴️ E2B Cookbook
+# âœ´ï¸ E2B Cookbook
 
 Example code and guides for building with [E2B SDK](https://github.com/e2b-dev/e2b).
 
@@ -140,13 +140,13 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
   </thead>
   <tbody>
     <tr>
-      <td>🦜⛓️ LangChain</td>
+      <td>ðŸ¦œâ›“ï¸ LangChain</td>
       <td>LangChain with Code Interpreter</td>
       <td><a href="./examples/langchain-python">Python</a></td>
       <td>-</td>
     </tr>
     <tr>
-      <td>🦜🕸️ LangGraph</td>
+      <td>ðŸ¦œðŸ•¸ï¸ LangGraph</td>
       <td>LangGraph with code interpreter</td>
       <td><a href="./examples/langgraph-python">Python</a></td>
       <td>-</td>
@@ -158,19 +158,19 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td>-</td>
     </tr>
     <tr>
-    <td>▲ Vercel AI SDK</td>
+    <td>â–² Vercel AI SDK</td>
       <td>Next.js + AI SDK + Code Interpreter</td>
       <td>-</td>
       <td><a href="./examples/nextjs-code-interpreter">TypeScript</a></td>
     </tr>
     <tr>
-    <td>▲ <a href="https://ai-sdk.dev">Vercel AI SDK</a></td>
+    <td>â–² <a href="https://ai-sdk.dev">Vercel AI SDK</a></td>
       <td>AI SDK sandbox provider: sandboxed tools via restricted sessions, and harness coding agents (Claude Code, Codex) running inside E2B</td>
       <td>-</td>
       <td><a href="./examples/vercel-ai-sdk-sandbox-js">TypeScript</a></td>
     </tr>
     <tr>
-    <td>▲ <a href="https://eve.dev/docs">Vercel eve</a></td>
+    <td>â–² <a href="https://eve.dev/docs">Vercel eve</a></td>
       <td>Feedback analyst agent whose sandbox backend is E2B, publishing an HTML report from the sandbox</td>
       <td>-</td>
       <td><a href="./examples/vercel-eve-feedback-analyst-js">TypeScript</a></td>
@@ -283,6 +283,7 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
 - Upload dataset and analyze it with Llama 3.3 - [Python](./examples/upload-dataset-code-interpreter)
 - Scrape Airbnb and analyze data with Claude Opus 5 and Firecrawl - [TypeScript](./examples/firecrawl-scrape-and-analyze-airbnb-data)
 - Visualize website topics with Claude Sonnet 5 and Firecrawl - [Python](./examples/claude-visualize-website-topics)
+- Scrape and analyze YC job listings with Olostep - [TypeScript](./examples/olostep-scrape-and-analyze)
 - Next.js app with LLM + Code Interpreter and streaming - [TypeScript](./examples/nextjs-code-interpreter)
 - How to run a Docker container in E2B - [Python/TypeScript](./examples/docker-in-e2b)
 - How to run Playwright in E2B - [TypeScript](./examples/playwright-in-e2b)

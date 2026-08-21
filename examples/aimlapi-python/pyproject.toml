@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "aimlapi-hello-world"
+version = "0.1.0"
+description = "Hello world example for AI/ML API"
+authors = ["Dmitry Tumanov <d1m7asis@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+e2b-code-interpreter = "^1.1.1"
+python-dotenv = "^1.0.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.poetry.scripts]
+start = "aimlapi_hello_world.main:main"

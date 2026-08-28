@@ -1,0 +1,20 @@
+{
+  "name": "olostep-scrape-and-analyze",
+  "version": "1.0.0",
+  "description": "Scrape YC job listings with Olostep and analyze them in an E2B sandbox",
+  "main": "index.ts",
+  "type": "module",
+  "scripts": {
+    "start": "tsx index.ts"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "tsx": "^4.7.3",
+    "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "@e2b/code-interpreter": "^2.7.0",
+    "dotenv": "^17.4.2"
+  }
+}

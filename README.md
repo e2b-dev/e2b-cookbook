@@ -305,6 +305,7 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
 
 **Example use cases**
 
+- Run an offline task and protect a sandbox web service with a traffic token - [Python](./examples/security-controls-python) / [TypeScript](./examples/security-controls-js)
 - Upload dataset and analyze it with Llama 3.3 - [Python](./examples/upload-dataset-code-interpreter)
 - Scrape Airbnb and analyze data with Claude Opus 5 and Firecrawl - [TypeScript](./examples/firecrawl-scrape-and-analyze-airbnb-data)
 - Visualize website topics with Claude Sonnet 5 and Firecrawl - [Python](./examples/claude-visualize-website-topics)

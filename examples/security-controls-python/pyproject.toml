@@ -1,0 +1,9 @@
+[project]
+name = "e2b-security-controls"
+version = "0.1.0"
+description = "Offline task and restricted service examples with E2B"
+requires-python = ">=3.10"
+dependencies = [
+    "e2b==2.49.1",
+    "httpx>=0.28.1,<0.29",
+]

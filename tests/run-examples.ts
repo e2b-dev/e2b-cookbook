@@ -43,6 +43,8 @@ const scripts: {
   entrypoint?: string
 }[] = [
   { name: 'hello-world-js', interpreter: 'npm', file: './examples/hello-world-js/' },
+  { name: 'security-controls-js', interpreter: 'npm', file: './examples/security-controls-js/', nodeVersion: '22.22.0' },
+  { name: 'security-controls-python', interpreter: 'uv', file: './examples/security-controls-python/' },
   { name: 'claude-code-interpreter-js', interpreter: 'npm', file: './examples/claude-code-interpreter-js/' },
   { name: 'firecrawl-scrape-and-analyze-airbnb-data', interpreter: 'npm', file: './examples/firecrawl-scrape-and-analyze-airbnb-data/' },
   { name: 'together-ai-code-interpreter-js', interpreter: 'npm', file: './examples/together-ai-code-interpreter-js' },

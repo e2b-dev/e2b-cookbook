@@ -165,9 +165,14 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td>-</td>
     </tr>
     <tr>
-      <td>🦜🕸️ LangGraph</td>
+      <td rowspan="2">🦜🕸️ LangGraph</td>
       <td>LangGraph with code interpreter</td>
       <td><a href="./examples/langgraph-python">Python</a></td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>Plan-and-execute coding agent: one sandbox across graph steps, checkpoints and a human-in-the-loop interrupt</td>
+      <td><a href="./examples/langgraph-plan-and-execute-python">Python</a></td>
       <td>-</td>
     </tr>
     <tr>

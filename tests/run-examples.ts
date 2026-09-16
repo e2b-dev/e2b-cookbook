@@ -60,6 +60,7 @@ const scripts: {
   { name: 'together-ai-code-interpreter-python', interpreter: 'jupyter', file: './examples/together-ai-code-interpreter-python/together_with_e2b_code_interpreter.ipynb' },
   { name: 'langchain-python', interpreter: 'poetry', file: './examples/langchain-python/' },
   { name: 'langgraph-python', interpreter: 'poetry', file: './examples/langgraph-python/' },
+  { name: 'langgraph-plan-and-execute-python', interpreter: 'uv', file: './examples/langgraph-plan-and-execute-python/' },
   { name: 'claude-code-interpreter-python', interpreter: 'jupyter', file: './examples/claude-code-interpreter-python/claude_code_interpreter.ipynb' },
   { name: 'claude-visualize-website-topics', interpreter: 'jupyter', file: './examples/claude-visualize-website-topics/claude-visualize-website-topics.ipynb' },
   { name: 'mcp-client-js', interpreter: 'npm', file: './examples/mcp-client-js/' },
@@ -173,6 +174,10 @@ const TIMEOUT_OVERRIDES: Record<string, number> = {
   // through Tailcat's rate-limited public DERP relay. The demo alone is ~30s;
   // with the install it does not reliably fit the shared budget.
   'tailcat-e2b-js': 300_000,
+  // Two planner calls plus a tool-calling agent per plan step, all at OpenAI
+  // reasoning effort "high": 145s on its last local run, before `uv sync`,
+  // which shares the same budget.
+  'langgraph-plan-and-execute-python': 600_000,
   'tailcat-e2b-python': 300_000,
 }
 

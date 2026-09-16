@@ -1,0 +1,27 @@
+[project]
+name = "langgraph-plan-and-execute-python"
+version = "0.1.0"
+description = "Plan-and-execute coding agent: a LangGraph graph that fixes a failing test suite inside one E2B sandbox"
+readme = "README.md"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "langgraph>=1.2,<2",
+    "langchain>=1.4,<2",
+    "langchain-openai>=1.6,<2",
+    "e2b>=2.50,<3",
+    "python-dotenv>=1.1,<2",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4,<9",
+    "ruff>=0.12,<1",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+# fixture_repo/tests is the *agent's* target, not ours: it fails on purpose.
+testpaths = ["tests"]
+
+[tool.ruff]
+exclude = ["fixture_repo"]

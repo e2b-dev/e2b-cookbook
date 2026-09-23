@@ -310,6 +310,7 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
 - Visualize website topics with Claude Sonnet 5 and Firecrawl - [Python](./examples/claude-visualize-website-topics)
 - Next.js app with LLM + Code Interpreter and streaming - [TypeScript](./examples/nextjs-code-interpreter)
 - How to run a Docker container in E2B - [Python/TypeScript](./examples/docker-in-e2b)
+- Run Alchemy Cloudflare Containers locally with an IPv4 proxy workaround - [Python/TypeScript](./examples/alchemy-containers)
 - Tailcat: encrypted links between sandboxes, and between a sandbox and your laptop - [Python/TypeScript](./examples/tailcat-e2b)
 - How to run Playwright in E2B - [TypeScript](./examples/playwright-in-e2b)
 - Map custom subdomains to your sandboxes - [TypeScript](./examples/custom-sandbox-domain-proxy)

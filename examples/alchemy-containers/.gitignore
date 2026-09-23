@@ -1,0 +1,6 @@
+.env
+.venv/
+__pycache__/
+results.json
+.alchemy/
+node_modules/

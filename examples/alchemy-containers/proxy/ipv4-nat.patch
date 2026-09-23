@@ -1,0 +1,278 @@
+--- a/main.go
++++ b/main.go
+@@ -589,15 +589,7 @@
+ }
+ 
+ func newProxy(ctx context.Context, addr *net.TCPAddr, egressIP net.IP, egress *egressConfiguration, tlsFactory TLSServerFactory) *proxy {
+-	config := net.ListenConfig{
+-		Control: func(network string, addr string, conn syscall.RawConn) error {
+-			return conn.Control(func(fd uintptr) {
+-				if err := syscall.SetsockoptInt(int(fd), syscall.SOL_IP, syscall.IP_TRANSPARENT, 1); err != nil {
+-					fatal(fmt.Errorf("setsockoptint: %w", err))
+-				}
+-			})
+-		},
+-	}
++	config := net.ListenConfig{}
+ 
+ 	listener, err := config.Listen(ctx, "tcp", addr.String())
+ 	if err != nil {
+@@ -769,8 +761,13 @@
+ 			containerConnection := conn.(*net.TCPConn)
+ 			sourceAddr := containerConnection.RemoteAddr().(*net.TCPAddr)
+ 
+-			// This might look counter-intuitive, but this is how it works with TPROXY
+-			dstAddr := conn.LocalAddr().(*net.TCPAddr)
++			// NAT rewrites LocalAddr. Recover the pre-NAT IPv4 destination from conntrack.
++			dstAddr, err := natOriginalTCPDestination(containerConnection)
++			if err != nil {
++				log.Println("NAT original destination:", err)
++				rstTCPConnection(containerConnection)
++				continue
++			}
+ 
+ 			wg.Go(func() {
+ 				wg := &sync.WaitGroup{}
+@@ -895,6 +892,9 @@
+ 
+ func entrypoint(ctx context.Context) {
+ 	flag.Parse()
++	if !*disableIPv6 {
++		fatal(errors.New("experimental NAT proxy requires --disable-ipv6"))
++	}
+ 
+ 	dockerGatewayIP, err := lookupDockerIPv4(ctx)
+ 	if err != nil {
+@@ -998,134 +998,14 @@
+ 
+ 	fmt.Printf("Proxy address: %s, Port: %d\n", proxyAnythingAddressTCP.IP.String(), proxyAnythingAddressTCP.Port)
+ 
+-	cleanupIptables(ctx)
+-
+-	deviceCIDRsV4, deviceCIDRsV6, err := networkDeviceCIDRs()
++	deviceCIDRsV4, _, err := networkDeviceCIDRs()
+ 	if err != nil {
+ 		fatal(err)
+ 	}
+-
+-	type ipTablesSetup struct {
+-		ipTablesCmd     string
+-		ipVersion       string
+-		ignoreAddresses []string
+-		proxy           *proxy
+-		dnsProxy        *dnsProxy
+-	}
+-
+-	ipv4Ignored := []string{"127.0.0.1/8", dockerNetwork.String(), egressIP.String() + "/24"}
+-	ipv4Ignored = append(ipv4Ignored, deviceCIDRsV4...)
+-
+-	ipv6Ignored := []string{"::1/128"}
+-	ipv6Ignored = append(ipv6Ignored, deviceCIDRsV6...)
+-
+-	ipTablesSetupList := []ipTablesSetup{
+-		{
+-			ipTablesCmd:     "iptables",
+-			ipVersion:       "-4",
+-			ignoreAddresses: ipv4Ignored,
+-			proxy:           proxies[0],
+-			dnsProxy:        dnsProxyV4,
+-		},
+-	}
+-
+-	if !*disableIPv6 {
+-		ipTablesSetupList = append(ipTablesSetupList, ipTablesSetup{
+-			ipTablesCmd:     "ip6tables",
+-			ipVersion:       "-6",
+-			ignoreAddresses: ipv6Ignored,
+-			proxy:           proxies[1],
+-			dnsProxy:        dnsProxyV6,
+-		})
+-	}
+-
+-	for _, iptablesSetup := range ipTablesSetupList {
+-		iptables := iptablesSetup.ipTablesCmd
+-
+-		// 0. Set up routing for marked packets
+-		mustRunCommand(ctx, "ip", iptablesSetup.ipVersion, "rule", "add", "fwmark", "1", "table", "100")
+-		mustRunCommand(ctx, "ip", iptablesSetup.ipVersion, "route", "add", "local", "default", "dev", "lo", "table", "100")
+-
+-		// 1. Create the DIVERT chain in the mangle table
+-		mustRunCommand(ctx, iptables, "-t", "mangle", "-N", "DIVERT")
+-
+-		// 2. Set the routing mark (1) for packets entering this chain
+-		mustRunCommand(ctx, iptables, "-t", "mangle", "-A", "DIVERT", "-j", "MARK", "--set-mark", "1")
+-
+-		// 3. Accept the packet (stop further processing in the mangle table for these packets)
+-		mustRunCommand(ctx, iptables, "-t", "mangle", "-A", "DIVERT", "-j", "ACCEPT")
+-
+-		// 4. In PREROUTING, check if there is an existing socket for this TCP packet.
+-		// If yes, send it to the DIVERT chain.
+-		mustRunCommand(ctx, iptables, "-t", "mangle", "-A", "PREROUTING", "-p", "tcp", "-m", "socket", "-j", "DIVERT")
+-
+-		const iptablesNamespaceTproxy = iptablesNamespace + "_TPROXY"
+-
+-		// 5. Setup the TPROXY rules in our namespace
+-		mustRunCommand(ctx, iptables, "-t", "mangle", "-N", iptablesNamespaceTproxy)
+-
+-		// ensure the chain starts empty before adding rules
+-		mustRunCommand(ctx, iptables, "-t", "mangle", "-F", iptablesNamespaceTproxy)
+-
+-		for _, cidrToIgnore := range iptablesSetup.ignoreAddresses {
+-			mustRunCommand(ctx, iptables, "-t", "mangle", "-A", iptablesNamespaceTproxy, "-d", cidrToIgnore, "-j", "RETURN")
+-		}
+-
+-		mustRunCommand(ctx, iptables, "-t", "mangle", "-A", iptablesNamespaceTproxy, "-m", "mark", "-p", "tcp", "--mark", "100", "-j", "RETURN")
+-
+-		mustRunCommand(ctx, iptables, "-t", "mangle", "-A", iptablesNamespaceTproxy, "-p", "tcp", "-j", "TPROXY", "--tproxy-mark", "0x1/0x1", "--on-port",
+-			strconv.Itoa(iptablesSetup.proxy.addr.Port), "--on-ip", iptablesSetup.proxy.addr.IP.String())
+-
+-		mustRunCommand(ctx, iptables, "-t", "mangle", "-A", "PREROUTING", "-p", "tcp", "-j", iptablesNamespaceTproxy)
+-
+-		// 6. Now time to do the new namespace for local rules, we will mark all matching egress with 0x1
+-		mustRunCommand(ctx, iptables, "-t", "mangle", "-N", iptablesNamespace)
+-
+-		// ensure the chain starts empty before adding rules
+-		mustRunCommand(ctx, iptables, "-t", "mangle", "-F", iptablesNamespace)
+-
+-		// Do not re-mark reply traffic for inbound connections accepted by a local socket.
+-		mustRunCommand(ctx, iptables, "-t", "mangle", "-A", iptablesNamespace, "-p", "tcp", "-m", "conntrack", "--ctdir", "REPLY", "-j", "RETURN")
+-
+-		for _, cidrToIgnore := range iptablesSetup.ignoreAddresses {
+-			mustRunCommand(ctx, iptables, "-t", "mangle", "-A", iptablesNamespace, "-d", cidrToIgnore, "-j", "RETURN")
+-		}
+-
+-		mustRunCommand(ctx, iptables, "-t", "mangle", "-A", iptablesNamespace, "-m", "mark", "-p", "tcp", "--mark", "100", "-j", "RETURN")
+-
+-		// mark it so it's processed by loopback by the table 100
+-		mustRunCommand(ctx, iptables, "-t", "mangle", "-A", iptablesNamespace, "-j", "MARK", "--set-mark", "1")
+-
+-		// Everything that tries to egress, process through the iptablesNamespace
+-		mustRunCommand(ctx, iptables, "-t", "mangle", "-A", "OUTPUT", "-p", "tcp", "-j", iptablesNamespace)
+-
+-		// flush the cache
+-		mustRunCommand(ctx, "ip", iptablesSetup.ipVersion, "route", "flush", "cache")
+-
+-		if iptablesSetup.dnsProxy == nil {
+-			continue
+-		}
+-
+-		mustRunCommand(ctx, iptables, "-t", "mangle", "-N", iptablesNamespaceDNSTproxy)
+-		mustRunCommand(ctx, iptables, "-t", "mangle", "-F", iptablesNamespaceDNSTproxy)
+-		for _, cidrToIgnore := range iptablesSetup.ignoreAddresses {
+-			mustRunCommand(ctx, iptables, "-t", "mangle", "-A", iptablesNamespaceDNSTproxy, "-d", cidrToIgnore, "-j", "RETURN")
+-		}
+-		mustRunCommand(ctx, iptables, "-t", "mangle", "-A", iptablesNamespaceDNSTproxy, "-m", "mark", "-p", "udp", "--mark", strconv.Itoa(dnsBypassMark), "-j", "RETURN")
+-		mustRunCommand(ctx, iptables, "-t", "mangle", "-A", iptablesNamespaceDNSTproxy, "-p", "udp", "--dport", "53", "-j", "TPROXY", "--tproxy-mark", "0x1/0x1", "--on-port",
+-			strconv.Itoa(iptablesSetup.dnsProxy.addr.Port), "--on-ip", iptablesSetup.dnsProxy.addr.IP.String())
+-		mustRunCommand(ctx, iptables, "-t", "mangle", "-A", "PREROUTING", "-p", "udp", "--dport", "53", "-j", iptablesNamespaceDNSTproxy)
+-
+-		mustRunCommand(ctx, iptables, "-t", "mangle", "-N", iptablesNamespaceDNS)
+-		mustRunCommand(ctx, iptables, "-t", "mangle", "-F", iptablesNamespaceDNS)
+-		mustRunCommand(ctx, iptables, "-t", "mangle", "-A", iptablesNamespaceDNS, "-p", "udp", "-m", "conntrack", "--ctdir", "REPLY", "-j", "RETURN")
+-		for _, cidrToIgnore := range iptablesSetup.ignoreAddresses {
+-			mustRunCommand(ctx, iptables, "-t", "mangle", "-A", iptablesNamespaceDNS, "-d", cidrToIgnore, "-j", "RETURN")
+-		}
+-		mustRunCommand(ctx, iptables, "-t", "mangle", "-A", iptablesNamespaceDNS, "-m", "mark", "-p", "udp", "--mark", strconv.Itoa(dnsBypassMark), "-j", "RETURN")
+-		mustRunCommand(ctx, iptables, "-t", "mangle", "-A", iptablesNamespaceDNS, "-p", "udp", "--dport", "53", "-j", "MARK", "--set-mark", "1")
+-		mustRunCommand(ctx, iptables, "-t", "mangle", "-A", "OUTPUT", "-p", "udp", "--dport", "53", "-j", iptablesNamespaceDNS)
+-		mustRunCommand(ctx, "ip", iptablesSetup.ipVersion, "route", "flush", "cache")
++	ignored := []string{"127.0.0.0/8", dockerNetwork.String(), egressIP.String() + "/24"}
++	ignored = append(ignored, deviceCIDRsV4...)
++	if err := configureNAT(ctx, proxies[0], dnsProxyV4, ignored); err != nil {
++		fatal(err)
+ 	}
+ 
+ 	wg := &sync.WaitGroup{}
+--- a/dns.go
++++ b/dns.go
+@@ -74,18 +74,7 @@
+ 		fatal(errors.New("dns proxy address must be a literal IP:port"))
+ 	}
+ 
+-	listenConfig := net.ListenConfig{
+-		Control: func(network string, address string, conn syscall.RawConn) error {
+-			var controlErr error
+-			if err := conn.Control(func(fd uintptr) {
+-				controlErr = setTransparentSocketOptions(int(fd), addr.IP.To4() == nil, true)
+-			}); err != nil {
+-				return err
+-			}
+-
+-			return controlErr
+-		},
+-	}
++	listenConfig := net.ListenConfig{}
+ 
+ 	packetConn, err := listenConfig.ListenPacket(ctx, udpNetworkForIP(addr.IP), addr.String())
+ 	if err != nil {
+@@ -108,10 +97,9 @@
+ func (p *dnsProxy) run(ctx context.Context, wg *sync.WaitGroup) {
+ 	wg.Go(func() {
+ 		packetBuffer := make([]byte, 64*1024)
+-		oobBuffer := make([]byte, 512)
+ 
+ 		for {
+-			n, oobn, _, sourceAddr, err := p.conn.ReadMsgUDP(packetBuffer, oobBuffer)
++			n, sourceAddr, err := p.conn.ReadFromUDP(packetBuffer)
+ 			if err != nil {
+ 				if errors.Is(err, net.ErrClosed) {
+ 					return
+@@ -121,7 +109,7 @@
+ 				return
+ 			}
+ 
+-			originalDst, err := originalDestinationFromOOB(oobBuffer[:oobn])
++			originalDst, err := net.ResolveUDPAddr("udp4", *natDNSUpstream)
+ 			if err != nil {
+ 				log.Println("error reading original dns destination:", err)
+ 				continue
+@@ -245,46 +233,9 @@
+ }
+ 
+ func (p *dnsProxy) replyToClient(ctx context.Context, sourceAddr *net.UDPAddr, originalDst *net.UDPAddr, payload []byte) error {
+-	dialer := net.Dialer{
+-		LocalAddr: cloneUDPAddr(originalDst),
+-		Timeout:   dnsUpstreamTimeout,
+-		Control: func(network string, address string, conn syscall.RawConn) error {
+-			var controlErr error
+-			if err := conn.Control(func(fd uintptr) {
+-				controlErr = setTransparentSocketOptions(int(fd), originalDst.IP.To4() == nil, false)
+-				if controlErr != nil {
+-					return
+-				}
+-
+-				controlErr = syscall.SetsockoptInt(int(fd), syscall.SOL_SOCKET, syscall.SO_REUSEADDR, 1)
+-				if controlErr != nil {
+-					return
+-				}
+-
+-				controlErr = syscall.SetsockoptInt(int(fd), syscall.SOL_SOCKET, syscall.SO_MARK, dnsBypassMark)
+-			}); err != nil {
+-				return err
+-			}
+-
+-			return controlErr
+-		},
+-	}
+-
+-	conn, err := dialer.DialContext(ctx, udpNetworkForIP(originalDst.IP), sourceAddr.String())
+-	if err != nil {
+-		return fmt.Errorf("dialing dns client %s from %s: %w", sourceAddr.String(), originalDst.String(), err)
+-	}
+-	defer conn.Close()
+-
+-	if err := conn.SetWriteDeadline(time.Now().Add(dnsUpstreamTimeout)); err != nil {
+-		return fmt.Errorf("setting dns reply deadline: %w", err)
+-	}
+-
+-	if _, err := conn.Write(payload); err != nil {
+-		return fmt.Errorf("writing dns reply to client: %w", err)
+-	}
+-
+-	return nil
++	// Reply on the same socket: conntrack reverses the DNAT to the client's resolver.
++	_, err := p.conn.WriteToUDP(payload, sourceAddr)
++	return err
+ }
+ 
+ func dnsResponseWithRcode(request *dns.Msg, rcode int) *dns.Msg {

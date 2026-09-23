@@ -81,6 +81,10 @@ const scripts: {
 
 // Deliberately not covered, and why. Anything not listed here should be added above.
 //
+// Requires an explicitly built 2 GB template and a multi-minute nested Docker/Go
+// build. Run its standalone main.py for the 13-check live integration test:
+//   alchemy-containers
+//
 // Blocked upstream: the third-party `sandbox-agent` package (0.4.2, latest) calls
 // Sandbox.betaCreate(), which the E2B SDK removed between 2.20 and 2.30. It cannot
 // run against any current SDK, and was already failing on main for this reason:

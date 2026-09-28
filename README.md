@@ -300,6 +300,11 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td>AI research using Groq with Exa MCP server</td>
       <td><a href="./examples/mcp-groq-exa-js">TypeScript</a></td>
     </tr>
+    <tr>
+      <td>MCP Groq Linkup</td>
+      <td>AI research using Groq with Linkup MCP server</td>
+      <td><a href="./examples/mcp-groq-linkup-js">TypeScript</a></td>
+    </tr>
   </tbody>
 </table>
 

@@ -1,6 +1,6 @@
 # Groq with Exa MCP Example
 
-> **Deprecated.** Groq's Responses API currently times out retrieving the tool list from the E2B sandbox MCP gateway (`external_connector_error`), so this example is no longer tested or maintained. For a working MCP gateway example see [mcp-client-js](../mcp-client-js).
+> **Deprecated.** This example is no longer tested or maintained. For a working MCP gateway example see [mcp-client-js](../mcp-client-js).
 
 This example demonstrates how to use Groq's API with Exa MCP server through E2B to research recent AI developments.
 

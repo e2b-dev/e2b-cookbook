@@ -1,0 +1,28 @@
+[project]
+name = "ag2-bug-fixer-python"
+version = "0.1.0"
+description = "AG2 agent that fixes a failing test suite inside an E2B sandbox"
+readme = "README.md"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "ag2[openai]>=1.1.0",
+    "e2b>=2.0.0,<3",
+    "python-dotenv>=1.1,<2",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4,<9",
+    "pytest-asyncio>=1.0,<2",
+    "ruff>=0.12,<1",
+]
+
+# Claude: ag2.extensions.e2b is not released yet. Replace this local source with
+# the first ag2 release that ships it (and raise the floor above) before the PR.
+[tool.uv.sources]
+ag2 = { path = "../../../ag2-int-156", editable = true }
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+asyncio_mode = "auto"

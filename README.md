@@ -183,6 +183,12 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td>-</td>
     </tr>
     <tr>
+      <td><a href="https://github.com/ag2ai/ag2">AG2</a></td>
+      <td>AG2 bug-fixer agent that runs and fixes a failing test suite in a sandbox</td>
+      <td><a href="./examples/ag2-bug-fixer-python">Python</a></td>
+      <td>-</td>
+    </tr>
+    <tr>
       <td><a href="https://github.com/NousResearch/hermes-agent">Hermes Agent</a></td>
       <td>Learn an incident-triage skill in one sandbox and apply it in a fresh session</td>
       <td><a href="./examples/hermes-incident-playbook-python">Python</a></td>

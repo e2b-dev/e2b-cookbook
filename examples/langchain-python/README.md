@@ -8,7 +8,7 @@ Check out the [official Python notebook](./langchain_code_interpreter.ipynb) rel
 ## Setup & run
 ### 1. Install dependencies
 ```
-poetry install
+uv sync
 ```
 
 ### 2. Set up `.env`
@@ -16,5 +16,5 @@ Copy `.env.template` to `.env` and your set the API keys
 
 ### 3. Run the example
 ```
-poetry run start
+uv run start
 ```

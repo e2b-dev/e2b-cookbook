@@ -20,7 +20,7 @@ import { uploadPathToPath, getApiKeys } from './utils'
 
 dotenv.config({ path: path.resolve(process.cwd(), '.env') })
 
-type Interpreter = 'npm' | 'poetry' | 'jupyter' | 'uv'
+type Interpreter = 'npm' | 'jupyter' | 'uv'
 
 const scripts: {
   name: string
@@ -37,9 +37,8 @@ const scripts: {
   // ships Node 20.9 (checked, not assumed), so a dependency declaring a newer engine
   // needs one fetched in. Pinned tarball rather than a piped installer script.
   nodeVersion?: string
-  // What to pass after `uv run` / `poetry run`. Defaults to main.py for uv and
-  // the `start` console script for poetry. Can be a path, a script name, or
-  // `python -m pkg.mod` for packages whose entry uses absolute imports.
+  // What to pass after `uv run`. Defaults to main.py. Can be a path, a console
+  // script name, or `python -m pkg.mod` for packages whose entry uses absolute imports.
   entrypoint?: string
 }[] = [
   { name: 'hello-world-js', interpreter: 'npm', file: './examples/hello-world-js/' },
@@ -51,15 +50,15 @@ const scripts: {
   { name: 'codestral-code-interpreter-js', interpreter: 'npm', file: './examples/codestral-code-interpreter-js/' },
   { name: 'openai-image-analysis-js', interpreter: 'npm', file: './examples/openai-image-analysis-js/' },
   { name: 'codestral-code-interpreter-python', interpreter: 'jupyter', file: './examples/codestral-code-interpreter-python/codestral_code_interpreter.ipynb' },
-  { name: 'hello-world-python', interpreter: 'poetry', file: './examples/hello-world-python/' },
+  { name: 'hello-world-python', interpreter: 'uv', file: './examples/hello-world-python/', entrypoint: 'start' },
   // Runs the sandbox-to-sandbox demo; the laptop demos need tailcat on the host and are not covered.
   { name: 'tailcat-e2b-js', interpreter: 'npm', file: './examples/tailcat-e2b/js/' },
-  { name: 'tailcat-e2b-python', interpreter: 'poetry', file: './examples/tailcat-e2b/python/' },
+  { name: 'tailcat-e2b-python', interpreter: 'uv', file: './examples/tailcat-e2b/python/', entrypoint: 'start' },
   { name: 'openai-ml-dataset-js', interpreter: 'npm', file: './examples/openai-ml-dataset-js/' },
   { name: 'openai-image-analysis-python', interpreter: 'jupyter', file: './examples/openai-image-analysis-python/image_analysis.ipynb' },
   { name: 'together-ai-code-interpreter-python', interpreter: 'jupyter', file: './examples/together-ai-code-interpreter-python/together_with_e2b_code_interpreter.ipynb' },
-  { name: 'langchain-python', interpreter: 'poetry', file: './examples/langchain-python/' },
-  { name: 'langgraph-python', interpreter: 'poetry', file: './examples/langgraph-python/' },
+  { name: 'langchain-python', interpreter: 'uv', file: './examples/langchain-python/', entrypoint: 'start' },
+  { name: 'langgraph-python', interpreter: 'uv', file: './examples/langgraph-python/', entrypoint: 'start' },
   { name: 'claude-code-interpreter-python', interpreter: 'jupyter', file: './examples/claude-code-interpreter-python/claude_code_interpreter.ipynb' },
   { name: 'claude-visualize-website-topics', interpreter: 'jupyter', file: './examples/claude-visualize-website-topics/claude-visualize-website-topics.ipynb' },
   { name: 'mcp-client-js', interpreter: 'npm', file: './examples/mcp-client-js/' },
@@ -76,7 +75,7 @@ const scripts: {
   { name: 'anthropic-claude-code-in-sandbox-python', interpreter: 'uv', file: './examples/anthropic-claude-code-in-sandbox-python/', entrypoint: 'python -m anthropic_claude_code_in_sandbox.main' },
   { name: 'mcp-custom-template-js', interpreter: 'npm', file: './examples/mcp-custom-template-js/' },
   { name: 'docker-in-e2b-js', interpreter: 'npm', file: './examples/docker-in-e2b/js/' },
-  { name: 'docker-in-e2b-python', interpreter: 'poetry', file: './examples/docker-in-e2b/python/', entrypoint: 'python main.py' },
+  { name: 'docker-in-e2b-python', interpreter: 'uv', file: './examples/docker-in-e2b/python/' },
 ]
 
 // Deliberately not covered, and why. Anything not listed here should be added above.
@@ -322,7 +321,6 @@ function testScript(
   nodeVersion?: string,
 ): string[] {
   const nodePrefix = nodeVersion ? nodeInstall(nodeVersion) : []
-  const INSTALL_POETRY_COMMAND = 'curl -sSL https://install.python-poetry.org | python3 -'
   // Installed from PyPI rather than `curl | sh`: this sandbox is handed provider
   // API keys a moment later, so an unpinned remote script does not belong here.
   const INSTALL_UV_COMMAND = 'pip install --quiet uv'
@@ -333,28 +331,14 @@ function testScript(
     return [INSTALL_UV_COMMAND, SET_PATH_COMMAND, `cd ${SANDBOX_TEST_DIRECTORY}`, 'uv sync', `uv run ${entrypoint ?? 'main.py'}`]
   }
 
-  // A Jupyter notebook, executed in a Poetry environment.
+  // A Jupyter notebook, executed in a throwaway uv project.
   if (interpreter === 'jupyter') {
     return [
-      INSTALL_POETRY_COMMAND,
+      INSTALL_UV_COMMAND,
       SET_PATH_COMMAND,
-      'poetry init --name my_project --python "^3.10" -n',
-      'poetry add jupyter nbconvert pip python-dotenv',
-      `poetry run jupyter nbconvert --debug --to markdown --execute --stdout ${notebookPath}`,
-    ]
-  }
-
-  // A Poetry project.
-  if (interpreter === 'poetry') {
-    return [
-      INSTALL_POETRY_COMMAND,
-      SET_PATH_COMMAND,
-      `cd ${SANDBOX_TEST_DIRECTORY}`,
-      // --no-root: these are scripts, and installing the project itself trips on
-      // metadata that refers outside the uploaded directory (docker-in-e2b/python
-      // declares readme = "README.md", which lives in its parent).
-      'poetry install --no-root',
-      `poetry run ${entrypoint ?? 'start'}`,
+      'uv init --bare --no-workspace --name my_project --python ">=3.10"',
+      'uv add jupyter nbconvert pip python-dotenv',
+      `uv run jupyter nbconvert --debug --to markdown --execute --stdout ${notebookPath}`,
     ]
   }
 

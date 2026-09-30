@@ -1,22 +1,25 @@
-[tool.poetry]
+[project]
 name = "langgraph-e2b-python"
 version = "0.1.0"
 description = "Example project for showcasing E2B code interpreter with LangGraph"
-authors = ["Vasek Mlejnsky <vasek@e2b.dev>"]
+authors = [{ name = "Vasek Mlejnsky", email = "vasek@e2b.dev" }]
 readme = "README.md"
+requires-python = ">=3.10,<4"
+dependencies = [
+    "langgraph>=1.0.6,<2",
+    "e2b-code-interpreter>=2.9.0,<3",
+    "e2b>=2.39,<3",
+    "langchain>=1.2.6,<2",
+    "python-dotenv>=1.2.1,<2",
+    "langchain-openai>=1.1.7,<2",
+]
 
-[tool.poetry.dependencies]
-python = "^3.10"
-langgraph = "^1.0.6"
-e2b-code-interpreter = "^2.9.0"
-e2b = ">=2.39,<3"
-langchain = "^1.2.6"
-python-dotenv = "^1.2.1"
-langchain-openai = "^1.1.7"
+[project.scripts]
+start = "langgraph_e2b_python.main:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["langgraph_e2b_python"]
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.scripts]
-start = "langgraph_e2b_python.main:main"
+requires = ["hatchling"]
+build-backend = "hatchling.build"

@@ -25,7 +25,7 @@ Build the `tailcat` template once per team, from either language (about one minu
 ```bash
 cd js && npm install && npm run e2b:build
 # or
-cd python && poetry install && poetry run build-template
+cd python && uv sync && uv run build-template
 ```
 
 If you skip this, the demos create a default sandbox and install tailcat at runtime, which costs a couple of seconds per sandbox.
@@ -41,9 +41,9 @@ npm run sandbox-tests-local-dev-server # sandbox tests a laptop-local developmen
 
 # Python
 cd python
-poetry run laptop-sandbox-file-transfer
-poetry run sandbox-to-sandbox   # also `poetry run start`
-poetry run sandbox-tests-local-dev-server
+uv run laptop-sandbox-file-transfer
+uv run sandbox-to-sandbox   # also `uv run start`
+uv run sandbox-tests-local-dev-server
 ```
 
 `DEMO_FILE_SIZE_MIB` changes the transferred file size. It defaults to 10 MiB in both file-transfer demos. These examples demonstrate the flow rather than benchmark the public relay.

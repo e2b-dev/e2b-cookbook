@@ -321,7 +321,7 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
 
 Every example is exercised nightly against live E2B by `tests/run-examples.ts`: each
 one is uploaded into a fresh sandbox, installed with its own toolchain (npm, uv,
-Poetry, or nbconvert for notebooks) and run. An example passes if it exits 0.
+or nbconvert for notebooks) and run. An example passes if it exits 0.
 
 ```bash
 npm install

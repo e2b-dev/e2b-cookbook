@@ -6,7 +6,7 @@ This example shows the minimal code for starting an [E2B Sandbox](https://e2b.de
 
 ### 1. Install dependencies
 ```
-poetry install
+uv sync
 ```
 
 ### 2. Set up `.env`
@@ -15,6 +15,6 @@ poetry install
 
 ### 3. Run the example
 ```
-poetry run start
+uv run start
 ```
 

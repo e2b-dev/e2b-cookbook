@@ -1,21 +1,22 @@
-[tool.poetry]
+[project]
 name = "e2b-hello-world"
 version = "0.1.0"
 description = "Hello world example for E2B"
-authors = ["Vasek Mlejnsky <vasek@e2b.dev>"]
+authors = [{ name = "Vasek Mlejnsky", email = "vasek@e2b.dev" }]
 readme = "README.md"
+requires-python = ">=3.11,<4"
+dependencies = [
+    "e2b-code-interpreter>=2.9.0,<3",
+    "e2b>=2.39,<3",
+    "python-dotenv>=1.0.1,<2",
+]
 
-[tool.poetry.dependencies]
-python = "^3.11"
-e2b-code-interpreter = "^2.9.0"
-e2b = ">=2.39,<3"
-python-dotenv = "^1.0.1"
+[project.scripts]
+start = "e2b_hello_world.main:main"
 
+[tool.hatch.build.targets.wheel]
+packages = ["e2b_hello_world"]
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
-
-
-[tool.poetry.scripts]
-start = "e2b_hello_world.main:main"
+requires = ["hatchling"]
+build-backend = "hatchling.build"

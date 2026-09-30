@@ -1,5 +1,7 @@
 # Groq with Exa MCP Example
 
+> **Deprecated.** This example is no longer tested or maintained. For a working MCP gateway example see [mcp-client-js](../mcp-client-js).
+
 This example demonstrates how to use Groq's API with Exa MCP server through E2B to research recent AI developments.
 
 ## Features

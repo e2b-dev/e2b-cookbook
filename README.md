@@ -296,7 +296,7 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td><a href="./examples/mcp-browserbase-js">TypeScript</a></td>
     </tr>
     <tr>
-      <td>MCP Groq Exa</td>
+      <td>MCP Groq Exa (deprecated)</td>
       <td>AI research using Groq with Exa MCP server</td>
       <td><a href="./examples/mcp-groq-exa-js">TypeScript</a></td>
     </tr>

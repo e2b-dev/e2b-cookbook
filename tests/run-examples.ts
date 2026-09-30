@@ -31,7 +31,7 @@ const scripts: {
   // window. That is not enough on its own: the Groq org is capped at 100k tokens
   // per DAY on this tier ("tokens per day (TPD): Limit 100000, Used 99952"), which
   // no retry policy can work around, so the Groq example count is deliberately
-  // held at two. See the exclusion note below before adding a third.
+  // held low. See the exclusion note below before adding another.
   provider?: string
   // Install this Node version in the sandbox before running. The E2B base template
   // ships Node 20.9 (checked, not assumed), so a dependency declaring a newer engine
@@ -65,7 +65,6 @@ const scripts: {
   { name: 'mcp-client-js', interpreter: 'npm', file: './examples/mcp-client-js/' },
   { name: 'mcp-custom-server-js', interpreter: 'npm', file: './examples/mcp-custom-server-js/' },
   { name: 'mcp-claude-code-js', interpreter: 'npm', file: './examples/mcp-claude-code-js/' },
-  { name: 'mcp-groq-exa-js', provider: 'groq', interpreter: 'npm', file: './examples/mcp-groq-exa-js/' },
   { name: 'openai-js', interpreter: 'npm', file: './examples/openai-js/' },
   { name: 'openai-python', interpreter: 'jupyter', file: './examples/openai-python/openai.ipynb' },
   // http-proxy-middleware 4 requires Node ^22.15 || ^24 || >=26.
@@ -109,9 +108,15 @@ const scripts: {
 // fit, so the two carrying the least distinct information come out:
 // groq-code-interpreter-js is the same demo as its Python twin, which stays, and
 // upload-dataset-code-interpreter is a third Groq chart demo.
-// groq-code-interpreter-python and mcp-groq-exa-js remain, covering the two
-// different SDK surfaces:
+// groq-code-interpreter-python remains:
 //   groq-code-interpreter-js, upload-dataset-code-interpreter
+// Deprecated. Groq's Responses API has to reach the sandbox's MCP gateway from
+// Groq's side, and on 2026-09-28 and again on the 2026-09-30 rerun it failed
+// with "Error retrieving tool list from MCP server: 'e2b-mcp-gateway'. Reason:
+// request timed out" (external_connector_error). That is a Groq-to-gateway
+// connectivity problem this suite cannot fix, and mcp-client-js,
+// mcp-custom-server-js and mcp-custom-template-js already cover the gateway:
+//   mcp-groq-exa-js
 // Calls a model the Fireworks account cannot reach: qwen2p5-coder-32b-instruct
 // returns 404 "Model not found, inaccessible, and/or not deployed", which does not
 // distinguish a retired model from one this account has not deployed. Needs someone
@@ -401,6 +406,8 @@ type Outcome = { name: string; verdict: Verdict; durationMs: number; failure: st
 const RATE_LIMITED = [
   /rate limit|\b429\b|tokens per day|overloaded|no credits remaining/i,
   /insufficient_quota|exceeded your current quota|quota exceeded/i,
+  // Together reports an exhausted balance as a 402 with type credit_limit.
+  /credit limit exceeded|\bcredit_limit\b/i,
 ]
 
 // Non-deterministic model behaviour. The sandbox ran the code; the model just did

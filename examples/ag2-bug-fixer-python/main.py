@@ -65,22 +65,19 @@ async def run_tests(env: SandboxFactory) -> ExecResult:
         return await sandbox.exec(TEST_COMMAND)
 
 
-def build_agent(env: SandboxFactory, config: OpenAIResponsesConfig) -> Agent:
-    # Both tools share one sandbox: files the shell edits are visible to the code tool.
-    return Agent(
-        "bug_fixer",
-        prompt=INSTRUCTIONS,
-        config=config,
-        tools=[SandboxShellTool(env), SandboxCodeTool(env)],
-    )
-
-
 async def fix_bug(
     env: SandboxFactory, config: OpenAIResponsesConfig
 ) -> tuple[str, ExecResult]:
     """Let the agent fix the repository, then verify the result independently."""
     await upload_repository(env)
-    reply = await build_agent(env, config).ask(TASK)
+    # Both tools share one sandbox: files the shell edits are visible to the code tool.
+    agent = Agent(
+        "bug_fixer",
+        prompt=INSTRUCTIONS,
+        config=config,
+        tools=[SandboxShellTool(env), SandboxCodeTool(env)],
+    )
+    reply = await agent.ask(TASK)
     return reply.body or "", await run_tests(env)
 
 

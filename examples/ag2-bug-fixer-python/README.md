@@ -53,12 +53,16 @@ code `0` only when every test passes.
    sandbox with `put_file`. The sandbox is created on first use.
 2. The agent works through `run_shell_command` and `run_code` tool calls. Each
    call runs in the same sandbox, so edits persist between calls.
-3. `run_tests()` runs the suite after the agent replies.
+3. `run_tests()` restores the original `tests/` and runs them after the agent
+   replies, so a run where the agent edited or replaced the tests still fails.
+   It cannot catch every shortcut, such as special-casing the test inputs in
+   the source, so read the agent's diff before trusting a fix.
 4. Leaving `async with E2BEnvironment(...)` kills the sandbox, whether the run
    succeeded or raised.
 
-`sandbox_timeout` is an idle lifetime: every tool call extends it while the
-agent works, and E2B reclaims the sandbox if the process dies without cleanup.
+`sandbox_timeout` is the sandbox's server-side lifetime. Tool calls keep
+extending it while the agent works, and E2B reclaims the sandbox if the process
+dies without cleanup.
 
 `PYTHONDONTWRITEBYTECODE=1` is set for every command. Without it, an in-place
 edit that keeps a file's size within the same second can be shadowed by a stale

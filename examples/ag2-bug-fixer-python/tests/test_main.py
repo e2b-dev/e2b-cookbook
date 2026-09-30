@@ -72,6 +72,18 @@ async def test_agent_fix_is_verified_independently(local_env: LocalEnvironment) 
     assert "OK" in result.output
 
 
+async def test_agent_that_replaces_the_tests_still_fails(
+    local_env: LocalEnvironment,
+) -> None:
+    fake_tests = "printf 'import unittest\\nclass T(unittest.TestCase):\\n    def test_ok(self): pass\\n' > tests/test_summary.py"
+    config = TestConfig(shell(fake_tests), shell("python -m unittest"), "All green.")
+
+    _, result = await main.fix_bug(local_env, config)
+
+    assert result.exit_code != 0
+    assert "test_even_length" in result.output
+
+
 async def test_agent_that_gives_up_leaves_tests_failing(
     local_env: LocalEnvironment,
 ) -> None:

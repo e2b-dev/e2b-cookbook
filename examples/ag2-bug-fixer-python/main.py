@@ -58,7 +58,10 @@ async def upload_repository(env: SandboxFactory, source: Path = FIXTURE_DIR) -> 
 
 
 async def run_tests(env: SandboxFactory) -> ExecResult:
+    """Run the original test suite, restored first so edited tests cannot fake a pass."""
     async with env.open() as sandbox:
+        for path in sorted((FIXTURE_DIR / "tests").glob("*.py")):
+            await sandbox.put_file(PurePosixPath("tests", path.name), path.read_bytes())
         return await sandbox.exec(TEST_COMMAND)
 
 

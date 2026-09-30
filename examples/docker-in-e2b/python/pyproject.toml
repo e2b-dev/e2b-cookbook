@@ -1,16 +1,13 @@
-[tool.poetry]
+[project]
 name = "python-example"
 version = "0.1.0"
 description = ""
-authors = ["Vasek Mlejnsky <vasek.mlejnsky@gmail.com>"]
-readme = "README.md"
+authors = [{ name = "Vasek Mlejnsky", email = "vasek.mlejnsky@gmail.com" }]
+requires-python = ">=3.11,<4"
+dependencies = [
+    "e2b>=2.38.0,<3",
+    "python-dotenv>=1.0.1,<2",
+]
 
-[tool.poetry.dependencies]
-python = "^3.11"
-e2b = "^2.38.0"
-python-dotenv = "^1.0.1"
-
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[tool.uv]
+package = false

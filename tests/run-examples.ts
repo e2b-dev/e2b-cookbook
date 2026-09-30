@@ -146,6 +146,10 @@ const scripts: {
 // reachable controller sandbox registered as an OpenAI webhook endpoint and
 // deploys its own E2B template. Neither is a script that exits on its own:
 //   openai-agents-api-python-sdk, openai-agents-api-python-sdk-webhook-managed
+// Deletes paused sandboxes across the whole team when run with --apply, so it
+// cannot share a team with anything else. The dry run only lists, which would
+// assert nothing beyond the list call:
+//   cleanup-paused-sandboxes
 
 const SANDBOX_TEST_DIRECTORY = '/home/user/example'
 const LOGS_DIRECTORY = 'logs'

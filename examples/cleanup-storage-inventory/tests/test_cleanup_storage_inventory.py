@@ -66,7 +66,11 @@ class CleanupTests(unittest.TestCase):
 
     def run_main(self, *args: str, client: FakeClient) -> tuple[int, str]:
         output = io.StringIO()
-        with contextlib.redirect_stdout(output), contextlib.redirect_stderr(output):
+        with (
+            contextlib.redirect_stdout(output),
+            contextlib.redirect_stderr(output),
+            mock.patch.dict("os.environ", {"E2B_API_KEY": "e2b_test"}),
+        ):
             try:
                 code = cleanup.main([str(self.inventory), *args], client=client)
             except SystemExit as exit:
@@ -177,18 +181,42 @@ class CleanupTests(unittest.TestCase):
         kinds = [call[0] == "delete_snapshot" for call in client.calls]
         self.assertEqual(kinds, sorted(kinds))
 
-    def test_rerun_skips_finished_rows_and_retries_the_rest(self) -> None:
+    def test_rerun_skips_deleted_rows_and_retries_the_rest(self) -> None:
         client = FakeClient(sandboxes={"done": PAUSED, "busy": RUNNING})
-        self.write(row("paused_sandbox", "done"), row("paused_sandbox", "busy"))
-        self.run_main("--apply", "--yes", client=client)
+        self.write(
+            row("paused_sandbox", "done"),
+            row("paused_sandbox", "busy"),
+            row("paused_sandbox", "gone"),
+        )
+        self.run_main("--apply", "--yes", "--workers", "1", client=client)
         client.sandboxes["busy"] = PAUSED
         client.calls.clear()
 
-        code, _ = self.run_main("--apply", "--yes", client=client)
+        code, _ = self.run_main("--apply", "--yes", "--workers", "1", client=client)
 
         self.assertEqual(code, 0)
-        self.assertEqual(client.calls, [("get_info", "busy"), ("kill", "busy")])
-        self.assertEqual(self.outcomes(), {"done": "deleted", "busy": "deleted"})
+        # not_found is re-checked: another team's sandbox also answers 404.
+        self.assertEqual(
+            client.calls, [("get_info", "busy"), ("kill", "busy"), ("get_info", "gone")]
+        )
+        self.assertEqual(
+            self.outcomes(), {"done": "deleted", "busy": "deleted", "gone": "not_found"}
+        )
+
+    def test_apply_without_an_api_key_stops_before_the_prompt(self) -> None:
+        client = FakeClient(snapshots={"t1": True})
+        self.write(row("snapshot", "t1"))
+
+        with mock.patch.dict("os.environ", clear=True):
+            output = io.StringIO()
+            with (
+                contextlib.redirect_stdout(output),
+                self.assertRaises(SystemExit) as exit,
+            ):
+                cleanup.main([str(self.inventory), "--apply"], client=client)
+
+        self.assertIn("set E2B_API_KEY", str(exit.exception.code))
+        self.assertEqual(client.calls, [])
 
     def test_api_errors_fail_the_row_and_the_run_continues(self) -> None:
         client = FakeClient(

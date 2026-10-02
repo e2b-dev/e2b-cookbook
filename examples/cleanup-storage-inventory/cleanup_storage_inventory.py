@@ -2,6 +2,7 @@
 
 import argparse
 import csv
+import os
 import sys
 import time
 from collections import Counter
@@ -26,7 +27,10 @@ RESULT_HEADER = ["resource_type", "resource_id", "outcome", "detail", "timestamp
 # Paused sandboxes go first: a snapshot can't be deleted while a paused
 # sandbox in the same file is still based on it.
 TYPES = ["paused_sandbox", "snapshot"]
-FINISHED = {"deleted", "not_found"}
+# Re-runs skip only deleted rows. A sandbox owned by another team also
+# returns 404, so a run with the wrong key must not mark rows as done.
+FINISHED = {"deleted"}
+DONE = {"deleted", "not_found"}
 CHUNK = 1000
 
 
@@ -119,11 +123,10 @@ def process(client, row: Row) -> tuple[str, str]:
     try:
         return delete(client, row)
     except Exception as error:
-        if (
-            isinstance(error, AuthenticationException)
-            or getattr(error, "status_code", None) == 403
-        ):
-            # pool.map re-raises this in the main thread and cancels the queued rows.
+        # pool.map re-raises these in the main thread and cancels the queued rows.
+        if isinstance(error, AuthenticationException):
+            raise SystemExit(f"error: {error}") from error
+        if getattr(error, "status_code", None) == 403:
             raise SystemExit(
                 f"error: {error} (on {row.id}): the API key belongs to another team, "
                 "or E2B_DOMAIN points at the wrong region"
@@ -183,7 +186,7 @@ def run(
             f"{counts['rate_limited']:,} rows were rate-limited. "
             f"Re-run with fewer --workers (currently {workers})."
         )
-    if set(counts) - FINISHED:
+    if set(counts) - DONE:
         print("Some rows were skipped or failed; re-run to retry them.")
         return 1
     return 0
@@ -262,6 +265,10 @@ def main(argv: list[str] | None = None, client=Sandbox) -> int:
     if not total:
         return 0
 
+    if not os.environ.get("E2B_API_KEY"):
+        sys.exit(
+            "error: set E2B_API_KEY to the API key of the team the inventory belongs to"
+        )
     confirm(args.yes)
     return run(client, args.inventory, selected, total, args.workers, results_path)
 

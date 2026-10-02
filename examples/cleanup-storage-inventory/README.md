@@ -38,7 +38,7 @@ A `401` or `403` means the key belongs to another team or `E2B_DOMAIN` points at
 region. The script stops.
 
 Outcomes are written to `<inventory>.results.csv` next to the input. A re-run skips rows that ended
-`deleted` or `not_found` and retries the rest, so it is safe to interrupt (Ctrl-C) and run
+`deleted` and re-checks the rest, including `not_found`, so it is safe to interrupt (Ctrl-C) and run
 again. The SDK waits out short rate limits on its own, which shows as a lower `rows/s` in the
 progress line. If rows still end `rate_limited`, the script says so at the end; re-run with
 fewer `--workers`.

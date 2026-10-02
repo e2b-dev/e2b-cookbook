@@ -314,6 +314,7 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
 - How to run Playwright in E2B - [TypeScript](./examples/playwright-in-e2b)
 - Map custom subdomains to your sandboxes - [TypeScript](./examples/custom-sandbox-domain-proxy)
 - Delete old paused sandboxes by age and metadata - [Python/Shell](./examples/cleanup-paused-sandboxes)
+- Delete paused sandboxes and snapshots listed in a storage inventory CSV - [Python](./examples/cleanup-storage-inventory)
 - Feedback analyst agent on Flue, publishing an HTML report from a sandbox - [TypeScript](./examples/flue-feedback-analyst-js)
 - Warm an E2B sandbox and rerun tests after adding a local regression case - [Python](./examples/crabbox-e2b-python)
 - Teach Hermes an incident-triage playbook and reuse it in a fresh session - [Python](./examples/hermes-incident-playbook-python)

@@ -155,6 +155,10 @@ const scripts: {
 // cannot share a team with anything else. The dry run only lists, which would
 // assert nothing beyond the list call:
 //   cleanup-paused-sandboxes
+// Deletes the resources listed in a storage inventory CSV when run with --apply,
+// and needs an inventory downloaded from the dashboard. Its unit tests cover the
+// outcomes against a fake client:
+//   cleanup-storage-inventory
 
 const SANDBOX_TEST_DIRECTORY = '/home/user/example'
 const LOGS_DIRECTORY = 'logs'

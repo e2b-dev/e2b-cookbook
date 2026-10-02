@@ -1,0 +1,7 @@
+[project]
+name = "cleanup-storage-inventory"
+version = "0.1.0"
+description = "Delete the paused sandboxes and snapshots listed in an E2B storage inventory CSV"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = ["e2b>=2.52.0"]

@@ -11,8 +11,8 @@ uv run cleanup_storage_inventory.py inventory.csv --older-than-days 90 --apply
 ```
 
 The script reads `E2B_API_KEY` from the environment; use the key of the team the inventory
-belongs to. For a team outside the default region, also set `E2B_DOMAIN`. To load them from
-a file instead, pass it to uv: `uv run --env-file .env cleanup_storage_inventory.py …`.
+belongs to. For a team outside the default region, also set `E2B_DOMAIN`. You can also put
+them in a `.env` file next to the script; copy `.env.template` to start.
 
 - `--type paused_sandbox|snapshot`: only this type (repeatable).
 - `--older-than-days N`: only rows whose `last_used_at` is more than N days ago.

@@ -13,6 +13,7 @@ from itertools import islice
 from pathlib import Path
 from typing import NamedTuple
 
+from dotenv import load_dotenv
 from e2b import (
     AuthenticationException,
     NotFoundException,
@@ -274,4 +275,5 @@ def main(argv: list[str] | None = None, client=Sandbox) -> int:
 
 
 if __name__ == "__main__":
+    load_dotenv()
     sys.exit(main())

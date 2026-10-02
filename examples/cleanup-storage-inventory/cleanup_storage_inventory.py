@@ -189,8 +189,8 @@ def run(
     return 0
 
 
-def main(argv: list[str] | None = None, client=Sandbox) -> int:
-    """Parse arguments, select rows, print the dry run and, with --apply, delete them."""
+def parse_args(argv: list[str] | None) -> argparse.Namespace:
+    """Parse and check the command-line arguments."""
     parser = argparse.ArgumentParser(
         description="Delete the resources listed in an E2B storage inventory CSV."
     )
@@ -209,15 +209,17 @@ def main(argv: list[str] | None = None, client=Sandbox) -> int:
     args = parser.parse_args(argv)
     if args.workers < 1:
         parser.error("--workers must be at least 1")
-    results_path = args.inventory.with_name(f"{args.inventory.stem}.results.csv")
+    return args
 
+
+def selector(
+    args: argparse.Namespace, finished: set[tuple[str, str]]
+) -> Callable[[Row], bool]:
+    """Return a filter for the rows to delete: --type, --older-than-days, not yet finished."""
     types = args.types or TYPES
     cutoff = None
     if args.older_than_days is not None:
         cutoff = datetime.now(UTC) - timedelta(days=args.older_than_days)
-    finished = read_finished(results_path)
-    if finished:
-        print(f"Skipping rows already finished in {results_path}.")
 
     def selected(row: Row) -> bool:
         return (
@@ -225,6 +227,30 @@ def main(argv: list[str] | None = None, client=Sandbox) -> int:
             and (cutoff is None or row.last_used_at < cutoff)
             and (row.kind, row.id) not in finished
         )
+
+    return selected
+
+
+def confirm(assume_yes: bool) -> None:
+    """Exit unless --yes was given or the user types 'delete'."""
+    if assume_yes:
+        return
+    if not sys.stdin.isatty():
+        sys.exit("error: --apply without a terminal needs --yes")
+    prompt = "This is permanent and cannot be undone. Type 'delete' to continue: "
+    if input(prompt) != "delete":
+        sys.exit("Aborted: nothing deleted.")
+
+
+def main(argv: list[str] | None = None, client=Sandbox) -> int:
+    """Print the dry run and, with --apply, delete the selected rows."""
+    args = parse_args(argv)
+    results_path = args.inventory.with_name(f"{args.inventory.stem}.results.csv")
+
+    finished = read_finished(results_path)
+    if finished:
+        print(f"Skipping rows already finished in {results_path}.")
+    selected = selector(args, finished)
 
     # This first full pass also validates the whole file before anything is deleted.
     summary, total = summarize(r for r in read_inventory(args.inventory) if selected(r))
@@ -235,14 +261,8 @@ def main(argv: list[str] | None = None, client=Sandbox) -> int:
         return 0
     if not total:
         return 0
-    if not args.yes:
-        if not sys.stdin.isatty():
-            sys.exit("error: --apply without a terminal needs --yes")
-        if (
-            input("This is permanent and cannot be undone. Type 'delete' to continue: ")
-            != "delete"
-        ):
-            sys.exit("Aborted: nothing deleted.")
+
+    confirm(args.yes)
     return run(client, args.inventory, selected, total, args.workers, results_path)
 
 

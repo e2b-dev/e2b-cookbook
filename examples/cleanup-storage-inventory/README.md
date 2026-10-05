@@ -41,7 +41,7 @@ region. The script stops. It also stops if every row of the first 1,000 fails, w
 Outcomes are written to `<inventory>.results.csv` next to the input. A re-run skips rows that ended
 `deleted` and re-checks the rest, including `not_found`, so it is safe to interrupt (Ctrl-C) and run
 again.
-Rows that were being deleted at the moment of the interrupt, up to `--workers` of them, are not
+Rows that were being deleted when the run stopped, on an interrupt or a `401`/`403`, up to `--workers` of them, are not
 recorded and report `not_found` on the re-run. The SDK waits out short rate limits on its own, which shows as a lower `rows/s` in the
 progress line. If rows still end `rate_limited`, the script says so at the end; re-run with
 fewer `--workers`.

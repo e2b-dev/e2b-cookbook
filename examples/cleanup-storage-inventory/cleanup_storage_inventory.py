@@ -131,7 +131,8 @@ def delete_row(row: Row) -> tuple[str, str]:
             deleted = Sandbox.kill(row.id)
         return ("deleted", "") if deleted else ("not_found", "")
 
-    # pool.map re-raises the SystemExits in the main thread and cancels the queued rows.
+    # pool.map re-raises the SystemExits in the main thread and cancels the queued
+    # rows; rows already in flight still finish but aren't recorded.
     except AuthenticationException as error:
         raise SystemExit(f"error: {error}") from error
     except NotFoundException:
@@ -168,6 +169,8 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
     args = parser.parse_args(argv)
     if args.workers < 1:
         parser.error("--workers must be at least 1")
+    if args.older_than_days is not None and args.older_than_days < 0:
+        parser.error("--older-than-days must be at least 0")
     return args
 
 

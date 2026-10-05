@@ -103,6 +103,14 @@ class CleanupTests(unittest.TestCase):
         self.assertIn("line 3: unknown resource_type 'template'", output)
         self.assertEqual(client.calls, [])
 
+    def test_rejects_a_negative_age(self) -> None:
+        self.write(row("snapshot", "t1"))
+
+        code, output = self.run_main("--older-than-days", "-1", client=FakeClient())
+
+        self.assertEqual(code, 2)
+        self.assertIn("--older-than-days must be at least 0", output)
+
     def test_dry_run_calls_nothing(self) -> None:
         client = FakeClient()
         self.write(

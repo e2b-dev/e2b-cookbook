@@ -8,6 +8,7 @@ below. By default it only prints what it would delete; `--apply` deletes permane
 uv run cleanup_storage_inventory.py inventory.csv                       # dry run
 uv run cleanup_storage_inventory.py inventory.csv --older-than-days 90  # dry run, filtered
 uv run cleanup_storage_inventory.py inventory.csv --older-than-days 90 --apply
+uv run cleanup_storage_inventory.py inventory.csv --apply --interactive    # confirm each row
 ```
 
 The script reads `E2B_API_KEY` from the environment; use the key of the team the inventory
@@ -16,8 +17,19 @@ them in a `.env` file next to the script; copy `.env.template` to start.
 
 - `--type paused_sandbox|snapshot`: only this type (repeatable).
 - `--older-than-days N`: only rows whose `last_used_at` is more than N days ago.
+- `--limit N`: delete at most N rows in this run; a re-run takes the next N.
 - `--apply`: delete permanently, without asking again. Run the dry run first.
-- `--workers N`: concurrent requests, default 16.
+- `--interactive` (with `--apply`): asks for the filters you didn't pass (the limit
+  suggests 100), then asks before each deletion:
+  - `y`: delete it.
+  - `n`: skip it; a re-run asks again.
+  - `a`: delete it and all remaining rows without asking.
+  - `q`: stop here; nothing more is deleted.
+
+  Rows run one at a time. Sandboxes that are running or changed are skipped without asking.
+- `--concurrency N`: rows in progress at once, default 10.
+- `--rate N`: API requests per second, default 100. A paused sandbox takes two requests, a
+  snapshot one.
 
 Keep the header and the values as exported. The whole file is checked before anything is
 deleted; the first invalid row stops the script with its line number.
@@ -32,19 +44,21 @@ in the same run. Each row ends with one outcome:
 - `skipped_running`: the sandbox is running.
 - `skipped_changed`: the sandbox was resumed after the inventory was taken.
 - `skipped_in_use`: a running or paused sandbox is still based on the snapshot.
-- `rate_limited`: the API kept rate-limiting the request after the SDK's retries.
+- `skipped_by_user`: you answered `n` in interactive mode.
 - `failed`: the API returned another error. The detail column has it.
 
 A `401` or `403` means the key belongs to another team or `E2B_DOMAIN` points at the wrong
-region. The script stops. It also stops if every row of the first 1,000 fails, which usually means `E2B_DOMAIN` is wrong.
+region. The script stops. It also stops if every row of the first 1,000 fails, which usually
+means `E2B_DOMAIN` is wrong.
 
-Outcomes are written to `<inventory>.results.csv` next to the input. A re-run skips rows that ended
-`deleted` and re-checks the rest, including `not_found`, so it is safe to interrupt (Ctrl-C) and run
-again.
-Rows that were being deleted when the run stopped, on an interrupt or a `401`/`403`, up to `--workers` of them, are not
-recorded and report `not_found` on the re-run. The SDK waits out short rate limits on its own, which shows as a lower `rows/s` in the
-progress line. If rows still end `rate_limited`, the script says so at the end; re-run with
-fewer `--workers`.
+Outcomes are written to `<inventory>.results.csv` next to the input. A re-run skips rows that
+ended `deleted` and re-checks the rest, including `not_found`, so it is safe to interrupt (Ctrl-C)
+and run again. Rows that were being deleted when the run stopped, on an interrupt or a
+`401`/`403`, up to `--concurrency` of them, may be deleted without being recorded and then report
+`not_found` on the re-run.
+
+A rate-limited request goes back in the queue until it succeeds; the progress line counts these
+as `requeued`. If you see many, lower `--rate`.
 
 The script exits `0` when every row is deleted or gone, and `1` otherwise.
 

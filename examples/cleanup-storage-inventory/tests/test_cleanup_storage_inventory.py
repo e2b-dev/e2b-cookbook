@@ -29,29 +29,33 @@ def row(kind: str, resource_id: str, last_used_at: datetime = PAUSED_AT) -> str:
 
 
 class FakeClient:
-    """Stands in for the Sandbox class. sandboxes maps id -> (state, started_at);
-    snapshots maps id -> True (deletable) or an exception to raise."""
+    """Stands in for the AsyncSandbox class. sandboxes maps id -> (state, started_at);
+    snapshots maps id -> True (deletable), an exception to raise, or a list of
+    those to go through one call at a time."""
 
     def __init__(self, sandboxes=None, snapshots=None):
         self.sandboxes = dict(sandboxes or {})
         self.snapshots = dict(snapshots or {})
         self.calls = []
 
-    def get_info(self, sandbox_id):
+    async def get_info(self, sandbox_id):
         self.calls.append(("get_info", sandbox_id))
         if sandbox_id not in self.sandboxes:
             raise SandboxNotFoundException(sandbox_id)
         state, started_at = self.sandboxes[sandbox_id]
         return SimpleNamespace(state=state, started_at=started_at)
 
-    def kill(self, sandbox_id):
+    async def kill(self, sandbox_id):
         self.calls.append(("kill", sandbox_id))
         return self.sandboxes.pop(sandbox_id, None) is not None
 
-    def delete_snapshot(self, snapshot_id):
+    async def delete_snapshot(self, snapshot_id):
         self.calls.append(("delete_snapshot", snapshot_id))
-        if isinstance(self.snapshots.get(snapshot_id), Exception):
-            raise self.snapshots[snapshot_id]
+        effect = self.snapshots.get(snapshot_id)
+        if isinstance(effect, list):
+            effect = effect.pop(0) if len(effect) > 1 else effect[0]
+        if isinstance(effect, Exception):
+            raise effect
         return self.snapshots.pop(snapshot_id, None) is not None
 
 
@@ -73,7 +77,7 @@ class CleanupTests(unittest.TestCase):
             mock.patch.dict("os.environ", {"E2B_API_KEY": "e2b_test"}),
         ):
             try:
-                with mock.patch.object(cleanup, "Sandbox", client):
+                with mock.patch.object(cleanup, "AsyncSandbox", client):
                     code = cleanup.main([str(self.inventory), *args])
             except SystemExit as exit:
                 code = exit.code
@@ -172,7 +176,7 @@ class CleanupTests(unittest.TestCase):
             row("paused_sandbox", "gone-sandbox"),
         )
 
-        code, _ = self.run_main("--apply", "--workers", "4", client=client)
+        code, _ = self.run_main("--apply", "--concurrency", "4", client=client)
 
         self.assertEqual(code, 1)
         self.assertEqual(
@@ -197,11 +201,11 @@ class CleanupTests(unittest.TestCase):
             row("paused_sandbox", "busy"),
             row("paused_sandbox", "gone"),
         )
-        self.run_main("--apply", "--workers", "1", client=client)
+        self.run_main("--apply", "--concurrency", "1", client=client)
         client.sandboxes["busy"] = PAUSED
         client.calls.clear()
 
-        code, _ = self.run_main("--apply", "--workers", "1", client=client)
+        code, _ = self.run_main("--apply", "--concurrency", "1", client=client)
 
         self.assertEqual(code, 0)
         # not_found is re-checked: another team's sandbox also answers 404.
@@ -221,17 +225,18 @@ class CleanupTests(unittest.TestCase):
             with (
                 contextlib.redirect_stdout(output),
                 self.assertRaises(SystemExit) as exit,
-                mock.patch.object(cleanup, "Sandbox", client),
+                mock.patch.object(cleanup, "AsyncSandbox", client),
             ):
                 cleanup.main([str(self.inventory), "--apply"])
 
         self.assertIn("set E2B_API_KEY", str(exit.exception.code))
         self.assertEqual(client.calls, [])
 
-    def test_api_errors_fail_the_row_and_the_run_continues(self) -> None:
+    def test_rate_limited_rows_are_queued_again_and_errors_fail_the_row(self) -> None:
+        limited = RateLimitException("429: Rate limit exceeded")
         client = FakeClient(
             snapshots={
-                "limited": RateLimitException("429: Rate limit exceeded"),
+                "limited": [limited, limited, True],
                 "broken": SandboxException("500: boom", status_code=500),
                 "fine": True,
             }
@@ -242,15 +247,94 @@ class CleanupTests(unittest.TestCase):
             row("snapshot", "fine"),
         )
 
-        code, output = self.run_main("--apply", "--workers", "1", client=client)
+        code, output = self.run_main("--apply", "--concurrency", "1", client=client)
 
         self.assertEqual(code, 1)
         self.assertEqual(
             self.outcomes(),
-            {"limited": "rate_limited", "broken": "failed", "fine": "deleted"},
+            {"limited": "deleted", "broken": "failed", "fine": "deleted"},
         )
-        self.assertIn("rate_limited 1", output)
-        self.assertIn("Re-run with fewer --workers (currently 1)", output)
+        self.assertIn("requeued 2", output)
+        self.assertIn("A lower --rate (currently 100) avoids that", output)
+
+    def test_limit_takes_paused_sandboxes_first_and_a_rerun_continues(self) -> None:
+        client = FakeClient(
+            sandboxes={"s1": PAUSED, "s2": PAUSED, "s3": PAUSED},
+            snapshots={"t1": True},
+        )
+        self.write(
+            row("snapshot", "t1"),
+            row("paused_sandbox", "s1"),
+            row("paused_sandbox", "s2"),
+            row("paused_sandbox", "s3"),
+        )
+
+        code, output = self.run_main("--apply", "--limit", "2", client=client)
+
+        self.assertEqual(code, 0)
+        self.assertRegex(output, r"paused_sandbox\s+2 rows")
+        self.assertRegex(output, r"snapshot\s+0 rows")
+        self.assertEqual(self.outcomes(), {"s1": "deleted", "s2": "deleted"})
+
+        self.run_main("--apply", "--limit", "2", client=client)
+
+        self.assertEqual(
+            self.outcomes(),
+            {"s1": "deleted", "s2": "deleted", "s3": "deleted", "t1": "deleted"},
+        )
+
+    def test_interactive_asks_for_filters_and_confirms_each_row(self) -> None:
+        client = FakeClient(
+            sandboxes={"s1": PAUSED, "busy": RUNNING, "s2": PAUSED, "s3": PAUSED},
+            snapshots={"t1": True},
+        )
+        self.write(
+            row("paused_sandbox", "s1"),
+            row("paused_sandbox", "busy"),
+            row("paused_sandbox", "s2"),
+            row("paused_sandbox", "s3"),
+            row("snapshot", "t1"),
+        )
+        # Types, age and limit, then s1, s2, s3; busy is skipped without asking
+        # and "a" covers t1.
+        answers = ["", "", "", "n", "y", "a"]
+
+        with mock.patch("builtins.input", side_effect=answers) as asked:
+            code, output = self.run_main("--apply", "--interactive", client=client)
+
+        self.assertEqual(code, 1)
+        self.assertEqual(asked.call_count, 6)
+        self.assertIn("n  skip it; a re-run asks again", output)
+        self.assertEqual(
+            self.outcomes(),
+            {
+                "s1": "skipped_by_user",
+                "busy": "skipped_running",
+                "s2": "deleted",
+                "s3": "deleted",
+                "t1": "deleted",
+            },
+        )
+
+    def test_interactive_quit_stops_without_deleting(self) -> None:
+        client = FakeClient(sandboxes={"s1": PAUSED, "s2": PAUSED})
+        self.write(row("paused_sandbox", "s1"), row("paused_sandbox", "s2"))
+
+        with mock.patch("builtins.input", side_effect=["", "", "5", "q"]):
+            code, output = self.run_main("--apply", "--interactive", client=client)
+
+        self.assertEqual(code, 1)
+        self.assertIn("Stopped: nothing more deleted.", output)
+        self.assertNotIn(("kill", "s1"), client.calls)
+        self.assertEqual(self.outcomes(), {})
+
+    def test_interactive_needs_apply(self) -> None:
+        self.write(row("snapshot", "t1"))
+
+        code, output = self.run_main("--interactive", client=FakeClient())
+
+        self.assertEqual(code, 2)
+        self.assertIn("--interactive needs --apply", output)
 
     def test_stops_when_the_whole_first_chunk_fails(self) -> None:
         unreachable = ConnectionError("dns error")
@@ -258,7 +342,7 @@ class CleanupTests(unittest.TestCase):
         self.write(row("snapshot", "t1"), row("snapshot", "t2"))
 
         with mock.patch.object(cleanup, "CHUNK", 1):
-            code, output = self.run_main("--apply", "--workers", "1", client=client)
+            code, output = self.run_main("--apply", "--concurrency", "1", client=client)
 
         self.assertEqual(code, 1)
         self.assertIn("check E2B_DOMAIN", output)
@@ -269,11 +353,11 @@ class CleanupTests(unittest.TestCase):
         client = FakeClient(snapshots={"t1": forbidden, "t2": True})
         self.write(row("snapshot", "t1"), row("snapshot", "t2"))
 
-        code, output = self.run_main("--apply", "--workers", "1", client=client)
+        code, output = self.run_main("--apply", "--concurrency", "1", client=client)
 
         self.assertEqual(code, 1)
         self.assertIn("another team", output)
-        # Rows queued behind the 403 are cancelled, not recorded.
+        # Rows waiting behind the 403 are cancelled, not recorded.
         self.assertEqual(self.outcomes(), {})
 
     def test_unauthorized_stops_the_run(self) -> None:
@@ -282,7 +366,7 @@ class CleanupTests(unittest.TestCase):
         )
         self.write(row("snapshot", "t1"), row("snapshot", "t2"))
 
-        code, output = self.run_main("--apply", "--workers", "1", client=client)
+        code, output = self.run_main("--apply", "--concurrency", "1", client=client)
 
         self.assertEqual(code, 1)
         self.assertIn("401: invalid key", output)

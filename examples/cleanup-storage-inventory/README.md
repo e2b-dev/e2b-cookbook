@@ -19,8 +19,8 @@ them in a `.env` file next to the script; copy `.env.template` to start.
 - `--older-than-days N`: only rows whose `last_used_at` is more than N days ago.
 - `--limit N`: delete at most N rows in this run; a re-run takes the next N.
 - `--apply`: delete permanently, without asking again. Run the dry run first.
-- `--interactive` (with `--apply`): asks for the filters you didn't pass (the limit
-  suggests 100), then asks before each deletion:
+- `--interactive`: asks for the filters you didn't pass; Enter means no filter. Without
+  `--apply` it then shows what would be deleted; with `--apply` it asks before each deletion:
   - `y`: delete it.
   - `n`: skip it; a re-run asks again.
   - `a`: delete it and all remaining rows without asking.

@@ -328,13 +328,18 @@ class CleanupTests(unittest.TestCase):
         self.assertNotIn(("kill", "s1"), client.calls)
         self.assertEqual(self.outcomes(), {})
 
-    def test_interactive_needs_apply(self) -> None:
-        self.write(row("snapshot", "t1"))
+    def test_interactive_without_apply_only_shows_the_summary(self) -> None:
+        client = FakeClient(snapshots={"t1": True, "t2": True})
+        self.write(row("snapshot", "t1"), row("snapshot", "t2"))
 
-        code, output = self.run_main("--interactive", client=FakeClient())
+        with mock.patch("builtins.input", side_effect=["snapshot", "", "1"]):
+            code, output = self.run_main("--interactive", client=client)
 
-        self.assertEqual(code, 2)
-        self.assertIn("--interactive needs --apply", output)
+        self.assertEqual(code, 0)
+        self.assertRegex(output, r"snapshot\s+1 rows")
+        self.assertIn("Dry run: nothing deleted.", output)
+        self.assertEqual(client.calls, [])
+        self.assertFalse(self.results.exists())
 
     def test_stops_when_the_whole_first_chunk_fails(self) -> None:
         unreachable = ConnectionError("dns error")

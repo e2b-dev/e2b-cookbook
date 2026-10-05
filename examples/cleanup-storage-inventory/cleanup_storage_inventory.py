@@ -6,7 +6,7 @@
 2. Delete paused sandboxes first, then snapshots, 1,000 rows at a time, so only one
    chunk is in memory. Up to --concurrency rows run at once, capped at --rate API
    requests per second; rate-limited rows go back in the queue until they succeed.
-   With --interactive, ask for the filters and confirm each row instead.
+   With --interactive, ask for the filters first; with --apply, confirm each row.
 3. Append each row's outcome to <inventory>.results.csv. A re-run skips the rows
    that ended deleted and re-checks the rest.
 """
@@ -39,8 +39,7 @@ RESULT_HEADER = ["resource_type", "resource_id", "outcome", "detail", "timestamp
 # Paused sandboxes go first: a snapshot can't be deleted while a paused
 # sandbox in the same file is still based on it.
 TYPES = ["paused_sandbox", "snapshot"]
-# Re-runs skip only deleted rows. A sandbox owned by another team also
-# returns 404, so a run with the wrong key must not mark rows as done.
+# Re-runs skip only deleted rows.
 FINISHED = {"deleted"}
 DONE = {"deleted", "not_found"}
 CHUNK = 1000
@@ -297,14 +296,12 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
     parser.add_argument(
         "--interactive",
         action="store_true",
-        help="with --apply: ask for the filters, then confirm each row",
+        help="ask for the filters; with --apply, also confirm each row",
     )
     argv = list(sys.argv[1:] if argv is None else argv)
     args = parser.parse_args(argv)
 
     if args.interactive:
-        if not args.apply:
-            parser.error("--interactive needs --apply")
         # The answers become flags, so they're checked like typed ones.
         if args.types is None:
             answer = input("Types to delete (paused_sandbox snapshot) [both]: ")
@@ -315,7 +312,9 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
             if answer:
                 argv += ["--older-than-days", answer]
         if args.limit is None:
-            argv += ["--limit", input("Delete at most N rows [100]: ") or "100"]
+            answer = input("Delete at most N rows [all]: ")
+            if answer:
+                argv += ["--limit", answer]
         args = parser.parse_args(argv)
 
     if args.older_than_days is not None and args.older_than_days < 0:
@@ -380,4 +379,8 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     load_dotenv()
-    sys.exit(main())
+    try:
+        sys.exit(main())
+    except KeyboardInterrupt:
+        print("\nInterrupted. Re-run the same command to continue.", file=sys.stderr)
+        sys.exit(130)

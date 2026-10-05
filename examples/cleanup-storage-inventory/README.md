@@ -36,11 +36,13 @@ in the same run. Each row ends with one outcome:
 - `failed`: the API returned another error. The detail column has it.
 
 A `401` or `403` means the key belongs to another team or `E2B_DOMAIN` points at the wrong
-region. The script stops.
+region. The script stops. It also stops if every row of the first 1,000 fails, which usually means `E2B_DOMAIN` is wrong.
 
 Outcomes are written to `<inventory>.results.csv` next to the input. A re-run skips rows that ended
 `deleted` and re-checks the rest, including `not_found`, so it is safe to interrupt (Ctrl-C) and run
-again. The SDK waits out short rate limits on its own, which shows as a lower `rows/s` in the
+again.
+Rows that were being deleted at the moment of the interrupt, up to `--workers` of them, are not
+recorded and report `not_found` on the re-run. The SDK waits out short rate limits on its own, which shows as a lower `rows/s` in the
 progress line. If rows still end `rate_limited`, the script says so at the end; re-run with
 fewer `--workers`.
 

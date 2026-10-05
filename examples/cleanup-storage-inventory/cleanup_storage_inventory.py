@@ -221,6 +221,13 @@ def main(argv: list[str] | None = None) -> int:
                     f"done {done:,}/{total:,} · {tally} · {rate:,.0f} rows/s",
                     flush=True,
                 )
+                # A wrong E2B_DOMAIN fails every row after a connect timeout,
+                # which would take hours on a large inventory.
+                if done == len(chunk) and set(outcomes) == {"failed"}:
+                    sys.exit(
+                        "error: every row in the first chunk failed; check E2B_DOMAIN "
+                        f"and the detail column in {results_path}"
+                    )
 
     print(f"Results: {results_path}")
     if outcomes["rate_limited"]:

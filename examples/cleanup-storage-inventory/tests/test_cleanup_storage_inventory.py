@@ -244,6 +244,18 @@ class CleanupTests(unittest.TestCase):
         self.assertIn("rate_limited 1", output)
         self.assertIn("Re-run with fewer --workers (currently 1)", output)
 
+    def test_stops_when_the_whole_first_chunk_fails(self) -> None:
+        unreachable = ConnectionError("dns error")
+        client = FakeClient(snapshots={"t1": unreachable, "t2": True})
+        self.write(row("snapshot", "t1"), row("snapshot", "t2"))
+
+        with mock.patch.object(cleanup, "CHUNK", 1):
+            code, output = self.run_main("--apply", "--workers", "1", client=client)
+
+        self.assertEqual(code, 1)
+        self.assertIn("check E2B_DOMAIN", output)
+        self.assertEqual(self.outcomes(), {"t1": "failed"})
+
     def test_forbidden_stops_the_run(self) -> None:
         forbidden = SandboxException("403: not your template", status_code=403)
         client = FakeClient(snapshots={"t1": forbidden, "t2": True})

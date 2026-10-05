@@ -16,7 +16,7 @@ them in a `.env` file next to the script; copy `.env.template` to start.
 
 - `--type paused_sandbox|snapshot`: only this type (repeatable).
 - `--older-than-days N`: only rows whose `last_used_at` is more than N days ago.
-- `--apply`: delete, after you type `delete` to confirm. `--yes` skips the prompt (needed without a terminal).
+- `--apply`: delete permanently, without asking again. Run the dry run first.
 - `--workers N`: concurrent requests, default 16.
 
 Keep the header and the values as exported. The whole file is checked before anything is

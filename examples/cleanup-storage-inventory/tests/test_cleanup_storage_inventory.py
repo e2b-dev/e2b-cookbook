@@ -9,6 +9,7 @@ from types import SimpleNamespace
 from unittest import mock
 
 from e2b import (
+    AuthenticationException,
     RateLimitException,
     SandboxException,
     SandboxNotFoundException,
@@ -72,7 +73,8 @@ class CleanupTests(unittest.TestCase):
             mock.patch.dict("os.environ", {"E2B_API_KEY": "e2b_test"}),
         ):
             try:
-                code = cleanup.main([str(self.inventory), *args], client=client)
+                with mock.patch.object(cleanup, "Sandbox", client):
+                    code = cleanup.main([str(self.inventory), *args])
             except SystemExit as exit:
                 code = exit.code
         if isinstance(code, str):
@@ -95,7 +97,7 @@ class CleanupTests(unittest.TestCase):
         client = FakeClient()
         self.write(row("snapshot", "ok"), row("template", "base"))
 
-        code, output = self.run_main("--apply", "--yes", client=client)
+        code, output = self.run_main("--apply", client=client)
 
         self.assertEqual(code, 1)
         self.assertIn("line 3: unknown resource_type 'template'", output)
@@ -132,7 +134,6 @@ class CleanupTests(unittest.TestCase):
             "--older-than-days",
             "90",
             "--apply",
-            "--yes",
             client=client,
         )
 
@@ -163,7 +164,7 @@ class CleanupTests(unittest.TestCase):
             row("paused_sandbox", "gone-sandbox"),
         )
 
-        code, _ = self.run_main("--apply", "--yes", "--workers", "4", client=client)
+        code, _ = self.run_main("--apply", "--workers", "4", client=client)
 
         self.assertEqual(code, 1)
         self.assertEqual(
@@ -188,11 +189,11 @@ class CleanupTests(unittest.TestCase):
             row("paused_sandbox", "busy"),
             row("paused_sandbox", "gone"),
         )
-        self.run_main("--apply", "--yes", "--workers", "1", client=client)
+        self.run_main("--apply", "--workers", "1", client=client)
         client.sandboxes["busy"] = PAUSED
         client.calls.clear()
 
-        code, _ = self.run_main("--apply", "--yes", "--workers", "1", client=client)
+        code, _ = self.run_main("--apply", "--workers", "1", client=client)
 
         self.assertEqual(code, 0)
         # not_found is re-checked: another team's sandbox also answers 404.
@@ -203,7 +204,7 @@ class CleanupTests(unittest.TestCase):
             self.outcomes(), {"done": "deleted", "busy": "deleted", "gone": "not_found"}
         )
 
-    def test_apply_without_an_api_key_stops_before_the_prompt(self) -> None:
+    def test_apply_without_an_api_key_stops_before_any_call(self) -> None:
         client = FakeClient(snapshots={"t1": True})
         self.write(row("snapshot", "t1"))
 
@@ -212,8 +213,9 @@ class CleanupTests(unittest.TestCase):
             with (
                 contextlib.redirect_stdout(output),
                 self.assertRaises(SystemExit) as exit,
+                mock.patch.object(cleanup, "Sandbox", client),
             ):
-                cleanup.main([str(self.inventory), "--apply"], client=client)
+                cleanup.main([str(self.inventory), "--apply"])
 
         self.assertIn("set E2B_API_KEY", str(exit.exception.code))
         self.assertEqual(client.calls, [])
@@ -232,9 +234,7 @@ class CleanupTests(unittest.TestCase):
             row("snapshot", "fine"),
         )
 
-        code, output = self.run_main(
-            "--apply", "--yes", "--workers", "1", client=client
-        )
+        code, output = self.run_main("--apply", "--workers", "1", client=client)
 
         self.assertEqual(code, 1)
         self.assertEqual(
@@ -249,38 +249,24 @@ class CleanupTests(unittest.TestCase):
         client = FakeClient(snapshots={"t1": forbidden, "t2": True})
         self.write(row("snapshot", "t1"), row("snapshot", "t2"))
 
-        code, output = self.run_main(
-            "--apply", "--yes", "--workers", "1", client=client
-        )
+        code, output = self.run_main("--apply", "--workers", "1", client=client)
 
         self.assertEqual(code, 1)
         self.assertIn("another team", output)
         # Rows queued behind the 403 are cancelled, not recorded.
         self.assertEqual(self.outcomes(), {})
 
-    def test_apply_without_a_terminal_needs_yes(self) -> None:
-        client = FakeClient(snapshots={"t1": True})
-        self.write(row("snapshot", "t1"))
+    def test_unauthorized_stops_the_run(self) -> None:
+        client = FakeClient(
+            snapshots={"t1": AuthenticationException("401: invalid key"), "t2": True}
+        )
+        self.write(row("snapshot", "t1"), row("snapshot", "t2"))
 
-        with mock.patch("sys.stdin.isatty", return_value=False):
-            code, output = self.run_main("--apply", client=client)
-
-        self.assertEqual(code, 1)
-        self.assertIn("--yes", output)
-        self.assertEqual(client.calls, [])
-
-    def test_apply_deletes_only_after_typing_delete(self) -> None:
-        client = FakeClient(snapshots={"t1": True})
-        self.write(row("snapshot", "t1"))
-
-        with (
-            mock.patch("sys.stdin.isatty", return_value=True),
-            mock.patch("builtins.input", return_value="yes"),
-        ):
-            code, _ = self.run_main("--apply", client=client)
+        code, output = self.run_main("--apply", "--workers", "1", client=client)
 
         self.assertEqual(code, 1)
-        self.assertEqual(client.calls, [])
+        self.assertIn("401: invalid key", output)
+        self.assertEqual(self.outcomes(), {})
 
 
 if __name__ == "__main__":

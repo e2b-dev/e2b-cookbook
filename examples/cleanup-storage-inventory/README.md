@@ -8,6 +8,7 @@ below. By default it only prints what it would delete; `--apply` deletes permane
 uv run cleanup_storage_inventory.py inventory.csv                       # dry run
 uv run cleanup_storage_inventory.py inventory.csv --older-than-days 90  # dry run, filtered
 uv run cleanup_storage_inventory.py inventory.csv --older-than-days 90 --apply
+uv run cleanup_storage_inventory.py inventory.csv --interactive            # choose filters, dry run
 uv run cleanup_storage_inventory.py inventory.csv --apply --interactive    # confirm each row
 ```
 
@@ -16,9 +17,13 @@ belongs to. For a team outside the default region, also set `E2B_DOMAIN`. You ca
 them in a `.env` file next to the script; copy `.env.template` to start.
 
 - `--type paused_sandbox|snapshot`: only this type (repeatable).
-- `--older-than-days N`: only rows whose `last_used_at` is more than N days ago.
+- `--older-than-days N`: only rows whose `last_used_at` is more than N days ago. For a paused
+  sandbox that's its last pause, for a snapshot the last time a sandbox was started from it.
+  Resuming a paused sandbox doesn't update it; the script checks the sandbox's state before
+  deleting it.
 - `--limit N`: delete at most N rows in this run; a re-run takes the next N.
-- `--apply`: delete permanently, without asking again. Run the dry run first.
+- `--apply`: delete permanently. Without `--interactive` it doesn't ask again, so run the dry
+  run first.
 - `--interactive`: asks for the filters you didn't pass; Enter means no filter. Without
   `--apply` it then shows what would be deleted; with `--apply` it asks before each deletion:
   - `y`: delete it.
@@ -60,7 +65,8 @@ and run again. Rows that were being deleted when the run stopped, on an interrup
 A rate-limited request goes back in the queue until it succeeds; the progress line counts these
 as `requeued`. If you see many, lower `--rate`.
 
-The script exits `0` when every row is deleted or gone, and `1` otherwise.
+The script exits `0` when every row is deleted or gone, `130` when interrupted with Ctrl-C, and
+`1` otherwise.
 
 ## Before you run it
 
@@ -71,8 +77,13 @@ The script exits `0` when every row is deleted or gone, and `1` otherwise.
 - **The inventory is up to a day old.** Download a fresh one before a large cleanup.
 - **Large inventories.** The file is read in chunks, so its size doesn't matter, but a re-run
   keeps every finished ID in memory (about 1.3 GB per 10 million) and each row costs one or two
-  API calls. Split files above about 10 million rows, keeping the header in each part. For
-  inventories with tens of millions of rows, contact support first.
+  API calls. At the default `--rate` of 100, that's about 50 paused sandboxes or 100 snapshots
+  per second, about 5.5 hours per million paused sandboxes. Split files above about 10 million
+  rows, keeping the header in each part. For inventories with tens of millions of rows, contact
+  support first.
+- **Snapshots used as a template base look unused.** Building a template `fromTemplate` a
+  snapshot doesn't update its `last_used_at`, and deleting the snapshot is allowed. Remove
+  snapshots you build templates from before you use `--older-than-days`.
 - **Billing.** Deleted resources stop counting toward your storage usage from the next daily
   inventory.
 - **Some rows may report `not_found` without being deleted.** A few paused sandboxes can

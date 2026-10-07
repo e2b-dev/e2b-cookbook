@@ -80,6 +80,13 @@ const scripts: {
 
 // Deliberately not covered, and why. Anything not listed here should be added above.
 //
+// These examples create their own sandbox and reconcile the running/paused account
+// list. This runner already creates an outer sandbox and runs examples concurrently,
+// so it cannot validate their one-sandbox guarantee. The Temporal example also starts
+// a local dev server and kills/restarts a worker process. Run each README's bounded
+// host command separately instead:
+//   pydantic-ai-python, pydantic-ai-temporal-python
+//
 // Blocked upstream: the third-party `sandbox-agent` package (0.4.2, latest) calls
 // Sandbox.betaCreate(), which the E2B SDK removed between 2.20 and 2.30. It cannot
 // run against any current SDK, and was already failing on main for this reason:

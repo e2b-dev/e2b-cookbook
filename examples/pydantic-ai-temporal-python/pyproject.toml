@@ -1,0 +1,10 @@
+[project]
+name = "pydantic-ai-temporal-python"
+version = "0.1.0"
+description = "Recover a Pydantic AI Temporal workflow in its existing E2B sandbox after a worker crash"
+requires-python = ">=3.11"
+dependencies = [
+    "pydantic-ai-harness[e2b,temporal]>=0.54.0",
+    "pydantic-ai-slim[openai]>=2.54.0",
+    "python-dotenv>=1.1.0",
+]

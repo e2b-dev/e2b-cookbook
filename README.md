@@ -77,7 +77,7 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td><a href="./examples/openai-codex-in-sandbox-js">TypeScript</a></td>
     </tr>
     <tr>
-      <td rowspan="3">Anthropic</td>
+      <td rowspan="4">Anthropic</td>
       <td>Claude Opus 5</td>
       <td>Code interpreter</td>
       <td><a href="./examples/claude-code-interpreter-python">Python</a></td>
@@ -94,6 +94,12 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td>Self-hosted worker running inside a Sandbox</td>
       <td><a href="./examples/anthropic-managed-agents/python">Python</a></td>
       <td>-</td>
+    </tr>
+    <tr>
+      <td>Computer use + browser use</td>
+      <td>Copy new hires from Excel into OrangeHRM on an E2B desktop</td>
+      <td>-</td>
+      <td><a href="./examples/anthropic-computer-use-orangehrm-js">TypeScript</a></td>
     </tr>
     <tr>
       <td>Meta</td>

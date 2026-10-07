@@ -1,0 +1,22 @@
+{
+  "name": "anthropic-computer-use-orangehrm",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Claude copies new hires from an Excel file on an E2B desktop into OrangeHRM, using computer use and browser use together",
+  "scripts": {
+    "start": "tsx index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "file:../../../claude-toolsets/vendor/anthropic-ai-sdk-preview-1f583e9.tgz",
+    "@e2b/claude-toolsets": "file:../../../claude-toolsets/packages/claude-toolsets-js",
+    "@e2b/desktop": "^2.4.0",
+    "dotenv": "^17.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.4",
+    "typescript": "^5.9.3"
+  }
+}

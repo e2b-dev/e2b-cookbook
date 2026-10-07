@@ -9,8 +9,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "file:../../../claude-toolsets/vendor/anthropic-ai-sdk-preview-1f583e9.tgz",
-    "@e2b/claude-toolsets": "file:../../../claude-toolsets/packages/claude-toolsets-js",
+    "@anthropic-ai/sdk": "^0.132.0",
+    "@e2b/claude-toolsets": "^0.0.2",
     "@e2b/desktop": "^2.4.0",
     "dotenv": "^17.4.2"
   },

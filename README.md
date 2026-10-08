@@ -177,6 +177,18 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td>-</td>
     </tr>
     <tr>
+      <td>Pydantic AI</td>
+      <td>Pause and resume a coding agent in the same E2B sandbox</td>
+      <td><a href="./examples/pydantic-ai-python">Python</a></td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>Pydantic AI + Temporal</td>
+      <td>Recover a crashed worker with the same sandbox ID and preserved project files</td>
+      <td><a href="./examples/pydantic-ai-temporal-python">Python</a></td>
+      <td>-</td>
+    </tr>
+    <tr>
       <td>CrewAI</td>
       <td>CrewAI agent with sandboxed Python execution</td>
       <td><a href="./examples/crewai-python">Python</a></td>

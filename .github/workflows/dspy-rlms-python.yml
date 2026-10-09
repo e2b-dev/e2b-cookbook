@@ -1,0 +1,30 @@
+name: DSPy RLM Python example
+on:
+  pull_request:
+    paths:
+      - examples/dspy-rlms-python/**
+      - .github/workflows/dspy-rlms-python.yml
+  push:
+    branches: [main]
+    paths:
+      - examples/dspy-rlms-python/**
+      - .github/workflows/dspy-rlms-python.yml
+permissions:
+  contents: read
+jobs:
+  offline:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: examples/dspy-rlms-python
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.11.26"
+          python-version: "3.11"
+      - run: uv sync --frozen
+      - run: uv run pytest -q -m 'not live'
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv build

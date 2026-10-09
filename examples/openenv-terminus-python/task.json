@@ -1,0 +1,10 @@
+{
+  "id": "weekly-sales",
+  "input": "region,amount\neast,10\nwest,7\neast,5\n",
+  "expected": {"east": 15, "west": 7},
+  "verification": {
+    "input": "region,amount\nnorth,3\nsouth,4\nnorth,8\nsouth,1\n",
+    "expected": {"north": 11, "south": 5}
+  },
+  "prompt": "Repair /home/user/work/report.py so it sums every CSV amount by region and prints one JSON object. Inspect the source and data, run the program, edit the file, then call submit. The input is /home/user/work/sales.csv. Use terminal for shell commands."
+}

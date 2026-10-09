@@ -132,6 +132,10 @@ const scripts: {
 //   stirrup-python (its own auth header)
 //   veris-e2b-js (VERIS_API_KEY, VERIS_ENVIRONMENT_ID — Sandbox.create() provisions
 //     a Veris twin of the vendor stack, so it cannot run without a Veris account)
+// Host-side OpenEnv server and native clients create their own episode sandboxes.
+// Uploading this example would nest resources and leave a long-lived service.
+// Scoped offline CI and a bounded host-side live smoke cover it separately:
+//   openenv-terminus-python
 // Orchestrates the external Crabbox CLI, which creates and reuses its own E2B
 // sandbox. Running it here would nest a live sandbox inside this runner, and the
 // suite does not install Crabbox. Its unit tests cover command order and cleanup;

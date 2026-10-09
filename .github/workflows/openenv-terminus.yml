@@ -1,0 +1,25 @@
+name: OpenEnv Terminus offline checks
+on:
+  pull_request:
+    paths:
+      - 'examples/openenv-terminus-python/**'
+      - '.github/workflows/openenv-terminus.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'examples/openenv-terminus-python/**'
+      - '.github/workflows/openenv-terminus.yml'
+jobs:
+  offline:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: examples/openenv-terminus-python
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.12'
+      - run: uv sync --frozen
+      - run: uv run --frozen pytest -q
+      - run: uv run --frozen ruff check .

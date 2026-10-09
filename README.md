@@ -239,6 +239,10 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
   </tbody>
 </table>
 
+**Reinforcement learning**
+
+- [Code rewards for TRL GRPO with E2B](./examples/trl-grpo-python) — first code rewards without a GPU, then train on JSON-processing tasks with sandboxed Python execution.
+
 **Remote execution integrations**
 
 <table>

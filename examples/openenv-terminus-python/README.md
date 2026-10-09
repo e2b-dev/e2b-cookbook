@@ -147,7 +147,7 @@ There is no default model or measured pretrained success rate. Transformers >=5.
 
 ### Factory and native tool loop
 
-In [train.py](./train.py), the factory creates a `ReportEpisode` and adds it to the list TRL manages. TRL 1.14.2's experimental `GRPOTrainer(environment_factory=...)` discovers its typed tool methods, resets one environment per completion, runs generated tool calls, appends observations and collects the score through `get_reward()`.
+In [train.py](./train.py), the factory creates a `ReportEpisode` and records it in a list for final cleanup. TRL 1.14.2's experimental `GRPOTrainer(environment_factory=...)` discovers its typed tool methods, resets one environment per completion, runs generated tool calls, appends observations and collects the score through `get_reward()`.
 
 TRL pools Python environment instances and can reset or execute tools serially. This is an object pool; each reset creates a new E2B policy sandbox. Submission deletes both resources and blocks further mutations. TRL's tool-loop and completion-token limits still control the end of generation. The training `finally` closes every environment again.
 

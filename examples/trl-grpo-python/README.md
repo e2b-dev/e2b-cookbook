@@ -2,6 +2,8 @@
 
 Use [Hugging Face TRL](https://huggingface.co/docs/trl/v1.14.2/grpo_trainer) to train a model with GRPO and use E2B to execute its generated Python code. A reward is the fraction of test cases the program passes. TRL owns generation and model updates; E2B supplies isolated code execution. The evaluator compares complete JSON results on your training host, outside the generated program.
 
+See the [E2B TRL/GRPO guide](https://docs.e2b.dev/agents/trl) for an overview of the integration.
+
 The tasks process JSON API-usage records: sum tokens, count requests, and filter successful requests per customer. They cover repeated customers, empty input, zero totals and large values. Separate evaluation tasks ask for input-token totals and error counts.
 
 Use this workflow when correctness can be checked with trusted inputs and expected outputs. E2B keeps generated code off the training host, without requiring a code-execution service on the GPU machine. Remote execution also adds sandbox creation and network overhead; measure the reward stage for your workload before increasing its scale.
@@ -184,7 +186,7 @@ new_task = task(
 )
 ```
 
-The helper supplies the conversational prompt and serializes each case's `input` and `output`. Name every input field and its type in the instruction. This snippet names `output_tokens` and `input_tokens` as integers but not `customer`; add that field if your model needs it. The model sees only the prompt, not the test cases, so it must not have to guess field names. Repeated customers test aggregation, differing input/output token counts expose summing the wrong field, and a zero total tests whether a customer is incorrectly omitted. Add cases for your intended domain and keep a different instruction, such as the existing error-count task, for held-out evaluation.
+The helper supplies the conversational prompt, defines `customer` as a string and serializes each case's `input` and `output`. This instruction adds `output_tokens` and `input_tokens` as integers. Name any additional input fields and their types in the instruction: the model sees only the prompt, not the test cases, so it must not have to guess field names. Repeated customers test aggregation, differing input/output token counts expose summing the wrong field, and a zero total tests whether a customer is incorrectly omitted. Add cases for your intended domain and keep a different instruction, such as the existing error-count task, for held-out evaluation.
 
 ## Execution, failures and resource ownership
 

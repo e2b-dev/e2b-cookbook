@@ -137,7 +137,7 @@ const scripts: {
 // suite does not install Crabbox. Its unit tests cover command order and cleanup;
 // the real provider lifecycle remains a separate, explicitly approved smoke:
 //   crabbox-e2b-python
-// Runs TRL on the evaluator host and creates fresh E2B sandboxes for code rewards.
+// Runs TRL on the evaluator host and reuses E2B workers for isolated code rewards.
 // This runner would nest sandbox creation and has no training GPU. Core reward
 // checks run in .github/workflows/trl-grpo.yml; live smoke and training are separate:
 //   trl-grpo-python

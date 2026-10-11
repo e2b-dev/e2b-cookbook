@@ -145,6 +145,7 @@ const scripts: {
 //   stirrup-python (its own auth header)
 //   veris-e2b-js (VERIS_API_KEY, VERIS_ENVIRONMENT_ID — Sandbox.create() provisions
 //     a Veris twin of the vendor stack, so it cannot run without a Veris account)
+//   olostep-scrape-and-analyze (OLOSTEP_API_KEY)
 // Host-side OpenEnv server and native clients create their own episode sandboxes.
 // Uploading this example would nest resources and leave a long-lived service.
 // Scoped offline CI and a bounded host-side live smoke cover it separately:

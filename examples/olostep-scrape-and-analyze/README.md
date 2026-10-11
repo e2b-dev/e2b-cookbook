@@ -6,13 +6,13 @@ Scrape [Hacker News Jobs](https://news.ycombinator.com/jobs) with [Olostep](http
 
 ## What this shows
 
-Olostep returns any page as clean LLM-ready markdown in a single API call. The E2B sandbox then runs untrusted parsing and plotting code against that markdown in an isolated VM — no local Python setup, no dependency conflicts, and nothing from the scraped page touching your machine.
+Olostep returns any page as clean LLM-ready markdown in a single API call. The E2B sandbox then runs untrusted parsing and plotting code against that markdown in an isolated VM, so there is no local Python setup and nothing from the scraped page touches your machine.
 
 The extraction happens with a regex inside the sandbox rather than through an LLM. For a page with predictable structure this is deterministic, free, and instant, and it keeps the example runnable with just two API keys.
 
 ## Prerequisites
 
-- Node.js 18+
+- Node.js 20.18.1 or newer (required by the E2B SDK)
 - An [Olostep API key](https://olostep.com)
 - An [E2B API key](https://e2b.dev/dashboard)
 

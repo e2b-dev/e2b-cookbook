@@ -11,7 +11,7 @@ const main = async () => {
   const sandbox = await Sandbox.create();
   await sandbox.files.write("/home/user/page.md", md);
 
-  const code = fs.readFileSync("analyze.py", "utf-8").replace(/^\uFEFF/, "");
+  const code = fs.readFileSync("analyze.py", "utf-8");
   const execution = await sandbox.runCode(code);
 
   console.log(execution.logs.stdout.join("\n"));

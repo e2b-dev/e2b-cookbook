@@ -1,4 +1,4 @@
-﻿import "dotenv/config";
+import "dotenv/config";
 
 const ENDPOINT = "https://api.olostep.com/v1/scrapes";
 

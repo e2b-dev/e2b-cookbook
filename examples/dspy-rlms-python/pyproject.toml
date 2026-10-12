@@ -1,0 +1,29 @@
+[build-system]
+requires = ["hatchling>=1.26,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "dspy-e2b-example"
+version = "0.1.0"
+description = "DSPy RLM inference with a stateful E2B CPython interpreter"
+readme = "README.md"
+license-files = ["THIRD_PARTY_NOTICES"]
+requires-python = ">=3.10,<3.15"
+dependencies = ["dspy==3.4.0", "e2b>=2.53.1,<3", "python-dotenv>=1.1,<2"]
+
+[dependency-groups]
+dev = ["pytest>=8,<9", "ruff>=0.12,<1"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["dspy_e2b"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["live: creates real E2B sandboxes; no model provider calls"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]

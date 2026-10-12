@@ -171,9 +171,26 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td>-</td>
     </tr>
     <tr>
-      <td>🦜🕸️ LangGraph</td>
+      <td rowspan="2">🦜🕸️ LangGraph</td>
       <td>LangGraph with code interpreter</td>
       <td><a href="./examples/langgraph-python">Python</a></td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>Plan-and-execute coding agent: one sandbox across graph steps, checkpoints and a human-in-the-loop interrupt</td>
+      <td><a href="./examples/langgraph-plan-and-execute-python">Python</a></td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>Pydantic AI</td>
+      <td>Pause and resume a coding agent in the same E2B sandbox</td>
+      <td><a href="./examples/pydantic-ai-python">Python</a></td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>Pydantic AI + Temporal</td>
+      <td>Recover a crashed worker with the same sandbox ID and preserved project files</td>
+      <td><a href="./examples/pydantic-ai-temporal-python">Python</a></td>
       <td>-</td>
     </tr>
     <tr>
@@ -235,6 +252,12 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td>Run Sandbox Agent inside E2B and connect with the SDK</td>
       <td>-</td>
       <td><a href="./examples/sandbox-agent-sdk-js">TypeScript</a></td>
+    </tr>
+    <tr>
+    <td><a href="https://github.com/e2b-dev/opencode-e2b">OpenCode E2B workspaces</a></td>
+      <td>Warp a live OpenCode session from your laptop into an E2B sandbox and back</td>
+      <td>-</td>
+      <td><a href="./examples/opencode-e2b-workspace-js">TypeScript</a></td>
     </tr>
     <tr>
       <td>Stirrup</td>

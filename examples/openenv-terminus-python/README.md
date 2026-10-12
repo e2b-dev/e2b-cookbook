@@ -119,7 +119,7 @@ OpenEnv 0.8.0 reads a policy-writable `/home/user/logs/verifier/reward.txt`, whi
 | `verification.expected` | Exact integer verification totals retained on the host |
 | `prompt` | Instructions sent to the policy |
 
-The training dataset has `prompt` (chat messages) and `task` (this object) columns. TRL forwards `task` to reset. Only `terminal(command)` and `submit()` are advertised as model tools; setup, reset, credentials, expected totals and cleanup remain orchestration controls.
+The training dataset has `prompt` (chat messages) and `task` (this object serialized with `json.dumps`) columns. TRL forwards `task` to reset, which decodes it. Store tasks as JSON strings so Arrow does not merge expectation keys across rows and pad missing regions with `None`. Direct Python callers can still pass a task dictionary. Only `terminal(command)` and `submit()` are advertised as model tools; setup, reset, credentials, expected totals and cleanup remain orchestration controls.
 
 ### Customize the repair
 

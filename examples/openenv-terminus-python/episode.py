@@ -97,11 +97,13 @@ class ReportEpisode:
         self._cleanup = []
         self._resources = {}
 
-    def reset(self, task: dict | None = None, **kwargs) -> str:
+    def reset(self, task: dict | str | None = None, **kwargs) -> str:
         self._close()
         self._fatal = None
         self._finished = False
         self._reward = None
+        if isinstance(task, str):
+            task = json.loads(task)
         self._task = TASK if task is None else task
         self._deadline = time.monotonic() + EPISODE_SECONDS
         started = time.monotonic()

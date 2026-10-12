@@ -1,4 +1,6 @@
 name: OpenEnv Terminus offline checks
+permissions:
+  contents: read
 on:
   pull_request:
     paths:
@@ -12,6 +14,9 @@ on:
 jobs:
   offline:
     runs-on: ubuntu-latest
+    env:
+      HF_HUB_OFFLINE: '1'
+      HF_HUB_DISABLE_TELEMETRY: '1'
     defaults:
       run:
         working-directory: examples/openenv-terminus-python
@@ -20,6 +25,7 @@ jobs:
       - uses: astral-sh/setup-uv@v6
         with:
           python-version: '3.12'
-      - run: uv sync --frozen
-      - run: uv run --frozen pytest -q
+      - run: uv sync --frozen --extra training
+      - run: uv run --frozen --extra training pytest -q
       - run: uv run --frozen ruff check .
+      - run: uv run --frozen ruff format --check .

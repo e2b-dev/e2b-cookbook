@@ -47,7 +47,8 @@ def main():
         [
             {
                 "prompt": [{"role": "user", "content": TASK["prompt"]}],
-                "task": TASK,
+                # Arrow structs merge nested expectation keys across task rows.
+                "task": json.dumps(TASK),
             }
         ]
     )

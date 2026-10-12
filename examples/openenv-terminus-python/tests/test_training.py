@@ -1,5 +1,6 @@
 """Optional CPU check: scripted tool tokens, synthetic env rewards, real optimizer."""
 
+import json
 import sys
 
 import pytest
@@ -65,7 +66,7 @@ def test_native_environment_factory_tool_loop_and_optimizer(tmp_path, monkeypatc
             instances.append(self)
 
         def reset(self, **kwargs):
-            assert kwargs["task"]["expected"] == {"east": 15, "west": 7}
+            assert json.loads(kwargs["task"])["expected"] == {"east": 15, "west": 7}
             calls.append("reset")
             return None
 

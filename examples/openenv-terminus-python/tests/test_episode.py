@@ -1,6 +1,7 @@
 """Offline contracts: task scoring, ownership, expiry and TRL tool discovery."""
 
 import inspect
+import json
 import time
 from contextlib import contextmanager
 from datetime import datetime, timezone
@@ -184,6 +185,27 @@ def test_reset_is_fresh_and_reconciles_previous_episode(episode):
     assert previous not in episode._test_owned
     assert len(episode._test_owned) == 1
     assert any(call[0] == "ttl" and call[2] == 600 for call in episode._test_calls)
+
+
+def test_arrow_rows_preserve_distinct_task_expectations(episode):
+    datasets = pytest.importorskip("datasets")
+    second = {
+        **TASK,
+        "input": "region,amount\ncoast,3\n",
+        "expected": {"coast": 3},
+        "verification": {"input": "region,amount\ncoast,7\n", "expected": {"coast": 7}},
+    }
+    tasks = [TASK, second]
+    rows = datasets.Dataset.from_list([{"task": json.dumps(task)} for task in tasks])
+    for task, row in zip(tasks, rows):
+        episode.reset(task=row["task"])
+        assert episode._task == task
+        episode._test_config["output"] = json.dumps(
+            task["verification"]["expected"]
+        ).encode()
+        assert episode.submit() == "Report reward: 1.0"
+        assert episode.get_reward() == 1.0
+        assert not episode._owned and not episode._test_owned
 
 
 def test_deadline_and_tool_error_are_fatal_even_if_trl_catches_tool_error(episode):

@@ -81,6 +81,13 @@ const scripts: {
 
 // Deliberately not covered, and why. Anything not listed here should be added above.
 //
+// These examples create their own sandbox and reconcile the running/paused account
+// list. This runner already creates an outer sandbox and runs examples concurrently,
+// so it cannot validate their one-sandbox guarantee. The Temporal example also starts
+// a local dev server and kills/restarts a worker process. Run each README's bounded
+// host command separately instead:
+//   pydantic-ai-python, pydantic-ai-temporal-python
+//
 // Needs a local OpenCode runtime and provisions its own E2B sandboxes from inside the
 // runner sandbox (nested), and the demo half drives the interactive TUI - there is no
 // single thing to assert from a fresh sandbox:

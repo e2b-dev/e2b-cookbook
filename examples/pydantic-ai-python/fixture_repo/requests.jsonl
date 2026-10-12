@@ -1,0 +1,4 @@
+{"status": 200, "latency_ms": 10}
+{"status": 200, "latency_ms": 20}
+{"status": 500, "latency_ms": 50}
+{"status": 503, "latency_ms": 100}

@@ -142,10 +142,12 @@ async def main() -> None:
         finally:
             # A failed local shutdown must not skip remote cleanup.
             if backend.ref is not None:
-                await E2BSandbox().destroy(backend.ref)
-                assert backend.ref.id not in await sandbox_ids(), (
-                    "Cleanup did not remove the sandbox"
-                )
+                print(f"Cleaning up sandbox: {backend.ref.id}", flush=True)
+                async with asyncio.timeout(30):
+                    await E2BSandbox().destroy(backend.ref)
+                    assert backend.ref.id not in await sandbox_ids(), (
+                        "Cleanup did not remove the sandbox"
+                    )
                 print(f"Cleanup verified: {backend.ref.id}", flush=True)
 
 

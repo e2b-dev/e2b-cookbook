@@ -57,7 +57,7 @@ The demonstrated crash is **after a persisted workspace ref and diagnosis checkp
 
 Temporal activities may run again if a worker disappears before completion is recorded. Recovery does not make arbitrary shell commands exactly-once or roll back file writes. Use repeatable operations such as replacing a named result, rather than appending the same output on every attempt. A lost response after remote sandbox creation is also an ambiguous outcome; a general no-duplicate-creation guarantee is not claimed here.
 
-Killing a worker stops its local process; it does not necessarily stop already-started remote commands. This demo crashes at an idle checkpoint, with no command in flight. The controller owns final deletion. An abrupt controller crash may leave a sandbox paused after its 600-second lifetime; explicit cleanup is still necessary.
+Killing a worker stops its local process; it does not necessarily stop already-started remote commands. This demo crashes at an idle checkpoint, with no command in flight. The controller owns final deletion. Deletion and the running/paused verification share a separate 30-second cleanup deadline. Cleanup errors and timeouts propagate; the sandbox ID is printed before cleanup so you can retry deletion if its outcome is unconfirmed. An abrupt controller crash may leave a sandbox paused after its 600-second lifetime; explicit cleanup is still necessary.
 
 The agent, workflow class, and capabilities remain unchanged across worker processes. Changing their registration while workflows are running can change replay history; use workflow draining or Temporal worker versioning for real deployments.
 

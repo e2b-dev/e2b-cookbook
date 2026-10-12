@@ -58,7 +58,7 @@ After `await sandbox.pause()`, the script constructs a fresh backend with `E2BSa
 
 ## Lifetime and cleanup
 
-The application owns the sandbox and calls `E2BSandbox().destroy(ref)` in `finally`, including after setup or model errors. Cleanup failure propagates; a printed sandbox ID lets you retry deletion. Destroying a paused sandbox does not resume it first.
+The application owns the sandbox and calls `E2BSandbox().destroy(ref)` in `finally`, including after setup or model errors. Deletion and the running/paused verification share a separate 30-second cleanup deadline. Cleanup errors and timeouts propagate; the sandbox ID is printed before cleanup so you can retry deletion if its outcome is unconfirmed. Destroying a paused sandbox does not resume it first.
 
 Pydantic AI does not delete a sandbox when an agent run ends. This example uses a 600-second server lifetime with pause-on-timeout, so a process crash can leave a paused sandbox that still needs explicit deletion. A dead sandbox raises `WorkspaceUnavailableError`; reconnect does not silently create an empty replacement. Pausing retains sandbox state, but kills, file deletion, and sandbox pause retention limits are separate concerns.
 

@@ -29,7 +29,8 @@ print(json.dumps(totals, sort_keys=True))
 """
 PROGRAM = "/home/user/work/report.py"
 RUN_REPORT = f"python3 -B {PROGRAM}"
-EPISODE_SECONDS = 120
+EPISODE_SECONDS = 600
+POLICY_SECONDS = 120
 SANDBOX_SECONDS = 600
 COMMAND_SECONDS = 10
 VERIFIER_SECONDS = 120
@@ -92,6 +93,7 @@ class ReportEpisode:
         self._finished = False
         self._reward = None
         self._deadline = 0.0
+        self._policy_deadline = 0.0
         self._task = TASK
         self._trace = []
         self._cleanup = []
@@ -139,6 +141,7 @@ class ReportEpisode:
             self._check()
             # Attach before policy execution; submission never reconnects or resumes it.
             self._policy = Sandbox.connect(self._active_id, request_timeout=10)
+            self._policy_deadline = time.monotonic() + POLICY_SECONDS
             self._trace.append(
                 {
                     "operation": "reset",
@@ -173,10 +176,23 @@ class ReportEpisode:
         if str(info.state).lower().split(".")[-1] != "running":
             raise InfrastructureError("Episode sandbox is not running")
 
+    def _expire_policy(self) -> bool:
+        if time.monotonic() < self._policy_deadline:
+            return False
+        self._check()  # Resource loss must not become a policy timeout score.
+        self._finished = True
+        self._close()
+        self._check_deadline()
+        self._reward = 0.0  # Commit only after confirmed cleanup.
+        self._trace.append({"operation": "policy_budget_exhausted"})
+        return True
+
     def _step(self, **arguments) -> str:
         started = time.monotonic()
         try:
             self._check()
+            if self._expire_policy():
+                return "Policy time budget exhausted; reward: 0.0."
             result = self._client.step(
                 CallToolAction(tool_name="terminal", arguments=arguments)
             )
@@ -190,6 +206,8 @@ class ReportEpisode:
             )
             # Completed command output is policy data, never an infrastructure signal.
             self._check()
+            if self._expire_policy():
+                return "Policy time budget exhausted; reward: 0.0."
             return output
         except Exception as exc:
             self._fatal = (
@@ -222,6 +240,8 @@ class ReportEpisode:
         verifier_id = None
         try:
             self._check()
+            if self._expire_policy():
+                return "Policy time budget exhausted; reward: 0.0."
             artifact = self._read_file(self._policy, PROGRAM)
             self._check()
             template = self._resources[policy_id]["template_id"]
@@ -316,6 +336,8 @@ class ReportEpisode:
             if self._reward is not None:
                 return self._reward
             self._check()
+            if self._expire_policy():
+                return self._reward
             # A healthy episode without submission gets zero, never a hidden infra score.
             return 0.0
         except Exception as exc:

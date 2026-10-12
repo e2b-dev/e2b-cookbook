@@ -208,14 +208,146 @@ def test_arrow_rows_preserve_distinct_task_expectations(episode):
         assert not episode._owned and not episode._test_owned
 
 
-def test_deadline_and_tool_error_are_fatal_even_if_trl_catches_tool_error(episode):
+@pytest.mark.parametrize("boundary", ["terminal", "submit", "get_reward"])
+def test_policy_budget_scores_zero_after_cleanup(episode, boundary):
     episode.reset()
+    episode._policy_deadline = time.monotonic() - 1
+    if boundary == "terminal":
+        assert "budget exhausted" in episode.terminal("pwd")
+    elif boundary == "submit":
+        assert "budget exhausted" in episode.submit()
+    assert episode.get_reward() == 0.0
+    assert not episode._owned and not episode._test_owned
+    assert not any(call[0] in ("step", "create") for call in episode._test_calls)
+    assert episode._finished
+
+
+def test_command_crossing_policy_budget_finishes_without_aborting(episode, monkeypatch):
+    episode.reset()
+    original = episode._client.step
+
+    def slow_step(action):
+        result = original(action)
+        episode._policy_deadline = time.monotonic() - 1
+        return result
+
+    monkeypatch.setattr(episode._client, "step", slow_step)
+    assert "budget exhausted" in episode.terminal("sleep 9")
+    assert episode.get_reward() == 0.0
+    assert not episode._test_owned
+    assert episode.terminal("pwd") == "Episode finished; no further commands allowed."
+    episode.reset()
+    assert episode._policy_deadline > time.monotonic()
+    assert episode.get_reward() == 0.0
+
+
+@pytest.mark.parametrize("failure", ["resource", "cleanup", "transport"])
+def test_policy_timeout_never_masks_infrastructure_failure(
+    episode, monkeypatch, failure
+):
+    episode.reset()
+    kill, get_info, sleep = (
+        module.Sandbox.kill,
+        module.Sandbox.get_info,
+        module.time.sleep,
+    )
+    episode._policy_deadline = time.monotonic() - 1
+    if failure == "resource":
+        episode._test_owned.clear()
+    elif failure == "cleanup":
+        monkeypatch.setattr(module.time, "sleep", lambda _: None)
+        monkeypatch.setattr(module.Sandbox, "kill", lambda *a, **kw: None)
+    else:
+
+        def fail(*args, **kwargs):
+            raise OSError("control API unavailable")
+
+        monkeypatch.setattr(module.Sandbox, "get_info", fail)
+    with pytest.raises(InfrastructureError):
+        episode.get_reward()
+    assert episode._reward is None
+    if failure != "resource":
+        assert episode._owned
+    monkeypatch.setattr(module.Sandbox, "kill", kill)
+    monkeypatch.setattr(module.Sandbox, "get_info", get_info)
+    monkeypatch.setattr(module.time, "sleep", sleep)
+
+
+def test_global_deadline_remains_fatal_even_if_policy_budget_expired(episode):
+    episode.reset()
+    episode._policy_deadline = time.monotonic() - 1
     episode._deadline = time.monotonic() - 1
     with pytest.raises(InfrastructureError):
         episode.terminal("pwd")
     with pytest.raises(InfrastructureError):
         episode.get_reward()
     assert not episode._test_owned
+
+
+def test_policy_budget_starts_after_reset_setup(episode, monkeypatch):
+    clock = [100.0]
+    monkeypatch.setattr(module.time, "monotonic", lambda: clock[0])
+    original = module.Sandbox.connect
+
+    def delayed_connect(*args, **kwargs):
+        clock[0] = 250.0
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(module.Sandbox, "connect", delayed_connect)
+    episode.reset()
+    assert episode._deadline == 700.0
+    assert episode._policy_deadline == 370.0
+
+
+def test_policy_zero_not_committed_if_global_budget_expires_during_cleanup(
+    episode, monkeypatch
+):
+    episode.reset()
+    episode._policy_deadline = time.monotonic() - 1
+    kill = module.Sandbox.kill
+
+    def delayed_kill(*args, **kwargs):
+        kill(*args, **kwargs)
+        episode._deadline = time.monotonic() - 1
+
+    monkeypatch.setattr(module.Sandbox, "kill", delayed_kill)
+    with pytest.raises(InfrastructureError, match="deadline"):
+        episode.get_reward()
+    assert episode._reward is None
+    assert not episode._owned and not episode._test_owned
+
+
+@pytest.mark.parametrize("global_expired", [False, True])
+def test_verification_uses_global_budget_after_timely_submit(
+    episode, monkeypatch, global_expired
+):
+    episode.reset()
+    original = module.Sandbox.create
+    episode._test_config["output"] = b'{"north":11,"south":5}'
+
+    def create(**kwargs):
+        verifier = original(**kwargs)
+        run = verifier.commands.run
+
+        def finish_after_policy_window(*args, **kw):
+            result = run(*args, **kw)
+            episode._policy_deadline = time.monotonic() - 1
+            if global_expired:
+                episode._deadline = time.monotonic() - 1
+            return result
+
+        verifier.commands.run = finish_after_policy_window
+        return verifier
+
+    monkeypatch.setattr(module.Sandbox, "create", create)
+    if global_expired:
+        with pytest.raises(InfrastructureError, match="deadline"):
+            episode.submit()
+        assert episode._reward is None
+    else:
+        assert episode.submit() == "Report reward: 1.0"
+        assert episode.get_reward() == 1.0
+    assert not episode._owned and not episode._test_owned
 
 
 def test_failed_cleanup_retains_ids_for_retry(episode, monkeypatch):

@@ -100,7 +100,8 @@ The host requires exit code zero and exactly the integer totals in `verification
 | Edit to accumulate; run; submit | Visible `{"east": 15, "west": 7}`; verification `{"north": 11, "south": 5}` | `1.0` |
 | Healthy episode ends without submission | Resource health confirmed, then cleanup | `0.0` |
 | Submitted program fails or hits its shell timeout | Non-zero verifier exit | `0.0` |
-| Resource/transport loss, episode deadline or unresolved cleanup | Infrastructure error | No score; abort run |
+| Policy window exhausted in a healthy sandbox | Confirm deletion before committing | `0.0`; continue training |
+| Resource/transport loss, global deadline or unresolved cleanup | Infrastructure error | No score; abort run |
 
 OpenEnv 0.8.0 reads a policy-writable `/home/user/logs/verifier/reward.txt`, which a background writer can forge. This recipe ignores it in both sandboxes. The fresh verifier does not inherit policy state, but the submitted candidate remains untrusted executable code. A visible-answer hardcode fails the separate input; both fixed fixtures are public in [task.json](./task.json), so hardcoding both remains possible. This is a bounded task check, not a secret benchmark or proof of generalization.
 
@@ -181,10 +182,13 @@ One policy sandbox holds files across terminal steps. Each call starts a new she
 
 ### Timeout budgets and cancellation
 
+The policy window starts after reset setup finishes. When it expires, the next tool or reward boundary checks sandbox health, confirms deletion and commits zero; subsequent commands are blocked. A timely submission stops policy work, and export/verification use the global and operation budgets. Infrastructure or cleanup failures remain fatal even when the policy window has expired. These checks do not interrupt model generation on the host; the trainer must enforce its own generation timeout.
+
 | Budget | Value | What it bounds |
 | --- | --- | --- |
 | Native policy lifetime / host extension | 300 s / 600 s | Initial allocation backstop / remote policy resource after its ID arrives |
-| Local episode deadline | 120 s | Creation, batch waiting, generation, tools, verification and cleanup before score commit |
+| Policy window after ready reset | 120 s | Batch waiting, generation and terminal work until submission; exhaustion scores zero after health/cleanup checks |
+| Global episode deadline | 600 s | Reset through verification and cleanup; exhaustion remains fatal |
 | Sandbox-side command limit | 10 s | An ordinary shell command or submitted report |
 | Native client message timeout | 25 s | Waiting for an OpenEnv response |
 | Verifier lifetime / SDK command timeout | 120 s / 20 s | Fresh resource / command response |
@@ -209,7 +213,7 @@ Ctrl-C runs Python cleanup; an abrupt host kill can require manual reconciliatio
 | No submission or all rewards are zero | Inspect the final operation trace, model tool-call compatibility and submitted code. Healthy no-submission is zero; identical group rewards can yield zero loss. |
 | A terminal call returns an error or shell timeout | Inspect the observation and fix the program before submitting. The completed command response does not abort the rollout. |
 | Submitted report gets zero | Check aggregation on both CSV shapes, exit status and output format/size. A submitted episode is finished; the next reset starts a new attempt. |
-| Resource loss, response timeout or `Episode deadline exceeded` | The bridge aborts scoring and cleans up; diagnose the infrastructure/budget before starting a new episode. |
+| Resource loss, response timeout or global `Episode deadline exceeded` | The bridge aborts scoring and cleans up; diagnose the infrastructure/budget before starting a new episode. |
 | `Cleanup unresolved: <owned ID>` | Check and delete that owned resource in the [E2B console](https://console.e2b.dev), confirm absence and preserve the reported ID for reconciliation. |
 
 ## Scale and cost

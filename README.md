@@ -20,6 +20,10 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
 - [E2B Fragments](https://github.com/e2b-dev/fragments) - prompt different LLMS to generate apps with UI
 - [E2B Surf](https://github.com/e2b-dev/surf) - computer use AI agent powered by OpenAI
 
+**Multi-turn reinforcement learning**
+
+- [OpenEnv Terminus: inspect, run and repair a report in E2B](./examples/openenv-terminus-python) — first reward without a model or GPU, with optional native TRL training wiring.
+
 **LLM providers**
 
 <table>

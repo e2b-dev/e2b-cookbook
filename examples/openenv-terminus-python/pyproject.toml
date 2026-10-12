@@ -1,0 +1,27 @@
+[project]
+name = "openenv-terminus-python"
+version = "0.1.0"
+description = "Multi-turn report repair with native OpenEnv Terminus and E2B"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "openenv==0.8.0",
+    "openenv-terminus-env @ git+https://github.com/huggingface/OpenEnv@625f5e724f0672ebe4f98a5a29198325aedd1c36#subdirectory=envs/terminus_env",
+    "e2b==2.53.1",
+    "e2b-code-interpreter==2.10.3",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+training = ["trl==1.14.2", "transformers>=5.2,<6", "datasets>=4"]
+
+[dependency-groups]
+dev = ["pytest>=8", "ruff>=0.12"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+
+[tool.ruff]
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]

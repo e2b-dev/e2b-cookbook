@@ -1,0 +1,30 @@
+name: TRL GRPO reward checks
+
+on:
+  pull_request:
+    paths:
+      - "examples/trl-grpo-python/**"
+      - ".github/workflows/trl-grpo.yml"
+  push:
+    branches: [main]
+    paths:
+      - "examples/trl-grpo-python/**"
+      - ".github/workflows/trl-grpo.yml"
+
+jobs:
+  rewards:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: examples/trl-grpo-python/uv.lock
+      - name: Check the evaluator without live services or training dependencies
+        working-directory: examples/trl-grpo-python
+        run: |
+          uv sync --locked --python 3.12 --group dev
+          bash -n isolated_run.sh
+          uv run --locked ruff check .
+          uv run --locked ruff format --check .
+          uv run --locked pytest -q

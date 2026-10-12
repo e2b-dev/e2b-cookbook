@@ -60,6 +60,7 @@ const scripts: {
   { name: 'together-ai-code-interpreter-python', interpreter: 'jupyter', file: './examples/together-ai-code-interpreter-python/together_with_e2b_code_interpreter.ipynb' },
   { name: 'langchain-python', interpreter: 'poetry', file: './examples/langchain-python/' },
   { name: 'langgraph-python', interpreter: 'poetry', file: './examples/langgraph-python/' },
+  { name: 'langgraph-plan-and-execute-python', interpreter: 'uv', file: './examples/langgraph-plan-and-execute-python/' },
   { name: 'claude-code-interpreter-python', interpreter: 'jupyter', file: './examples/claude-code-interpreter-python/claude_code_interpreter.ipynb' },
   { name: 'claude-visualize-website-topics', interpreter: 'jupyter', file: './examples/claude-visualize-website-topics/claude-visualize-website-topics.ipynb' },
   { name: 'mcp-client-js', interpreter: 'npm', file: './examples/mcp-client-js/' },
@@ -80,6 +81,17 @@ const scripts: {
 
 // Deliberately not covered, and why. Anything not listed here should be added above.
 //
+// These examples create their own sandbox and reconcile the running/paused account
+// list. This runner already creates an outer sandbox and runs examples concurrently,
+// so it cannot validate their one-sandbox guarantee. The Temporal example also starts
+// a local dev server and kills/restarts a worker process. Run each README's bounded
+// host command separately instead:
+//   pydantic-ai-python, pydantic-ai-temporal-python
+//
+// Needs a local OpenCode runtime and provisions its own E2B sandboxes from inside the
+// runner sandbox (nested), and the demo half drives the interactive TUI - there is no
+// single thing to assert from a fresh sandbox:
+//   opencode-e2b-workspace-js
 // Blocked upstream: the third-party `sandbox-agent` package (0.4.2, latest) calls
 // Sandbox.betaCreate(), which the E2B SDK removed between 2.20 and 2.30. It cannot
 // run against any current SDK, and was already failing on main for this reason:
@@ -141,6 +153,10 @@ const scripts: {
 // suite does not install Crabbox. Its unit tests cover command order and cleanup;
 // the real provider lifecycle remains a separate, explicitly approved smoke:
 //   crabbox-e2b-python
+// Runs TRL on the evaluator host and reuses E2B workers for isolated code rewards.
+// This runner would nest sandbox creation and has no training GPU. Core reward
+// checks run in .github/workflows/trl-grpo.yml; live smoke and training are separate:
+//   trl-grpo-python
 // Orchestrates Hermes inside the separately published `hermes` template and
 // makes two provider calls so the agent can create and reuse a skill. Its unit
 // tests cover orchestration and cleanup; template/inference remains a separate,
@@ -186,6 +202,10 @@ const TIMEOUT_OVERRIDES: Record<string, number> = {
   // through Tailcat's rate-limited public DERP relay. The demo alone is ~30s;
   // with the install it does not reliably fit the shared budget.
   'tailcat-e2b-js': 300_000,
+  // Two planner calls plus a tool-calling agent per plan step, all at OpenAI
+  // reasoning effort "high": 145s on its last local run, before `uv sync`,
+  // which shares the same budget.
+  'langgraph-plan-and-execute-python': 600_000,
   'tailcat-e2b-python': 300_000,
 }
 

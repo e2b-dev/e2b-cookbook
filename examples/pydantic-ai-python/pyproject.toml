@@ -1,0 +1,10 @@
+[project]
+name = "pydantic-ai-python"
+version = "0.1.0"
+description = "Continue a Pydantic AI coding agent in the same E2B sandbox after pausing"
+requires-python = ">=3.11"
+dependencies = [
+    "pydantic-ai-harness[e2b]>=0.54.0",
+    "pydantic-ai-slim[openai]>=2.54.0",
+    "python-dotenv>=1.1.0",
+]

@@ -231,6 +231,12 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td><a href="./examples/sandbox-agent-sdk-js">TypeScript</a></td>
     </tr>
     <tr>
+    <td><a href="https://github.com/e2b-dev/opencode-e2b">OpenCode E2B workspaces</a></td>
+      <td>Warp a live OpenCode session from your laptop into an E2B sandbox and back</td>
+      <td>-</td>
+      <td><a href="./examples/opencode-e2b-workspace-js">TypeScript</a></td>
+    </tr>
+    <tr>
       <td>Stirrup</td>
       <td>The lightweight framework for building agents</td>
       <td><a href="./examples/stirrup-python">Python</a></td>

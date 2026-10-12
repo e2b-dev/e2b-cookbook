@@ -80,6 +80,10 @@ const scripts: {
 
 // Deliberately not covered, and why. Anything not listed here should be added above.
 //
+// Needs a local OpenCode runtime and provisions its own E2B sandboxes from inside the
+// runner sandbox (nested), and the demo half drives the interactive TUI - there is no
+// single thing to assert from a fresh sandbox:
+//   opencode-e2b-workspace-js
 // Blocked upstream: the third-party `sandbox-agent` package (0.4.2, latest) calls
 // Sandbox.betaCreate(), which the E2B SDK removed between 2.20 and 2.30. It cannot
 // run against any current SDK, and was already failing on main for this reason:

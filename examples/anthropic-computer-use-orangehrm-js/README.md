@@ -24,28 +24,19 @@ The sandbox can reach only `opensource-demo.orangehrmlive.com`: E2B's egress fir
 
 ## Setup
 
-### 1. Pre-release packages
-
-The toolset helpers are not in the published Anthropic SDK yet. Until they are, `package.json` installs both packages from a local clone of [e2b-dev/claude-toolsets](https://github.com/e2b-dev/claude-toolsets) next to this repo (`../../../claude-toolsets`):
-
-- `@anthropic-ai/sdk` from its vendored early-access build, `vendor/anthropic-ai-sdk-preview-*.tgz`
-- `@e2b/claude-toolsets` from `packages/claude-toolsets-js` (build it first with `pnpm install && pnpm build` there)
-
-`.npmrc` sets `install-links=true`, so the toolsets package is copied in and shares this example's Anthropic SDK.
-
-### 2. Set up API keys
+### 1. Set up API keys
 
 - Copy `.env.template` to `.env`
   - Get the [E2B API KEY](https://e2b.dev/docs/getting-started/api-key)
   - Get the [ANTHROPIC API KEY](https://console.anthropic.com/settings/keys)
 
-### 3. Install packages
+### 2. Install packages
 
 ```
 npm i
 ```
 
-### 4. Run the example
+### 3. Run the example
 
 ```
 npm run start

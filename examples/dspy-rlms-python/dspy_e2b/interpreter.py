@@ -172,7 +172,14 @@ class E2BInterpreter:
                     message = json.loads(line)
                     if not isinstance(message, dict) or not isinstance(message.get("type"), str):
                         raise CodeInterpreterError("Invalid E2B response frame")
-                    self._responses.put(message, timeout=0.1)
+                    while not self._stop.is_set():
+                        try:
+                            self._responses.put(message, timeout=0.1)
+                            break
+                        except queue.Full:
+                            continue
+                    else:
+                        return
                 if len(buffered.encode("utf-8")) > MAX_FRAME_BYTES:
                     raise CodeInterpreterError("E2B response frame exceeds 8 MiB")
             if not self._stop.is_set():

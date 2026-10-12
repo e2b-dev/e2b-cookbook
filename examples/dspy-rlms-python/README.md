@@ -91,7 +91,7 @@ This calls E2B and your model provider. `result.json` contains the answer, fixtu
 
 ### How the source fits together
 
-- [main.py](main.py) owns host LM configuration, input loading and the RLM call. Its factory returns a new interpreter. `assess_fixture()` checks the prediction before writing the answer, assessment and trajectory to `result.json`.
+- [main.py](main.py) owns host LM configuration, input loading and the RLM call. Its factory returns a new interpreter. `assess_fixture()` checks the prediction. The answer and trajectory are written to `result.json` even when a deterministic fixture check fails; the artifact records the assessment error, and the run still raises the original error.
 - [interpreter.py](dspy_e2b/interpreter.py) owns sandbox creation, input upload, the execution deadline and deletion. It sends framed JSON through worker stdin and reads replies from stdout. A tool request must have a unique ID for that execution, a registered name and valid argument containers before the host callable runs.
 - [_worker.py](dspy_e2b/_worker.py) keeps a persistent Python namespace in E2B and installs wrappers for the tool names. A wrapper sends its name, arguments and request ID to the host, waits for a matching result and returns it to generated Python. `SUBMIT` ends the code block and returns final fields; DSPy validates their types against the signature on the host.
 
@@ -197,17 +197,17 @@ Concurrent invocations have separate sandboxes. Overlapping `execute()` calls on
 
 Only JSON-compatible inputs and host-tool results are supported. Inputs above 64 KiB use a single sandbox-local file, bounded to 64 MiB, uploaded again when their content changes. On new content, the worker reads and verifies the file once, keeps the raw bytes in memory and parses them afresh each step. Mutating inputs or overwriting the transport file does not alter the next input.
 
-The 8 MiB frame limit applies to code, tool requests/results and returned values. Captured stdout/stderr keeps at most 1 MiB of raw bytes plus `[output truncated]`, and is further trimmed if needed to fit the response after JSON escaping. A large print does not end the session; aggregate received data is limited to 64 MiB per session. This is not unlimited-context support. `max_output_chars` separately limits execution output included in the action prompt.
+The 8 MiB frame limit applies to code, tool requests/results and returned values. An oversized ordinary expression result raises recoverable `CodeExecutionError`; the Python state remains available so the next step can inspect a smaller value or print a bounded preview. A generated tool request is checked before sending, including JSON escaping and frame metadata; oversized arguments raise recoverable code feedback without invoking the host tool. Oversized host-tool results or structured `SUBMIT` fields remain terminal protocol errors; final answers are never truncated. Captured stdout/stderr keeps at most 1 MiB of raw bytes plus `[output truncated]`, and is further trimmed if needed to fit the response after JSON escaping. A large print does not end the session; aggregate received data is limited to 64 MiB per session. This is not unlimited-context support. `max_output_chars` separately limits execution output included in the action prompt.
 
 ### Host-tool concurrency and argument boundaries
 
-At most eight host-tool calls run concurrently per interpreter. This is distinct from DSPy's `llm_query_batched`: one tool request can start several concurrent provider requests on the host. DSPy's sub-query budget counts prompts, so a batch of four uses four calls from this example's budget. Async callables are awaited on host tool threads.
+At most eight host-tool calls run concurrently per interpreter. This is distinct from DSPy's `llm_query_batched`: one tool request can start several concurrent provider requests on the host. DSPy's sub-query budget counts prompts, so a batch of four uses four calls from this example's budget. Async callables are awaited on host tool threads. Excess simultaneous calls receive per-call errors. The reader buffers at most 32 response frames and waits for the consumer when full; shutdown interrupts that wait instead of treating queue pressure as lost state.
 
 The interpreter validates request IDs, registered names and argument containers; it does not decide which host paths or operations an application should permit. Validate arguments and restrict operations inside each custom callable. A registered function name alone is not an argument security boundary.
 
 ### Execution failures and deadlines
 
-Syntax and generated-code failures become `SyntaxError`/`CodeExecutionError`, allowing RLM to repair code. Setup, protocol, worker death, deadline and transport failures are terminal `CodeInterpreterError` and kill the sandbox. All generated threads must finish before their code block ends.
+Syntax and generated-code failures become `SyntaxError`/`CodeExecutionError`, allowing RLM to repair code. Setup, protocol, worker death, deadline and transport failures are terminal `CodeInterpreterError` and kill the sandbox. All generated threads must finish before their code block ends. Standard input is EOF for generated code and children: `input()` raises recoverable `EOFError` feedback, while the worker reads protocol frames through its own non-inheritable descriptor.
 
 The execution deadline includes time waiting for host tools. Killing the sandbox cannot forcibly stop an already running host callable or provider request; set those deadlines independently. Late tool replies are discarded after the session ends. The sandbox TTL is a separate lifetime backstop.
 
@@ -238,6 +238,9 @@ The first command lists running and paused sandboxes. The second deletes only sa
 | `dspy_e2b` cannot be imported | Run `uv sync --frozen` in this example directory; use `uv run` or install this local project in the application's environment. It is not a separate PyPI package. |
 | Missing credentials or LM configuration error | Set host `E2B_API_KEY` and `OPENAI_API_KEY`. `MODEL` changes only the identifier; check LM parameters in `main.py` for the chosen model. |
 | Expired sandbox or execution deadline exceeded | The session is terminal. Review the trajectory and host-tool/provider deadlines; create a fresh interpreter for a new invocation rather than replaying lost state. |
+| Oversized last-expression value | The execution error is recoverable; inspect a subset or print a bounded preview in the same session. Structured `SUBMIT` output is not truncated. |
+| Fixture IDs or counts do not match | The run fails, but `result.json` and printed output retain the answer, trajectory and assessment error. Review these before changing the prompt or data. |
+| Oversized tool arguments | Reduce the argument or select a smaller passage; the rejected request does not invoke the host tool and the session remains available. |
 | Input, frame or session response limit exceeded | Reduce input or returned values and review the limits above. `max_output_chars` only controls prompt output; it does not raise transport limits. |
 | Sub-query budget exceeded | Each prompt in a batch counts toward `max_llm_calls`; use Python/SQL for aggregation and review the configured budget. |
 | `RLM.acall()` blocks other async work | Use DSPy's thread offload route when appropriate, retaining the cancellation limits above. |

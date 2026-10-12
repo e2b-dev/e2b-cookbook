@@ -327,10 +327,10 @@ def test_new_input_content_still_requires_digest_verification(transport, monkeyp
     assert interpreter._ended and transport[0].kills == 1
 
 
-def test_large_return_value_remains_a_terminal_frame_error(transport):
-    interpreter = E2BInterpreter()
+def test_large_host_tool_result_remains_a_terminal_frame_error(transport):
+    interpreter = E2BInterpreter(tools={"large": lambda: "x" * (8 * 1024 * 1024 + 1)})
     with pytest.raises(dspy.CodeInterpreterError, match="frame"):
-        interpreter.execute("'x' * (8 * 1024 * 1024 + 1)")
+        interpreter.execute("large()")
     assert interpreter._ended
 
 

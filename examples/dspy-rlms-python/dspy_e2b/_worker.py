@@ -17,10 +17,13 @@ import tempfile
 import threading
 from typing import Any
 
+_protocol_input = os.fdopen(os.dup(sys.__stdin__.fileno()), "rb")
+os.set_inheritable(_protocol_input.fileno(), False)
 _protocol_output = os.fdopen(os.dup(sys.__stdout__.fileno()), "w", encoding="utf-8")
 os.set_inheritable(_protocol_output.fileno(), False)
 _worker_stdout, _worker_stderr = sys.stdout, sys.stderr
-_sink = os.open(os.devnull, os.O_WRONLY)
+_sink = os.open(os.devnull, os.O_RDWR)
+os.dup2(_sink, 0)
 os.dup2(_sink, 1)
 os.dup2(_sink, 2)
 os.close(_sink)
@@ -71,11 +74,15 @@ class Protocol:
 
     def call_tool(self, name: str, args: tuple[Any, ...], kwargs: dict[str, Any]) -> Any:
         request_id = next(self.ids)
+        request = {"type": "tool_request", "id": request_id, "name": name, "args": args, "kwargs": kwargs}
+        payload = json.dumps(request, separators=(",", ":"), allow_nan=False) + "\n"
+        if len(payload.encode()) > MAX_FRAME_BYTES:
+            raise ValueError("Host-tool request exceeds the 8 MiB frame limit; pass smaller arguments.")
         response: queue.Queue[dict[str, Any] | None] = queue.Queue(maxsize=1)
         with self.lock:
             self.pending[request_id] = response
         try:
-            send({"type": "tool_request", "id": request_id, "name": name, "args": args, "kwargs": kwargs})
+            send(request)
             message = response.get()
         finally:
             with self.lock:
@@ -253,12 +260,20 @@ def send(message: dict[str, Any]) -> None:
             message["stdout"] = stdout[:low] + TRUNCATION_MARKER
             payload = json.dumps(message, separators=(",", ":"), allow_nan=False)
         if len(payload.encode()) > MAX_FRAME_BYTES:
-            payload = json.dumps({"type": "terminal_error", "error": "response frame exceeds 8 MiB"})
+            if message.get("type") == "result":
+                message = {
+                    "type": "execution_error",
+                    "error": "Expression result exceeds the 8 MiB response frame limit; "
+                    "inspect a smaller value or print a bounded preview.",
+                }
+            else:
+                message = {"type": "terminal_error", "error": "response frame exceeds 8 MiB"}
+            payload = json.dumps(message)
         print(payload, file=_protocol_output, flush=True)
 
 
 def receive() -> dict[str, Any]:
-    line = sys.__stdin__.buffer.readline(MAX_FRAME_BYTES + 1)
+    line = _protocol_input.readline(MAX_FRAME_BYTES + 1)
     if not line:
         raise EOFError
     if len(line) > MAX_FRAME_BYTES:

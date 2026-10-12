@@ -116,11 +116,17 @@ def main(argv=None):
     result = rlm(records=records, query=QUERY)
     artifact = {
         "answer": {name: getattr(result, name) for name in IncidentAnalysis.output_fields},
-        "fixture_assessment": assess_fixture(records, result),
         "trajectory": result.trajectory,
     }
-    Path("result.json").write_text(json.dumps(artifact, indent=2) + "\n")
-    print(json.dumps(artifact, indent=2))
+    try:
+        artifact["fixture_assessment"] = assess_fixture(records, result)
+    except ValueError as exc:
+        artifact["fixture_assessment"] = {"exact_ids_and_counts": "failed", "error": str(exc)}
+        raise
+    finally:
+        serialized = json.dumps(artifact, indent=2)
+        Path("result.json").write_text(serialized + "\n")
+        print(serialized)
 
 
 if __name__ == "__main__":

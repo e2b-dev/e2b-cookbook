@@ -1,0 +1,28 @@
+[project]
+name = "ag2-bug-fixer-python"
+version = "0.1.0"
+description = "AG2 agent that fixes a failing test suite inside an E2B sandbox"
+readme = "README.md"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "ag2[openai]",
+    "e2b>=2.0.0,<3",
+    "python-dotenv>=1.1,<2",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4,<9",
+    "pytest-asyncio>=1.0,<2",
+    "ruff>=0.12,<1",
+]
+
+# ag2.extensions.e2b is not in an AG2 release yet (TBA). Until it is, install AG2
+# from the pull request that adds it; then pin "ag2[openai]>=TBA" and drop this source.
+[tool.uv.sources]
+ag2 = { git = "https://github.com/max-sudolabs/ag2", rev = "d813a600877d78e8a7158e4bb98028fb5b603318" }
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+asyncio_mode = "auto"

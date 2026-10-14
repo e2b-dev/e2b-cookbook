@@ -45,19 +45,14 @@ const scripts: {
   { name: 'hello-world-js', interpreter: 'npm', file: './examples/hello-world-js/' },
   { name: 'claude-code-interpreter-js', interpreter: 'npm', file: './examples/claude-code-interpreter-js/' },
   { name: 'firecrawl-scrape-and-analyze-airbnb-data', interpreter: 'npm', file: './examples/firecrawl-scrape-and-analyze-airbnb-data/' },
-  { name: 'together-ai-code-interpreter-js', interpreter: 'npm', file: './examples/together-ai-code-interpreter-js' },
-  { name: 'groq-code-interpreter-python', provider: 'groq', interpreter: 'jupyter', file: './examples/groq-code-interpreter-python/groq_code_interpreter.ipynb' },
   { name: 'openai-ml-dataset-python', interpreter: 'jupyter', file: './examples/openai-ml-dataset-python/ml_dataset.ipynb' },
-  { name: 'codestral-code-interpreter-js', interpreter: 'npm', file: './examples/codestral-code-interpreter-js/' },
   { name: 'openai-image-analysis-js', interpreter: 'npm', file: './examples/openai-image-analysis-js/' },
-  { name: 'codestral-code-interpreter-python', interpreter: 'jupyter', file: './examples/codestral-code-interpreter-python/codestral_code_interpreter.ipynb' },
   { name: 'hello-world-python', interpreter: 'poetry', file: './examples/hello-world-python/' },
   // Runs the sandbox-to-sandbox demo; the laptop demos need tailcat on the host and are not covered.
   { name: 'tailcat-e2b-js', interpreter: 'npm', file: './examples/tailcat-e2b/js/' },
   { name: 'tailcat-e2b-python', interpreter: 'poetry', file: './examples/tailcat-e2b/python/' },
   { name: 'openai-ml-dataset-js', interpreter: 'npm', file: './examples/openai-ml-dataset-js/' },
   { name: 'openai-image-analysis-python', interpreter: 'jupyter', file: './examples/openai-image-analysis-python/image_analysis.ipynb' },
-  { name: 'together-ai-code-interpreter-python', interpreter: 'jupyter', file: './examples/together-ai-code-interpreter-python/together_with_e2b_code_interpreter.ipynb' },
   { name: 'langchain-python', interpreter: 'poetry', file: './examples/langchain-python/' },
   { name: 'langgraph-python', interpreter: 'poetry', file: './examples/langgraph-python/' },
   { name: 'langgraph-plan-and-execute-python', interpreter: 'uv', file: './examples/langgraph-plan-and-execute-python/' },
@@ -118,10 +113,16 @@ const scripts: {
 // day's budget allows, and they should be restored if the tier is raised. The org
 // is capped at 100k tokens per day and four Groq examples several calls each do not
 // fit, so the two carrying the least distinct information come out:
-// groq-code-interpreter-js is the same demo as its Python twin, which stays, and
-// upload-dataset-code-interpreter is a third Groq chart demo.
-// groq-code-interpreter-python remains:
+// groq-code-interpreter-js is the same demo as its Python twin, and
+// upload-dataset-code-interpreter is a third Groq chart demo:
 //   groq-code-interpreter-js, upload-dataset-code-interpreter
+// The provider key is revoked. MISTRAL_API_KEY, GROQ_API_KEY and TOGETHER_API_KEY
+// were last set on 2024-10-23 and every call returned 401 invalid_api_key on
+// 2026-10-12 and 2026-10-14 (Mistral and Together still passed on 2026-10-05), so
+// these can only fail on the key. Set a new secret and move them back up:
+//   codestral-code-interpreter-js, codestral-code-interpreter-python (Mistral)
+//   groq-code-interpreter-python (Groq)
+//   together-ai-code-interpreter-js, together-ai-code-interpreter-python (Together)
 // Deprecated. Groq's Responses API has to reach the sandbox's MCP gateway from
 // Groq's side, and on 2026-09-28 and again on the 2026-09-30 rerun it failed
 // with "Error retrieving tool list from MCP server: 'e2b-mcp-gateway'. Reason:

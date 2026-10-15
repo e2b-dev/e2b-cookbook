@@ -88,7 +88,7 @@ The [OrangeHRM demo](https://opensource-demo.orangehrmlive.com) is public and sh
 
 1. **Start the desktop from the template.** `Sandbox.create(template="openai-computer-use-exec-py", ...)` gives the same desktop with PyAutoGUI installed, and the same seeding as `1-run.py`.
 2. **Start the runtime.** `start_runtime` uploads `exec_py_runtime.py` and runs it in the background. It keeps one Python namespace for the whole run and listens on a Unix socket inside the sandbox, so nothing is exposed outside it.
-3. **Run the model.** `run` is the loop from OpenAI's guide: `responses.create` with the `exec_py` function tool, chained with `previous_response_id`. Each `function_call` is written to the desktop and posted to the runtime with `curl`; the runtime returns `input_text` and `input_image` items, which go back unchanged as the `function_call_output`. The terminal prints every call's code.
+3. **Run the model.** `run` is the loop from OpenAI's guide: `responses.create` with the `exec_py` function tool, chained with `previous_response_id`. Each `function_call` is written to a file on the desktop, and a `curl` POST over the socket tells the runtime to run it; the runtime returns `input_text` and `input_image` items, which go back unchanged as the `function_call_output`. The terminal prints every call's code.
 
 Unlike OpenAI's sample app, which runs the generated code on your own computer and moves your real mouse, here it runs in a throwaway E2B desktop with no internet access.
 

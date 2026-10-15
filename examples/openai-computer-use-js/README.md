@@ -86,7 +86,7 @@ The [OrangeHRM demo](https://opensource-demo.orangehrmlive.com) is public and sh
 
 1. **Start the desktop from the template.** `Sandbox.create('openai-computer-use-exec-js', ...)` gives the same desktop with Node and `playwright-core` installed, and the script writes the same two order files.
 2. **Start Chrome and the runtime.** `startRuntime` opens the desktop's own Chrome, maximized on `file:///home/user/orders/`, with the DevTools protocol on inside the sandbox. It then uploads `exec-js-runtime.mjs`, which connects Playwright to that Chrome over CDP, keeps one context for the whole run, and listens on a Unix socket inside the sandbox, so nothing is exposed outside it.
-3. **Run the model.** `run` is the loop from OpenAI's guide: `responses.create` with the `exec_js` function tool, chained with `previous_response_id`. Each `function_call` is written to the desktop and posted to the runtime with `curl`; the runtime returns `input_text` and `input_image` items, which go back unchanged as the `function_call_output`. The terminal prints every call's code.
+3. **Run the model.** `run` is the loop from OpenAI's guide: `responses.create` with the `exec_js` function tool, chained with `previous_response_id`. Each `function_call` is written to a file on the desktop, and a `curl` POST over the socket tells the runtime to run it; the runtime returns `input_text` and `input_image` items, which go back unchanged as the `function_call_output`. The terminal prints every call's code.
 
 Unlike OpenAI's sample app, which runs the generated code on your own computer, here it runs in a throwaway E2B desktop with no internet access, and you watch Chrome through the live view.
 

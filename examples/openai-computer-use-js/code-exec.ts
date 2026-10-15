@@ -21,7 +21,7 @@ export const TEMPLATE = 'openai-computer-use-exec-js';
 
 export const RUNTIME_DIR = '/home/user/.exec_js'; // template.ts installs playwright-core here
 const SOCKET = '/tmp/exec_js.sock';
-const CELL = `${RUNTIME_DIR}/cell.js`;
+const CELL = `${RUNTIME_DIR}/cell.js`; // next to the runtime, which reads it on each call
 const CALL_TIMEOUT_S = 60; // seconds one exec_js call may run
 
 // The tool definition from OpenAI's guide, with this desktop's screen size.
@@ -63,7 +63,7 @@ export async function startRuntime(desktop: Sandbox, url: string) {
 export async function execJs(desktop: Sandbox, code: string): Promise<ResponseInputMessageContentList> {
   await desktop.files.write(CELL, code);
   const result = await desktop.commands.run(
-    `curl -sS --fail -m ${CALL_TIMEOUT_S} --unix-socket ${SOCKET} --data-binary @${CELL} http://exec_js/`,
+    `curl -sS --fail -m ${CALL_TIMEOUT_S} --unix-socket ${SOCKET} -X POST http://exec_js/`,
     { timeoutMs: (CALL_TIMEOUT_S + 10) * 1000 },
   );
   return JSON.parse(result.stdout);

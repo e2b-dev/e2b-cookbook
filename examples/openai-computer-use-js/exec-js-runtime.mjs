@@ -2,20 +2,22 @@
  * The exec_js runtime. It runs inside the E2B desktop, never on your machine.
  *
  * code-exec.ts uploads this file and starts it once per desktop, after Chrome. It connects Playwright to that Chrome
- * over CDP and listens on a Unix socket; each POST body is JavaScript that runs in one shared context with Playwright's
- * `browser`, `context` and `page`, `console.log(value)` and `display(base64Image)`. Variables saved on `globalThis`
- * persist across calls. The response is the JSON list of `input_text` and `input_image` items that the Responses API
- * takes as a `function_call_output`, so the host passes it through unchanged.
+ * over CDP and listens on a Unix socket. For each call, code-exec.ts writes the model's code to cell.js next to this
+ * file and POSTs to the socket; the runtime runs cell.js in one shared context with Playwright's `browser`, `context`
+ * and `page`, `console.log(value)` and `display(base64Image)`. Variables saved on `globalThis` persist across calls.
+ * The response is the JSON list of `input_text` and `input_image` items that the Responses API takes as a
+ * `function_call_output`, so the host passes it through unchanged.
  *
  * Adapted from the Playwright worker in OpenAI's CUA sample app (github.com/openai/openai-cua-sample-app).
  */
-import { existsSync, unlinkSync } from 'node:fs';
+import { existsSync, readFileSync, unlinkSync } from 'node:fs';
 import http from 'node:http';
 import util from 'node:util';
 import vm from 'node:vm';
 import { chromium } from 'playwright-core';
 
 const SOCKET = '/tmp/exec_js.sock';
+const CELL = new URL('cell.js', import.meta.url);
 const MAX_OUTPUT_BYTES = 8 * 1024 * 1024;
 
 const browser = await chromium.connectOverCDP('http://127.0.0.1:9222');
@@ -71,9 +73,7 @@ async function execute(code) {
 if (existsSync(SOCKET)) unlinkSync(SOCKET);
 http
   .createServer(async (request, response) => {
-    const chunks = [];
-    for await (const chunk of request) chunks.push(chunk);
-    const body = JSON.stringify(await execute(Buffer.concat(chunks).toString()));
+    const body = JSON.stringify(await execute(readFileSync(CELL, 'utf8')));
     response.writeHead(200, { 'Content-Type': 'application/json' }).end(body);
   })
   .listen(SOCKET);

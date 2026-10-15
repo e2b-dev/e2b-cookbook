@@ -1,9 +1,10 @@
 """The exec_py runtime. It runs inside the E2B desktop, never on your machine.
 
-code_exec.py uploads this file and starts it once per desktop. It listens on a Unix socket; each POST body is Python
-source that runs in one shared namespace, so variables persist across calls. The code gets `pyautogui`, `time`,
-`log(value)` and `display(image)`. The response is the JSON list of `input_text` and `input_image` items that the
-Responses API takes as a `function_call_output`, so the host passes it through unchanged.
+code_exec.py uploads this file and starts it once per desktop. For each call, code_exec.py writes the model's code to
+cell.py next to this file and POSTs to a Unix socket; the runtime runs cell.py in one shared namespace, so variables
+persist across calls. The code gets `pyautogui`, `time`, `log(value)` and `display(image)`. The response is the JSON
+list of `input_text` and `input_image` items that the Responses API takes as a `function_call_output`, so the host
+passes it through unchanged.
 
 Adapted from the PyAutoGUI worker in OpenAI's CUA sample app (github.com/openai/openai-cua-sample-app).
 """
@@ -17,6 +18,7 @@ import socketserver
 import time
 import traceback
 from http.server import BaseHTTPRequestHandler
+from pathlib import Path
 
 import pyautogui
 import pyscreeze
@@ -27,6 +29,7 @@ from PIL import Image
 pyscreeze.GNOMESCREENSHOT_EXISTS = True
 
 SOCKET = "/tmp/exec_py.sock"
+CELL = Path(__file__).with_name("cell.py")
 MAX_TEXT_BYTES = 60 * 1024
 MAX_IMAGE_BYTES = 8 * 1024 * 1024
 
@@ -80,8 +83,7 @@ def execute(code: str) -> list:
 
 class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
-        code = self.rfile.read(int(self.headers["Content-Length"])).decode()
-        body = json.dumps(execute(code)).encode()
+        body = json.dumps(execute(CELL.read_text())).encode()
         self.send_response(200)
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(body)))

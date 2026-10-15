@@ -22,7 +22,7 @@ TEMPLATE = "openai-computer-use-exec-py"
 
 RUNTIME = "/home/user/.exec_py/runtime.py"
 SOCKET = "/tmp/exec_py.sock"
-CELL = "/home/user/.exec_py/cell.py"
+CELL = "/home/user/.exec_py/cell.py"  # next to the runtime, which reads it on each call
 CALL_TIMEOUT = 60  # seconds one exec_py call may run
 
 # The tool definition from OpenAI's guide, plus the screen size.
@@ -59,7 +59,7 @@ def exec_py(desktop: Sandbox, code: str) -> list:
     """Run one exec_py call on the desktop and return its output items."""
     desktop.files.write(CELL, code)
     result = desktop.commands.run(
-        f"curl -sS --fail -m {CALL_TIMEOUT} --unix-socket {SOCKET} --data-binary @{CELL} http://exec_py/",
+        f"curl -sS --fail -m {CALL_TIMEOUT} --unix-socket {SOCKET} -X POST http://exec_py/",
         timeout=CALL_TIMEOUT + 10,
     )
     return json.loads(result.stdout)

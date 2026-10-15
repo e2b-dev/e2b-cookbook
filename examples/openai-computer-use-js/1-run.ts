@@ -33,7 +33,9 @@ try {
 
   const answer = await run(desktop, TASK, { maxSteps: 15, timeLimitMs: 120_000 });
   console.log(`\nAnswer: ${answer}`);
-  console.log(answer.trim() === orderNumber ? 'Correct.' : `Wrong: the order number is ${orderNumber}.`);
+  const correct = answer.trim() === orderNumber;
+  console.log(correct ? 'Correct.' : `Wrong: the order number is ${orderNumber}.`);
+  if (!correct) process.exitCode = 1;
 
   await mkdir('output', { recursive: true });
   await writeFile('output/1-run.png', await desktop.screenshot());

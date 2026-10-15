@@ -38,7 +38,7 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
   </thead>
   <tbody>
     <tr>
-      <td rowspan="7">OpenAI</td>
+      <td rowspan="8">OpenAI</td>
       <td>Agents SDK</td>
       <td>Agentic workflows running in E2B sandboxes</td>
       <td><a href="./examples/openai-agents-sdk">Python</a></td>
@@ -79,6 +79,12 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td>OpenAI Codex, running inside a Sandbox</td>
       <td><a href="./examples/openai-codex-in-sandbox-python">Python</a></td>
       <td><a href="./examples/openai-codex-in-sandbox-js">TypeScript</a></td>
+    </tr>
+    <tr>
+      <td>Computer use</td>
+      <td>Copy new hires from Excel into OrangeHRM on an E2B desktop with GPT-6 Luna</td>
+      <td><a href="./examples/openai-computer-use-python">Python</a></td>
+      <td><a href="./examples/openai-computer-use-js">TypeScript</a></td>
     </tr>
     <tr>
       <td rowspan="4">Anthropic</td>

@@ -1,0 +1,25 @@
+{
+  "name": "openai-computer-use",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "OpenAI computer use on an E2B desktop: gpt-6-luna copies new hires from Excel into OrangeHRM",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "tsx 1-run.ts",
+    "orangehrm": "tsx 2-orangehrm.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@e2b/desktop": "^2.4.0",
+    "dotenv": "^17.4.2",
+    "openai": "7.33.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.4",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,18 @@
+[project]
+name = "openai-computer-use-python"
+version = "0.1.0"
+description = "OpenAI computer use on an E2B desktop: gpt-6-luna copies new hires from Excel into OrangeHRM"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "openai==3.31.0",  # first release with openai.lib.computer
+    "e2b-desktop==2.6.0",
+    "e2b==2.52.0",
+]
+
+[tool.uv]
+package = false
+# Skip package versions published in the last 7 days (supply-chain guard).
+exclude-newer = "7 days"
+# openai 3.31.0 (2026-10-14) is newer than the guard and is the release the helper ships in.
+exclude-newer-package = { openai = false }

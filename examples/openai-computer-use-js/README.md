@@ -5,7 +5,7 @@
 OpenAI's [computer use guide](https://developers.openai.com/api/docs/guides/tools-computer-use) offers two ways to connect a model to a screen, and this folder shows both:
 
 - **The computer tool** (`1-run.ts`, `2-orangehrm.ts`): the model returns structured clicks and keystrokes, and `E2BDriver` performs them.
-- **Code execution** (`1-run-code-exec.ts`), the path OpenAI recommends for `gpt-6-astra`: the model gets one function tool, `exec_js`, and writes [Playwright](https://playwright.dev) code against Chrome on the desktop. That code runs in a persistent Node process inside the E2B desktop, never on your machine, and returns its logs and screenshots. It can read the page's text and click elements by role instead of by pixels.
+- **Code execution** (`1-run-code-exec.ts`, `2-orangehrm-code-exec.ts`), the path OpenAI recommends for `gpt-6-astra`: the model gets one function tool, `exec_js`, and writes [Playwright](https://playwright.dev) code against Chrome on the desktop. That code runs in a persistent Node process inside the E2B desktop, never on your machine, and returns its logs and screenshots. It can read the page's text and click elements by role instead of by pixels. For apps outside the browser, such as LibreOffice Calc, the runtime adds a small `desktop` object: a full-screen screenshot, click, type and key, through scrot and xdotool.
 
 The same examples in Python: [`openai-computer-use-python`](../openai-computer-use-python), where the code-execution example drives the whole desktop with PyAutoGUI (`exec_py`).
 
@@ -14,9 +14,10 @@ The same examples in Python: [`openai-computer-use-python`](../openai-computer-u
 | [`1-run.ts`](1-run.ts) | **Hello world.** The task from OpenAI's guide: Luna opens one of two text files in the file manager and reads back its order number, checked against the number the script generated. Start here. |
 | [`2-orangehrm.ts`](2-orangehrm.ts) | **Excel to OrangeHRM.** "Swivel chair" office work: Luna reads new hires from an Excel file in LibreOffice Calc, enters each one into [OrangeHRM](https://opensource-demo.orangehrmlive.com) (an open-source HR system with no API in reach), and writes the Employee Id OrangeHRM assigns back into the spreadsheet. |
 | [`1-run-code-exec.ts`](1-run-code-exec.ts) | **Hello world with code execution.** The same orders folder, shown in Chrome: `gpt-6-astra` opens the file by writing Playwright code through `exec_js`. Needs the template from `template.ts`. |
+| [`2-orangehrm-code-exec.ts`](2-orangehrm-code-exec.ts) | **Excel to OrangeHRM with code execution.** The same task and desktop as `2-orangehrm.ts`, driven by `gpt-6-astra` through `exec_js`: Playwright for OrangeHRM, the `desktop` helpers for Calc. Needs the template from `template.ts`. |
 | [`e2b-driver.ts`](e2b-driver.ts) | Helper, not an example: `E2BDriver`, the live view, and the `ComputerToolset.run` call the computer-tool examples share. |
 | [`code-exec.ts`](code-exec.ts) | Helper: the `exec_js` tool, starting Chrome and the runtime on a desktop, and the Responses loop from OpenAI's code-execution guide. |
-| [`exec-js-runtime.mjs`](exec-js-runtime.mjs) | Runs inside the desktop, not on your machine: the persistent Node context with Playwright's `browser`, `context` and `page`, `console.log` and `display`, adapted from [OpenAI's CUA sample app](https://github.com/openai/openai-cua-sample-app). |
+| [`exec-js-runtime.mjs`](exec-js-runtime.mjs) | Runs inside the desktop, not on your machine: the persistent Node context with Playwright's `browser`, `context` and `page`, `console.log`, `display` and `desktop`, adapted from [OpenAI's CUA sample app](https://github.com/openai/openai-cua-sample-app). |
 | [`template.ts`](template.ts) | Builds the `openai-computer-use-exec-js` E2B template: the stock desktop plus Node 22 and `playwright-core`. |
 
 `2-orangehrm.ts` is the same demo as the Claude example [`anthropic-computer-use-orangehrm-js`](../anthropic-computer-use-orangehrm-js): same `new_hires.csv`, same steps, same egress allowlist. One difference: this example uses only the computer tool, so Luna drives OrangeHRM in Chrome by pixels too, the same way it drives Calc. The OpenAI SDK also has a browser toolset, but it needs a browser driver for the E2B desktop, which this example does not include.
@@ -46,7 +47,7 @@ npm i
 
 ### 3. Build the code-execution template
 
-Only `1-run-code-exec.ts` needs it. Build it once per E2B team; it takes about a minute.
+Only the `*-code-exec.ts` examples need it. Build it once per E2B team; it takes about a minute.
 
 ```
 npm run template
@@ -58,11 +59,12 @@ npm run template
 npm run start       # 1-run.ts
 npm run orangehrm   # 2-orangehrm.ts
 npm run code-exec   # 1-run-code-exec.ts
+npm run orangehrm:code-exec   # 2-orangehrm-code-exec.ts
 ```
 
-The live view opens in your browser. When the model finishes, the final screen is saved to `output/`, and `2-orangehrm.ts` also downloads the updated spreadsheet to `output/new_hires.xlsx`; press Enter to close the desktop. Set `OPENAI_MODEL` to try another model.
+The live view opens in your browser. When the model finishes, the final screen is saved to `output/`, and the OrangeHRM examples also download the updated spreadsheet to `output/new_hires.xlsx`; press Enter to close the desktop. Set `OPENAI_MODEL` to try another model.
 
-In our runs, `1-run.ts` took about 20 seconds and under $0.001, and `2-orangehrm.ts` about 4 to 5 minutes and about $0.01 to $0.02 in OpenAI tokens (most of each screenshot is served from the prompt cache). `1-run-code-exec.ts` took about 35 seconds end to end, including the desktop's start, and Astra needed two `exec_js` calls: one to read the folder listing, one to click the file and read its text.
+In our runs, `1-run.ts` took about 20 seconds and under $0.001, and `2-orangehrm.ts` about 4 to 5 minutes and about $0.01 to $0.02 in OpenAI tokens (most of each screenshot is served from the prompt cache). `1-run-code-exec.ts` took about 35 seconds end to end, including the desktop's start, and Astra needed two `exec_js` calls: one to read the folder listing, one to click the file and read its text. `2-orangehrm-code-exec.ts` needed 15 `exec_js` calls in our run.
 
 Edit `new_hires.csv` to change the hires. LibreOffice turns it into `new_hires.xlsx` inside the sandbox, so there is nothing to generate locally.
 

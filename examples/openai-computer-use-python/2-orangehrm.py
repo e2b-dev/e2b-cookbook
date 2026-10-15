@@ -44,12 +44,13 @@ try:
     desktop.commands.run("soffice --headless --convert-to xlsx --outdir /home/user/Desktop /tmp/new_hires.csv",
                          timeout=120)
 
-    # Chrome first, Calc after it, so Calc is in front for the model's first screenshot.
+    # Chrome first, Calc after it, so Calc is in front for the model's first screenshot. timeout=0 keeps both
+    # running past the 60 seconds a background command otherwise gets.
     print("Opening Chrome and LibreOffice Calc\n")
     desktop.commands.run("google-chrome --user-data-dir=/tmp/chrome --no-first-run --no-default-browser-check "
-                         "--window-position=0,0 --window-size=1280,800 about:blank", background=True)
+                         "--window-position=0,0 --window-size=1280,800 about:blank", background=True, timeout=0)
     desktop.commands.run("xdotool search --sync --class chrome", timeout=60)
-    desktop.commands.run(f"libreoffice --calc {SHEET}", background=True)
+    desktop.commands.run(f"libreoffice --calc {SHEET}", background=True, timeout=0)
     desktop.commands.run("xdotool search --sync --name new_hires", timeout=60)
 
     answer = run(desktop, TASK, max_steps=200, time_limit=840)

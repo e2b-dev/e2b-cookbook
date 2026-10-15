@@ -11,6 +11,7 @@
     "start": "tsx 1-run.ts",
     "orangehrm": "tsx 2-orangehrm.ts",
     "code-exec": "tsx 1-run-code-exec.ts",
+    "orangehrm:code-exec": "tsx 2-orangehrm-code-exec.ts",
     "template": "tsx template.ts",
     "typecheck": "tsc --noEmit"
   },

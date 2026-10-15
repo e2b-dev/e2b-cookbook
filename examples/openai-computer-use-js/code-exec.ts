@@ -24,7 +24,7 @@ const SOCKET = '/tmp/exec_js.sock';
 const CELL = `${RUNTIME_DIR}/cell.js`; // next to the runtime, which reads it on each call
 const CALL_TIMEOUT_S = 60; // seconds one exec_js call may run
 
-// The tool definition from OpenAI's guide, with this desktop's screen size.
+// The tool definition from OpenAI's guide, with this desktop's screen size and the `desktop` helpers.
 const TOOL = {
   type: 'function' as const,
   name: 'exec_js',
@@ -33,7 +33,9 @@ browser, context, and page objects; console.log(value); and display(base64Image)
 Save reusable variables on globalThis. Inspect a screenshot before acting and
 check the screen after a short group of actions. Keep screenshots in memory.
 Use top-level await for async operations. Return images with display() and concise
-text with console.log(). Chrome is maximized on a 1280x800 screen.`,
+text with console.log(). Chrome is maximized on a 1280x800 screen. Outside the browser,
+desktop.screenshot() returns the whole screen as base64, and desktop.click(x, y),
+desktop.type(text) and desktop.key(keys) (xdotool names, such as ctrl+s) drive it.`,
   parameters: {
     type: 'object',
     properties: { code: { type: 'string' } },
@@ -45,17 +47,18 @@ text with console.log(). Chrome is maximized on a 1280x800 screen.`,
 
 /** Open Chrome maximized on `url` with CDP on, then upload the exec_js runtime, start it, and wait for its socket. */
 export async function startRuntime(desktop: Sandbox, url: string) {
+  // timeoutMs: 0 keeps Chrome and the runtime running; a background command otherwise ends after 60 seconds.
   await desktop.commands.run(
     `google-chrome --start-maximized --no-first-run --no-default-browser-check --remote-debugging-port=9222 ` +
       `--user-data-dir=${RUNTIME_DIR}/chrome '${url}'`,
-    { background: true },
+    { background: true, timeoutMs: 0 },
   );
   await desktop.commands.run(
     'for i in $(seq 300); do curl -fs http://127.0.0.1:9222/json/version >/dev/null && exit 0; sleep 0.1; done; exit 1',
     { timeoutMs: 40_000 }, // Chrome takes a few seconds to start on a fresh profile
   );
   await desktop.files.write(`${RUNTIME_DIR}/runtime.mjs`, await readFile(new URL('exec-js-runtime.mjs', import.meta.url), 'utf8'));
-  await desktop.commands.run(`node ${RUNTIME_DIR}/runtime.mjs`, { background: true });
+  await desktop.commands.run(`node ${RUNTIME_DIR}/runtime.mjs`, { background: true, timeoutMs: 0 });
   await desktop.commands.run(`for i in $(seq 100); do [ -S ${SOCKET} ] && exit 0; sleep 0.1; done; exit 1`);
 }
 

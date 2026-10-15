@@ -5,15 +5,16 @@
 OpenAI's [computer use guide](https://developers.openai.com/api/docs/guides/tools-computer-use) offers two ways to connect a model to a screen, and this folder shows both on the same task:
 
 - **The computer tool** (`1-run.py`, `2-orangehrm.py`): the model returns structured clicks and keystrokes, and `E2BDriver` performs them.
-- **Code execution** (`1-run-code-exec.py`), the path OpenAI recommends for `gpt-6-astra`: the model gets one function tool, `exec_py`, and writes [PyAutoGUI](https://pyautogui.readthedocs.io) code. That code runs in a persistent Python process inside the E2B desktop, never on your machine, and returns its logs and screenshots. One call can batch several actions and check its own result.
+- **Code execution** (`1-run-code-exec.py`, `2-orangehrm-code-exec.py`), the path OpenAI recommends for `gpt-6-astra`: the model gets one function tool, `exec_py`, and writes [PyAutoGUI](https://pyautogui.readthedocs.io) code. That code runs in a persistent Python process inside the E2B desktop, never on your machine, and returns its logs and screenshots. One call can batch several actions and check its own result.
 
-The same examples in TypeScript: [`openai-computer-use-js`](../openai-computer-use-js), where the code-execution example drives Chrome with Playwright (`exec_js`).
+The same examples in TypeScript: [`openai-computer-use-js`](../openai-computer-use-js), where the code-execution examples drive Chrome with Playwright (`exec_js`).
 
 | File | What it is |
 | --- | --- |
 | [`1-run.py`](1-run.py) | **Hello world.** The task from OpenAI's guide: Luna opens one of two text files in the file manager and reads back its order number, checked against the number the script generated. Start here. |
 | [`2-orangehrm.py`](2-orangehrm.py) | **Excel to OrangeHRM.** "Swivel chair" office work: Luna reads new hires from an Excel file in LibreOffice Calc, enters each one into [OrangeHRM](https://opensource-demo.orangehrmlive.com) (an open-source HR system with no API in reach), and writes the Employee Id OrangeHRM assigns back into the spreadsheet. |
 | [`1-run-code-exec.py`](1-run-code-exec.py) | **Hello world with code execution.** The same task as `1-run.py`, but `gpt-6-astra` opens the file by writing PyAutoGUI code through `exec_py`. Needs the template from `template.py`. |
+| [`2-orangehrm-code-exec.py`](2-orangehrm-code-exec.py) | **Excel to OrangeHRM with code execution.** The same task and desktop as `2-orangehrm.py`, driven by `gpt-6-astra` through `exec_py`. Needs the template from `template.py`. |
 | [`e2b_driver.py`](e2b_driver.py) | Helper, not an example: `E2BDriver`, the live view, and the `ComputerToolset.run` call the computer-tool examples share. |
 | [`code_exec.py`](code_exec.py) | Helper: the `exec_py` tool, starting the runtime on a desktop, and the Responses loop from OpenAI's code-execution guide. |
 | [`exec_py_runtime.py`](exec_py_runtime.py) | Runs inside the desktop, not on your machine: the persistent Python namespace with `pyautogui`, `log` and `display`, adapted from [OpenAI's CUA sample app](https://github.com/openai/openai-cua-sample-app). |
@@ -48,7 +49,7 @@ uv sync
 
 ### 3. Build the code-execution template
 
-Only `1-run-code-exec.py` needs it. Build it once per E2B team; it takes about a minute.
+Only the `*-code-exec.py` examples need it. Build it once per E2B team; it takes about a minute.
 
 ```
 uv run --env-file .env template.py
@@ -60,11 +61,12 @@ uv run --env-file .env template.py
 uv run --env-file .env 1-run.py
 uv run --env-file .env 2-orangehrm.py
 uv run --env-file .env 1-run-code-exec.py
+uv run --env-file .env 2-orangehrm-code-exec.py
 ```
 
-The live view opens in your browser. When the model finishes, the final screen is saved to `output/`, and `2-orangehrm.py` also downloads the updated spreadsheet to `output/new_hires.xlsx`; press Enter to close the desktop. Set `OPENAI_MODEL` to try another model.
+The live view opens in your browser. When the model finishes, the final screen is saved to `output/`, and the OrangeHRM examples also download the updated spreadsheet to `output/new_hires.xlsx`; press Enter to close the desktop. Set `OPENAI_MODEL` to try another model.
 
-In our runs, `1-run.py` took about 20 seconds and under $0.001, and `2-orangehrm.py` about 4 to 5 minutes and about $0.02 in OpenAI tokens (most of each screenshot is served from the prompt cache). `1-run-code-exec.py` took about 40 seconds end to end, including the desktop's start, and Astra needed two `exec_py` calls: one screenshot, then a double-click and a screenshot to check it.
+In our runs, `1-run.py` took about 20 seconds and under $0.001, and `2-orangehrm.py` about 4 to 5 minutes and about $0.02 in OpenAI tokens (most of each screenshot is served from the prompt cache). `1-run-code-exec.py` took about 40 seconds end to end, including the desktop's start, and Astra needed two `exec_py` calls: one screenshot, then a double-click and a screenshot to check it. `2-orangehrm-code-exec.py` passed 3 of 3 runs at about 3 minutes, 20 `exec_py` calls and $0.55 per run, about half of what the computer tool costs on the same model; `gpt-6-luna` is cheaper but failed this task with code execution, so keep the computer tool for Luna.
 
 Edit `new_hires.csv` to change the hires. LibreOffice turns it into `new_hires.xlsx` inside the sandbox, so there is nothing to generate locally.
 

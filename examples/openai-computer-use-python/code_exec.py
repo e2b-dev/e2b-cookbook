@@ -51,7 +51,8 @@ TOOL = {
 def start_runtime(desktop: Sandbox):
     """Upload the exec_py runtime to the desktop, start it, and wait for its socket."""
     desktop.files.write(RUNTIME, Path(__file__).with_name("exec_py_runtime.py").read_text())
-    desktop.commands.run(f"python3 {RUNTIME}", background=True)  # the desktop sets DISPLAY for every command
+    # timeout=0: a background command otherwise ends after 60 seconds. The desktop sets DISPLAY for every command.
+    desktop.commands.run(f"python3 {RUNTIME}", background=True, timeout=0)
     desktop.commands.run(f"for i in $(seq 100); do [ -S {SOCKET} ] && exit 0; sleep 0.1; done; exit 1")
 
 

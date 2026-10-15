@@ -74,6 +74,7 @@ const scripts: {
   { name: 'mcp-custom-template-js', interpreter: 'npm', file: './examples/mcp-custom-template-js/' },
   { name: 'docker-in-e2b-js', interpreter: 'npm', file: './examples/docker-in-e2b/js/' },
   { name: 'docker-in-e2b-python', interpreter: 'poetry', file: './examples/docker-in-e2b/python/', entrypoint: 'python main.py' },
+  { name: 'tenuo-scoped-mcp-python', interpreter: 'uv', file: './examples/tenuo-scoped-mcp-python/' },
 ]
 
 // Deliberately not covered, and why. Anything not listed here should be added above.
@@ -210,6 +211,9 @@ const TIMEOUT_OVERRIDES: Record<string, number> = {
   // which shares the same budget.
   'langgraph-plan-and-execute-python': 600_000,
   'tailcat-e2b-python': 300_000,
+  // Creates a sandbox, starts two MCP server images, runs the scoped tool plan,
+  // and probes both allowed and denied egress directly from the sandbox.
+  'tenuo-scoped-mcp-python': 300_000,
 }
 
 // Examples that run from a custom template need it built on the account first.

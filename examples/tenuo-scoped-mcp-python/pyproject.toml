@@ -1,0 +1,10 @@
+[project]
+name = "tenuo-scoped-mcp-python"
+version = "0.1.0"
+description = "Scope calls to sandbox-hosted MCP tools with Tenuo warrants"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "e2b>=2.50,<3",
+    "tenuo[mcp]>=0.3.1,<0.4",
+]

@@ -1,0 +1,11 @@
+name,age,city,salary,department
+Alice,28,New York,75000,Engineering
+Bob,35,San Francisco,95000,Engineering
+Charlie,42,Chicago,110000,Management
+Diana,31,New York,82000,Marketing
+Eve,26,San Francisco,68000,Engineering
+Frank,38,Chicago,98000,Management
+Grace,29,New York,71000,Marketing
+Henry,45,San Francisco,125000,Management
+Ivy,33,Chicago,88000,Engineering
+Jack,27,New York,65000,Marketing

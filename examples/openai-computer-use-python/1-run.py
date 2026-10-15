@@ -35,7 +35,10 @@ try:
     answer = run(desktop, TASK, max_steps=15, time_limit=120)
     print(f"\nAnswer: {answer}")
     correct = answer.strip() == order_number
-    print("Correct." if correct else f"Wrong: the order number is {order_number}.")
+    if correct:
+        print("Correct.")
+    else:
+        print(f"Wrong: the order number is {order_number}.", file=sys.stderr)
 
     Path("output").mkdir(exist_ok=True)
     Path("output/1-run.png").write_bytes(desktop.screenshot())

@@ -463,7 +463,7 @@ const MODEL_SIDE = [
   // `print("[Code Interpreter ERROR]", exec.error)` line and misread a 404 as
   // model behaviour.
   /\[Code Interpreter ERROR\][^"')\n]{3,}|AI-generated Python runtime error/i,
-  // A computer-use model read back the wrong value from the desktop.
+  // A computer-use model read back the wrong value from the desktop (printed to stderr).
   /Wrong: the order number is/,
 ]
 

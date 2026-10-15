@@ -1,0 +1,21 @@
+{
+  "name": "soulink-agent-identity",
+  "version": "1.0.0",
+  "description": "Give E2B sandbox agents verified on-chain identities via Soulink",
+  "main": "index.js",
+  "scripts": {
+    "start": "tsx index.ts"
+  },
+  "keywords": ["e2b", "soulink", "agent-identity"],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.16.6",
+    "tsx": "^4.7.3",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "@e2b/code-interpreter": "^1.0.1",
+    "dotenv": "^16.4.5"
+  }
+}

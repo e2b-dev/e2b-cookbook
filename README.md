@@ -246,6 +246,12 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td><a href="./examples/pi-code-interpreter-js">TypeScript</a></td>
     </tr>
     <tr>
+    <td><a href="https://github.com/e2b-dev/pi-extension">Pi + @e2b/pi</a></td>
+      <td>Pi runs on your machine while its tools run in an E2B sandbox: it builds a site, shares a public preview URL, and <code>/e2b pull</code> brings the files back</td>
+      <td>-</td>
+      <td><a href="./examples/pi-e2b-extension-js">TypeScript</a></td>
+    </tr>
+    <tr>
     <td>AgentKit</td>
       <td>AgentKit Coding Agent</td>
       <td>-</td>

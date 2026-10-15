@@ -44,15 +44,16 @@ try {
     timeoutMs: 120_000,
   });
 
-  // Chrome first, Calc after it, so Calc is in front for the model's first screenshot.
+  // Chrome first, Calc after it, so Calc is in front for the model's first screenshot. timeoutMs: 0 keeps both
+  // running past the 60 seconds a background command otherwise gets.
   console.log('Opening Chrome and LibreOffice Calc\n');
   await desktop.commands.run(
     'google-chrome --user-data-dir=/tmp/chrome --no-first-run --no-default-browser-check ' +
       '--window-position=0,0 --window-size=1280,800 about:blank',
-    { background: true },
+    { background: true, timeoutMs: 0 },
   );
   await desktop.commands.run('xdotool search --sync --class chrome', { timeoutMs: 60_000 });
-  await desktop.commands.run(`libreoffice --calc ${SHEET}`, { background: true });
+  await desktop.commands.run(`libreoffice --calc ${SHEET}`, { background: true, timeoutMs: 0 });
   await desktop.commands.run('xdotool search --sync --name new_hires', { timeoutMs: 60_000 });
 
   const answer = await run(desktop, TASK, { maxSteps: 200, timeLimitMs: 840_000 });

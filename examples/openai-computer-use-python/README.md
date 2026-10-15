@@ -66,7 +66,7 @@ uv run --env-file .env 2-orangehrm-code-exec.py
 
 The live view opens in your browser. When the model finishes, the final screen is saved to `output/`, and the OrangeHRM examples also download the updated spreadsheet to `output/new_hires.xlsx`; press Enter to close the desktop. Set `OPENAI_MODEL` to try another model.
 
-In our runs, `1-run.py` took about 20 seconds and under $0.001, and `2-orangehrm.py` about 4 to 5 minutes and about $0.02 in OpenAI tokens (most of each screenshot is served from the prompt cache). `1-run-code-exec.py` took about 40 seconds end to end, including the desktop's start, and Astra needed two `exec_py` calls: one screenshot, then a double-click and a screenshot to check it. `2-orangehrm-code-exec.py` passed 3 of 3 runs at about 3 minutes, 20 `exec_py` calls and $0.55 per run, about half of what the computer tool costs on the same model.
+In our runs, `1-run.py` took about 20 seconds and under $0.001, and `2-orangehrm.py` about 4 to 5 minutes and about $0.02 in OpenAI tokens (most of each screenshot is served from the prompt cache). `1-run-code-exec.py` took about 40 seconds end to end, including the desktop's start, and Astra needed two `exec_py` calls: one screenshot, then a double-click and a screenshot to check it.
 
 Edit `new_hires.csv` to change the hires. LibreOffice turns it into `new_hires.xlsx` inside the sandbox, so there is nothing to generate locally.
 

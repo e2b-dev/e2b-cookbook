@@ -82,7 +82,7 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
     </tr>
     <tr>
       <td>Computer use</td>
-      <td>Copy new hires from Excel into OrangeHRM on an E2B desktop with GPT-6 Luna</td>
+      <td>Copy new hires from Excel into OrangeHRM on an E2B desktop with GPT-6 Luna, or let GPT-6 Astra drive the desktop with PyAutoGUI and Playwright code</td>
       <td><a href="./examples/openai-computer-use-python">Python</a></td>
       <td><a href="./examples/openai-computer-use-js">TypeScript</a></td>
     </tr>

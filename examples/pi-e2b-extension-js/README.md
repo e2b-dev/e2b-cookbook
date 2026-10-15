@@ -2,8 +2,6 @@
 
 [Pi](https://pi.dev) runs on your machine; its tools run in an [E2B](https://e2b.dev) sandbox. The [`@e2b/pi`](https://github.com/e2b-dev/pi-extension) extension gives Pi a `--e2b` flag: the agent works on a copy of your project in a sandbox, can't touch your files, processes or credentials, and you bring its changes back with `/e2b pull`.
 
-![demo](demo.gif)
-
 This example drives that flow from a script with Pi's SDK, so you can run it with one command and read every step in your terminal:
 
 1. **Start.** A fresh git checkout, `sandbox-roasters`, is created on your machine. The sandbox starts with the first prompt and gets a copy of the working tree.

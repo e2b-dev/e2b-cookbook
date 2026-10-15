@@ -8,7 +8,7 @@
   },
   "license": "MIT",
   "engines": {
-    "node": ">=22"
+    "node": ">=22.19.0"
   },
   "dependencies": {
     "@e2b/pi": "^0.1.1",

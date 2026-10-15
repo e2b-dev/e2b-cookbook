@@ -60,6 +60,11 @@ const { session } = await createAgentSession({
   sessionManager: SessionManager.inMemory(project), // like `pi --no-session`: the sandbox is killed, never paused
 })
 
+// Ctrl-C skips `finally`, so kill the sandbox here too. Extension commands run even while the agent is working.
+for (const signal of ['SIGINT', 'SIGTERM'] as const) {
+  process.once(signal, () => void session.prompt('/e2b kill').catch(() => undefined).finally(() => process.exit(130)))
+}
+
 try {
   session.extensionRunner.setFlagValue('e2b', true) // the `--e2b` flag
   // Fires session_start: the extension swaps bash, read, write and edit for sandbox-backed ones and adds preview_url.
@@ -69,6 +74,11 @@ try {
 
   // 2. Work. The first prompt starts the sandbox and uploads the checkout while the model thinks.
   await session.prompt(task)
+  // A failed model call (bad key, rate limit) ends the turn instead of throwing. Stop here, as `pi -p` does.
+  const last = session.messages.at(-1)
+  if (last?.role === 'assistant' && (last.stopReason === 'error' || last.stopReason === 'aborted')) {
+    throw new Error(last.errorMessage || `Request ${last.stopReason}`)
+  }
 
   // 3. Pull. The extension shows the diff stat and asks first; tui.ui answers yes.
   await session.prompt('/e2b pull')

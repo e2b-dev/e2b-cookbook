@@ -65,7 +65,7 @@ const scripts: {
   { name: 'openai-python', interpreter: 'jupyter', file: './examples/openai-python/openai.ipynb' },
   // http-proxy-middleware 4 requires Node ^22.15 || ^24 || >=26.
   { name: 'custom-sandbox-domain-proxy', interpreter: 'npm', file: './examples/custom-sandbox-domain-proxy/', nodeVersion: '22.22.0' },
-  // @e2b/pi and Pi's SDK require Node 22.
+  // @e2b/pi and Pi's SDK require Node 22.19 or newer.
   { name: 'pi-e2b-extension-js', interpreter: 'npm', file: './examples/pi-e2b-extension-js/', nodeVersion: '22.22.0' },
   { name: 'crewai-python', interpreter: 'uv', file: './examples/crewai-python/' },
   { name: 'playwright-in-e2b', interpreter: 'npm', file: './examples/playwright-in-e2b/' },

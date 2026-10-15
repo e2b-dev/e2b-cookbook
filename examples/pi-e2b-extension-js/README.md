@@ -52,7 +52,7 @@ This example drives that flow from a script with Pi's SDK, so you can run it wit
 
 Copy `.env.example` to `.env` and fill in `E2B_API_KEY` and `ANTHROPIC_API_KEY`.
 
-**2. Install dependencies** (Node 22 or newer)
+**2. Install dependencies** (Node 22.19 or newer)
 
 ```bash
 npm install

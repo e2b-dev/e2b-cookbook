@@ -23,9 +23,19 @@ const KEYS: Record<string, string> = {
   pageup: 'Page_Up', pagedown: 'Page_Down', arrowup: 'Up', arrowdown: 'Down', arrowleft: 'Left', arrowright: 'Right',
   up: 'Up', down: 'Down', left: 'Left', right: 'Right',
 };
+// Punctuation as X keysyms; key names are also shell-quoted, so no key can break the command.
+const PUNCTUATION: Record<string, string> = {
+  ';': 'semicolon', ':': 'colon', "'": 'apostrophe', '"': 'quotedbl', ',': 'comma', '.': 'period', '/': 'slash',
+  '\\': 'backslash', '|': 'bar', '?': 'question', '!': 'exclam', '@': 'at', '#': 'numbersign', $: 'dollar',
+  '%': 'percent', '^': 'asciicircum', '&': 'ampersand', '*': 'asterisk', '(': 'parenleft', ')': 'parenright',
+  '-': 'minus', _: 'underscore', '=': 'equal', '+': 'plus', '[': 'bracketleft', ']': 'bracketright',
+  '{': 'braceleft', '}': 'braceright', '<': 'less', '>': 'greater', '`': 'grave', '~': 'asciitilde', ' ': 'space',
+};
 const BUTTONS = { left: 1, wheel: 2, right: 3, back: 8, forward: 9 };
 
-const xkey = (name: string) => KEYS[name.toLowerCase()] ?? (/^f\d+$/i.test(name) ? name.toUpperCase() : name.toLowerCase());
+const xkey = (name: string) =>
+  PUNCTUATION[name] ?? KEYS[name.toLowerCase()] ?? (/^f\d+$/i.test(name) ? name.toUpperCase() : name.toLowerCase());
+const quote = (text: string) => `'${text.replaceAll("'", `'\\''`)}'`;
 
 /** ComputerDriver for the OpenAI helper: each action becomes one xdotool call on the E2B desktop. */
 export class E2BDriver implements ComputerDriver {
@@ -37,7 +47,7 @@ export class E2BDriver implements ComputerDriver {
 
   // Modifier keys held during a click, drag, move or scroll.
   private async xdotool(keys: string[] | null | undefined, ...commands: string[]) {
-    const mods = (keys ?? []).map(xkey);
+    const mods = (keys ?? []).map((k) => quote(xkey(k)));
     await this.desktop.commands.run(
       'xdotool ' +
         [...mods.map((m) => `keydown ${m}`), ...commands, ...[...mods].reverse().map((m) => `keyup ${m}`)].join(' '),
@@ -88,7 +98,7 @@ export class E2BDriver implements ComputerDriver {
   }
 
   async keypress(action: ComputerAction.Keypress) {
-    await this.desktop.commands.run('xdotool key ' + action.keys.map(xkey).join('+'));
+    await this.desktop.commands.run('xdotool key ' + quote(action.keys.map(xkey).join('+')));
   }
 
   async type(action: ComputerAction.Type) {

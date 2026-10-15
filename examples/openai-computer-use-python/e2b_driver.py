@@ -8,6 +8,7 @@
 
 import base64
 import os
+import shlex
 import sys
 import time
 import webbrowser
@@ -22,11 +23,18 @@ MODEL = os.environ.get("OPENAI_MODEL", "gpt-6-luna")
 # OpenAI key names that e2b_desktop's map_key does not cover.
 KEYS = {"arrowup": "Up", "arrowdown": "Down", "arrowleft": "Left", "arrowright": "Right",
         "pageup": "Page_Up", "pagedown": "Page_Down", "return": "Return"}
+# Punctuation as X keysyms; key names are also shell-quoted, so no key can break the command.
+PUNCTUATION = {";": "semicolon", ":": "colon", "'": "apostrophe", '"': "quotedbl", ",": "comma", ".": "period",
+               "/": "slash", "\\": "backslash", "|": "bar", "?": "question", "!": "exclam", "@": "at",
+               "#": "numbersign", "$": "dollar", "%": "percent", "^": "asciicircum", "&": "ampersand",
+               "*": "asterisk", "(": "parenleft", ")": "parenright", "-": "minus", "_": "underscore", "=": "equal",
+               "+": "plus", "[": "bracketleft", "]": "bracketright", "{": "braceleft", "}": "braceright",
+               "<": "less", ">": "greater", "`": "grave", "~": "asciitilde", " ": "space"}
 BUTTONS = {"left": 1, "wheel": 2, "right": 3, "back": 8, "forward": 9}
 
 
 def xkey(name: str) -> str:
-    return KEYS.get(name.lower()) or map_key(name)
+    return PUNCTUATION.get(name) or KEYS.get(name.lower()) or map_key(name)
 
 
 class E2BDriver:
@@ -37,7 +45,7 @@ class E2BDriver:
 
     def _xdotool(self, keys, *commands: str):
         # Modifier keys held during a click, drag, move or scroll.
-        mods = [xkey(k) for k in keys or []]
+        mods = [shlex.quote(xkey(k)) for k in keys or []]
         self.desktop.commands.run("xdotool " + " ".join(
             [f"keydown {m}" for m in mods] + list(commands) + [f"keyup {m}" for m in reversed(mods)]))
 
@@ -70,7 +78,7 @@ class E2BDriver:
         self._xdotool(action.keys, f"mousemove --sync {action.x} {action.y}", *clicks)
 
     def keypress(self, action, *, cancelled=None):
-        self.desktop.commands.run("xdotool key " + "+".join(xkey(k) for k in action.keys))
+        self.desktop.commands.run("xdotool key " + shlex.quote("+".join(xkey(k) for k in action.keys)))
 
     def type(self, action, *, cancelled=None):
         self.desktop.write(action.text)

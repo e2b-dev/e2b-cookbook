@@ -7,6 +7,7 @@ while you watch live. The number is generated here and never sent in the prompt,
 """
 
 import secrets
+import sys
 from pathlib import Path
 
 from e2b_desktop import Sandbox
@@ -33,7 +34,11 @@ try:
 
     answer = run(desktop, TASK, max_steps=15, time_limit=120)
     print(f"\nAnswer: {answer}")
-    print("Correct." if answer.strip() == order_number else f"Wrong: the order number is {order_number}.")
+    correct = answer.strip() == order_number
+    if correct:
+        print("Correct.")
+    else:
+        print(f"Wrong: the order number is {order_number}.", file=sys.stderr)
 
     Path("output").mkdir(exist_ok=True)
     Path("output/1-run.png").write_bytes(desktop.screenshot())
@@ -41,3 +46,4 @@ try:
     hold_open()
 finally:
     desktop.kill()
+sys.exit(0 if correct else 1)

@@ -10,11 +10,14 @@
   "scripts": {
     "start": "tsx 1-run.ts",
     "orangehrm": "tsx 2-orangehrm.ts",
+    "code-exec": "tsx 1-run-code-exec.ts",
+    "template": "tsx template.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@e2b/desktop": "^2.4.0",
     "dotenv": "^17.4.2",
+    "e2b": "^2.53.1",
     "openai": "7.33.0"
   },
   "devDependencies": {

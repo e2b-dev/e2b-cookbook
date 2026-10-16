@@ -1,7 +1,7 @@
 /**
  * Hello world with code execution: the same task as 1-run.ts, done the way OpenAI recommends for gpt-6-astra.
  *
- * Chrome on the desktop shows a folder with two orders. gpt-6-astra gets one tool, exec_js, and writes Playwright
+ * Chromium on the desktop shows a folder with two orders. gpt-6-astra gets one tool, exec_js, and writes Playwright
  * code that runs inside the E2B desktop to open the priority order and read back its order number while you watch
  * live. The number is generated here and never sent in the prompt, so the answer is checked.
  *

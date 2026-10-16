@@ -1,0 +1,19 @@
+{
+  "name": "acp-agents",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@agentclientprotocol/sdk": "^1.8.0",
+    "@e2b/acp": "^0.1.0",
+    "dotenv": "^17.4.2",
+    "e2b": "^2.56.1",
+    "tsx": "^4.19.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.9.3"
+  }
+}

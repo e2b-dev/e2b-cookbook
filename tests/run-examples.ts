@@ -72,6 +72,8 @@ const scripts: {
   // openai 7.33 (the first release with openai/helpers/computer) requires Node 22.
   { name: 'openai-computer-use-python', interpreter: 'uv', file: './examples/openai-computer-use-python/', entrypoint: '1-run.py' },
   { name: 'openai-computer-use-js', interpreter: 'npm', file: './examples/openai-computer-use-js/', nodeVersion: '22.22.0' },
+  { name: 'acp-agents-js', interpreter: 'npm', file: './examples/acp-agents-js/', nodeVersion: '22.22.0' },
+  { name: 'acp-agents-python', interpreter: 'uv', file: './examples/acp-agents-python/' },
   { name: 'playwright-in-e2b', interpreter: 'npm', file: './examples/playwright-in-e2b/' },
   { name: 'anthropic-claude-code-in-sandbox-js', interpreter: 'npm', file: './examples/anthropic-claude-code-in-sandbox-js/' },
   { name: 'anthropic-claude-code-in-sandbox-python', interpreter: 'uv', file: './examples/anthropic-claude-code-in-sandbox-python/', entrypoint: 'python -m anthropic_claude_code_in_sandbox.main' },

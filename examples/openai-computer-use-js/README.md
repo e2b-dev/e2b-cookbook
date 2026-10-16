@@ -36,7 +36,7 @@ The OrangeHRM desktop can reach only `opensource-demo.orangehrmlive.com`: E2B's 
 ### 1. Set up API keys
 
 - Copy `.env.template` to `.env`
-  - Get the [E2B API KEY](https://e2b.dev/docs/getting-started/api-key)
+  - Get the [E2B API KEY](https://e2b.dev/docs/api-key)
   - Get the [OPENAI API KEY](https://platform.openai.com/api-keys)
 
 ### 2. Install packages

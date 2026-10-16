@@ -1,7 +1,7 @@
 /**
  * Build the E2B template that the code-exec examples run on: the stock desktop plus Node 22, Playwright and its Chromium.
  *
- * Run it once per E2B team; it takes a few minutes.
+ * Run it once per E2B team; it takes about a minute.
  *
  *   npm run template
  */

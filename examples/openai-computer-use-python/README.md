@@ -7,7 +7,7 @@ OpenAI's [computer use guide](https://developers.openai.com/api/docs/guides/tool
 - **The computer tool** (`1-run.py`, `2-orangehrm.py`): the model returns structured clicks and keystrokes, and `E2BDriver` performs them.
 - **Code execution** (`1-run-code-exec.py`, `2-orangehrm-code-exec.py`), the path OpenAI recommends for `gpt-6-astra`: the model gets one function tool, `exec_py`, and writes [PyAutoGUI](https://pyautogui.readthedocs.io) code. That code runs in a persistent Python process inside the E2B desktop, never on your machine, and returns its logs and screenshots. One call can batch several actions and check its own result.
 
-The same examples in TypeScript: [`openai-computer-use-js`](../openai-computer-use-js), where the code-execution examples drive Chrome with Playwright (`exec_js`).
+The same examples in TypeScript: [`openai-computer-use-js`](../openai-computer-use-js), where the code-execution examples drive Chromium with Playwright (`exec_js`).
 
 | File | What it is |
 | --- | --- |
@@ -36,7 +36,7 @@ The OrangeHRM desktop can reach only `opensource-demo.orangehrmlive.com`: E2B's 
 ### 1. Set up API keys
 
 - Copy `.env.template` to `.env`
-  - Get the [E2B API KEY](https://e2b.dev/docs/getting-started/api-key)
+  - Get the [E2B API KEY](https://e2b.dev/docs/api-key)
   - Get the [OPENAI API KEY](https://platform.openai.com/api-keys)
 
 ### 2. Install packages

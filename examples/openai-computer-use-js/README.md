@@ -47,7 +47,7 @@ npm i
 
 ### 3. Build the code-execution template
 
-Only the `*-code-exec.ts` examples need it. Build it once per E2B team; it takes about a minute.
+Only the `*-code-exec.ts` examples need it. Build it once per E2B team, and again after `template.ts` changes; it takes about a minute.
 
 ```
 npm run template

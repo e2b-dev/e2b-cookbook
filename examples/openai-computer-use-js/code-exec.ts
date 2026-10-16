@@ -21,6 +21,7 @@ export const TEMPLATE = 'openai-computer-use-exec-js';
 
 export const RUNTIME_DIR = '/home/user/.exec_js'; // template.ts installs Playwright and its Chromium here
 const SOCKET = '/tmp/exec_js.sock';
+const RUNTIME_LOG = `${RUNTIME_DIR}/runtime.log`; // the runtime's stdout and stderr, shown if it fails to start
 const CELL = `${RUNTIME_DIR}/cell.js`; // next to the runtime, which reads it on each call
 const CALL_TIMEOUT_S = 60; // seconds one exec_js call may run
 
@@ -52,11 +53,23 @@ as ctrl+s) act on it in screen coordinates.`,
 export async function startRuntime(desktop: Sandbox, url: string) {
   await desktop.files.write(`${RUNTIME_DIR}/runtime.mjs`, await readFile(new URL('exec-js-runtime.mjs', import.meta.url), 'utf8'));
   // timeoutMs: 0 keeps the runtime running; a background command otherwise ends after 60 seconds.
-  await desktop.commands.run(`node ${RUNTIME_DIR}/runtime.mjs '${url}'`, { background: true, timeoutMs: 0 });
-  await desktop.commands.run(
-    `for i in $(seq 300); do [ -S ${SOCKET} ] && exit 0; sleep 0.1; done; exit 1`,
-    { timeoutMs: 40_000 }, // Chromium takes a few seconds to start
-  );
+  const runtime = await desktop.commands.run(`node ${RUNTIME_DIR}/runtime.mjs '${url}' > ${RUNTIME_LOG} 2>&1`, {
+    background: true,
+    timeoutMs: 0,
+  });
+  try {
+    // Wait for the socket, and stop early if the runtime exits.
+    await desktop.commands.run(
+      `for i in $(seq 300); do [ -S ${SOCKET} ] && exit 0; kill -0 ${runtime.pid} 2>/dev/null || exit 1; sleep 0.1; done; exit 1`,
+      { timeoutMs: 40_000 }, // Chromium takes a few seconds to start
+    );
+  } catch {
+    const log = await desktop.files.read(RUNTIME_LOG).catch(() => '');
+    throw new Error(
+      `The exec_js runtime did not start. If the ${TEMPLATE} template was built before it installed Playwright's ` +
+        `Chromium, rebuild it with npm run template.\n${log}`,
+    );
+  }
 }
 
 /** Run one exec_js call on the desktop and return its output items. */

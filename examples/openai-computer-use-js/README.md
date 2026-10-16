@@ -5,7 +5,7 @@
 OpenAI's [computer use guide](https://developers.openai.com/api/docs/guides/tools-computer-use) offers two ways to connect a model to a screen, and this folder shows both:
 
 - **The computer tool** (`1-run.ts`, `2-orangehrm.ts`): the model returns structured clicks and keystrokes, and `E2BDriver` performs them.
-- **Code execution** (`1-run-code-exec.ts`, `2-orangehrm-code-exec.ts`), the path OpenAI recommends for `gpt-6-astra`: the model gets one function tool, `exec_js`, and writes [Playwright](https://playwright.dev) code against Chrome on the desktop. That code runs in a persistent Node process inside the E2B desktop, never on your machine, and returns its logs and screenshots. It can read the page's text and click elements by role instead of by pixels. For apps outside the browser, such as LibreOffice Calc, the runtime adds a small `desktop` object: a full-screen screenshot, click, type and key, through scrot and xdotool.
+- **Code execution** (`1-run-code-exec.ts`, `2-orangehrm-code-exec.ts`), the path OpenAI recommends for `gpt-6-astra`: the model gets one function tool, `exec_js`, and writes [Playwright](https://playwright.dev) code against Chromium on the desktop, launched by Playwright as in OpenAI's sample app. That code runs in a persistent Node process inside the E2B desktop, never on your machine, and returns its logs and screenshots. It can read the page's text and click elements by role instead of by pixels. For everything outside the browser, such as LibreOffice Calc, the taskbar or a file dialog, the runtime adds a `desktop` object that works in screen coordinates through scrot and xdotool: a full-screen screenshot, click, double-click, right-click, drag, scroll, type and key.
 
 The same examples in Python: [`openai-computer-use-python`](../openai-computer-use-python), where the code-execution example drives the whole desktop with PyAutoGUI (`exec_py`).
 
@@ -13,12 +13,12 @@ The same examples in Python: [`openai-computer-use-python`](../openai-computer-u
 | --- | --- |
 | [`1-run.ts`](1-run.ts) | **Hello world.** The task from OpenAI's guide: Luna opens one of two text files in the file manager and reads back its order number, checked against the number the script generated. Start here. |
 | [`2-orangehrm.ts`](2-orangehrm.ts) | **Excel to OrangeHRM.** "Swivel chair" office work: Luna reads new hires from an Excel file in LibreOffice Calc, enters each one into [OrangeHRM](https://opensource-demo.orangehrmlive.com) (an open-source HR system with no API in reach), and writes the Employee Id OrangeHRM assigns back into the spreadsheet. |
-| [`1-run-code-exec.ts`](1-run-code-exec.ts) | **Hello world with code execution.** The same orders folder, shown in Chrome: `gpt-6-astra` opens the file by writing Playwright code through `exec_js`. Needs the template from `template.ts`. |
+| [`1-run-code-exec.ts`](1-run-code-exec.ts) | **Hello world with code execution.** The same orders folder, shown in Chromium: `gpt-6-astra` opens the file by writing Playwright code through `exec_js`. Needs the template from `template.ts`. |
 | [`2-orangehrm-code-exec.ts`](2-orangehrm-code-exec.ts) | **Excel to OrangeHRM with code execution.** The same task and desktop as `2-orangehrm.ts`, driven by `gpt-6-astra` through `exec_js`: Playwright for OrangeHRM, the `desktop` helpers for Calc. Needs the template from `template.ts`. |
 | [`e2b-driver.ts`](e2b-driver.ts) | Helper, not an example: `E2BDriver`, the live view, and the `ComputerToolset.run` call the computer-tool examples share. |
-| [`code-exec.ts`](code-exec.ts) | Helper: the `exec_js` tool, starting Chrome and the runtime on a desktop, and the Responses loop from OpenAI's code-execution guide. |
+| [`code-exec.ts`](code-exec.ts) | Helper: the `exec_js` tool, starting the runtime and its Chromium on a desktop, and the Responses loop from OpenAI's code-execution guide. |
 | [`exec-js-runtime.mjs`](exec-js-runtime.mjs) | Runs inside the desktop, not on your machine: the persistent Node context with Playwright's `browser`, `context` and `page`, `console.log`, `display` and `desktop`, adapted from [OpenAI's CUA sample app](https://github.com/openai/openai-cua-sample-app). |
-| [`template.ts`](template.ts) | Builds the `openai-computer-use-exec-js` E2B template: the stock desktop plus Node 22 and `playwright-core`. |
+| [`template.ts`](template.ts) | Builds the `openai-computer-use-exec-js` E2B template: the stock desktop plus Node 22, Playwright and its Chromium. |
 
 `2-orangehrm.ts` is the same demo as the Claude example [`anthropic-computer-use-orangehrm-js`](../anthropic-computer-use-orangehrm-js): same `new_hires.csv`, same steps, same egress allowlist. One difference: this example uses only the computer tool, so Luna drives OrangeHRM in Chrome by pixels too, the same way it drives Calc. The OpenAI SDK also has a browser toolset, but it needs a browser driver for the E2B desktop, which this example does not include.
 
@@ -28,7 +28,7 @@ The OrangeHRM desktop can reach only `opensource-demo.orangehrmlive.com`: E2B's 
 
 - [E2B Desktop SDK](https://github.com/e2b-dev/desktop) for the Linux desktop with Chrome and LibreOffice
 - [OpenAI Node SDK](https://www.npmjs.com/package/openai) 7.33.0, the first release with `openai/helpers/computer`, with `gpt-6-luna` (computer tool) and `gpt-6-astra` (code execution)
-- [Playwright](https://playwright.dev) (`playwright-core`) inside the desktop, for code execution
+- [Playwright](https://playwright.dev) and its Chromium inside the desktop, for code execution
 - TypeScript on Node 22 or newer
 
 ## Setup
@@ -47,7 +47,7 @@ npm i
 
 ### 3. Build the code-execution template
 
-Only the `*-code-exec.ts` examples need it. Build it once per E2B team; it takes about a minute.
+Only the `*-code-exec.ts` examples need it. Build it once per E2B team, and again after `template.ts` changes; it takes about a minute.
 
 ```
 npm run template
@@ -86,11 +86,11 @@ The [OrangeHRM demo](https://opensource-demo.orangehrmlive.com) is public and sh
 
 ### Code execution
 
-1. **Start the desktop from the template.** `Sandbox.create('openai-computer-use-exec-js', ...)` gives the same desktop with Node and `playwright-core` installed, and the script writes the same two order files.
-2. **Start Chrome and the runtime.** `startRuntime` opens the desktop's own Chrome, maximized on `file:///home/user/orders/`, with the DevTools protocol on inside the sandbox. It then uploads `exec-js-runtime.mjs`, which connects Playwright to that Chrome over CDP, keeps one context for the whole run, and listens on a Unix socket inside the sandbox, so nothing is exposed outside it.
+1. **Start the desktop from the template.** `Sandbox.create('openai-computer-use-exec-js', ...)` gives the same desktop with Node, Playwright and its Chromium installed, and the script writes the same two order files.
+2. **Start the runtime.** `startRuntime` uploads `exec-js-runtime.mjs` and starts it on `file:///home/user/orders/`. Like OpenAI's sample app, the runtime launches Playwright's own Chromium, here visible and maximized on the desktop, keeps one context and page for the whole run, and listens on a Unix socket inside the sandbox, so nothing is exposed outside it.
 3. **Run the model.** `run` is the loop from OpenAI's guide: `responses.create` with the `exec_js` function tool, chained with `previous_response_id`. Each `function_call` is written to a file on the desktop, and a `curl` POST over the socket tells the runtime to run it; the runtime returns `input_text` and `input_image` items, which go back unchanged as the `function_call_output`. The terminal prints every call's code.
 
-Unlike OpenAI's sample app, which runs the generated code on your own computer, here it runs in a throwaway E2B desktop with no internet access, and you watch Chrome through the live view.
+Unlike OpenAI's sample app, which runs the generated code on your own computer, here it runs in a throwaway E2B desktop with no internet access, and you watch Chromium through the live view.
 
 ## Feedback
 

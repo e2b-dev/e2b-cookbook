@@ -1,8 +1,9 @@
 /**
  * The exec_js runtime. It runs inside the E2B desktop, never on your machine.
  *
- * code-exec.ts uploads this file and starts it once per desktop, after Chrome. It connects Playwright to that Chrome
- * over CDP and listens on a Unix socket. For each call, code-exec.ts writes the model's code to cell.js next to this
+ * code-exec.ts uploads this file and starts it once per desktop with a start URL. Like OpenAI's sample app, it launches
+ * Playwright's own Chromium, visible on the desktop, opens one context and page on that URL, and listens on a Unix
+ * socket. For each call, code-exec.ts writes the model's code to cell.js next to this
  * file and POSTs to the socket; the runtime runs cell.js in one shared context with Playwright's `browser`, `context`
  * and `page`, `console.log(value)`, `display(base64Image)`, and `desktop` for the rest of the screen (LibreOffice, the
  * taskbar) through scrot and xdotool. Variables saved on `globalThis` persist across calls.
@@ -16,22 +17,25 @@ import { existsSync, readFileSync, rmSync, unlinkSync } from 'node:fs';
 import http from 'node:http';
 import util from 'node:util';
 import vm from 'node:vm';
-import { chromium } from 'playwright-core';
+import { chromium } from 'playwright';
 
 const SOCKET = '/tmp/exec_js.sock';
 const CELL = new URL('cell.js', import.meta.url);
 const SCREEN = new URL('screen.png', import.meta.url);
 const MAX_OUTPUT_BYTES = 8 * 1024 * 1024;
 
-const browser = await chromium.connectOverCDP('http://127.0.0.1:9222');
-const context = browser.contexts()[0];
-const page = context.pages()[0];
+// Headful on the desktop's display, so the live view shows it; maximized, with the page filling the window.
+const browser = await chromium.launch({ headless: false, args: ['--start-maximized'] });
+const context = await browser.newContext({ viewport: null });
+const page = await context.newPage();
+await page.goto(process.argv[2]);
 context.setDefaultTimeout(10_000);
 context.setDefaultNavigationTimeout(15_000);
 
 const xdotool = (...args) => void execFileSync('xdotool', args.map(String));
 
-// Playwright sees only Chrome's pages, so tasks that leave the browser get the whole desktop through these.
+// Playwright sees only the browser's pages; `desktop` reaches the rest of the screen (other apps, the taskbar, file
+// dialogs) in screen coordinates, through scrot and xdotool.
 const desktop = {
   screenshot: () => {
     rmSync(SCREEN, { force: true }); // scrot adds a suffix instead of overwriting
@@ -39,6 +43,12 @@ const desktop = {
     return readFileSync(SCREEN).toString('base64');
   },
   click: (x, y) => xdotool('mousemove', '--sync', x, y, 'click', 1),
+  doubleClick: (x, y) => xdotool('mousemove', '--sync', x, y, 'click', '--repeat', 2, 1),
+  rightClick: (x, y) => xdotool('mousemove', '--sync', x, y, 'click', 3),
+  drag: (x1, y1, x2, y2) =>
+    xdotool('mousemove', '--sync', x1, y1, 'mousedown', 1, 'mousemove', '--sync', x2, y2, 'mouseup', 1),
+  // Positive clicks scroll down, negative up.
+  scroll: (x, y, clicks) => xdotool('mousemove', '--sync', x, y, 'click', '--repeat', Math.abs(clicks), clicks < 0 ? 4 : 5),
   type: (text) => xdotool('type', '--delay', 12, '--', text),
   key: (keys) => xdotool('key', '--', ...String(keys).split(' ')),
 };

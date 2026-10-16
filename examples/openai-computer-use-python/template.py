@@ -1,6 +1,6 @@
-"""Build the E2B template that 1-run-code-exec.py runs on: the stock desktop plus PyAutoGUI.
+"""Build the E2B template that the code-exec examples run on: the stock desktop plus PyAutoGUI.
 
-Run it once per E2B team; it takes a few minutes.
+Run it once per E2B team; it takes about a minute.
 
     uv run --env-file .env template.py
 """

@@ -11,12 +11,9 @@ const agents = {
   opencode: {
     template: 'opencode',
     command: 'opencode acp',
-    envs: { OPENAI_API_KEY: process.env.OPENAI_API_KEY ?? '' },
-    // OpenCode reads its model from its config file.
-    files: {
-      '/home/user/.config/opencode/opencode.json': JSON.stringify({
-        model: 'openai/gpt-5.6-luna',
-      }),
+    envs: {
+      OPENAI_API_KEY: process.env.OPENAI_API_KEY ?? '',
+      OPENCODE_CONFIG_CONTENT: JSON.stringify({ model: 'openai/gpt-5.6-luna' }),
     },
   },
   goose: {
@@ -27,13 +24,11 @@ const agents = {
       GOOSE_PROVIDER: 'openai',
       GOOSE_MODEL: 'gpt-5.6-luna',
     },
-    files: {},
   },
   claude: {
     template: 'claude',
     command: 'claude-agent-acp',
     envs: { ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY ?? '' },
-    files: {},
   },
 }
 
@@ -64,9 +59,6 @@ const sandbox = await Sandbox.create(agentConfig.template, { timeoutMs: 10 * 60_
 console.log(`Sandbox ${sandbox.sandboxId} with ${name}`)
 
 try {
-  for (const [path, content] of Object.entries(agentConfig.files)) {
-    await sandbox.files.write(path, content)
-  }
   const cwd = '/home/user/project'
   await sandbox.files.makeDir(cwd)
 

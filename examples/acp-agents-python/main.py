@@ -15,12 +15,9 @@ AGENTS = {
     "opencode": {
         "template": "opencode",
         "command": "opencode acp",
-        "envs": {"OPENAI_API_KEY": os.getenv("OPENAI_API_KEY", "")},
-        # OpenCode reads its model from its config file.
-        "files": {
-            "/home/user/.config/opencode/opencode.json": json.dumps(
-                {"model": "openai/gpt-5.6-luna"}
-            )
+        "envs": {
+            "OPENAI_API_KEY": os.getenv("OPENAI_API_KEY", ""),
+            "OPENCODE_CONFIG_CONTENT": json.dumps({"model": "openai/gpt-5.6-luna"}),
         },
     },
     "goose": {
@@ -31,13 +28,11 @@ AGENTS = {
             "GOOSE_PROVIDER": "openai",
             "GOOSE_MODEL": "gpt-5.6-luna",
         },
-        "files": {},
     },
     "claude": {
         "template": "claude",
         "command": "claude-agent-acp",
         "envs": {"ANTHROPIC_API_KEY": os.getenv("ANTHROPIC_API_KEY", "")},
-        "files": {},
     },
 }
 
@@ -71,8 +66,6 @@ async def main():
     sandbox = await AsyncSandbox.create(config["template"], timeout=600)
     print(f"Sandbox {sandbox.sandbox_id} with {name}")
     try:
-        for path, content in config["files"].items():
-            await sandbox.files.write(path, content)
         cwd = "/home/user/project"
         await sandbox.files.make_dir(cwd)
 

@@ -1,10 +1,7 @@
 import 'dotenv/config'
 import { Sandbox } from 'e2b'
-import {
-  ClientSideConnection,
-  PROTOCOL_VERSION,
-  type Client,
-} from '@agentclientprotocol/sdk'
+import { connectAcpAgent } from '@e2b/acp'
+import { PROTOCOL_VERSION, type Client } from '@agentclientprotocol/sdk'
 
 // Each agent is a sandbox template plus the command that starts it in ACP mode.
 const agents = {
@@ -63,11 +60,13 @@ try {
   await sandbox.files.makeDir(cwd)
 
   // Start the agent inside the sandbox and connect an ACP client to it.
-  const agent = await sandbox.acp.start(agentConfig.command, {
+  const agent = await connectAcpAgent(sandbox, {
+    command: agentConfig.command,
+    client,
     cwd,
     envs: agentConfig.envs,
   })
-  const connection = new ClientSideConnection(() => client, agent.stream)
+  const connection = agent.connection
 
   const { agentInfo } = await connection.initialize({
     protocolVersion: PROTOCOL_VERSION,
@@ -90,6 +89,9 @@ try {
   // The agent worked inside the sandbox, so its result is there.
   const result = await sandbox.commands.run(`python3 ${cwd}/fizzbuzz.py`)
   console.log(`fizzbuzz.py in the sandbox prints:\n${result.stdout}`)
+  if (!result.stdout.includes('FizzBuzz')) {
+    throw new Error('fizzbuzz.py did not print FizzBuzz')
+  }
 
   await agent.close()
 } finally {

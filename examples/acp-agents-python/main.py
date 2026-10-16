@@ -7,6 +7,7 @@ from acp import schema
 from dotenv import load_dotenv
 
 from e2b import AsyncSandbox
+from e2b_acp import connect_acp_agent
 
 load_dotenv()
 
@@ -51,7 +52,10 @@ class Client:
         )
 
     async def session_update(self, session_id, update, **kwargs):
-        if isinstance(update, schema.AgentMessageChunk) and update.content.type == "text":
+        if (
+            isinstance(update, schema.AgentMessageChunk)
+            and update.content.type == "text"
+        ):
             print(update.content.text, end="", flush=True)
         elif isinstance(update, schema.ToolCallStart):
             print(f"\n[tool] {update.title}")
@@ -70,8 +74,10 @@ async def main():
         await sandbox.files.make_dir(cwd)
 
         # Start the agent inside the sandbox and connect an ACP client to it.
-        agent = await sandbox.acp.start(config["command"], cwd=cwd, envs=config["envs"])
-        connection = acp.connect_to_agent(Client(), agent)
+        agent = await connect_acp_agent(
+            sandbox, config["command"], Client(), cwd=cwd, envs=config["envs"]
+        )
+        connection = agent.connection
 
         init = await connection.initialize(protocol_version=acp.PROTOCOL_VERSION)
         print(f"Connected to {init.agent_info.name} {init.agent_info.version}")
@@ -91,6 +97,8 @@ async def main():
         # The agent worked inside the sandbox, so its result is there.
         result = await sandbox.commands.run(f"python3 {cwd}/fizzbuzz.py")
         print(f"fizzbuzz.py in the sandbox prints:\n{result.stdout}")
+        if "FizzBuzz" not in result.stdout:
+            raise RuntimeError("fizzbuzz.py did not print FizzBuzz")
 
         await agent.close()
     finally:

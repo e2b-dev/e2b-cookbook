@@ -47,10 +47,10 @@ sbx.kill()
 
 1. Run `npm i -g @e2b/cli@latest` to install the latest version of the E2B CLI.
 1. Run `e2b template init` in your project directory.
-1. Copy the [e2b.Dockerfile](./e2b.Dockerfile) into your project.
+1. Copy the template definition from [template.ts](./js/template/template.ts) (JavaScript) or [template.py](./python/template/template.py) (Python) into your project.
 1. Run `e2b template build` to build your sandbox.
 1. Start the sandbox either via our SDK or the E2B CLI like this `e2b sandbox spawn <sandbox-template-id>`.
 
 
 > [!WARNING]
-> If you want to use the [code interpreting features](https://github.com/e2b-dev/code-interpreter) you can use the `e2bdev/code-interpreter` base image instead of the default `ubuntu:20.04` one in the `e2b.Dockerfile` and then follow the [sandbox customization guide](https://e2b.dev/docs/sandbox-template).
+> If you want to use the [code interpreting features](https://github.com/e2b-dev/code-interpreter) you can use the `e2bdev/code-interpreter` base image instead of the default `ubuntu:20.04` one in the template definition and then follow the [sandbox customization guide](https://e2b.dev/docs/sandbox-template).

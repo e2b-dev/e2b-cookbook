@@ -3,14 +3,14 @@ This is an example that tests the capabilities of OpenAI's models. You can choos
 
 
 ## Tech Stack
-- [E2B Code Interpreter SDK]((https://github.com/e2b-dev/code-interpreter)) for running the LLM-generated code
+- [E2B Code Interpreter SDK](https://github.com/e2b-dev/code-interpreter) for running the LLM-generated code
 - [OpenAI's GPT-5.6](https://openai.com/index/hello-GPT-5.6/) as an LLM
 - JavaScript/TypeScript
 
 ## Setup
 ### 1. Set up API keys
 - Copy `.env.template` to `.env`
-- Get the [E2B API KEY]((https://e2b.dev/docs/getting-started/api-key))
+- Get the [E2B API KEY](https://e2b.dev/docs/getting-started/api-key)
 - Get the [OPENAI API KEY](https://platform.openai.com/settings)
 
 ### 2. Install packages
@@ -28,7 +28,7 @@ After running the program, you should get the results of a chart visualizing the
 
 ![Example of the output](temperature_analysis.png)
 
-If you encounter any problems, please let us know at our [Discord]((https://discord.com/invite/U7KEcGErtQ)).
+If you encounter any problems, please let us know at our [Discord](https://discord.com/invite/U7KEcGErtQ).
 If you want to let the world know about what you're building with E2B, tag [@e2b_dev](https://twitter.com/e2b_dev) on X (Twitter).
 
 ### 4. Visit our docs

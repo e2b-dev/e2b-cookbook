@@ -60,9 +60,7 @@ try {
   await sandbox.files.makeDir(cwd)
 
   // Start the agent inside the sandbox and connect an ACP client to it.
-  const agent = await connectAcpAgent(sandbox, {
-    command: agentConfig.command,
-    client,
+  const agent = await connectAcpAgent(sandbox, agentConfig.command, client, {
     cwd,
     envs: agentConfig.envs,
   })
@@ -93,7 +91,7 @@ try {
     throw new Error('fizzbuzz.py did not print FizzBuzz')
   }
 
-  await agent.close()
+  await agent.stop()
 } finally {
   await sandbox.kill()
 }

@@ -15,13 +15,13 @@ The same client works for all three agents: only the sandbox template and the co
 The example creates a sandbox from the agent's template, then `connectAcpAgent()` from [`@e2b/acp`](https://www.npmjs.com/package/@e2b/acp) starts the agent inside it and connects your ACP client over the agent's stdin and stdout:
 
 ```ts
-const agent = await connectAcpAgent(sandbox, { command: 'opencode acp', client, cwd, envs })
+const agent = await connectAcpAgent(sandbox, 'opencode acp', client, { cwd, envs })
 
 await agent.connection.initialize({ protocolVersion: PROTOCOL_VERSION, clientCapabilities: {} })
 const { sessionId } = await agent.connection.newSession({ cwd, mcpServers: [] })
 await agent.connection.prompt({ sessionId, prompt: [{ type: 'text', text: '...' }] })
 
-await agent.close()
+await agent.stop()
 ```
 
 `connectAcpAgent()` turns off the client filesystem and terminal capabilities in `initialize` and rejects agent requests for them, so the agent edits files and runs commands with its own tools inside the sandbox, never on the machine running your client. It does not restrict the agent's network access or the MCP servers you pass to it.

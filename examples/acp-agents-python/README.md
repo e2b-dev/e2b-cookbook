@@ -21,7 +21,7 @@ await agent.connection.initialize(protocol_version=acp.PROTOCOL_VERSION)
 session = await agent.connection.new_session(cwd=cwd, mcp_servers=[])
 await agent.connection.prompt(session_id=session.session_id, prompt=[acp.text_block("...")])
 
-await agent.close()
+await agent.stop()
 ```
 
 `connect_acp_agent()` turns off the client filesystem and terminal capabilities in `initialize` and rejects agent requests for them, so the agent edits files and runs commands with its own tools inside the sandbox, never on the machine running your client. It does not restrict the agent's network access or the MCP servers you pass to it.

@@ -100,7 +100,7 @@ async def main():
         if "FizzBuzz" not in result.stdout:
             raise RuntimeError("fizzbuzz.py did not print FizzBuzz")
 
-        await agent.close()
+        await agent.stop()
     finally:
         await sandbox.kill()
 

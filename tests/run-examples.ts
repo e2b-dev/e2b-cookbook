@@ -152,6 +152,9 @@ const scripts: {
 //   stirrup-python (its own auth header)
 //   veris-e2b-js (VERIS_API_KEY, VERIS_ENVIRONMENT_ID — Sandbox.create() provisions
 //     a Veris twin of the vendor stack, so it cannot run without a Veris account)
+//   anchor-cloud-browser-js (ANCHOR_API_KEY — getApiKeys already forwards it.
+//     Once the secret exists, move this into the scripts list with a 600_000
+//     timeout: npm install plus the browser task does not fit 150s)
 // Host-side OpenEnv server and native clients create their own episode sandboxes.
 // Uploading this example would nest resources and leave a long-lived service.
 // Scoped offline CI and a bounded host-side live smoke cover it separately:

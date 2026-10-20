@@ -368,6 +368,7 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
 - Tailcat: encrypted links between sandboxes, and between a sandbox and your laptop - [Python/TypeScript](./examples/tailcat-e2b)
 - How to run Playwright in E2B - [TypeScript](./examples/playwright-in-e2b)
 - Test an app running in a sandbox with a Notte cloud browser, from Playwright over CDP and from the Notte CLI inside the sandbox - [Python](./examples/notte-browser-python)
+- Anchor cloud browser: run code in an E2B sandbox and drive Chromium in Anchor Cloud - [TypeScript](./examples/anchor-cloud-browser-js)
 - Map custom subdomains to your sandboxes - [TypeScript](./examples/custom-sandbox-domain-proxy)
 - Delete old paused sandboxes by age and metadata - [Python/Shell](./examples/cleanup-paused-sandboxes)
 - Feedback analyst agent on Flue, publishing an HTML report from a sandbox - [TypeScript](./examples/flue-feedback-analyst-js)

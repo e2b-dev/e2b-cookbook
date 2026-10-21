@@ -1,0 +1,12 @@
+[project]
+name = "browser-use-cloud-browser-python"
+version = "0.1.0"
+description = "Test a web app running in an E2B sandbox with a Browser Use cloud browser"
+readme = "README.md"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "browser-use-sdk>=3.12,<4",
+    "e2b>=2.51,<3",
+    "playwright>=1.49,<2",
+    "python-dotenv>=1.1,<2",
+]

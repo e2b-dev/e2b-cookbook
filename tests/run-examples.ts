@@ -148,6 +148,8 @@ const scripts: {
 //   watsonx-ai-code-interpreter-js / -python (WATSONX_API_KEY, _PROJECT_ID, _URL)
 //   mcp-browserbase-js (BROWSERBASE_API_KEY, BROWSERBASE_PROJECT_ID, GEMINI_API_KEY)
 //   notte-browser-python (NOTTE_API_KEY)
+//   browser-use-cloud-browser-python (BROWSER_USE_API_KEY — getApiKeys already
+//     forwards it, so add the secret and move this into the scripts list)
 //   mcp-research-agent-js (EXA_API_KEY)
 //   stirrup-python (its own auth header)
 //   veris-e2b-js (VERIS_API_KEY, VERIS_ENVIRONMENT_ID — Sandbox.create() provisions

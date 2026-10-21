@@ -74,7 +74,7 @@ async def main() -> None:
     )
     worker = None
     try:
-        async with asyncio.timeout(300):
+        async with asyncio.timeout(300) as deadline:
             workspace = Workspace(backend)
             await seed(workspace)
             ref = backend.ref
@@ -143,6 +143,8 @@ async def main() -> None:
                     )
                     if ui_port:
                         # The server stops with this block; keep the finished workflow viewable.
+                        # The viewing pause must not use up the demo's 300-second deadline.
+                        deadline.reschedule(deadline.when() + 30)
                         print(
                             f"Temporal UI stays up for 30s: http://localhost:{ui_port}"
                             f"/namespaces/default/workflows/{queue}",

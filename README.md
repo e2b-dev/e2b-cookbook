@@ -264,6 +264,12 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td><a href="./examples/agentkit-coding-agent">TypeScript</a></td>
     </tr>
     <tr>
+    <td><a href="https://agentclientprotocol.com">Agent Client Protocol</a></td>
+      <td>Drive OpenCode, goose or Claude Code inside a Sandbox with an ACP client</td>
+      <td><a href="./examples/acp-agents-python">Python</a></td>
+      <td><a href="./examples/acp-agents-js">TypeScript</a></td>
+    </tr>
+    <tr>
     <td><a href="https://sandboxagent.dev/docs/sdk-overview">Sandbox Agent SDK</a></td>
       <td>Run Sandbox Agent inside E2B and connect with the SDK</td>
       <td>-</td>

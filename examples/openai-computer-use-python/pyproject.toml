@@ -15,4 +15,5 @@ package = false
 # Skip package versions published in the last 7 days (supply-chain guard).
 exclude-newer = "7 days"
 # openai 3.31.0 (2026-10-14) is newer than the guard and is the release the helper ships in.
-exclude-newer-package = { openai = false }
+# certifi 2026.10.19 (2026-10-20) is the eMudhra-patched trust store: https://emudhra.we-have-a-problem.com/
+exclude-newer-package = { openai = false, certifi = "2026-10-20T02:24:17Z" }

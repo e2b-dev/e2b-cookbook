@@ -142,7 +142,7 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
     <tr>
       <td>Llama 3.1 405B, 70B, 8B</td>
       <td>Code interpreter</td>
-      <td><a href="https://github.com/e2b-dev/e2b-cookbook/blob/fireworks/examples/fireworks-code-interpreter-python/llama_3.1_code_interpreter.ipynb">Python</a></td>
+      <td><a href="https://github.com/e2b-dev/e2b-cookbook/blob/fireworks/examples/fireworks-and-e2b/fireworks-code-interpreter-python/llama_3.1_code_interpreter.ipynb">Python</a></td>
       <td>-</td>
     </tr>
     <tr>

@@ -5,7 +5,7 @@ import { OpenAI } from 'openai';
 async function runGroqExaExample() {
   console.log('Creating E2B sandbox with Exa MCP server...');
   
-  // Create E2B sandbox with Exa MCP server
+  // Create E2B sandbox with Exa MCP server - the fastest and most accurate web search API for AI
   const sandbox = await Sandbox.create({
     mcp: {
       exa: {

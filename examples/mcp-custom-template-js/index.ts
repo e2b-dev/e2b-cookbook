@@ -66,10 +66,6 @@ async function runSandboxExample() {
 
   console.log(`\nTotal tools available: ${tools.tools.length}`);
 
-  // Cleanup
-  console.log('\nCleaning up sandbox...');
-  await sandbox.kill();
-  console.log('Sandbox closed successfully');
 }
 
 runSandboxExample().catch((error) => {

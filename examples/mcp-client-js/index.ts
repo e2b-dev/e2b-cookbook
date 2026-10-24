@@ -58,10 +58,6 @@ async function run() {
 
   console.log(`\nTotal tools available: ${tools.tools.length}`);
 
-  // Cleanup
-  console.log('\nCleaning up sandbox...');
-  await sandbox.kill();
-  console.log('Sandbox closed successfully');
 }
 
 // Run the example

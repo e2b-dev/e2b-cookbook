@@ -1,0 +1,16 @@
+{
+  "name": "gemini-cli-in-sandbox",
+  "version": "1.0.0",
+  "description": "Run Gemini CLI headless in an E2B sandbox to fix a failing test",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "e2b": "^2.62.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.21.0"
+  }
+}

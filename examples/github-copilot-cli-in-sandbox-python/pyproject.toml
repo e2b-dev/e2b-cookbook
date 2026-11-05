@@ -1,0 +1,10 @@
+[project]
+name = "github-copilot-cli-in-sandbox-python"
+version = "0.1.0"
+description = "Run GitHub Copilot CLI headless in an E2B sandbox to fix a failing test"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "e2b>=2.62.0,<3",
+    "python-dotenv",
+]

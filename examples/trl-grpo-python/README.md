@@ -222,11 +222,11 @@ A cancelled host coroutine does not prove the remote process stopped. Cancellati
 
 | Limit | Hobby | Pro baseline |
 | --- | --- | --- |
-| Concurrent sandboxes | `20` | `100`, with add-ons for more. |
+| Concurrent sandboxes | `10` | `100`, expandable to `1,100` with concurrency add-ons. |
 | Sandbox creations per second | `1` | `5` |
 | Maximum continuous sandbox runtime | `1 hour` | `24 hours` |
 
-Creation rate and concurrency are separate limits: launching 20 workers on Hobby requires pacing even though they may run together. Limits are shared across your project, so reserve capacity for other workloads. For a Pro workload you can increase `--sandbox-workers` and use `--create-interval 0.2`, subject to that shared capacity. A 100-worker pool can take at least about 20 seconds to create at five creations/second, plus initialization; this example creates workers serially, so actual startup can be longer. This is configuration guidance, not a validated 100-worker benchmark. The SDK also handles HTTP 429 with `Retry-After`.
+Creation rate and concurrency are separate limits: launching 10 workers on Hobby requires pacing even though they may run together. Limits are shared across your project, so reserve capacity for other workloads. For a Pro workload you can increase `--sandbox-workers` and use `--create-interval 0.2`, subject to that shared capacity. A 100-worker pool can take at least about 20 seconds to create at five creations/second, plus initialization; this example creates workers serially, so actual startup can be longer. This is configuration guidance, not a validated 100-worker benchmark. The SDK also handles HTTP 429 with `Retry-After`.
 
 ### Measure your reward stage
 

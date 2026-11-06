@@ -9,7 +9,7 @@ See the [Sandcastle guide](https://e2b.dev/docs/agents/sandcastle) for authentic
 ## Prerequisites
 
 - Node.js 22.19 or newer, and `git`
-- `E2B_API_KEY` from the [E2B dashboard](https://e2b.dev/dashboard?tab=keys)
+- `E2B_API_KEY` from the [E2B dashboard](https://console.e2b.dev/?tab=keys)
 - `ANTHROPIC_API_KEY` for Claude Code
 
 ## Run
@@ -27,16 +27,18 @@ The agents use `claude-sonnet-5-5`. Set `CLAUDE_MODEL` in `.env` to use another 
 ```
 Demo repo: /tmp/sandcastle-demo-mHMbjg
 [agent/fix-slugify] Started on branch agent/fix-slugify
+  tail -f /tmp/sandcastle-demo-mHMbjg/.sandcastle/logs/agent-fix-slugify-agent-fix-slugify.log
 [agent/add-median] Started on branch agent/add-median
+  tail -f /tmp/sandcastle-demo-mHMbjg/.sandcastle/logs/agent-add-median-agent-add-median.log
 
 agent/fix-slugify: 1 commit(s)
 a2c53a6 Lowercase slugify output
- src/slugify.js | 1 +
+src/slugify.js | 1 +
  1 file changed, 1 insertion(+)
 
 agent/add-median: 1 commit(s)
 a362adc Implement median() in stats
- src/stats.js | 4 +++-
+src/stats.js | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 All tests pass on main after merging both branches.

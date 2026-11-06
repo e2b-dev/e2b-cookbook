@@ -1,0 +1,12 @@
+[project]
+name = "openhands-in-sandbox-python"
+version = "0.1.0"
+description = "Run an OpenHands agent in an E2B sandbox to fix a failing test"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "e2b>=2.62.0,<3",
+    "openhands-sdk>=1.59.0",
+    "openhands-tools>=1.59.0",
+    "python-dotenv",
+]

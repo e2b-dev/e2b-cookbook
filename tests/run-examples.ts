@@ -73,6 +73,9 @@ const scripts: {
   { name: 'openai-computer-use-python', interpreter: 'uv', file: './examples/openai-computer-use-python/', entrypoint: '1-run.py' },
   { name: 'openai-computer-use-js', interpreter: 'npm', file: './examples/openai-computer-use-js/', nodeVersion: '22.22.0' },
   { name: 'playwright-in-e2b', interpreter: 'npm', file: './examples/playwright-in-e2b/' },
+  // The runner holds only OPENAI_API_KEY, which these use when LLM_API_KEY is not set. e2b 2.62 requires Node 22.19 or newer.
+  { name: 'openhands-in-sandbox-js', interpreter: 'npm', file: './examples/openhands-in-sandbox-js/', nodeVersion: '22.22.0' },
+  { name: 'openhands-in-sandbox-python', interpreter: 'uv', file: './examples/openhands-in-sandbox-python/' },
   { name: 'anthropic-claude-code-in-sandbox-js', interpreter: 'npm', file: './examples/anthropic-claude-code-in-sandbox-js/' },
   { name: 'anthropic-claude-code-in-sandbox-python', interpreter: 'uv', file: './examples/anthropic-claude-code-in-sandbox-python/', entrypoint: 'python -m anthropic_claude_code_in_sandbox.main' },
   { name: 'mcp-custom-template-js', interpreter: 'npm', file: './examples/mcp-custom-template-js/' },
@@ -204,6 +207,9 @@ const TIMEOUT_OVERRIDES: Record<string, number> = {
   'openai-codex-in-sandbox-js': 600_000,
   'openai-codex-in-sandbox-python': 600_000,
   'playwright-in-e2b': 300_000,
+  // Start the OpenHands Agent Server in the sandbox, then hand the agent a task.
+  'openhands-in-sandbox-js': 300_000,
+  'openhands-in-sandbox-python': 300_000,
   // Same shape: Claude Code doing multi-step research over two MCP servers
   // (arxiv, duckduckgo) before it writes the page. It fit the shared budget
   // only by accident - 112s of 150s on its last green run - so one slow arxiv

@@ -198,6 +198,12 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td>-</td>
     </tr>
     <tr>
+      <td>OpenHands</td>
+      <td>OpenHands agent fixing a failing test inside an E2B sandbox</td>
+      <td><a href="./examples/openhands-in-sandbox-python">Python</a></td>
+      <td><a href="./examples/openhands-in-sandbox-js">TypeScript</a></td>
+    </tr>
+    <tr>
       <td>Pydantic AI</td>
       <td>Pause and resume a coding agent in the same E2B sandbox</td>
       <td><a href="./examples/pydantic-ai-python">Python</a></td>

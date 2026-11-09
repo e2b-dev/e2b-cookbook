@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "e2b-tempo"
+version = "0.1.0"
+description = "E2B sandbox with autonomous Tempo payments via MPP"
+authors = ["Max Hager"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+e2b = "^2.20.0"
+pympp = "^0.6.0"
+python-dotenv = "^1.0.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+start = "e2b_tempo.main:main"

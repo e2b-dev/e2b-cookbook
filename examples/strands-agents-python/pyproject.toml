@@ -1,0 +1,10 @@
+[project]
+name = "strands-agents-python"
+version = "0.1.0"
+description = "A Strands Agents data analyst whose Python, shell, and file tools run in an E2B sandbox"
+requires-python = ">=3.11"
+dependencies = [
+    "strands-e2b>=0.1.0",
+    "strands-agents[anthropic]>=1.64.0",
+    "python-dotenv>=1.1.0",
+]

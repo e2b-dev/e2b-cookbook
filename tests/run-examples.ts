@@ -68,6 +68,7 @@ const scripts: {
   // @e2b/pi and Pi's SDK require Node 22.19 or newer.
   { name: 'pi-e2b-extension-js', interpreter: 'npm', file: './examples/pi-e2b-extension-js/', nodeVersion: '22.22.0' },
   { name: 'crewai-python', interpreter: 'uv', file: './examples/crewai-python/' },
+  { name: 'strands-agents-python', interpreter: 'uv', file: './examples/strands-agents-python/' },
   // The hello world only: 2-orangehrm takes about five minutes against the shared public OrangeHRM demo.
   // openai 7.33 (the first release with openai/helpers/computer) requires Node 22.
   { name: 'openai-computer-use-python', interpreter: 'uv', file: './examples/openai-computer-use-python/', entrypoint: '1-run.py' },

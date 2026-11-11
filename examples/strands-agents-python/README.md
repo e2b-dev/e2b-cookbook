@@ -50,6 +50,6 @@ Verified summary.json {'north': '2026-05', 'south': '2026-04', 'west': '2026-06'
 
 - **You own the sandbox.** The script creates it and kills it in `finally`. Neither Strands nor `strands-e2b` creates, extends, or kills it.
 - **Files persist, processes don't.** Each `sandbox_python_repl` call starts a fresh `python3`, so variables don't carry over between calls. Agents sometimes notice this mid-run and rerun their whole script; save intermediate results to files.
-- **Timeouts stop the code.** When a tool call times out or is cancelled, its process group in the sandbox is killed, including the `python3` it started.
+- **Timeouts kill the process group.** When a tool call times out or is cancelled, its process group in the sandbox is killed, including the `python3` it started. A process that starts its own session, such as a daemon, is not reached.
 
 See the [`strands-e2b` README](https://github.com/e2b-dev/strands-e2b#readme) for all options and behavior.

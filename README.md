@@ -204,15 +204,15 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td>-</td>
     </tr>
     <tr>
-      <td>Strands Agents</td>
-      <td>Data analyst agent whose Python, shell, and file tools run in E2B</td>
-      <td><a href="./examples/strands-agents-python">Python</a></td>
-      <td>-</td>
-    </tr>
-    <tr>
       <td>Pydantic AI + Temporal</td>
       <td>Recover a crashed worker with the same sandbox ID and preserved project files</td>
       <td><a href="./examples/pydantic-ai-temporal-python">Python</a></td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>Strands Agents</td>
+      <td>Data analyst agent whose Python, shell, and file tools run in E2B</td>
+      <td><a href="./examples/strands-agents-python">Python</a></td>
       <td>-</td>
     </tr>
     <tr>

@@ -1,0 +1,20 @@
+{
+  "name": "sandcastle-parallel-agents",
+  "version": "1.0.0",
+  "description": "Run two Claude Code agents in parallel with Sandcastle, each in its own E2B sandbox and on its own branch",
+  "type": "module",
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "scripts": {
+    "start": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@ai-hero/sandcastle": "^0.14.0",
+    "dotenv": "^17.4.2",
+    "e2b": "^2.63.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.21.0"
+  }
+}

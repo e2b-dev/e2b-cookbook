@@ -67,12 +67,19 @@ const scripts: {
   { name: 'custom-sandbox-domain-proxy', interpreter: 'npm', file: './examples/custom-sandbox-domain-proxy/', nodeVersion: '22.22.0' },
   // @e2b/pi and Pi's SDK require Node 22.19 or newer.
   { name: 'pi-e2b-extension-js', interpreter: 'npm', file: './examples/pi-e2b-extension-js/', nodeVersion: '22.22.0' },
+  // The e2b SDK that Sandcastle's E2B provider needs requires Node 22.19 or newer.
+  { name: 'sandcastle-parallel-agents-js', interpreter: 'npm', file: './examples/sandcastle-parallel-agents-js/', nodeVersion: '22.22.0' },
   { name: 'crewai-python', interpreter: 'uv', file: './examples/crewai-python/' },
   // The hello world only: 2-orangehrm takes about five minutes against the shared public OrangeHRM demo.
   // openai 7.33 (the first release with openai/helpers/computer) requires Node 22.
   { name: 'openai-computer-use-python', interpreter: 'uv', file: './examples/openai-computer-use-python/', entrypoint: '1-run.py' },
   { name: 'openai-computer-use-js', interpreter: 'npm', file: './examples/openai-computer-use-js/', nodeVersion: '22.22.0' },
+  { name: 'acp-agents-js', interpreter: 'npm', file: './examples/acp-agents-js/', nodeVersion: '22.22.0' },
+  { name: 'acp-agents-python', interpreter: 'uv', file: './examples/acp-agents-python/' },
   { name: 'playwright-in-e2b', interpreter: 'npm', file: './examples/playwright-in-e2b/' },
+  // The runner holds only OPENAI_API_KEY, which these use when LLM_API_KEY is not set. e2b 2.62 requires Node 22.19 or newer.
+  { name: 'openhands-in-sandbox-js', interpreter: 'npm', file: './examples/openhands-in-sandbox-js/', nodeVersion: '22.22.0' },
+  { name: 'openhands-in-sandbox-python', interpreter: 'uv', file: './examples/openhands-in-sandbox-python/' },
   // The runner holds no Copilot token, so these run Copilot CLI with OPENAI_API_KEY through its custom provider mode.
   // e2b 2.62 requires Node 22.19 or newer.
   { name: 'github-copilot-cli-in-sandbox-js', interpreter: 'npm', file: './examples/github-copilot-cli-in-sandbox-js/', nodeVersion: '22.22.0' },
@@ -208,11 +215,17 @@ const TIMEOUT_OVERRIDES: Record<string, number> = {
   'openai-codex-in-sandbox-js': 600_000,
   'openai-codex-in-sandbox-python': 600_000,
   'playwright-in-e2b': 300_000,
+  // Start the OpenHands Agent Server in the sandbox, then hand the agent a task.
+  'openhands-in-sandbox-js': 300_000,
+  'openhands-in-sandbox-python': 300_000,
   // Same shape: Claude Code doing multi-step research over two MCP servers
   // (arxiv, duckduckgo) before it writes the page. It fit the shared budget
   // only by accident - 112s of 150s on its last green run - so one slow arxiv
   // search was always going to end it, and one did.
   'mcp-claude-code-js': 600_000,
+  // Two Claude Code agents, each in its own nested sandbox, then a sync back
+  // and a merge on the runner.
+  'sandcastle-parallel-agents-js': 600_000,
   // Installs its toolchain, then creates two more sandboxes and moves 10 MiB
   // through Tailcat's rate-limited public DERP relay. The demo alone is ~30s;
   // with the install it does not reliably fit the shared budget.

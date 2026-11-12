@@ -15,4 +15,6 @@ package = false
 # Skip package versions published in the last 7 days (supply-chain guard).
 exclude-newer = "7 days"
 # openai 3.31.0 (2026-10-14) is newer than the guard and is the release the helper ships in.
-exclude-newer-package = { openai = false }
+# certifi gets a shorter rolling window so CA-distrust releases land sooner; 2026.10.19 drops the
+# compromised emSign roots (https://github.com/certifi/python-certifi/pull/437).
+exclude-newer-package = { openai = false, certifi = "3 days" }

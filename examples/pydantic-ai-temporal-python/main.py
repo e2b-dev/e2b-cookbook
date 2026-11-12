@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+import os
 import sys
 import uuid
 from datetime import timedelta
@@ -65,13 +66,15 @@ async def wait_checkpoint(handle, worker) -> dict:
 
 async def main() -> None:
     configure()
+    # Optional: serve the Temporal Web UI on this port to watch the workflow live.
+    ui_port = int(os.environ.get("TEMPORAL_UI_PORT") or 0)
     baseline = await sandbox_ids()
     backend = E2BSandboxBackend(
         working_dir=WORKDIR, env=ENV, sandbox_timeout=600, allow_internet_access=False
     )
     worker = None
     try:
-        async with asyncio.timeout(300):
+        async with asyncio.timeout(300) as deadline:
             workspace = Workspace(backend)
             await seed(workspace)
             ref = backend.ref
@@ -80,8 +83,12 @@ async def main() -> None:
             # The application owns the sandbox; its credential-free ref is durable workflow input.
             with TemporaryDirectory(prefix="pydantic-temporal-") as directory:
                 async with await WorkflowEnvironment.start_local(
+                    ui=bool(ui_port),
+                    ui_port=ui_port or None,
                     plugins=[PydanticAIPlugin()],
                     dev_server_database_filename=str(Path(directory) / "temporal.db"),
+                    # Warn-level server logs (slow queries, history paging) interleave with the demo output.
+                    dev_server_log_level="error",
                 ) as server:
                     queue = f"log-cli-{uuid.uuid4()}"
                     worker = await start_worker(
@@ -134,6 +141,16 @@ async def main() -> None:
                         "Exactly one sandbox; original workflow completed after worker restart",
                         flush=True,
                     )
+                    if ui_port:
+                        # The server stops with this block; keep the finished workflow viewable.
+                        # The viewing pause must not use up the demo's 300-second deadline.
+                        deadline.reschedule(deadline.when() + 30)
+                        print(
+                            f"Temporal UI stays up for 30s: http://localhost:{ui_port}"
+                            f"/namespaces/default/workflows/{queue}",
+                            flush=True,
+                        )
+                        await asyncio.sleep(30)
                     await stop_worker(worker)
                     worker = None
     finally:

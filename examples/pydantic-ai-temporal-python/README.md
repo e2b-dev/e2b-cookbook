@@ -21,6 +21,8 @@ uv run python main.py
 
 The Temporal Python SDK starts a local development server and downloads its server binary on the first run. No Docker, Temporal Cloud account, or global CLI installation is required. The demo owns this server and its temporary SQLite database and removes them on exit. It uses an ephemeral local server address and a unique task queue/workflow ID for each run.
 
+To watch the workflow in the Temporal Web UI, set `TEMPORAL_UI_PORT=8233` in `.env` and open http://localhost:8233 while it runs. The workflow's input is the sandbox ref, and the timeline shows each model request, sandbox call and the `continue_fix` signal. With the UI enabled, the server stays up for 30 seconds after the workflow completes.
+
 Model calls are billable. Each of the two agent runs has an eight-request and $0.10 estimated-cost limit, with 1,536 output tokens per model request. Estimated-cost limits depend on provider usage/pricing and can be exceeded by the final request; they are not account spending caps. SDK model retries are disabled; Temporal activity retries are limited to two attempts. The application has a 300-second deadline and bounded command/activity timeouts.
 
 ## Crash and recovery sequence

@@ -87,7 +87,7 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td><a href="./examples/openai-computer-use-js">TypeScript</a></td>
     </tr>
     <tr>
-      <td rowspan="4">Anthropic</td>
+      <td rowspan="5">Anthropic</td>
       <td>Claude Opus 5</td>
       <td>Code interpreter</td>
       <td><a href="./examples/claude-code-interpreter-python">Python</a></td>
@@ -110,6 +110,12 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td>Copy new hires from Excel into OrangeHRM on an E2B desktop</td>
       <td>-</td>
       <td><a href="./examples/anthropic-computer-use-orangehrm-js">TypeScript</a></td>
+    </tr>
+    <tr>
+      <td>Claude Agent SDK + Box Mount</td>
+      <td>Review a contract from a Box folder mounted in a Sandbox</td>
+      <td>-</td>
+      <td><a href="./examples/box-mount-contract-review-js">TypeScript</a></td>
     </tr>
     <tr>
       <td>Meta</td>
@@ -373,6 +379,8 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
 - How to run a Docker container in E2B - [Python/TypeScript](./examples/docker-in-e2b)
 - Tailcat: encrypted links between sandboxes, and between a sandbox and your laptop - [Python/TypeScript](./examples/tailcat-e2b)
 - How to run Playwright in E2B - [TypeScript](./examples/playwright-in-e2b)
+- Test an app running in a sandbox with a Notte cloud browser, from Playwright over CDP and from the Notte CLI inside the sandbox - [Python](./examples/notte-browser-python)
+- Anchor cloud browser: run code in an E2B sandbox and drive Chromium in Anchor Cloud - [TypeScript](./examples/anchor-cloud-browser-js)
 - Map custom subdomains to your sandboxes - [TypeScript](./examples/custom-sandbox-domain-proxy)
 - Delete old paused sandboxes by age and metadata - [Python/Shell](./examples/cleanup-paused-sandboxes)
 - Feedback analyst agent on Flue, publishing an HTML report from a sandbox - [TypeScript](./examples/flue-feedback-analyst-js)

@@ -1,0 +1,9 @@
+{
+  "name": "anchor-in-e2b",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "anchorbrowser": "^1.0.0",
+    "tsx": "^4.19.2"
+  }
+}

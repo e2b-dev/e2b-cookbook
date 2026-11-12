@@ -94,6 +94,13 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td><a href="./examples/gemini-cli-in-sandbox-js">TypeScript</a></td>
     </tr>
     <tr>
+      <td>GitHub</td>
+      <td>Copilot CLI</td>
+      <td>GitHub Copilot CLI fixing a failing test inside a Sandbox</td>
+      <td><a href="./examples/github-copilot-cli-in-sandbox-python">Python</a></td>
+      <td><a href="./examples/github-copilot-cli-in-sandbox-js">TypeScript</a></td>
+    </tr>
+    <tr>
       <td rowspan="5">Anthropic</td>
       <td>Claude Opus 5</td>
       <td>Code interpreter</td>

@@ -80,6 +80,10 @@ const scripts: {
   // The runner holds only OPENAI_API_KEY, which these use when LLM_API_KEY is not set. e2b 2.62 requires Node 22.19 or newer.
   { name: 'openhands-in-sandbox-js', interpreter: 'npm', file: './examples/openhands-in-sandbox-js/', nodeVersion: '22.22.0' },
   { name: 'openhands-in-sandbox-python', interpreter: 'uv', file: './examples/openhands-in-sandbox-python/' },
+  // The runner holds no Copilot token, so these run Copilot CLI with OPENAI_API_KEY through its custom provider mode.
+  // e2b 2.62 requires Node 22.19 or newer.
+  { name: 'github-copilot-cli-in-sandbox-js', interpreter: 'npm', file: './examples/github-copilot-cli-in-sandbox-js/', nodeVersion: '22.22.0' },
+  { name: 'github-copilot-cli-in-sandbox-python', interpreter: 'uv', file: './examples/github-copilot-cli-in-sandbox-python/' },
   { name: 'anthropic-claude-code-in-sandbox-js', interpreter: 'npm', file: './examples/anthropic-claude-code-in-sandbox-js/' },
   { name: 'anthropic-claude-code-in-sandbox-python', interpreter: 'uv', file: './examples/anthropic-claude-code-in-sandbox-python/', entrypoint: 'python -m anthropic_claude_code_in_sandbox.main' },
   { name: 'mcp-custom-template-js', interpreter: 'npm', file: './examples/mcp-custom-template-js/' },

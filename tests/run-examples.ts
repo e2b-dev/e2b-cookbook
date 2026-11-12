@@ -74,6 +74,8 @@ const scripts: {
   // openai 7.33 (the first release with openai/helpers/computer) requires Node 22.
   { name: 'openai-computer-use-python', interpreter: 'uv', file: './examples/openai-computer-use-python/', entrypoint: '1-run.py' },
   { name: 'openai-computer-use-js', interpreter: 'npm', file: './examples/openai-computer-use-js/', nodeVersion: '22.22.0' },
+  { name: 'acp-agents-js', interpreter: 'npm', file: './examples/acp-agents-js/', nodeVersion: '22.22.0' },
+  { name: 'acp-agents-python', interpreter: 'uv', file: './examples/acp-agents-python/' },
   { name: 'playwright-in-e2b', interpreter: 'npm', file: './examples/playwright-in-e2b/' },
   // The runner holds only OPENAI_API_KEY, which these use when LLM_API_KEY is not set. e2b 2.62 requires Node 22.19 or newer.
   { name: 'openhands-in-sandbox-js', interpreter: 'npm', file: './examples/openhands-in-sandbox-js/', nodeVersion: '22.22.0' },

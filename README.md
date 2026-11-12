@@ -258,6 +258,12 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/flue-feedback-analyst-js">TypeScript</a></td>
     </tr>
     <tr>
+    <td><a href="https://github.com/mattpocock/sandcastle">Sandcastle</a></td>
+      <td>Two Claude Code agents in parallel, each in its own E2B sandbox, with their commits coming back to branches in a local repository</td>
+      <td>-</td>
+      <td><a href="./examples/sandcastle-parallel-agents-js">TypeScript</a></td>
+    </tr>
+    <tr>
     <td><a href="https://github.com/earendil-works/pi">Pi</a></td>
       <td>Pi builds its own E2B code-interpreter extension in a sandbox, then uses it to analyze data</td>
       <td>-</td>

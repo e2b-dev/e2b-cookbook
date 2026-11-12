@@ -67,6 +67,8 @@ const scripts: {
   { name: 'custom-sandbox-domain-proxy', interpreter: 'npm', file: './examples/custom-sandbox-domain-proxy/', nodeVersion: '22.22.0' },
   // @e2b/pi and Pi's SDK require Node 22.19 or newer.
   { name: 'pi-e2b-extension-js', interpreter: 'npm', file: './examples/pi-e2b-extension-js/', nodeVersion: '22.22.0' },
+  // The e2b SDK that Sandcastle's E2B provider needs requires Node 22.19 or newer.
+  { name: 'sandcastle-parallel-agents-js', interpreter: 'npm', file: './examples/sandcastle-parallel-agents-js/', nodeVersion: '22.22.0' },
   { name: 'crewai-python', interpreter: 'uv', file: './examples/crewai-python/' },
   // The hello world only: 2-orangehrm takes about five minutes against the shared public OrangeHRM demo.
   // openai 7.33 (the first release with openai/helpers/computer) requires Node 22.
@@ -215,6 +217,9 @@ const TIMEOUT_OVERRIDES: Record<string, number> = {
   // only by accident - 112s of 150s on its last green run - so one slow arxiv
   // search was always going to end it, and one did.
   'mcp-claude-code-js': 600_000,
+  // Two Claude Code agents, each in its own nested sandbox, then a sync back
+  // and a merge on the runner.
+  'sandcastle-parallel-agents-js': 600_000,
   // Installs its toolchain, then creates two more sandboxes and moves 10 MiB
   // through Tailcat's rate-limited public DERP relay. The demo alone is ~30s;
   // with the install it does not reliably fit the shared budget.

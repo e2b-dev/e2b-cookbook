@@ -1,0 +1,19 @@
+{
+  "name": "hatchet-sandbox-e2b",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Durable Hatchet task running commands in an E2B sandbox",
+  "scripts": {
+    "start": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@hatchet-dev/sandbox": "^0.1.5",
+    "@hatchet-dev/typescript-sdk": "^1.47.0",
+    "dotenv": "^17.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}

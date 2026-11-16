@@ -344,6 +344,12 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td><a href="./examples/crabbox-e2b-python">Python</a></td>
       <td>-</td>
     </tr>
+    <tr>
+      <td><a href="https://hatchet.run">Hatchet</a></td>
+      <td>Hatchet durable task that creates an E2B sandbox, runs code, kills it and reconnects to its snapshot</td>
+      <td>-</td>
+      <td><a href="./examples/hatchet-sandbox-e2b-js">TypeScript</a></td>
+    </tr>
   </tbody>
 </table>
 

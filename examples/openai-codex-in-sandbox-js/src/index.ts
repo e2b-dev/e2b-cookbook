@@ -3,10 +3,12 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
-const templateName = 'openai-codex'
+// The prebuilt "codex" template ships a current Codex CLI.
+const templateName = 'codex'
 const sbx = await Sandbox.create(templateName, {
   envs: {
-    OPENAI_API_KEY: process.env.OPENAI_API_KEY ?? '',
+    // Codex reads an OpenAI API key from CODEX_API_KEY.
+    CODEX_API_KEY: process.env.CODEX_API_KEY || process.env.OPENAI_API_KEY || '',
   },
 })
 

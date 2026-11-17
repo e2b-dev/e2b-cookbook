@@ -5,11 +5,13 @@ from e2b import Sandbox
 
 load_dotenv()
 
-template_name = 'openai-codex'
+# The prebuilt "codex" template ships a current Codex CLI.
+template_name = 'codex'
 sbx = Sandbox.create(
     template_name,
     envs={
-        "OPENAI_API_KEY": os.getenv("OPENAI_API_KEY"),
+        # Codex reads an OpenAI API key from CODEX_API_KEY.
+        "CODEX_API_KEY": os.getenv("CODEX_API_KEY") or os.getenv("OPENAI_API_KEY"),
     },
 )
 print("Sandbox created", sbx.sandbox_id)

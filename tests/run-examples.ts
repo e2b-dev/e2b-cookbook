@@ -86,6 +86,8 @@ const scripts: {
   { name: 'github-copilot-cli-in-sandbox-python', interpreter: 'uv', file: './examples/github-copilot-cli-in-sandbox-python/' },
   { name: 'anthropic-claude-code-in-sandbox-js', interpreter: 'npm', file: './examples/anthropic-claude-code-in-sandbox-js/' },
   { name: 'anthropic-claude-code-in-sandbox-python', interpreter: 'uv', file: './examples/anthropic-claude-code-in-sandbox-python/', entrypoint: 'python -m anthropic_claude_code_in_sandbox.main' },
+  { name: 'openai-codex-in-sandbox-js', interpreter: 'npm', file: './examples/openai-codex-in-sandbox-js/' },
+  { name: 'openai-codex-in-sandbox-python', interpreter: 'uv', file: './examples/openai-codex-in-sandbox-python/', entrypoint: 'src/openai_codex_in_sandbox_python/main.py' },
   { name: 'mcp-custom-template-js', interpreter: 'npm', file: './examples/mcp-custom-template-js/' },
   { name: 'docker-in-e2b-js', interpreter: 'npm', file: './examples/docker-in-e2b/js/' },
   { name: 'docker-in-e2b-python', interpreter: 'poetry', file: './examples/docker-in-e2b/python/', entrypoint: 'python main.py' },
@@ -117,15 +119,6 @@ const scripts: {
 // sys.path.insert(...parents[4]) and imports examples.sandbox.misc.example_support,
 // so it expects to run inside the openai-agents-python repo, not here:
 //   openai-agents-sdk (11 standalone scripts, no manifest)
-// The Codex CLI the template installs (v0.147.0) no longer authenticates from
-// OPENAI_API_KEY in the environment: it reports "Missing bearer or basic
-// authentication in header" against wss://api.openai.com/v1/responses, i.e. no
-// auth header is sent at all, so it now expects `codex login` or an explicit
-// credential rather than an env var. The examples still pass the key as an env,
-// which was correct for older Codex. Fixing this needs someone who can iterate
-// against the current CLI - either pin Codex in the template or wire its current
-// auth - so it is not guessed at here:
-//   openai-codex-in-sandbox-js, openai-codex-in-sandbox-python
 // Dropped to fit the Groq quota, NOT because they are broken - both pass when the
 // day's budget allows, and they should be restored if the tier is raised. The org
 // is capped at 100k tokens per day and four Groq examples several calls each do not
@@ -249,10 +242,8 @@ const TIMEOUT_OVERRIDES: Record<string, number> = {
 // template that no example actually creates a sandbox from.
 //
 // Two aliases are shared, which is why builds are keyed by alias rather than by
-// example: anthropic-claude-code is built by both the js and python siblings,
-// e2b-with-docker by both docker-in-e2b subprojects, and
-// openai-codex-in-sandbox-js has no build script at all - it relies on the
-// python sibling's. Building per example would race two builds of one alias.
+// example: e2b-with-docker is built by both docker-in-e2b subprojects, and tailcat
+// by both tailcat-e2b ones. Building per example would race two builds of one alias.
 type TemplateBuild = {
   alias: string
   dir: string
@@ -263,10 +254,6 @@ type TemplateBuild = {
 // example name -> template alias it creates a sandbox from
 const TEMPLATE_USED_BY: Record<string, string> = {
   'playwright-in-e2b': 'playwright-chromium',
-  'anthropic-claude-code-in-sandbox-js': 'anthropic-claude-code',
-  'anthropic-claude-code-in-sandbox-python': 'anthropic-claude-code',
-  'openai-codex-in-sandbox-js': 'openai-codex',
-  'openai-codex-in-sandbox-python': 'openai-codex',
   'mcp-custom-template-js': 'browserbase-mcp-gateway',
   'docker-in-e2b-js': 'e2b-with-docker',
   'docker-in-e2b-python': 'e2b-with-docker',
@@ -276,11 +263,9 @@ const TEMPLATE_USED_BY: Record<string, string> = {
 
 const TEMPLATE_BUILDS: TemplateBuild[] = [
   { alias: 'playwright-chromium', dir: './examples/playwright-in-e2b/', interpreter: 'npm', build: 'npm run e2b:build:prod' },
-  { alias: 'anthropic-claude-code', dir: './examples/anthropic-claude-code-in-sandbox-js/', interpreter: 'npm', build: 'npm run e2b:build:prod' },
   { alias: 'e2b-with-docker', dir: './examples/docker-in-e2b/js/', interpreter: 'npm', build: 'npm run e2b:build:prod' },
   { alias: 'tailcat', dir: './examples/tailcat-e2b/js/', interpreter: 'npm', build: 'npm run e2b:build' },
   { alias: 'browserbase-mcp-gateway', dir: './examples/mcp-custom-template-js/', interpreter: 'npm', build: 'npm run build' },
-  { alias: 'openai-codex', dir: './examples/openai-codex-in-sandbox-python/', interpreter: 'uv', build: 'uv run build_prod.py' },
 ]
 
 // A template build is minutes, not seconds, and the result persists on the

@@ -8,10 +8,10 @@ We prepared a sandbox template with Codex already installed. You can create a sa
 ```javascript
 const { Sandbox } = require('e2b')
 
-const sbx = await Sandbox.create('openai-codex', {
+const sbx = await Sandbox.create('codex', {
   envs: {
-    // You can get your API key from OpenAI Console.
-    OPENAI_API_KEY: '<your api key>',
+    // Codex reads an OpenAI API key from CODEX_API_KEY.
+    CODEX_API_KEY: '<your api key>',
   },
 })
 
@@ -32,8 +32,7 @@ console.log(result.stdout)
 
 ## How to run example
 
-**1. Create sandbox with Codex**
-** 1. Set up E2B_API_KEY environment variable in `.env` file.**
+**1. Set `E2B_API_KEY` and `CODEX_API_KEY` (an OpenAI API key) in a `.env` file.** `OPENAI_API_KEY` works too.
 
 **2. Install dependencies**
 `npm install`

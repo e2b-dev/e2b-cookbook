@@ -325,6 +325,7 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
 **Reinforcement learning**
 
 - [Code rewards for TRL GRPO with E2B](./examples/trl-grpo-python) — first code rewards without a GPU, then train on JSON-processing tasks with sandboxed Python execution.
+- [Code execution for verl ReTool with E2B](./examples/verl-retool-python) — replay ReTool trajectories through the recipe's E2B tool and reward without a GPU, then switch a training run to E2B with one override.
 
 **Remote execution integrations**
 

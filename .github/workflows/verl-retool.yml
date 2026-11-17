@@ -1,0 +1,30 @@
+name: verl ReTool offline checks
+permissions:
+  contents: read
+on:
+  pull_request:
+    paths:
+      - "examples/verl-retool-python/**"
+      - ".github/workflows/verl-retool.yml"
+  push:
+    branches: [main]
+    paths:
+      - "examples/verl-retool-python/**"
+      - ".github/workflows/verl-retool.yml"
+jobs:
+  offline:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: examples/verl-retool-python
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: examples/verl-retool-python/uv.lock
+      - run: uv sync --locked --python 3.12
+      - run: bash -n get_recipe.sh && ./get_recipe.sh
+      - run: uv run --locked ruff check .
+      - run: uv run --locked ruff format --check .
+      - run: uv run --locked pytest -q

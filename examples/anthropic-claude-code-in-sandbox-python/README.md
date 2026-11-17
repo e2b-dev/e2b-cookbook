@@ -7,13 +7,15 @@ This example shows how to run Anthropic's [Claude Code](https://github.com/anthr
 We prepared a sandbox template with Claude Code already installed. You can create a sandbox with Claude by running the following code:
 
 ```python
+import os
+
 from e2b import Sandbox
 
 sbx = Sandbox.create(
     "claude",
     # You can get your API key from Anthropic Console.
     envs={
-        'ANTHROPIC_API_KEY': '<your api key>',
+        'ANTHROPIC_API_KEY': os.environ['ANTHROPIC_API_KEY'],
     },
     # Timeout set to 5 minutes, you can customize it as needed.
     timeout=60 * 5,

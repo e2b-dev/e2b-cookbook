@@ -6,12 +6,12 @@ This example shows how to run OpenAI's [Codex](https://github.com/openai/codex) 
 We prepared a sandbox template with Codex already installed. You can create a sandbox with Codex by running the following code:
 
 ```javascript
-const { Sandbox } = require('e2b')
+import { Sandbox } from 'e2b'
 
 const sbx = await Sandbox.create('codex', {
   envs: {
     // Codex reads an OpenAI API key from CODEX_API_KEY.
-    CODEX_API_KEY: '<your api key>',
+    CODEX_API_KEY: process.env.CODEX_API_KEY,
   },
 })
 
@@ -26,7 +26,11 @@ const result = await sbx.commands.run(
 )
 
 console.log(result.stdout)
+
+await sbx.kill()
 ```
+
+The snippet uses `import` and top-level `await`, so run it as an ES module (`"type": "module"` in `package.json`, as in this example).
 
 ---
 

@@ -6,13 +6,15 @@ This example shows how to run OpenAI's [Codex](https://github.com/openai/codex) 
 We prepared a sandbox template with Codex already installed. You can create a sandbox with Codex by running the following code:
 
 ```python
+import os
+
 from e2b import Sandbox
 
 sbx = Sandbox.create(
     "codex",
     envs={
         # Codex reads an OpenAI API key from CODEX_API_KEY.
-        "CODEX_API_KEY": "<your api key>",
+        "CODEX_API_KEY": os.environ["CODEX_API_KEY"],
     },
     # Timeout set to 5 minutes, you can customize it as needed.
     timeout=60 * 5,
@@ -29,6 +31,8 @@ result = sbx.commands.run(
     timeout=0,
 )
 print(result.stdout)
+
+sbx.kill()
 ```
 
 ---

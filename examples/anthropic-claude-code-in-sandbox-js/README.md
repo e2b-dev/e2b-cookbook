@@ -22,6 +22,8 @@ const result = await sbx.commands.run(
   { cwd: "/home/user", timeoutMs: 0 } // Claude Code can run for a long time, so we need to set the timeoutMs to 0.
 )
 console.log(result.stdout)
+
+await sbx.kill()
 ```
 
 ---

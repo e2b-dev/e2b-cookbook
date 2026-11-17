@@ -27,6 +27,8 @@ console.log(result.stdout)
 await sbx.kill()
 ```
 
+The snippet uses `import` and top-level `await`, so run it as an ES module (`"type": "module"` in `package.json`, as in this example).
+
 ---
 
 ## How to run example

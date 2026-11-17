@@ -263,8 +263,6 @@ type TemplateBuild = {
 // example name -> template alias it creates a sandbox from
 const TEMPLATE_USED_BY: Record<string, string> = {
   'playwright-in-e2b': 'playwright-chromium',
-  'anthropic-claude-code-in-sandbox-js': 'anthropic-claude-code',
-  'anthropic-claude-code-in-sandbox-python': 'anthropic-claude-code',
   'openai-codex-in-sandbox-js': 'openai-codex',
   'openai-codex-in-sandbox-python': 'openai-codex',
   'mcp-custom-template-js': 'browserbase-mcp-gateway',
@@ -276,7 +274,6 @@ const TEMPLATE_USED_BY: Record<string, string> = {
 
 const TEMPLATE_BUILDS: TemplateBuild[] = [
   { alias: 'playwright-chromium', dir: './examples/playwright-in-e2b/', interpreter: 'npm', build: 'npm run e2b:build:prod' },
-  { alias: 'anthropic-claude-code', dir: './examples/anthropic-claude-code-in-sandbox-js/', interpreter: 'npm', build: 'npm run e2b:build:prod' },
   { alias: 'e2b-with-docker', dir: './examples/docker-in-e2b/js/', interpreter: 'npm', build: 'npm run e2b:build:prod' },
   { alias: 'tailcat', dir: './examples/tailcat-e2b/js/', interpreter: 'npm', build: 'npm run e2b:build' },
   { alias: 'browserbase-mcp-gateway', dir: './examples/mcp-custom-template-js/', interpreter: 'npm', build: 'npm run build' },

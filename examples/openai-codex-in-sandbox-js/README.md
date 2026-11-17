@@ -6,12 +6,13 @@ This example shows how to run OpenAI's [Codex](https://github.com/openai/codex) 
 We prepared a sandbox template with Codex already installed. You can create a sandbox with Codex by running the following code:
 
 ```javascript
+import 'dotenv/config' // loads E2B_API_KEY and CODEX_API_KEY from .env
 import { Sandbox } from 'e2b'
 
 const sbx = await Sandbox.create('codex', {
   envs: {
     // Codex reads an OpenAI API key from CODEX_API_KEY.
-    CODEX_API_KEY: process.env.CODEX_API_KEY,
+    CODEX_API_KEY: process.env.CODEX_API_KEY || process.env.OPENAI_API_KEY,
   },
 })
 

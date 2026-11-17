@@ -8,13 +8,16 @@ We prepared a sandbox template with Codex already installed. You can create a sa
 ```python
 import os
 
+from dotenv import load_dotenv
 from e2b import Sandbox
+
+load_dotenv()  # loads E2B_API_KEY and CODEX_API_KEY from .env
 
 sbx = Sandbox.create(
     "codex",
     envs={
         # Codex reads an OpenAI API key from CODEX_API_KEY.
-        "CODEX_API_KEY": os.environ["CODEX_API_KEY"],
+        "CODEX_API_KEY": os.getenv("CODEX_API_KEY") or os.environ["OPENAI_API_KEY"],
     },
     # Timeout set to 5 minutes, you can customize it as needed.
     timeout=60 * 5,

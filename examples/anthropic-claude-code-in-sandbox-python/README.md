@@ -9,7 +9,10 @@ We prepared a sandbox template with Claude Code already installed. You can creat
 ```python
 import os
 
+from dotenv import load_dotenv
 from e2b import Sandbox
+
+load_dotenv()  # loads E2B_API_KEY and ANTHROPIC_API_KEY from .env
 
 sbx = Sandbox.create(
     "claude",

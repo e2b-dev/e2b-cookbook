@@ -7,6 +7,7 @@ This example shows how to run Anthropic's [Claude Code](https://github.com/anthr
 We prepared a sandbox template with Claude Code already installed. You can create a sandbox with Claude Code by running the following code:
 
 ```javascript
+import 'dotenv/config' // loads E2B_API_KEY and ANTHROPIC_API_KEY from .env
 import { Sandbox } from 'e2b'
 
 const sbx = await Sandbox.create("claude", {

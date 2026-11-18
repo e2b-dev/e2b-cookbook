@@ -18,7 +18,7 @@ The runner leases one sandbox per target for each worker and deletes them when t
 
 ## Prerequisites
 
-- Node.js 22.22.3 or later (or 24.8.0 or later)
+- Node.js 22 (22.22.3 or later) or Node.js 24.8.0 or later
 - An [E2B API key](https://e2b.dev/dashboard)
 
 ## Run the Android tests
@@ -53,7 +53,7 @@ The image tag in `scripts/build-template.ts` must match the Playwright version t
 
 `npm run test:all` runs four tests. With an Anthropic key, all four pass. Without it, the two scripted tests pass and the two agent tests are skipped. A run takes about one minute.
 
-The report, the screenshots, and the agent step cache are in `.e2e/`. The runner can replay a passed agent step from the cache without model calls. It calls the model again when the screen changed or when a step used an action that cannot be replayed, such as the Android swipe tool.
+The report, the screenshots, and the agent step cache are in `.e2e/`. The runner can replay a passed agent step from the cache without model calls. It calls the model again when it cannot replay the cached actions or cannot verify their result. One example is a step that used the Android swipe tool.
 
 ## Where to read the code
 

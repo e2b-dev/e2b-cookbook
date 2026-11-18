@@ -6,29 +6,34 @@ This example shows how to run OpenAI's [Codex](https://github.com/openai/codex) 
 We prepared a sandbox template with Codex already installed. You can create a sandbox with Codex by running the following code:
 
 ```python
+import os
+
+from dotenv import load_dotenv
 from e2b import Sandbox
 
-sbx = Sandbox.create(
+load_dotenv()  # loads E2B_API_KEY and CODEX_API_KEY from .env
+
+# The with block kills the sandbox even when the run fails.
+with Sandbox.create(
     "codex",
     envs={
         # Codex reads an OpenAI API key from CODEX_API_KEY.
-        "CODEX_API_KEY": "<your api key>",
+        "CODEX_API_KEY": os.getenv("CODEX_API_KEY") or os.environ["OPENAI_API_KEY"],
     },
     # Timeout set to 5 minutes, you can customize it as needed.
     timeout=60 * 5,
-)
+) as sbx:
+    # Print help for Codex
+    # result = sbx.commands.run('codex --help', request_timeout=0, timeout=0)
+    # print(result.stdout)
 
-# Print help for Codex
-# result = sbx.commands.run('codex --help', request_timeout=0, timeout=0)
-# print(result.stdout)
-
-# Run a prompt with Codex
-result = sbx.commands.run(
-    "codex exec --skip-git-repo-check --dangerously-bypass-approvals-and-sandbox 'Create a hello world index.html'",
-    # Codex can run for a long time, so we need to set the timeout to 0.
-    timeout=0,
-)
-print(result.stdout)
+    # Run a prompt with Codex
+    result = sbx.commands.run(
+        "codex exec --skip-git-repo-check --dangerously-bypass-approvals-and-sandbox 'Create a hello world index.html'",
+        # Codex can run for a long time, so we need to set the timeout to 0.
+        timeout=0,
+    )
+    print(result.stdout)
 ```
 
 ---

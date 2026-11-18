@@ -6,27 +6,35 @@ This example shows how to run OpenAI's [Codex](https://github.com/openai/codex) 
 We prepared a sandbox template with Codex already installed. You can create a sandbox with Codex by running the following code:
 
 ```javascript
-const { Sandbox } = require('e2b')
+import 'dotenv/config' // loads E2B_API_KEY and CODEX_API_KEY from .env
+import { Sandbox } from 'e2b'
 
 const sbx = await Sandbox.create('codex', {
   envs: {
     // Codex reads an OpenAI API key from CODEX_API_KEY.
-    CODEX_API_KEY: '<your api key>',
+    CODEX_API_KEY: process.env.CODEX_API_KEY || process.env.OPENAI_API_KEY,
   },
 })
 
-// Print help for Codex
-// const result = await sbx.commands.run('codex --help')
-// console.log(result.stdout)
+try {
+  // Print help for Codex
+  // const result = await sbx.commands.run('codex --help')
+  // console.log(result.stdout)
 
-// Run a prompt with Codex
-const result = await sbx.commands.run(
-  `codex exec --skip-git-repo-check --dangerously-bypass-approvals-and-sandbox "Create a hello world index.html"`,
-  { timeoutMs: 0 } // Codex can run for a long time, so we need to set the timeoutMs to 0.
-)
+  // Run a prompt with Codex
+  const result = await sbx.commands.run(
+    `codex exec --skip-git-repo-check --dangerously-bypass-approvals-and-sandbox "Create a hello world index.html"`,
+    { timeoutMs: 0 } // Codex can run for a long time, so we need to set the timeoutMs to 0.
+  )
 
-console.log(result.stdout)
+  console.log(result.stdout)
+} finally {
+  // Kill the sandbox even when the run fails.
+  await sbx.kill()
+}
 ```
+
+The snippet uses `import` and top-level `await`, so run it as an ES module (`"type": "module"` in `package.json`, as in this example).
 
 ---
 

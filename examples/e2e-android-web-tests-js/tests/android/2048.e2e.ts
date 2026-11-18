@@ -31,7 +31,11 @@ describe('2048 on Android', { platforms: ['android'] }, () => {
   test('an agent plays from a goal', async ({ agent, screen }) => {
     test.skip(!process.env.ANTHROPIC_API_KEY, 'set ANTHROPIC_API_KEY to run the agent tests');
 
-    await agent.act('Skip the tutorial, start a new game, and swipe the board until the score is above 0.');
+    // The swipe tool takes screen coordinates, so the goal gives the screen size.
+    await agent.act(
+      'Skip the tutorial, start a new game, and swipe the board until the score is above 0. ' +
+        'The screen is 720 pixels wide and 1280 pixels high. Keep each swipe inside the board.',
+    );
 
     // The agent acts, and a plain assertion checks the result.
     await expect(screen.getByTestId(`${APP_ID}:id/points`)).not.toHaveText('0');

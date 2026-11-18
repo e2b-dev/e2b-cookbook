@@ -31,7 +31,8 @@ The sandbox keeps the project at the **same path as on your machine**, so a sess
 ## Prerequisites
 
 - Node.js 20 or newer.
-- [OpenCode](https://opencode.ai/docs) `1.16.0` or newer on your `PATH` (`opencode --version`).
+- OpenCode 1, `1.16.0` or newer, on your `PATH` (`opencode --version`). Install it with `npm i -g opencode-ai`. The installer on [opencode.ai](https://opencode.ai) installs OpenCode 2, which has no workspace API, so this example does not run on it.
+- The scripts load the plugin from npm as [`@e2b/opencode`](https://www.npmjs.com/package/@e2b/opencode). There is nothing to install by hand.
 - A model provider you are logged into with `opencode auth login` (see step 2).
 - [VHS](https://github.com/charmbracelet/vhs), only if you want to re-render the clip.
 
@@ -78,9 +79,9 @@ npm run demo
 
 ## Notes
 
-- Requires OpenCode `1.16.0`+ started with `OPENCODE_EXPERIMENTAL_WORKSPACES=true` (the scripts set it). The workspace API is experimental and can change.
+- Requires OpenCode 1 (`1.16.0`+) started with `OPENCODE_EXPERIMENTAL_WORKSPACES=true` (the scripts set it). The workspace API is experimental and can change.
 - The first run for a project builds a sandbox template (about one to two minutes). Later workspaces reuse it and connect in about 15 seconds.
-- Warping a brand-new session is reliable. Warping a session with a long history can occasionally lag behind the replay ("Timed out waiting for sync fence") or fail with a sync error ("sequence mismatch"). `npm start` retries the first; for the second, retry the warp or start the session inside the workspace. See the plugin's [known limitations](https://github.com/e2b-dev/opencode-e2b#known-limitations).
+- Warping a brand-new session is reliable. Warping a session that already has messages can fail with "Timed out waiting for sync fence" or with a sync error ("sequence mismatch"). In testing on OpenCode 1.19.5 the last step of `npm start`, which warps such a session, failed this way in about half of the runs, also after its three tries. Run it again, or start the session inside the workspace. See the plugin's [known limitations](https://github.com/e2b-dev/opencode-e2b#known-limitations).
 - `npm start` removes its workspace and sandbox at the end, also when a step fails. A workspace created in the TUI stays until you remove it or until the sandbox has seen no requests for `sandboxTimeoutMs` (1 hour by default), at which point E2B destroys it.
 - When you warp a session out of the sandbox, OpenCode asks whether to move the sandbox's file changes back with it. The diff is what the agent changed there, so **yes** brings the work home.
 

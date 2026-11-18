@@ -1,0 +1,12 @@
+[project]
+name = "acp-agents-python"
+version = "0.1.0"
+description = "Drive ACP coding agents (OpenCode, goose, Claude Code) running inside an E2B sandbox"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "agent-client-protocol>=0.12.1,<0.13",
+    "e2b>=2.56.1",
+    "e2b-acp>=0.1.0",
+    "python-dotenv>=1.1,<2",
+]

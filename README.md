@@ -87,6 +87,20 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td><a href="./examples/openai-computer-use-js">TypeScript</a></td>
     </tr>
     <tr>
+      <td>Google</td>
+      <td>Gemini CLI</td>
+      <td>Gemini CLI fixing a failing test inside a Sandbox</td>
+      <td><a href="./examples/gemini-cli-in-sandbox-python">Python</a></td>
+      <td><a href="./examples/gemini-cli-in-sandbox-js">TypeScript</a></td>
+    </tr>
+    <tr>
+      <td>GitHub</td>
+      <td>Copilot CLI</td>
+      <td>GitHub Copilot CLI fixing a failing test inside a Sandbox</td>
+      <td><a href="./examples/github-copilot-cli-in-sandbox-python">Python</a></td>
+      <td><a href="./examples/github-copilot-cli-in-sandbox-js">TypeScript</a></td>
+    </tr>
+    <tr>
       <td rowspan="5">Anthropic</td>
       <td>Claude Opus 5</td>
       <td>Code interpreter</td>
@@ -198,6 +212,12 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td>-</td>
     </tr>
     <tr>
+      <td>OpenHands</td>
+      <td>OpenHands agent fixing a failing test inside an E2B sandbox</td>
+      <td><a href="./examples/openhands-in-sandbox-python">Python</a></td>
+      <td><a href="./examples/openhands-in-sandbox-js">TypeScript</a></td>
+    </tr>
+    <tr>
       <td>Pydantic AI</td>
       <td>Pause and resume a coding agent in the same E2B sandbox</td>
       <td><a href="./examples/pydantic-ai-python">Python</a></td>
@@ -252,6 +272,12 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/flue-feedback-analyst-js">TypeScript</a></td>
     </tr>
     <tr>
+    <td><a href="https://github.com/mattpocock/sandcastle">Sandcastle</a></td>
+      <td>Two Claude Code agents in parallel, each in its own E2B sandbox, with their commits coming back to branches in a local repository</td>
+      <td>-</td>
+      <td><a href="./examples/sandcastle-parallel-agents-js">TypeScript</a></td>
+    </tr>
+    <tr>
     <td><a href="https://github.com/earendil-works/pi">Pi</a></td>
       <td>Pi builds its own E2B code-interpreter extension in a sandbox, then uses it to analyze data</td>
       <td>-</td>
@@ -268,6 +294,12 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td>AgentKit Coding Agent</td>
       <td>-</td>
       <td><a href="./examples/agentkit-coding-agent">TypeScript</a></td>
+    </tr>
+    <tr>
+    <td><a href="https://agentclientprotocol.com">Agent Client Protocol</a></td>
+      <td>Drive OpenCode, goose or Claude Code inside a Sandbox with an ACP client</td>
+      <td><a href="./examples/acp-agents-python">Python</a></td>
+      <td><a href="./examples/acp-agents-js">TypeScript</a></td>
     </tr>
     <tr>
     <td><a href="https://sandboxagent.dev/docs/sdk-overview">Sandbox Agent SDK</a></td>
@@ -311,6 +343,12 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td>Warm one E2B sandbox, sync local changes, and rerun a test suite on the same lease</td>
       <td><a href="./examples/crabbox-e2b-python">Python</a></td>
       <td>-</td>
+    </tr>
+    <tr>
+      <td><a href="https://hatchet.run">Hatchet</a></td>
+      <td>Hatchet durable task that creates an E2B sandbox, runs code, kills it and reconnects to its snapshot</td>
+      <td>-</td>
+      <td><a href="./examples/hatchet-sandbox-e2b-js">TypeScript</a></td>
     </tr>
     <tr>
       <td><a href="https://github.com/e2e-inc/e2e">e2e</a></td>

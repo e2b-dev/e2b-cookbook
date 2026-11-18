@@ -13,7 +13,8 @@ from e2b import Sandbox
 
 load_dotenv()  # loads E2B_API_KEY and CODEX_API_KEY from .env
 
-sbx = Sandbox.create(
+# The with block kills the sandbox even when the run fails.
+with Sandbox.create(
     "codex",
     envs={
         # Codex reads an OpenAI API key from CODEX_API_KEY.
@@ -21,21 +22,18 @@ sbx = Sandbox.create(
     },
     # Timeout set to 5 minutes, you can customize it as needed.
     timeout=60 * 5,
-)
+) as sbx:
+    # Print help for Codex
+    # result = sbx.commands.run('codex --help', request_timeout=0, timeout=0)
+    # print(result.stdout)
 
-# Print help for Codex
-# result = sbx.commands.run('codex --help', request_timeout=0, timeout=0)
-# print(result.stdout)
-
-# Run a prompt with Codex
-result = sbx.commands.run(
-    "codex exec --skip-git-repo-check --dangerously-bypass-approvals-and-sandbox 'Create a hello world index.html'",
-    # Codex can run for a long time, so we need to set the timeout to 0.
-    timeout=0,
-)
-print(result.stdout)
-
-sbx.kill()
+    # Run a prompt with Codex
+    result = sbx.commands.run(
+        "codex exec --skip-git-repo-check --dangerously-bypass-approvals-and-sandbox 'Create a hello world index.html'",
+        # Codex can run for a long time, so we need to set the timeout to 0.
+        timeout=0,
+    )
+    print(result.stdout)
 ```
 
 ---

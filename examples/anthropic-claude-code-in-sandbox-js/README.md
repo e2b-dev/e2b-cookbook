@@ -17,14 +17,17 @@ const sbx = await Sandbox.create("claude", {
   },
 }) // Timeout set to 5 minutes, you can customize it as needed.
 
-// Run a prompt with Claude Code
-const result = await sbx.commands.run(
-  `echo 'Create a hello world index.html' | claude -p --dangerously-skip-permissions`,
-  { cwd: "/home/user", timeoutMs: 0 } // Claude Code can run for a long time, so we need to set the timeoutMs to 0.
-)
-console.log(result.stdout)
-
-await sbx.kill()
+try {
+  // Run a prompt with Claude Code
+  const result = await sbx.commands.run(
+    `echo 'Create a hello world index.html' | claude -p --dangerously-skip-permissions`,
+    { cwd: "/home/user", timeoutMs: 0 } // Claude Code can run for a long time, so we need to set the timeoutMs to 0.
+  )
+  console.log(result.stdout)
+} finally {
+  // Kill the sandbox even when the run fails.
+  await sbx.kill()
+}
 ```
 
 The snippet uses `import` and top-level `await`, so run it as an ES module (`"type": "module"` in `package.json`, as in this example).

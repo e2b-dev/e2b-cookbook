@@ -12,14 +12,14 @@
  *   5. remove the workspace
  */
 import 'dotenv/config'
-import { spawn, type ChildProcess } from 'node:child_process'
+import { spawn, spawnSync, type ChildProcess } from 'node:child_process'
 import { existsSync, readFileSync, rmSync } from 'node:fs'
 import { mkdtemp, writeFile } from 'node:fs/promises'
 import { homedir, tmpdir } from 'node:os'
 import path from 'node:path'
 
 const PROJECT_DIR = path.resolve(process.env.PROJECT_DIR ?? 'demo-project') // the WIP project to open
-const PLUGIN = process.env.OPENCODE_E2B_PLUGIN ?? 'opencode-e2b-workspace-plugin'
+const PLUGIN = process.env.OPENCODE_E2B_PLUGIN ?? '@e2b/opencode'
 const PORT = 20_000 + Math.floor(Math.random() * 20_000)
 const PROMPT = 'Run `hostname` and `pwd`, then tell me in one sentence where you are running.'
 
@@ -28,6 +28,14 @@ class Fatal extends Error {}
 
 if (!process.env.E2B_API_KEY) {
   console.error('Set E2B_API_KEY (see .env.example)')
+  process.exit(1)
+}
+
+// The workspace API exists only in OpenCode 1. The installer on opencode.ai installs
+// OpenCode 2, where this script would only time out waiting for the server.
+const installed = spawnSync('opencode', ['--version'], { encoding: 'utf8' }).stdout?.match(/(\d+)\.(\d+)\.\d+/)
+if (installed && (installed[1] !== '1' || Number(installed[2]) < 16)) {
+  console.error(`This example needs OpenCode 1, version 1.16.0 or newer (found ${installed[0]}). Install it with: npm i -g opencode-ai`)
   process.exit(1)
 }
 
@@ -54,7 +62,7 @@ const server: ChildProcess = spawn('opencode', ['serve', '--port', String(PORT)]
   stdio: 'ignore',
 })
 server.on('error', (error: NodeJS.ErrnoException) => {
-  if (error.code === 'ENOENT') console.error('`opencode` was not found on PATH. Install OpenCode 1.16+ first: https://opencode.ai/docs')
+  if (error.code === 'ENOENT') console.error('`opencode` was not found on PATH. Install OpenCode 1 (1.16.0 or newer) first: npm i -g opencode-ai')
   else console.error(error)
   process.exit(1)
 })
@@ -64,7 +72,8 @@ process.on('exit', () => {
 })
 
 const base = `http://127.0.0.1:${PORT}`
-await waitFor(() => api('GET', '/global/health'), 'opencode to start')
+// A request that arrives while OpenCode is still starting can hang, so each check gets its own timeout.
+await waitFor(() => api('GET', '/global/health', undefined, {}, 5_000), 'opencode to start')
 step(`OpenCode is up at ${base}`)
 
 // --- pick a model -------------------------------------------------------------------
@@ -107,8 +116,8 @@ try {
   })
   step('Same session, now inside the sandbox:')
   // Moving a session that already has history replays its events into the sandbox.
-  // OpenCode's sync can occasionally lag behind that replay ("Timed out waiting for
-  // sync fence"); it usually settles within a few seconds, so give it a couple of tries.
+  // OpenCode's sync can fail to catch up with that replay ("Timed out waiting for
+  // sync fence"). A few tries cover a short lag; a run that still fails needs a rerun.
   say(await retry(() => prompt(local.id, { workspace: workspace.id }), /sync fence/, 3))
 } finally {
   // --- clean up ---------------------------------------------------------------------
@@ -121,7 +130,7 @@ try {
 
 // --- helpers ------------------------------------------------------------------------
 
-async function api(method: string, route: string, body?: unknown, query: Record<string, string> = {}) {
+async function api(method: string, route: string, body?: unknown, query: Record<string, string> = {}, timeoutMs?: number) {
   const url = new URL(route, base)
   url.searchParams.set('directory', PROJECT_DIR)
   for (const [k, v] of Object.entries(query)) url.searchParams.set(k, v)
@@ -129,6 +138,7 @@ async function api(method: string, route: string, body?: unknown, query: Record<
     method,
     headers: body === undefined ? {} : { 'content-type': 'application/json' },
     body: body === undefined ? undefined : JSON.stringify(body),
+    signal: timeoutMs === undefined ? undefined : AbortSignal.timeout(timeoutMs),
   })
   const text = await res.text()
   if (!res.ok) throw new Error(`${method} ${url.pathname} → ${res.status}: ${text.slice(0, 300)}`)

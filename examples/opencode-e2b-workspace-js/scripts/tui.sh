@@ -9,6 +9,16 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 if [ -f .env ]; then set -a; . ./.env; set +a; fi
 : "${E2B_API_KEY:?Set E2B_API_KEY (see .env.example)}"
+# The workspace API exists only in OpenCode 1. The installer on opencode.ai installs OpenCode 2.
+if ! command -v opencode >/dev/null; then
+  echo '`opencode` was not found on PATH. Install OpenCode 1 (1.16.0 or newer) first: npm i -g opencode-ai' >&2
+  exit 1
+fi
+installed="$(opencode --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1 || true)"
+case "$installed" in
+  "" | 1.1[6-9].* | 1.[2-9][0-9].* | 1.[1-9][0-9][0-9]*.*) ;; # a build that prints no version is let through, as in src/index.ts
+  *) echo "This example needs OpenCode 1, version 1.16.0 or newer (found $installed). Install it with: npm i -g opencode-ai" >&2; exit 1 ;;
+esac
 # The project OpenCode opens. By default: a fresh, standalone copy of the bundled WIP
 # project, initialised as its own git repository — like a real project you would warp.
 # (Warp moves changes between the sandbox and your repo by applying a git patch, so the
@@ -27,7 +37,7 @@ else
   echo "Opening a fresh copy of demo-project at $project" >&2
 fi
 
-plugin="${OPENCODE_E2B_PLUGIN:-opencode-e2b-workspace-plugin}"
+plugin="${OPENCODE_E2B_PLUGIN:-@e2b/opencode}"
 config_dir="$(mktemp -d)"
 {
   echo '{'

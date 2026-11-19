@@ -17,8 +17,6 @@ Install [uv](https://docs.astral.sh/uv/getting-started/installation/) and run:
 uv sync
 ```
 
-`ag2.extensions.e2b` is not in an AG2 release yet (TBA), so `pyproject.toml` installs AG2 from the pull request that adds it.
-
 ### 2. Configure API keys
 
 ```bash
@@ -83,4 +81,4 @@ The sandbox isolates agent-written commands and code from the machine running AG
 - keep the command and sandbox timeouts as short as the task allows;
 - close the environment explicitly, as this example does with `async with`.
 
-See the AG2 E2B extension guide (link: TBA) and the [E2B sandbox lifecycle documentation](https://e2b.dev/docs/sandbox) for more details.
+See the [AG2 E2B extension guide](https://docs.ag2.ai/docs/user-guide/extensions/e2b/) and the [E2B sandbox lifecycle documentation](https://e2b.dev/docs/sandbox) for more details.

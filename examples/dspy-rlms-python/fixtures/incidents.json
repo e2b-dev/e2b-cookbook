@@ -1,0 +1,10 @@
+[
+  {"id":"INC-001","service":"inference","region":"eu","status":"resolved","severity":"high","summary":"Burst traffic exceeded scheduler admission capacity. Requests waited in the queue until new replicas drained the backlog."},
+  {"id":"INC-002","service":"inference","region":"us","status":"resolved","severity":"high","summary":"A model artifact had an incompatible tokenizer version. Loading failed before any requests could enter the scheduler."},
+  {"id":"INC-003","service":"inference","region":"eu","status":"open","severity":"high","summary":"The scheduler queue is growing during a traffic spike. Investigation is still in progress."},
+  {"id":"INC-004","service":"inference","region":"us","status":"resolved","severity":"high","summary":"Long prompts occupied every prefill slot. Pending requests accumulated behind them; admission control reduced the waiting backlog."},
+  {"id":"INC-005","service":"billing","region":"eu","status":"resolved","severity":"high","summary":"Invoice jobs stalled in a queue while the database was unavailable."},
+  {"id":"INC-006","service":"inference","region":"eu","status":"resolved","severity":"high","summary":"Autoscaling reacted too late to batch traffic. Queued requests timed out before GPU workers became available."},
+  {"id":"INC-007","service":"inference","region":"us","status":"resolved","severity":"low","summary":"A short scheduler backlog added latency to a few requests."},
+  {"id":"INC-008","service":"inference","region":"eu","status":"resolved","severity":"low","summary":"A stale dashboard displayed an old queue-length metric; request handling was healthy."}
+]

@@ -1,0 +1,19 @@
+{
+  "name": "anchor-cloud-browser-js",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Run code in an E2B sandbox and drive an Anchor cloud browser over HTTPS and CDP.",
+  "scripts": {
+    "start": "tsx app.ts"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "e2b": "^2.38.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2"
+  }
+}

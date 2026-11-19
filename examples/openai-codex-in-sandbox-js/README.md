@@ -6,34 +6,41 @@ This example shows how to run OpenAI's [Codex](https://github.com/openai/codex) 
 We prepared a sandbox template with Codex already installed. You can create a sandbox with Codex by running the following code:
 
 ```javascript
-const { Sandbox } = require('e2b')
+import 'dotenv/config' // loads E2B_API_KEY and CODEX_API_KEY from .env
+import { Sandbox } from 'e2b'
 
-const sbx = await Sandbox.create('openai-codex', {
+const sbx = await Sandbox.create('codex', {
   envs: {
-    // You can get your API key from OpenAI Console.
-    OPENAI_API_KEY: '<your api key>',
+    // Codex reads an OpenAI API key from CODEX_API_KEY.
+    CODEX_API_KEY: process.env.CODEX_API_KEY || process.env.OPENAI_API_KEY,
   },
 })
 
-// Print help for Codex
-// const result = await sbx.commands.run('codex --help')
-// console.log(result.stdout)
+try {
+  // Print help for Codex
+  // const result = await sbx.commands.run('codex --help')
+  // console.log(result.stdout)
 
-// Run a prompt with Codex
-const result = await sbx.commands.run(
-  `codex exec --skip-git-repo-check --dangerously-bypass-approvals-and-sandbox "Create a hello world index.html"`,
-  { timeoutMs: 0 } // Codex can run for a long time, so we need to set the timeoutMs to 0.
-)
+  // Run a prompt with Codex
+  const result = await sbx.commands.run(
+    `codex exec --skip-git-repo-check --dangerously-bypass-approvals-and-sandbox "Create a hello world index.html"`,
+    { timeoutMs: 0 } // Codex can run for a long time, so we need to set the timeoutMs to 0.
+  )
 
-console.log(result.stdout)
+  console.log(result.stdout)
+} finally {
+  // Kill the sandbox even when the run fails.
+  await sbx.kill()
+}
 ```
+
+The snippet uses `import` and top-level `await`, so run it as an ES module (`"type": "module"` in `package.json`, as in this example).
 
 ---
 
 ## How to run example
 
-**1. Create sandbox with Codex**
-** 1. Set up E2B_API_KEY environment variable in `.env` file.**
+**1. Set `E2B_API_KEY` and `CODEX_API_KEY` (an OpenAI API key) in a `.env` file.** `OPENAI_API_KEY` works too.
 
 **2. Install dependencies**
 `npm install`

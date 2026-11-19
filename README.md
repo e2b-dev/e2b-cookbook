@@ -20,6 +20,10 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
 - [E2B Fragments](https://github.com/e2b-dev/fragments) - prompt different LLMS to generate apps with UI
 - [E2B Surf](https://github.com/e2b-dev/surf) - computer use AI agent powered by OpenAI
 
+**Multi-turn reinforcement learning**
+
+- [OpenEnv Terminus: inspect, run and repair a report in E2B](./examples/openenv-terminus-python) — first reward without a model or GPU, with optional native TRL training wiring.
+
 **LLM providers**
 
 <table>
@@ -34,7 +38,7 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
   </thead>
   <tbody>
     <tr>
-      <td rowspan="7">OpenAI</td>
+      <td rowspan="8">OpenAI</td>
       <td>Agents SDK</td>
       <td>Agentic workflows running in E2B sandboxes</td>
       <td><a href="./examples/openai-agents-sdk">Python</a></td>
@@ -77,7 +81,27 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td><a href="./examples/openai-codex-in-sandbox-js">TypeScript</a></td>
     </tr>
     <tr>
-      <td rowspan="4">Anthropic</td>
+      <td>Computer use</td>
+      <td>Copy new hires from Excel into OrangeHRM on an E2B desktop with GPT-6 Luna, or let GPT-6 Astra drive the desktop with PyAutoGUI and Playwright code</td>
+      <td><a href="./examples/openai-computer-use-python">Python</a></td>
+      <td><a href="./examples/openai-computer-use-js">TypeScript</a></td>
+    </tr>
+    <tr>
+      <td>Google</td>
+      <td>Gemini CLI</td>
+      <td>Gemini CLI fixing a failing test inside a Sandbox</td>
+      <td><a href="./examples/gemini-cli-in-sandbox-python">Python</a></td>
+      <td><a href="./examples/gemini-cli-in-sandbox-js">TypeScript</a></td>
+    </tr>
+    <tr>
+      <td>GitHub</td>
+      <td>Copilot CLI</td>
+      <td>GitHub Copilot CLI fixing a failing test inside a Sandbox</td>
+      <td><a href="./examples/github-copilot-cli-in-sandbox-python">Python</a></td>
+      <td><a href="./examples/github-copilot-cli-in-sandbox-js">TypeScript</a></td>
+    </tr>
+    <tr>
+      <td rowspan="5">Anthropic</td>
       <td>Claude Opus 5</td>
       <td>Code interpreter</td>
       <td><a href="./examples/claude-code-interpreter-python">Python</a></td>
@@ -100,6 +124,12 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td>Copy new hires from Excel into OrangeHRM on an E2B desktop</td>
       <td>-</td>
       <td><a href="./examples/anthropic-computer-use-orangehrm-js">TypeScript</a></td>
+    </tr>
+    <tr>
+      <td>Claude Agent SDK + Box Mount</td>
+      <td>Review a contract from a Box folder mounted in a Sandbox</td>
+      <td>-</td>
+      <td><a href="./examples/box-mount-contract-review-js">TypeScript</a></td>
     </tr>
     <tr>
       <td>Meta</td>
@@ -171,9 +201,38 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td>-</td>
     </tr>
     <tr>
-      <td>🦜🕸️ LangGraph</td>
+      <td rowspan="2">🦜🕸️ LangGraph</td>
       <td>LangGraph with code interpreter</td>
       <td><a href="./examples/langgraph-python">Python</a></td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>Plan-and-execute coding agent: one sandbox across graph steps, checkpoints and a human-in-the-loop interrupt</td>
+      <td><a href="./examples/langgraph-plan-and-execute-python">Python</a></td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>OpenHands</td>
+      <td>OpenHands agent fixing a failing test inside an E2B sandbox</td>
+      <td><a href="./examples/openhands-in-sandbox-python">Python</a></td>
+      <td><a href="./examples/openhands-in-sandbox-js">TypeScript</a></td>
+    </tr>
+    <tr>
+      <td>Pydantic AI</td>
+      <td>Pause and resume a coding agent in the same E2B sandbox</td>
+      <td><a href="./examples/pydantic-ai-python">Python</a></td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>Pydantic AI + Temporal</td>
+      <td>Recover a crashed worker with the same sandbox ID and preserved project files</td>
+      <td><a href="./examples/pydantic-ai-temporal-python">Python</a></td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>DSPy RLMs</td>
+      <td>Remote CPython and SQLite with host-side sub-model tools</td>
+      <td><a href="./examples/dspy-rlms-python">Python</a></td>
       <td>-</td>
     </tr>
     <tr>
@@ -219,10 +278,22 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td><a href="https://github.com/e2b-dev/e2b-cookbook/tree/main/examples/flue-feedback-analyst-js">TypeScript</a></td>
     </tr>
     <tr>
+    <td><a href="https://github.com/mattpocock/sandcastle">Sandcastle</a></td>
+      <td>Two Claude Code agents in parallel, each in its own E2B sandbox, with their commits coming back to branches in a local repository</td>
+      <td>-</td>
+      <td><a href="./examples/sandcastle-parallel-agents-js">TypeScript</a></td>
+    </tr>
+    <tr>
     <td><a href="https://github.com/earendil-works/pi">Pi</a></td>
       <td>Pi builds its own E2B code-interpreter extension in a sandbox, then uses it to analyze data</td>
       <td>-</td>
       <td><a href="./examples/pi-code-interpreter-js">TypeScript</a></td>
+    </tr>
+    <tr>
+    <td><a href="https://github.com/e2b-dev/pi-extension">Pi + @e2b/pi</a></td>
+      <td>Pi runs on your machine while its tools run in an E2B sandbox: it builds a site, shares a public preview URL, and <code>/e2b pull</code> brings the files back</td>
+      <td>-</td>
+      <td><a href="./examples/pi-e2b-extension-js">TypeScript</a></td>
     </tr>
     <tr>
     <td>AgentKit</td>
@@ -231,10 +302,22 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td><a href="./examples/agentkit-coding-agent">TypeScript</a></td>
     </tr>
     <tr>
+    <td><a href="https://agentclientprotocol.com">Agent Client Protocol</a></td>
+      <td>Drive OpenCode, goose or Claude Code inside a Sandbox with an ACP client</td>
+      <td><a href="./examples/acp-agents-python">Python</a></td>
+      <td><a href="./examples/acp-agents-js">TypeScript</a></td>
+    </tr>
+    <tr>
     <td><a href="https://sandboxagent.dev/docs/sdk-overview">Sandbox Agent SDK</a></td>
       <td>Run Sandbox Agent inside E2B and connect with the SDK</td>
       <td>-</td>
       <td><a href="./examples/sandbox-agent-sdk-js">TypeScript</a></td>
+    </tr>
+    <tr>
+    <td><a href="https://github.com/e2b-dev/opencode-e2b">OpenCode E2B workspaces</a></td>
+      <td>Warp a live OpenCode session from your laptop into an E2B sandbox and back</td>
+      <td>-</td>
+      <td><a href="./examples/opencode-e2b-workspace-js">TypeScript</a></td>
     </tr>
     <tr>
       <td>Stirrup</td>
@@ -244,6 +327,10 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
     </tr>
   </tbody>
 </table>
+
+**Reinforcement learning**
+
+- [Code rewards for TRL GRPO with E2B](./examples/trl-grpo-python) — first code rewards without a GPU, then train on JSON-processing tasks with sandboxed Python execution.
 
 **Remote execution integrations**
 
@@ -262,6 +349,12 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td>Warm one E2B sandbox, sync local changes, and rerun a test suite on the same lease</td>
       <td><a href="./examples/crabbox-e2b-python">Python</a></td>
       <td>-</td>
+    </tr>
+    <tr>
+      <td><a href="https://hatchet.run">Hatchet</a></td>
+      <td>Hatchet durable task that creates an E2B sandbox, runs code, kills it and reconnects to its snapshot</td>
+      <td>-</td>
+      <td><a href="./examples/hatchet-sandbox-e2b-js">TypeScript</a></td>
     </tr>
   </tbody>
 </table>
@@ -324,6 +417,8 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
 - How to run a Docker container in E2B - [Python/TypeScript](./examples/docker-in-e2b)
 - Tailcat: encrypted links between sandboxes, and between a sandbox and your laptop - [Python/TypeScript](./examples/tailcat-e2b)
 - How to run Playwright in E2B - [TypeScript](./examples/playwright-in-e2b)
+- Test an app running in a sandbox with a Notte cloud browser, from Playwright over CDP and from the Notte CLI inside the sandbox - [Python](./examples/notte-browser-python)
+- Anchor cloud browser: run code in an E2B sandbox and drive Chromium in Anchor Cloud - [TypeScript](./examples/anchor-cloud-browser-js)
 - Map custom subdomains to your sandboxes - [TypeScript](./examples/custom-sandbox-domain-proxy)
 - Delete old paused sandboxes by age and metadata - [Python/Shell](./examples/cleanup-paused-sandboxes)
 - Feedback analyst agent on Flue, publishing an HTML report from a sandbox - [TypeScript](./examples/flue-feedback-analyst-js)

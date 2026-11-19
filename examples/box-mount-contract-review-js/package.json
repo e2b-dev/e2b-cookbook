@@ -1,0 +1,31 @@
+{
+  "name": "box-mount-contract-review",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "start": "tsx src/start.ts",
+    "postinstall": "npm ci --prefix agent --no-audit --no-fund",
+    "build-template": "tsx src/build-template.ts",
+    "doctor": "tsx src/doctor.ts",
+    "status": "tsx src/status.ts",
+    "teardown": "tsx src/teardown.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint",
+    "test": "npm run typecheck && npm run lint && npm run test:unit",
+    "test:unit": "node --test src/*.test.ts agent/*.test.ts"
+  },
+  "dependencies": {
+    "dotenv": "17.4.2",
+    "e2b": "2.53.1",
+    "playwright": "1.63.0"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.1",
+    "oxlint": "1.87.0",
+    "tsx": "4.23.15",
+    "typescript": "7.0.2"
+  }
+}

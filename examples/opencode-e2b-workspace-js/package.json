@@ -1,0 +1,18 @@
+{
+  "name": "opencode-e2b-workspace-js",
+  "version": "1.0.0",
+  "description": "Warp a live OpenCode session from your laptop into an E2B sandbox and back, using the OpenCode E2B workspace plugin.",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "tui": "bash scripts/tui.sh",
+    "demo": "vhs demo.tape"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.5.2",
+    "tsx": "^4.21.0"
+  }
+}

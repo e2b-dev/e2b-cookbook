@@ -1,0 +1,11 @@
+[project]
+name = "notte-browser-python"
+version = "0.1.0"
+description = "Test a web app running in an E2B sandbox with a Notte cloud browser"
+readme = "README.md"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "e2b>=2.51,<3",
+    "notte-sdk[playwright]>=1.9.2,<2",
+    "python-dotenv>=1.1,<2",
+]

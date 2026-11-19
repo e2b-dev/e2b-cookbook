@@ -1,0 +1,32 @@
+{
+  "name": "e2e-android-web-tests",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "^22.22.3 || >=24.8.0"
+  },
+  "scripts": {
+    "start": "e2e run --target android",
+    "test:web": "e2e run --target web",
+    "test:all": "e2e run",
+    "download-apk": "node scripts/download-apk.ts",
+    "build-template": "node --env-file-if-exists=.env scripts/build-template.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint",
+    "check": "npm run typecheck && npm run lint"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "4.0.102",
+    "@e2e-dev/e2b": "0.0.1",
+    "@e2e-dev/mobile": "0.12.7",
+    "@e2e-dev/web": "0.16.0",
+    "ai": "7.0.170",
+    "e2b": "2.63.0",
+    "e2e": "0.23.1"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.1",
+    "oxlint": "1.93.0",
+    "typescript": "7.0.2"
+  }
+}

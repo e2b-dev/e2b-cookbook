@@ -80,9 +80,9 @@ await sbx.kill()
 
 1. Run `npm i -g @e2b/cli@latest` to install the latest version of the E2B CLI.
 2. Run `e2b template init` in your project directory.
-3. Copy the [e2b.Dockerfile](./template/e2b.Dockerfile) into your project.
+3. Copy the [template definition](./template/template.ts) into your project.
 4. Run `e2b template build` to build your sandbox.
 5. Start the sandbox either via our SDK or the E2B CLI like this `e2b sandbox spawn <sandbox-template-id>`.
 
 > [!WARNING]
-> This template only works with the `node:20-slim` base image as shown in the Dockerfile. It is not compatible with the `e2bdev/code-interpreter` base image due to specific dependencies required for Playwright.
+> This template only works with the `node:20-slim` base image as shown in the template definition. It is not compatible with the `e2bdev/code-interpreter` base image due to specific dependencies required for Playwright.

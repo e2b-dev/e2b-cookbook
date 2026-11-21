@@ -1,0 +1,27 @@
+{
+  "name": "bilig-workpaper-formula-readback-js",
+  "version": "1.0.0",
+  "description": "Run Bilig WorkPaper formula readback inside an E2B sandbox",
+  "type": "module",
+  "main": "index.ts",
+  "scripts": {
+    "start": "tsx index.ts",
+    "test": "echo \"No tests configured for this example\""
+  },
+  "keywords": ["e2b", "bilig", "workpaper", "spreadsheet", "formula", "agent"],
+  "license": "MIT",
+  "author": {
+    "name": "FoundryLabs, Inc.",
+    "email": "hello@e2b.dev",
+    "url": "https://e2b.dev"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "e2b": "^2.21.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.16.6",
+    "tsx": "^4.7.3",
+    "typescript": "^5.4.5"
+  }
+}

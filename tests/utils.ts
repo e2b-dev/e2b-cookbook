@@ -14,6 +14,7 @@ export function getApiKeys(): Record<string, string> {
     GROQ_API_KEY: process.env.GROQ_API_KEY || '',
     TOGETHER_API_KEY: process.env.TOGETHER_API_KEY || '',
     ANCHOR_API_KEY: process.env.ANCHOR_API_KEY || '',
+    BROWSER_USE_API_KEY: process.env.BROWSER_USE_API_KEY || '',
     WATSONX_PROJECT_ID: process.env.WATSONX_PROJECT_ID || '',
     WATSONX_URL: process.env.WATSONX_URL || '',
     WATSONX_API_KEY: process.env.WATSONX_API_KEY || '',

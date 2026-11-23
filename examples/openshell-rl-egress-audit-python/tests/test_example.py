@@ -67,6 +67,15 @@ L7_DENIED = (
     "HTTP:GET [MED] DENIED GET https://pypi.org/simple/cachetools/ "
     "[policy:pypi engine:l7] [reason:GET /simple/cachetools/ blocked by deny rule]"
 )
+# Observed on openshell-e2b (OpenShell v0.1.9) on 2026-11-23.
+OBSERVED_DENIED = [
+    "HTTP:GET [MED] DENIED GET https://pypi.org/simple/cachetools/ [policy:pypi engine:l7] "
+    "[http_event_kind:decision request_sequence:1 reason:L7_REQUEST deny GET "
+    "pypi.org:443/simple/cachetools/ reason=GET /simple/cachetools/ blocked by deny rule]",
+    "NET:REFUSE [MED] DENIED api.github.com [reason:policy_dns_ineligible]",
+    "NET:OPEN [MED] DENIED /usr/bin/curl(0) -> api.github.com:443 "
+    "[reason:transparent_tcp_policy_denied]",
+]
 ALLOWED = (
     "HTTP:GET [INFO] ALLOWED curl(88) -> GET https://api.example.com/v1/data "
     "[policy:default-egress engine:mechanistic]"
@@ -86,6 +95,12 @@ def test_denied_lines_keeps_raw_denials_only():
         _line("OCSF", L7_DENIED),
     ]
     assert denied_lines(logs) == [CONNECT_DENIED, L7_DENIED]
+
+
+def test_denied_lines_matches_lines_observed_on_a_live_gateway():
+    logs = [_line("OCSF", m) for m in OBSERVED_DENIED]
+    logs.append(_line("OCSF", "SSH:OPEN [INFO] ALLOWED"))  # also observed, not a denial
+    assert denied_lines(logs) == OBSERVED_DENIED
 
 
 # --- reward vs. training decision ---------------------------------------------

@@ -181,6 +181,11 @@ const scripts: {
 // This runner would nest sandbox creation and has no training GPU. Core reward
 // checks run in .github/workflows/trl-grpo.yml; live smoke and training are separate:
 //   trl-grpo-python
+// Part 2 needs an openshell-e2b gateway (its own E2B templates and a control VM)
+// reached through a local tunnel, and Part 1 creates its own rollout and grader
+// sandboxes, so uploading it would nest sandboxes. Offline checks run in
+// .github/workflows/openshell-rl-egress-audit.yml:
+//   openshell-rl-egress-audit-python
 // Orchestrates Hermes inside the separately published `hermes` template and
 // makes two provider calls so the agent can create and reuse a skill. Its unit
 // tests cover orchestration and cleanup; template/inference remains a separate,

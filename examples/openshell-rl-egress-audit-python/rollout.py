@@ -20,7 +20,7 @@ import time
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
-from e2b import CommandExitException, Sandbox, SandboxQuery
+from e2b import CommandExitException, FileNotFoundException, Sandbox, SandboxQuery
 
 from task import HIDDEN_TEST, SOLUTION_FILE, WORKDIR, Policy, buggy_package, workspace_files
 
@@ -119,7 +119,7 @@ def run_plain(policy: Policy, run_id: str) -> tuple[str, list[Step], str | None]
         steps = [_plain_step(sbx, c) for c in policy.commands]
         try:
             candidate = sbx.files.read(f"{WORKDIR}/{SOLUTION_FILE}")
-        except Exception:  # deleted or unreadable by the policy: nothing to grade
+        except FileNotFoundException:  # the policy deleted it: nothing to grade
             candidate = None
         return sbx.sandbox_id, steps, candidate
     finally:

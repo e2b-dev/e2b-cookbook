@@ -1,0 +1,27 @@
+[project]
+name = "openshell-rl-egress-audit-python"
+version = "0.1.0"
+description = "Path-level egress rules and a denial record for RL coding rollouts with OpenShell on E2B"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "e2b==2.64.0",
+    "openshell==0.1.9",
+    # The task: the buggy release the rollout starts from (read from the installed package).
+    "cachetools==7.1.4",
+    "python-dotenv>=1.0",
+]
+
+[dependency-groups]
+dev = ["pytest>=8", "ruff>=0.12"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+markers = ["live: creates real E2B sandboxes (needs E2B_API_KEY)"]
+addopts = "-m 'not live'"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]

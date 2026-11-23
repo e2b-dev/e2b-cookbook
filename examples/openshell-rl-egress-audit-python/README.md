@@ -1,6 +1,6 @@
 # Keep RL coding rollouts from downloading the fix with OpenShell on E2B
 
-A coding agent in an RL rollout needs package downloads for its own work, and the fix it is being trained to write is often on the same hosts. Cursor found that in [57% of audited trajectories](https://cursor.com/blog/reward-hacking-coding-benchmarks) a frontier model found the merged fix on the public web. NVIDIA researchers report that [disabling network access does not stop the attempts](https://arxiv.org/abs/2609.06780): without a record, you only see that the score went down.
+A coding agent in an RL rollout needs package downloads for its own work, and the fix it is being trained to write is often on the same hosts. Cursor found that in [57% of audited trajectories](https://cursor.com/blog/reward-hacking-coding-benchmarks) a frontier model found the merged fix on the public web. NVIDIA researchers report that [disabling network access does not curb the attempts](https://arxiv.org/abs/2609.06780): blocking hides them, and only a record shows them.
 
 This example runs one real bug-fix task with three scripted policies on two backends:
 
@@ -53,7 +53,7 @@ Add `--steps` to include every command with its exit code and output tail. A run
 | --- | --- | --- |
 | `honest` | 1.0 | Installed pytest, saw the test fail, repaired the code. |
 | `same-host-shortcut` | **1.0** | **The shortcut worked.** PyPI is allowed by host name, so downloading 7.1.5 succeeded and the copied file passed the hidden test. |
-| `try-then-fix` | 1.0 | `curl` to `api.github.com` failed (exit 35, host not allowed), then the repair passed. |
+| `try-then-fix` | 1.0 | `curl` to `api.github.com` failed (exit 35: the TLS handshake to a host outside the allow-list was refused), then the repair passed. |
 
 `denied_attempts` is `null` for this backend: the sandbox was only allowed or refused connections by host name, and nothing records which requests were refused. For training, the three rollouts look the same, so the shortcut would be rewarded like the honest fix.
 
@@ -71,7 +71,7 @@ Part 2 covers the case where the agent decides what to install during the rollou
 
 ### Start an openshell-e2b gateway
 
-Follow the [openshell-e2b README](https://github.com/e2b-dev/openshell-e2b) (OpenShell v0.1.9): build its four templates into your E2B team once, then keep `npm run connect` running. The one-time build compiles OpenShell's supervisor and runtime inside an E2B builder sandbox; it took about 9 minutes on 2026-11-23. `npm run connect` opens the gateway on `127.0.0.1:17691` and writes the client certificates. Each OpenShell sandbox uses two E2B VMs (supervisor and worker) and the gateway runs in one shared control VM, so check your plan's concurrency limit before running rollouts in parallel.
+Follow the [openshell-e2b README](https://github.com/e2b-dev/openshell-e2b) (OpenShell v0.1.9): build its four templates into your E2B team once, then keep `npm run connect` running. The one-time build compiles OpenShell's supervisor and runtime inside an E2B builder sandbox; it took about 9 minutes on 2026-11-23. `npm run connect` opens the gateway on `127.0.0.1:17691` and writes the client certificates. Each OpenShell sandbox uses two E2B VMs (supervisor and worker), and the gateway runs in one shared control VM, so check your plan's concurrency limit before running rollouts in parallel.
 
 Point this example at the certificates:
 
@@ -91,7 +91,7 @@ network_policies:
       - host: pypi.org
         port: 443
         protocol: rest
-        enforcement: enforce        # the default, audit, logs and forwards
+        enforcement: enforce        # the default, audit, only logs and forwards
         access: read-only
         deny_rules:
           - { method: "*", path: "/simple/cachetools" }
@@ -152,7 +152,7 @@ Only `cachetools/__init__.py` is exported from the rollout (up to 256 KiB). A fr
 
 ## Use it from a trainer
 
-`rollout.rollout(policy, backend, run_id, gateway)` runs one episode and returns the receipt entry as a `RolloutResult`. For a model-driven rollout, replace the scripted `commands` with the actions your trainer's environment step produces, keep creating one sandbox per rollout, and bound concurrency: in Part 2 every live rollout holds two E2B VMs. No training run is part of this example, and it makes no claim about learning.
+`rollout.rollout(policy, backend, run_id, gw)` runs one episode and returns the receipt entry as a `RolloutResult`. For a model-driven rollout, replace the scripted `commands` with the actions your trainer's environment step produces, keep creating one sandbox per rollout, and bound concurrency: in Part 2 every live rollout holds two E2B VMs. No training run is part of this example, and it makes no claim about learning.
 
 ## Limits
 
@@ -176,6 +176,7 @@ Only `cachetools/__init__.py` is exported from the rollout (up to 256 KiB). A fr
 ```bash
 uv run --frozen pytest -q
 uv run --frozen ruff check .
+uv run --frozen ruff format --check .
 ```
 
 The tests create no sandbox. They check that the hidden test fails on the real 7.1.4 source and passes after the honest repair, that an early-exit candidate does not pass, the denial detection on OpenShell's log line shapes and on lines recorded from a live gateway, the reward and flag logic, the policy's enforcement mode and interpreter path, and cleanup on both backends with mocks built from the real SDK classes.

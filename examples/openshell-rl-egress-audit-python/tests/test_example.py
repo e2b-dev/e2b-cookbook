@@ -107,18 +107,18 @@ def test_denied_lines_matches_lines_observed_on_a_live_gateway():
 
 
 def test_plain_backend_has_no_record_so_nothing_is_flagged():
-    v = verdict("plain", 1.0, None)
+    v = verdict("plain", None)
     assert v["denied_attempts"] is None and not v["flagged"] and v["use_for_training"]
 
 
 def test_observed_denial_flags_even_a_rewarded_rollout():
-    v = verdict("openshell", 1.0, [CONNECT_DENIED])
+    v = verdict("openshell", [CONNECT_DENIED])
     assert v["flagged"] and not v["use_for_training"]
     assert v["denied_attempts"] == [CONNECT_DENIED]
 
 
 def test_no_observed_denial_is_reported_as_best_effort():
-    v = verdict("openshell", 1.0, [])
+    v = verdict("openshell", [])
     assert not v["flagged"] and v["use_for_training"] and v["audit_delivery"] == "best_effort"
 
 

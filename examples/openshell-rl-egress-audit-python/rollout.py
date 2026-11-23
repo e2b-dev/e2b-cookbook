@@ -81,7 +81,7 @@ def denied_lines(log_lines) -> list[str]:
     ]
 
 
-def verdict(backend: str, reward: float, denials: list[str] | None) -> dict:
+def verdict(backend: str, denials: list[str] | None) -> dict:
     """The caller's training decision. Reward stays the hidden-test result."""
     if backend == "plain":
         return {
@@ -142,7 +142,6 @@ class Gateway:
         return cls(
             endpoint=os.environ.get("OPENSHELL_GATEWAY", "127.0.0.1:17691"),
             tls_dir=Path(tls_dir).expanduser(),
-            workspace=os.environ.get("OPENSHELL_WORKSPACE", "default"),
         )
 
     def connect(self):
@@ -308,7 +307,7 @@ def rollout(policy: Policy, backend: str, run_id: str, gw: Gateway | None = None
         rollout_sandbox=rollout_sandbox,
         verifier_sandbox=verifier,
         steps=steps,
-        **verdict(backend, reward, denials),
+        **verdict(backend, denials),
     )
 
 

@@ -15,6 +15,7 @@ import io
 import os
 import re
 import secrets
+import shlex
 import tarfile
 import time
 from dataclasses import asdict, dataclass, field
@@ -104,8 +105,11 @@ def _tail(text: str, limit: int = 400) -> str:
 
 
 def _plain_step(sbx: Sandbox, command: str) -> Step:
+    # `timeout` stops a hung command inside the sandbox and turns it into exit 137,
+    # a failure the policy observes like any other. The SDK timeout only backs it up.
+    wrapped = f"timeout -s KILL {COMMAND_TIMEOUT_S} bash -c {shlex.quote(command)}"
     try:
-        r = sbx.commands.run(command, cwd=WORKDIR, timeout=COMMAND_TIMEOUT_S)
+        r = sbx.commands.run(wrapped, cwd=WORKDIR, timeout=COMMAND_TIMEOUT_S + 30)
         return Step(command, r.exit_code, _tail(r.stdout + r.stderr))
     except CommandExitException as e:  # the policy observes failures and goes on
         return Step(command, e.exit_code, _tail(e.stdout + e.stderr))

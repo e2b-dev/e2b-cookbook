@@ -7,7 +7,7 @@ from types import SimpleNamespace
 from unittest import mock
 
 import pytest
-from e2b import FileNotFoundException, Sandbox
+from e2b import CommandExitException, FileNotFoundException, Sandbox
 from openshell import SandboxClient
 from openshell._proto import sandbox_pb2
 
@@ -233,6 +233,17 @@ def test_plain_export_of_a_deleted_file_is_nothing_to_grade():
     sbx = _plain_sandbox(FileNotFoundException("gone"))
     with mock.patch.object(rollout.Sandbox, "create", return_value=sbx):
         assert run_plain(POLICIES["honest"], "abc123")[2] is None
+
+
+def test_plain_hung_command_is_killed_in_the_sandbox_and_recorded():
+    sbx = _plain_sandbox([b"src"])
+    killed = CommandExitException(stderr="", stdout="", exit_code=137, error=None)
+    sbx.commands.run.side_effect = killed
+    step = rollout._plain_step(sbx, "python3 -m http.server")
+    assert step.command == "python3 -m http.server" and step.exit_code == 137
+    sent, kw = sbx.commands.run.call_args.args[0], sbx.commands.run.call_args.kwargs
+    assert sent == f"timeout -s KILL {rollout.COMMAND_TIMEOUT_S} bash -c 'python3 -m http.server'"
+    assert kw["timeout"] > rollout.COMMAND_TIMEOUT_S  # the in-sandbox kill fires first
 
 
 def test_sandboxes_left_counts_both_backends():

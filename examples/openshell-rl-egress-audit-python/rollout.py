@@ -208,16 +208,15 @@ def _tar(files: dict[str, str]) -> bytes:
     return buf.getvalue()
 
 
-POLICY_CODES = {"honest": "ho", "same-host-shortcut": "sh", "try-then-fix": "tf"}
-
-
 def run_openshell(
     policy: Policy, run_id: str, gw: Gateway
 ) -> tuple[str, list[Step], str | None, list[str]]:
     from openshell._proto import datamodel_pb2, openshell_pb2
 
     client, stub, channel = gw.connect()
-    name = f"rl-{run_id}-{POLICY_CODES[policy.name]}"  # OpenShell names are at most 19 chars
+    # Unique per rollout, so parallel rollouts never share (or delete) a sandbox.
+    # OpenShell names are at most 19 chars; the run id goes in the label.
+    name = f"rl-{secrets.token_hex(6)}"
     ws = gw.workspace
 
     def sh(command: str, **kw):

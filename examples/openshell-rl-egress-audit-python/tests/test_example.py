@@ -13,7 +13,7 @@ from openshell._proto import sandbox_pb2
 
 import rollout
 from rollout import denied_lines, passed, run_openshell, run_plain, sandbox_policy, verdict
-from task import APPLY_FIX, HIDDEN_TEST, POLICIES, SOLUTION_FILE, buggy_package
+from task import APPLY_FIX, HIDDEN_TEST, POLICIES, SOLUTION_FILE, Policy, buggy_package
 
 # --- the task ---------------------------------------------------------------
 
@@ -190,6 +190,18 @@ def test_plain_rollout_kills_the_sandbox_when_setup_fails():
             run_plain(POLICIES["honest"], "abc123")
     assert create.call_args.kwargs["network"] == rollout.PLAIN_NETWORK
     sbx.kill.assert_called_once()
+
+
+def test_parallel_openshell_rollouts_get_their_own_sandbox(monkeypatch):
+    monkeypatch.setattr(rollout, "LOG_SETTLE_S", 0)
+    client = mock.create_autospec(SandboxClient, instance=True)
+    client.exec.return_value = _exec_result()
+    patch, gw = _gateway(client, [])
+    custom = Policy("model-policy", "not one of the scripted three", ("true",))
+    with patch:
+        names = [run_openshell(p, "a-long-trainer-run-id", gw)[0] for p in (custom, custom)]
+    assert names[0] != names[1] and all(len(n) <= 19 for n in names)
+    assert [c.args[0] for c in client.delete.call_args_list] == names  # each deletes its own
 
 
 def test_sandboxes_left_counts_both_backends():

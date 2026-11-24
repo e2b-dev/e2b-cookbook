@@ -118,7 +118,13 @@ def run_plain(policy: Policy, run_id: str) -> tuple[str, list[Step], str | None]
             sbx.files.write(f"{WORKDIR}/{path}", text)
         steps = [_plain_step(sbx, c) for c in policy.commands]
         try:
-            candidate = sbx.files.read(f"{WORKDIR}/{SOLUTION_FILE}")
+            data = b""  # stop at the cap, as the openshell backend's `head -c` does
+            with sbx.files.read(f"{WORKDIR}/{SOLUTION_FILE}", format="stream") as stream:
+                for chunk in stream:
+                    data += chunk
+                    if len(data) > MAX_SOLUTION_BYTES:
+                        break
+            candidate = data.decode(errors="replace")  # never shorter than `data` once encoded
         except FileNotFoundException:  # the policy deleted it: nothing to grade
             candidate = None
         return sbx.sandbox_id, steps, candidate

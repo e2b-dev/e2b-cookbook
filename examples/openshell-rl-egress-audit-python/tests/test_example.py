@@ -7,7 +7,7 @@ from types import SimpleNamespace
 from unittest import mock
 
 import pytest
-from e2b import Sandbox
+from e2b import FileNotFoundException, Sandbox
 from openshell import SandboxClient
 from openshell._proto import sandbox_pb2
 
@@ -202,6 +202,37 @@ def test_parallel_openshell_rollouts_get_their_own_sandbox(monkeypatch):
         names = [run_openshell(p, "a-long-trainer-run-id", gw)[0] for p in (custom, custom)]
     assert names[0] != names[1] and all(len(n) <= 19 for n in names)
     assert [c.args[0] for c in client.delete.call_args_list] == names  # each deletes its own
+
+
+def _plain_sandbox(file_chunks):
+    sbx = mock.Mock(spec=Sandbox)
+    sbx.sandbox_id = "sbx"
+    sbx.files = mock.Mock()
+    sbx.commands = mock.Mock()
+    sbx.commands.run.return_value = SimpleNamespace(exit_code=0, stdout="", stderr="")
+    if isinstance(file_chunks, Exception):
+        sbx.files.read.side_effect = file_chunks
+    else:
+        stream = mock.MagicMock()
+        stream.__enter__.return_value = file_chunks
+        sbx.files.read.return_value = stream
+    return sbx
+
+
+def test_plain_export_stops_reading_past_the_cap():
+    chunks = iter([b"x" * 64 * 1024] * 1000)  # a 64 MiB file
+    sbx = _plain_sandbox(chunks)
+    with mock.patch.object(rollout.Sandbox, "create", return_value=sbx):
+        _, _, candidate = run_plain(POLICIES["honest"], "abc123")
+    assert sbx.files.read.call_args.kwargs["format"] == "stream"
+    assert len(list(chunks)) > 900  # most of the file was never downloaded
+    assert rollout.grade(candidate, "abc123") == (0.0, None)  # still rejected as too big
+
+
+def test_plain_export_of_a_deleted_file_is_nothing_to_grade():
+    sbx = _plain_sandbox(FileNotFoundException("gone"))
+    with mock.patch.object(rollout.Sandbox, "create", return_value=sbx):
+        assert run_plain(POLICIES["honest"], "abc123")[2] is None
 
 
 def test_sandboxes_left_counts_both_backends():

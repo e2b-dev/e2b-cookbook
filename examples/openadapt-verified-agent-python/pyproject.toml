@@ -1,0 +1,9 @@
+[project]
+name = "openadapt-verified-agent-python"
+version = "0.1.0"
+description = "Run OpenAdapt inside an E2B sandbox to compile an agent workflow into verified, zero-model-call replay"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "e2b>=2.39,<3",
+]

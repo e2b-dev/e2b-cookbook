@@ -1,0 +1,27 @@
+name: OpenShell OpenClaw offline checks
+permissions:
+  contents: read
+on:
+  pull_request:
+    paths:
+      - 'examples/openshell-openclaw-js/**'
+      - '.github/workflows/openshell-openclaw.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'examples/openshell-openclaw-js/**'
+      - '.github/workflows/openshell-openclaw.yml'
+jobs:
+  offline:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: examples/openshell-openclaw-js
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm ci
+      - run: npm test
+      - run: npm run typecheck

@@ -1,0 +1,26 @@
+# Provider profile for OpenClaw in the openshell-workload-openclaw template.
+# Based on OpenShell's providers/anthropic.yaml (Apache-2.0); only the id and
+# the binaries changed: OpenClaw calls the Anthropic API from its bundled
+# Node, so that one binary may use the key, and nothing else in the sandbox.
+#   openshell provider profile import -f openclaw-anthropic.yaml --global   (src/main.ts does this)
+id: openclaw-anthropic
+display_name: Anthropic for OpenClaw
+description: Anthropic inference API
+category: inference
+inference_capable: true
+credentials:
+  - name: api_key
+    description: Anthropic API key
+    env_vars: [ANTHROPIC_API_KEY]
+    required: true
+    auth_style: header
+    header_name: x-api-key
+discovery:
+  credentials: [api_key]
+endpoints:
+  - host: api.anthropic.com
+    port: 443
+    protocol: rest
+    access: read-write
+    enforcement: enforce
+binaries: [/usr/lib/openclaw/tools/node-v24.22.1/bin/node]

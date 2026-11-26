@@ -1,0 +1,4 @@
+.env
+recipe/
+.pytest_cache/
+.ruff_cache/

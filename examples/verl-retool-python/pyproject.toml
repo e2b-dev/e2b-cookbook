@@ -1,0 +1,28 @@
+[project]
+name = "verl-retool-python"
+version = "0.1.0"
+description = "Run the verl ReTool recipe's code interpreter in E2B sandboxes"
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    "verl==0.9.1",
+    "e2b==2.64.0",
+    "pyyaml>=6",
+]
+
+[dependency-groups]
+dev = ["pytest>=8", "ruff>=0.12"]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 120
+extend-exclude = ["recipe"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]

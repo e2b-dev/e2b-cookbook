@@ -181,6 +181,11 @@ const scripts: {
 // This runner would nest sandbox creation and has no training GPU. Core reward
 // checks run in .github/workflows/trl-grpo.yml; live smoke and training are separate:
 //   trl-grpo-python
+// Replays verl ReTool trajectories on the host through the recipe's E2B tool,
+// which creates and pools its own sandboxes, and needs a verl-recipe checkout.
+// Running it here would nest sandbox creation. Offline checks run in
+// .github/workflows/verl-retool.yml; the live run is a separate host-side smoke:
+//   verl-retool-python
 // Orchestrates Hermes inside the separately published `hermes` template and
 // makes two provider calls so the agent can create and reuse a skill. Its unit
 // tests cover orchestration and cleanup; template/inference remains a separate,

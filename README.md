@@ -325,6 +325,7 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
 **Reinforcement learning**
 
 - [Code rewards for TRL GRPO with E2B](./examples/trl-grpo-python) — first code rewards without a GPU, then train on JSON-processing tasks with sandboxed Python execution.
+- [Keep RL coding rollouts from downloading the fix with OpenShell](./examples/openshell-rl-egress-audit-python) — the same coding task and scripted policies under a host allow-list on E2B and under OpenShell path rules with a record of denied requests; no model or GPU.
 
 **Remote execution integrations**
 

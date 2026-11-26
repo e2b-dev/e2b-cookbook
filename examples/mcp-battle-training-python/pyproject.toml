@@ -1,0 +1,14 @@
+[project]
+name = "mcp-battle-training-python"
+version = "0.1.0"
+description = "Scout the battle.training arena from an E2B sandbox via its hosted MCP server"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "e2b>=2.62.0,<3",
+    # Only needed to run scout.py directly on the host; inside the
+    # sandbox main.py installs the same pin with pip. The 2.x line
+    # changed the streamable HTTP client scout.py uses.
+    "mcp>=1.0,<2",
+    "python-dotenv",
+]

@@ -163,6 +163,11 @@ const scripts: {
 // (HATCHET_CLIENT_TOKEN), which this repo has no secret for, and the sandbox is created
 // by Hatchet's operator rather than from inside the runner sandbox:
 //   hatchet-sandbox-e2b-js
+// Creates its own E2B sandbox from inside the runner sandbox (nested) and
+// calls a third-party hosted MCP server (battle.training) that this repo
+// does not control. The arena's read tools are public, so it is verified
+// by running scout.py against the live arena instead; see the README:
+//   mcp-battle-training-python
 // Host-side OpenEnv server and native clients create their own episode sandboxes.
 // Uploading this example would nest resources and leave a long-lived service.
 // Scoped offline CI and a bounded host-side live smoke cover it separately:

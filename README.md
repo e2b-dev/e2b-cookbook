@@ -351,6 +351,12 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td><a href="./examples/hatchet-sandbox-e2b-js">TypeScript</a></td>
     </tr>
     <tr>
+      <td><a href="https://battle.training">battle.training</a></td>
+      <td>Scout the battle.training bot arena from an E2B sandbox through its hosted MCP server</td>
+      <td><a href="./examples/mcp-battle-training-python">Python</a></td>
+      <td>-</td>
+    </tr>
+    <tr>
       <td><a href="https://github.com/e2e-inc/e2e">e2e</a></td>
       <td>Run end-to-end tests on Android and in Chromium, one sandbox per target for each test worker</td>
       <td>-</td>

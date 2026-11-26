@@ -1,0 +1,18 @@
+{
+  "name": "openshell-openclaw-js",
+  "private": true,
+  "type": "module",
+  "description": "A personal agent (OpenClaw) in an NVIDIA OpenShell sandbox on E2B: injected key, live read-only grants, a denial record.",
+  "scripts": {
+    "start": "node --env-file=.env --experimental-transform-types src/main.ts",
+    "test": "node --experimental-transform-types --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=22.18"
+  }
+}

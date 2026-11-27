@@ -5,6 +5,7 @@ import csv
 import io
 import json
 import os
+import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -58,12 +59,19 @@ async def main() -> None:
             result = await agent.invoke_async(TASK)
         print(f"\nTools used: {sorted(result.metrics.tool_metrics)}")
 
-        # Check the artifacts instead of trusting the agent's reply.
+        # Check the artifacts instead of trusting the agent's reply. A missing or
+        # wrong artifact is the model's mistake, so it exits with a message of its
+        # own; sandbox and API errors still raise as usual.
         expected = {region: MONTHS[values.index(max(values))] for region, values in REVENUE.items()}
-        summary = json.loads(await workspace.read_text("summary.json"))
-        assert summary == expected, f"summary.json {summary} != expected {expected}"
-        chart = await workspace.read_file("chart.png")
-        assert chart.startswith(b"\x89PNG"), "chart.png is not a PNG"
+        try:
+            summary = json.loads(await workspace.read_text("summary.json"))
+            chart = await workspace.read_file("chart.png")
+        except (FileNotFoundError, json.JSONDecodeError) as e:
+            sys.exit(f"Wrong analysis from the model: {e}")
+        if summary != expected:
+            sys.exit(f"Wrong analysis from the model: summary.json {summary} != expected {expected}")
+        if not chart.startswith(b"\x89PNG"):
+            sys.exit("Wrong analysis from the model: chart.png is not a PNG")
         Path("chart.png").write_bytes(chart)
         print(f"Verified summary.json {summary}; saved chart.png ({len(chart)} bytes)")
     finally:

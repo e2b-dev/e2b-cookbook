@@ -483,6 +483,8 @@ const MODEL_SIDE = [
   /\[Code Interpreter ERROR\][^"')\n]{3,}|AI-generated Python runtime error/i,
   // A computer-use model read back the wrong value from the desktop (printed to stderr).
   /Wrong: the order number is/,
+  // The Strands data analyst wrote a missing or wrong summary.json or chart.png.
+  /Wrong analysis from the model/,
 ]
 
 function classify(output: string): Verdict {

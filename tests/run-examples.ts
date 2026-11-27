@@ -67,15 +67,28 @@ const scripts: {
   { name: 'custom-sandbox-domain-proxy', interpreter: 'npm', file: './examples/custom-sandbox-domain-proxy/', nodeVersion: '22.22.0' },
   // @e2b/pi and Pi's SDK require Node 22.19 or newer.
   { name: 'pi-e2b-extension-js', interpreter: 'npm', file: './examples/pi-e2b-extension-js/', nodeVersion: '22.22.0' },
+  // The e2b SDK that Sandcastle's E2B provider needs requires Node 22.19 or newer.
+  { name: 'sandcastle-parallel-agents-js', interpreter: 'npm', file: './examples/sandcastle-parallel-agents-js/', nodeVersion: '22.22.0' },
   { name: 'crewai-python', interpreter: 'uv', file: './examples/crewai-python/' },
   { name: 'strands-agents-python', interpreter: 'uv', file: './examples/strands-agents-python/' },
   // The hello world only: 2-orangehrm takes about five minutes against the shared public OrangeHRM demo.
   // openai 7.33 (the first release with openai/helpers/computer) requires Node 22.
   { name: 'openai-computer-use-python', interpreter: 'uv', file: './examples/openai-computer-use-python/', entrypoint: '1-run.py' },
   { name: 'openai-computer-use-js', interpreter: 'npm', file: './examples/openai-computer-use-js/', nodeVersion: '22.22.0' },
+  { name: 'acp-agents-js', interpreter: 'npm', file: './examples/acp-agents-js/', nodeVersion: '22.22.0' },
+  { name: 'acp-agents-python', interpreter: 'uv', file: './examples/acp-agents-python/' },
   { name: 'playwright-in-e2b', interpreter: 'npm', file: './examples/playwright-in-e2b/' },
+  // The runner holds only OPENAI_API_KEY, which these use when LLM_API_KEY is not set. e2b 2.62 requires Node 22.19 or newer.
+  { name: 'openhands-in-sandbox-js', interpreter: 'npm', file: './examples/openhands-in-sandbox-js/', nodeVersion: '22.22.0' },
+  { name: 'openhands-in-sandbox-python', interpreter: 'uv', file: './examples/openhands-in-sandbox-python/' },
+  // The runner holds no Copilot token, so these run Copilot CLI with OPENAI_API_KEY through its custom provider mode.
+  // e2b 2.62 requires Node 22.19 or newer.
+  { name: 'github-copilot-cli-in-sandbox-js', interpreter: 'npm', file: './examples/github-copilot-cli-in-sandbox-js/', nodeVersion: '22.22.0' },
+  { name: 'github-copilot-cli-in-sandbox-python', interpreter: 'uv', file: './examples/github-copilot-cli-in-sandbox-python/' },
   { name: 'anthropic-claude-code-in-sandbox-js', interpreter: 'npm', file: './examples/anthropic-claude-code-in-sandbox-js/' },
   { name: 'anthropic-claude-code-in-sandbox-python', interpreter: 'uv', file: './examples/anthropic-claude-code-in-sandbox-python/', entrypoint: 'python -m anthropic_claude_code_in_sandbox.main' },
+  { name: 'openai-codex-in-sandbox-js', interpreter: 'npm', file: './examples/openai-codex-in-sandbox-js/' },
+  { name: 'openai-codex-in-sandbox-python', interpreter: 'uv', file: './examples/openai-codex-in-sandbox-python/', entrypoint: 'src/openai_codex_in_sandbox_python/main.py' },
   { name: 'mcp-custom-template-js', interpreter: 'npm', file: './examples/mcp-custom-template-js/' },
   { name: 'docker-in-e2b-js', interpreter: 'npm', file: './examples/docker-in-e2b/js/' },
   { name: 'docker-in-e2b-python', interpreter: 'poetry', file: './examples/docker-in-e2b/python/', entrypoint: 'python main.py' },
@@ -107,15 +120,6 @@ const scripts: {
 // sys.path.insert(...parents[4]) and imports examples.sandbox.misc.example_support,
 // so it expects to run inside the openai-agents-python repo, not here:
 //   openai-agents-sdk (11 standalone scripts, no manifest)
-// The Codex CLI the template installs (v0.147.0) no longer authenticates from
-// OPENAI_API_KEY in the environment: it reports "Missing bearer or basic
-// authentication in header" against wss://api.openai.com/v1/responses, i.e. no
-// auth header is sent at all, so it now expects `codex login` or an explicit
-// credential rather than an env var. The examples still pass the key as an env,
-// which was correct for older Codex. Fixing this needs someone who can iterate
-// against the current CLI - either pin Codex in the template or wire its current
-// auth - so it is not guessed at here:
-//   openai-codex-in-sandbox-js, openai-codex-in-sandbox-python
 // Dropped to fit the Groq quota, NOT because they are broken - both pass when the
 // day's budget allows, and they should be restored if the tier is raised. The org
 // is capped at 100k tokens per day and four Groq examples several calls each do not
@@ -156,6 +160,10 @@ const scripts: {
 //   anchor-cloud-browser-js (ANCHOR_API_KEY — getApiKeys already forwards it.
 //     Once the secret exists, move this into the scripts list with a 600_000
 //     timeout: npm install plus the browser task does not fit 150s)
+// Needs a Hatchet Cloud tenant with Sandboxes enabled and an E2B provider connected
+// (HATCHET_CLIENT_TOKEN), which this repo has no secret for, and the sandbox is created
+// by Hatchet's operator rather than from inside the runner sandbox:
+//   hatchet-sandbox-e2b-js
 // Host-side OpenEnv server and native clients create their own episode sandboxes.
 // Uploading this example would nest resources and leave a long-lived service.
 // Scoped offline CI and a bounded host-side live smoke cover it separately:
@@ -165,6 +173,11 @@ const scripts: {
 // suite does not install Crabbox. Its unit tests cover command order and cleanup;
 // the real provider lifecycle remains a separate, explicitly approved smoke:
 //   crabbox-e2b-python
+// The e2e test runner leases its own Android and Chromium sandboxes, so running it
+// here would nest live sandboxes inside this runner, and the web target needs the
+// e2e-chromium template built on the account first. It is verified by a live run
+// from a developer machine instead:
+//   e2e-android-web-tests-js
 // Runs TRL on the evaluator host and reuses E2B workers for isolated code rewards.
 // This runner would nest sandbox creation and has no training GPU. Core reward
 // checks run in .github/workflows/trl-grpo.yml; live smoke and training are separate:
@@ -205,11 +218,17 @@ const TIMEOUT_OVERRIDES: Record<string, number> = {
   'openai-codex-in-sandbox-js': 600_000,
   'openai-codex-in-sandbox-python': 600_000,
   'playwright-in-e2b': 300_000,
+  // Start the OpenHands Agent Server in the sandbox, then hand the agent a task.
+  'openhands-in-sandbox-js': 300_000,
+  'openhands-in-sandbox-python': 300_000,
   // Same shape: Claude Code doing multi-step research over two MCP servers
   // (arxiv, duckduckgo) before it writes the page. It fit the shared budget
   // only by accident - 112s of 150s on its last green run - so one slow arxiv
   // search was always going to end it, and one did.
   'mcp-claude-code-js': 600_000,
+  // Two Claude Code agents, each in its own nested sandbox, then a sync back
+  // and a merge on the runner.
+  'sandcastle-parallel-agents-js': 600_000,
   // Installs its toolchain, then creates two more sandboxes and moves 10 MiB
   // through Tailcat's rate-limited public DERP relay. The demo alone is ~30s;
   // with the install it does not reliably fit the shared budget.
@@ -229,10 +248,8 @@ const TIMEOUT_OVERRIDES: Record<string, number> = {
 // template that no example actually creates a sandbox from.
 //
 // Two aliases are shared, which is why builds are keyed by alias rather than by
-// example: anthropic-claude-code is built by both the js and python siblings,
-// e2b-with-docker by both docker-in-e2b subprojects, and
-// openai-codex-in-sandbox-js has no build script at all - it relies on the
-// python sibling's. Building per example would race two builds of one alias.
+// example: e2b-with-docker is built by both docker-in-e2b subprojects, and tailcat
+// by both tailcat-e2b ones. Building per example would race two builds of one alias.
 type TemplateBuild = {
   alias: string
   dir: string
@@ -243,10 +260,6 @@ type TemplateBuild = {
 // example name -> template alias it creates a sandbox from
 const TEMPLATE_USED_BY: Record<string, string> = {
   'playwright-in-e2b': 'playwright-chromium',
-  'anthropic-claude-code-in-sandbox-js': 'anthropic-claude-code',
-  'anthropic-claude-code-in-sandbox-python': 'anthropic-claude-code',
-  'openai-codex-in-sandbox-js': 'openai-codex',
-  'openai-codex-in-sandbox-python': 'openai-codex',
   'mcp-custom-template-js': 'browserbase-mcp-gateway',
   'docker-in-e2b-js': 'e2b-with-docker',
   'docker-in-e2b-python': 'e2b-with-docker',
@@ -256,11 +269,9 @@ const TEMPLATE_USED_BY: Record<string, string> = {
 
 const TEMPLATE_BUILDS: TemplateBuild[] = [
   { alias: 'playwright-chromium', dir: './examples/playwright-in-e2b/', interpreter: 'npm', build: 'npm run e2b:build:prod' },
-  { alias: 'anthropic-claude-code', dir: './examples/anthropic-claude-code-in-sandbox-js/', interpreter: 'npm', build: 'npm run e2b:build:prod' },
   { alias: 'e2b-with-docker', dir: './examples/docker-in-e2b/js/', interpreter: 'npm', build: 'npm run e2b:build:prod' },
   { alias: 'tailcat', dir: './examples/tailcat-e2b/js/', interpreter: 'npm', build: 'npm run e2b:build' },
   { alias: 'browserbase-mcp-gateway', dir: './examples/mcp-custom-template-js/', interpreter: 'npm', build: 'npm run build' },
-  { alias: 'openai-codex', dir: './examples/openai-codex-in-sandbox-python/', interpreter: 'uv', build: 'uv run build_prod.py' },
 ]
 
 // A template build is minutes, not seconds, and the result persists on the

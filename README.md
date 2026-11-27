@@ -230,6 +230,12 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
       <td>-</td>
     </tr>
     <tr>
+      <td>Strands Agents</td>
+      <td>Data analyst agent whose Python, shell, and file tools run in E2B</td>
+      <td><a href="./examples/strands-agents-python">Python</a></td>
+      <td>-</td>
+    </tr>
+    <tr>
       <td>DSPy RLMs</td>
       <td>Remote CPython and SQLite with host-side sub-model tools</td>
       <td><a href="./examples/dspy-rlms-python">Python</a></td>

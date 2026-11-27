@@ -70,6 +70,7 @@ const scripts: {
   // The e2b SDK that Sandcastle's E2B provider needs requires Node 22.19 or newer.
   { name: 'sandcastle-parallel-agents-js', interpreter: 'npm', file: './examples/sandcastle-parallel-agents-js/', nodeVersion: '22.22.0' },
   { name: 'crewai-python', interpreter: 'uv', file: './examples/crewai-python/' },
+  { name: 'strands-agents-python', interpreter: 'uv', file: './examples/strands-agents-python/' },
   // The hello world only: 2-orangehrm takes about five minutes against the shared public OrangeHRM demo.
   // openai 7.33 (the first release with openai/helpers/computer) requires Node 22.
   { name: 'openai-computer-use-python', interpreter: 'uv', file: './examples/openai-computer-use-python/', entrypoint: '1-run.py' },
@@ -237,6 +238,8 @@ const TIMEOUT_OVERRIDES: Record<string, number> = {
   // which shares the same budget.
   'langgraph-plan-and-execute-python': 600_000,
   'tailcat-e2b-python': 300_000,
+  // uv sync, then a Strands agent loop the example bounds at 300s.
+  'strands-agents-python': 600_000,
   // Node 22 install or uv sync, an E2B desktop and a model loop of up to 120s.
   'openai-computer-use-js': 300_000,
   'openai-computer-use-python': 300_000,
@@ -480,6 +483,8 @@ const MODEL_SIDE = [
   /\[Code Interpreter ERROR\][^"')\n]{3,}|AI-generated Python runtime error/i,
   // A computer-use model read back the wrong value from the desktop (printed to stderr).
   /Wrong: the order number is/,
+  // The Strands data analyst wrote a missing or wrong summary.json or chart.png.
+  /Wrong analysis from the model/,
 ]
 
 function classify(output: string): Verdict {

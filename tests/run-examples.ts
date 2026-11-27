@@ -186,6 +186,11 @@ const scripts: {
 // tests cover orchestration and cleanup; template/inference remains a separate,
 // explicitly approved smoke because this repository has no OpenRouter secret:
 //   hermes-incident-playbook-python
+// Needs an openshell-e2b gateway (its own E2B templates and a control VM) reached
+// through a local tunnel, plus Anthropic and OpenAI keys; each run creates up to
+// six worker VMs through that gateway and three grader sandboxes. Offline checks run in
+// .github/workflows/openshell-coding-agents.yml:
+//   openshell-coding-agents-js
 // Runs a long-lived agent/server process rather than a script that exits, so
 // this runner can only ever time out on them:
 //   flue-feedback-analyst-js, vercel-eve-feedback-analyst-js,

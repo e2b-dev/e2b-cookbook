@@ -1,0 +1,27 @@
+name: OpenShell coding agents offline checks
+permissions:
+  contents: read
+on:
+  pull_request:
+    paths:
+      - 'examples/openshell-coding-agents-js/**'
+      - '.github/workflows/openshell-coding-agents.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'examples/openshell-coding-agents-js/**'
+      - '.github/workflows/openshell-coding-agents.yml'
+jobs:
+  offline:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: examples/openshell-coding-agents-js
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm ci
+      - run: npm test
+      - run: npm run typecheck

@@ -424,6 +424,7 @@ Read more about E2B on the [E2B website](https://e2b.dev/?utm_source=github&utm_
 - Feedback analyst agent on Flue, publishing an HTML report from a sandbox - [TypeScript](./examples/flue-feedback-analyst-js)
 - Warm an E2B sandbox and rerun tests after adding a local regression case - [Python](./examples/crabbox-e2b-python)
 - Teach Hermes an incident-triage playbook and reuse it in a fresh session - [Python](./examples/hermes-incident-playbook-python)
+- Run two Claude Code workers and one Codex worker under NVIDIA OpenShell: keys stay outside the sandboxes, nothing else is reachable, and fixes are graded offline - [TypeScript](./examples/openshell-coding-agents-js)
 
 ## Running the examples as a test suite
 

@@ -1,0 +1,28 @@
+# Provider profile for Claude Code in the openshell-workload-agents template.
+# Based on OpenShell's providers/claude-code.yaml (Apache-2.0). Changes: the id,
+# inference only (statsig.anthropic.com and sentry.io telemetry dropped, so those
+# requests are denied and logged), and only the binary E2B's `claude` template ships.
+# Scope: the binary below and the processes it starts may send the key to the whole
+# API host (read-write), not only the inference route. Use a project-scoped key.
+#   openshell provider profile import -f fleet-claude-code.yaml --global   (src/main.ts does this)
+id: fleet-claude-code
+display_name: Claude Code (fleet)
+description: Claude Code CLI, Anthropic API only
+category: agent
+inference_capable: true
+credentials:
+  - name: api_key
+    description: Anthropic API key used by Claude Code
+    env_vars: [ANTHROPIC_API_KEY]
+    required: true
+    auth_style: header
+    header_name: x-api-key
+discovery:
+  credentials: [api_key]
+endpoints:
+  - host: api.anthropic.com
+    port: 443
+    protocol: rest
+    access: read-write
+    enforcement: enforce
+binaries: [/usr/local/bin/claude]

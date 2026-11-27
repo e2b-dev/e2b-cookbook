@@ -1,0 +1,21 @@
+{
+  "name": "openshell-coding-agents-js",
+  "private": true,
+  "type": "module",
+  "description": "Two Claude Code workers and one Codex worker under NVIDIA OpenShell on E2B: injected keys, nothing else reachable, offline grading.",
+  "scripts": {
+    "start": "node --env-file=.env --experimental-transform-types src/main.ts",
+    "test": "node --experimental-transform-types --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "e2b": "2.51.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=22.18"
+  }
+}

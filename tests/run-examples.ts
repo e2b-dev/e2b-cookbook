@@ -238,6 +238,8 @@ const TIMEOUT_OVERRIDES: Record<string, number> = {
   // which shares the same budget.
   'langgraph-plan-and-execute-python': 600_000,
   'tailcat-e2b-python': 300_000,
+  // uv sync, then a Strands agent loop the example bounds at 300s.
+  'strands-agents-python': 600_000,
   // Node 22 install or uv sync, an E2B desktop and a model loop of up to 120s.
   'openai-computer-use-js': 300_000,
   'openai-computer-use-python': 300_000,

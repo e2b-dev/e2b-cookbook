@@ -1,0 +1,19 @@
+{
+  "name": "mcp-pkgdiet-guardrails-js",
+  "version": "1.0.0",
+  "description": "Using PkgDiet via MCP to guard an E2B Sandbox against malicious or bloated dependencies.",
+  "main": "index.ts",
+  "scripts": {
+    "start": "tsx index.ts"
+  },
+  "dependencies": {
+    "@e2b/code-interpreter": "^1.0.0",
+    "@modelcontextprotocol/sdk": "^0.6.0",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.2",
+    "@types/node": "^22.5.4"
+  }
+}
